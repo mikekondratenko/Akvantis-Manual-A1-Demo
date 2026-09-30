@@ -101,7 +101,7 @@ window.MANUAL_DATA = {
         "id": "cv-photo",
         "type": "photo",
         "page": "front",
-        "src": "assets/art/box/a1-unit.png",
+        "src": "assets/screen/a1-unit.webp",
         "x": -22,
         "y": 153,
         "scale": 1.0517
@@ -164,12 +164,12 @@ window.MANUAL_DATA = {
     {
       "id": "sp1",
       "mode": "image",
-      "image": "assets/art/spreads/spread-02-03.png"
+      "image": "assets/screen/spread-02-03.webp"
     },
     {
       "id": "sp2",
       "mode": "image",
-      "image": "assets/art/spreads/spread-04-05.png"
+      "image": "assets/screen/spread-04-05.webp"
     }
   ],
   "sections": [
@@ -186,7 +186,7 @@ window.MANUAL_DATA = {
           "label": "Main",
           "items": [
             {
-              "art": "assets/art/box/a1-unit.png",
+              "art": "assets/screen/a1-unit.webp",
               "name": "A1 unit",
               "count": "1x",
               "desc": "Filtration module"
@@ -356,7 +356,7 @@ window.MANUAL_DATA = {
         {
           "id": "b6",
           "type": "image",
-          "art": "assets/art/box/a1-unit.png",
+          "art": "assets/screen/a1-unit.webp",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 12,
@@ -521,7 +521,7 @@ window.MANUAL_DATA = {
         {
           "id": "b23",
           "type": "step",
-          "art": "assets/art/box/a1-unit.png",
+          "art": "assets/screen/a1-unit.webp",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 6

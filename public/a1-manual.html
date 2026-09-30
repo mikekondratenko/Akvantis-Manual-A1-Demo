@@ -248,7 +248,8 @@ html.no-flip .flip{transition:none}
 .turn-layer{position:absolute;inset:0;z-index:5;transform-style:preserve-3d;pointer-events:none}
 html.is-closed .sheet > .flip, html.is-closed .sheet > .fold{visibility:hidden}
 .sheet:has(.turn-layer){overflow:visible}
-.turn-leaf{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 50%}
+.turn-leaf{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 50%;will-change:transform}
+.turn-copy img{-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .turn-copy{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid!important}
 .turn-shade{position:absolute;top:0;bottom:0;width:50%;opacity:0;pointer-events:none;backface-visibility:hidden}
 .turn-shade.is-r{left:50%;background:linear-gradient(to right, rgba(0,0,0,.5), rgba(0,0,0,0) 70%)}
@@ -944,18 +945,30 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     layer.insertBefore(leaf, firstLeaf);
     if (typeof b === 'number') go({ side:'inner', spread:b }, false);
     var from = getComputedStyle(sheet).transform;
-    var t = { anims:[
+    /* Mobile flicker (2026-09-30): a copy's picture that is not decoded yet
+       paints blank for a frame or two. The leaf waits for its pictures (at most
+       a quarter second) and only then starts to move. */
+    var imgs = [].slice.call(leaf.querySelectorAll('img')).concat(underNear ? [].slice.call(underNear.querySelectorAll('img')) : []);
+    leaf.style.visibility = 'hidden';
+    var t = { anims:[] };
+    turns.push(t);
+    var started = false;
+    function go2(){
+      if (started || turns.indexOf(t) < 0) return; started = true;
+      leaf.style.visibility = '';
+      t.anims.push(
       leaf.animate([{ transform:'rotateY(0deg)' }, { transform:'rotateY(' + (fwd ? -180 : 180) + 'deg)' }], { duration:DUR, easing:EASE, fill:'forwards' }),
-      shade.animate([{ opacity:0 }, { opacity:.35, offset:.5 }, { opacity:0 }], { duration:DUR, fill:'forwards' })
-    ] };
+      shade.animate([{ opacity:0 }, { opacity:.35, offset:.5 }, { opacity:0 }], { duration:DUR, fill:'forwards' }));
+      t.anims[0].onfinish = function(){
+        turns.splice(turns.indexOf(t), 1);
+        if (!turns.length){ underNear = null; rest(cur); }
+      };
+    }
+    Promise.all(imgs.map(function(i){ return i.decode ? i.decode().catch(function(){}) : null; })).then(go2);
+    setTimeout(go2, 250);
     sheet.getAnimations().forEach(function(x){ x.cancel(); });
     sheet.style.transform = 'translateX(' + shiftOf(b) + ')';
     sheet.animate([{ transform:from === 'none' ? 'translateX(0)' : from }, { transform:'translateX(' + shiftOf(b) + ')' }], { duration:DUR, easing:EASE });
-    turns.push(t);
-    t.anims[0].onfinish = function(){
-      turns.splice(turns.indexOf(t), 1);
-      if (!turns.length){ underNear = null; rest(cur); }
-    };
   }
   /* the states in reading order; a jump of several is turned page by page */
   function walk(a, b){
@@ -1004,6 +1017,8 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
       if (embedded) try { window.parent.postMessage({ type:'a1-overflow', pages:over }, '*'); } catch (err) {}
     });
     if (el.classList.contains('capture')) capture();
+    /* decode the pages' pictures up front, so the first turn has them ready */
+    if (TURN) sheet.querySelectorAll('img').forEach(function(i){ if (i.decode) i.decode().catch(function(){}); });
   }
 
   /* Page numbers from the spread's place in the booklet, not from markup:
