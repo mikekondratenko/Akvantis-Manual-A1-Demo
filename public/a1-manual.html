@@ -901,13 +901,26 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
   function clearLayer(){ if (anim){ anim.forEach(function(x){ x.cancel(); }); anim = null; } if (layer){ layer.remove(); layer = null; } }
   function add(parent, node){ if (node) parent.appendChild(node); return node; }
   /* a state shown at rest */
+  /* Flicker fix (2026-09-30): a fresh copy's pictures can paint blank for a
+     frame on phones, so the old layer stays on top until the new one's
+     pictures are decoded (at most a quarter second). */
+  function swapOut(old, nu){
+    old.style.zIndex = 6;
+    var imgs = [].slice.call(nu.querySelectorAll('img')), done = false;
+    function gone(){ if (done) return; done = true; old.remove(); }
+    Promise.all(imgs.map(function(i){ return i.decode ? i.decode().catch(function(){}) : null; })).then(function(){ requestAnimationFrame(gone); });
+    setTimeout(gone, 250);
+  }
   function rest(s){
-    clearLayer();
+    if (anim){ anim.forEach(function(x){ x.cancel(); }); anim = null; }
+    var old = layer; layer = null;
+    if (old && s !== 'L' && s !== 'R'){ old.remove(); old = null; }
     if (s === 'L' || s === 'R'){
       el.classList.add('is-closed');
       layer = document.createElement('div'); layer.className = 'turn-layer';
       add(layer, copy(s, s === 'L' ? 'r' : 'l'));
       sheet.appendChild(layer);
+      if (old) swapOut(old, layer);
     } else {
       el.classList.remove('is-closed');
       go({ side:'inner', spread:s }, false);
@@ -925,12 +938,13 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
   function turnTo(a, b){
     var fwd = ordOf(b) > ordOf(a);
     if (turns.length && fwd !== turnFwd){ turns.forEach(function(t){ t.anims.forEach(function(x){ x.cancel(); }); }); turns = []; rest(a); }
+    var oldLayer = null, freshLayer = false;
     if (!turns.length){
-      clearLayer();
+      oldLayer = layer; layer = null;
       layer = document.createElement('div'); layer.className = 'turn-layer';
       add(layer, copy(a, fwd ? 'l' : 'r'));                  /* the far half — the old one, where the leaves land: stays until they do */
-      el.classList.add('is-closed');                           /* the real sheet hides while the copies move */
       sheet.appendChild(layer);
+      freshLayer = true;                                       /* the real sheet hides only once the copies are decoded */
     } else if (underNear){ underNear.remove(); }
     turnFwd = fwd;
     /* the near half under the new leaf: the target's */
@@ -943,12 +957,11 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     /* under the leaves already turning, above the under-halves */
     var firstLeaf = layer.querySelector('.turn-leaf');
     layer.insertBefore(leaf, firstLeaf);
-    if (typeof b === 'number') go({ side:'inner', spread:b }, false);
     var from = getComputedStyle(sheet).transform;
     /* Mobile flicker (2026-09-30): a copy's picture that is not decoded yet
        paints blank for a frame or two. The leaf waits for its pictures (at most
        a quarter second) and only then starts to move. */
-    var imgs = [].slice.call(leaf.querySelectorAll('img')).concat(underNear ? [].slice.call(underNear.querySelectorAll('img')) : []);
+    var imgs = [].slice.call((freshLayer ? layer : leaf).querySelectorAll('img')).concat(underNear ? [].slice.call(underNear.querySelectorAll('img')) : []);
     leaf.style.visibility = 'hidden';
     var t = { anims:[] };
     turns.push(t);
@@ -956,6 +969,8 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     function go2(){
       if (started || turns.indexOf(t) < 0) return; started = true;
       leaf.style.visibility = '';
+      if (freshLayer){ el.classList.add('is-closed'); if (oldLayer) oldLayer.remove(); }
+      if (typeof b === 'number') go({ side:'inner', spread:b }, false);
       t.anims.push(
       leaf.animate([{ transform:'rotateY(0deg)' }, { transform:'rotateY(' + (fwd ? -180 : 180) + 'deg)' }], { duration:DUR, easing:EASE, fill:'forwards' }),
       shade.animate([{ opacity:0 }, { opacity:.35, offset:.5 }, { opacity:0 }], { duration:DUR, fill:'forwards' }));
