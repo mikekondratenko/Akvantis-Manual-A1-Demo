@@ -245,7 +245,7 @@ html.is-static .flip{transition:none}
    документ оставляет для того случая, когда его открыли самого по себе. */
 html.no-flip .flip{transition:none}
 /* page turn (?turn=1): copies of the old/new spread over the real sheet */
-.turn-layer{position:absolute;inset:0;z-index:5;transform-style:preserve-3d;pointer-events:none}
+.turn-layer{position:absolute;inset:0;z-index:5;transform-style:flat;perspective:1400mm;pointer-events:none}
 html.is-closed .sheet > .flip, html.is-closed .sheet > .fold{visibility:hidden}
 .sheet:has(.turn-layer){overflow:visible}
 .turn-leaf{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 50%;will-change:transform}
@@ -840,7 +840,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     if (!animate) el.classList.add('is-static');
     spread = k;
     sheet.dataset.spread = k;
-    sheet.querySelectorAll('.side-inner').forEach(function(sd){
+    sheet.querySelectorAll('.side-inner:not(.turn-copy)').forEach(function(sd){
       sd.classList.toggle('is-on', +sd.dataset.spread === k);
     });
     sheet.dataset.side = v.side;
@@ -962,7 +962,6 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
        paints blank for a frame or two. The leaf waits for its pictures (at most
        a quarter second) and only then starts to move. */
     var imgs = [].slice.call((freshLayer ? layer : leaf).querySelectorAll('img')).concat(underNear ? [].slice.call(underNear.querySelectorAll('img')) : []);
-    leaf.style.visibility = 'hidden';
     var t = { anims:[] };
     turns.push(t);
     var started = false;
@@ -979,8 +978,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
         if (!turns.length){ underNear = null; rest(cur); }
       };
     }
-    Promise.all(imgs.map(function(i){ return i.decode ? i.decode().catch(function(){}) : null; })).then(go2);
-    setTimeout(go2, 250);
+    go2();
     sheet.getAnimations().forEach(function(x){ x.cancel(); });
     sheet.style.transform = 'translateX(' + shiftOf(b) + ')';
     sheet.animate([{ transform:from === 'none' ? 'translateX(0)' : from }, { transform:'translateX(' + shiftOf(b) + ')' }], { duration:DUR, easing:EASE });
