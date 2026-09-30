@@ -33,5 +33,5 @@ and `assets/uploads` from `../Manual/public`.
 
 ## Deploy
 
-Its own Cloudflare worker, `akvantis-a1-manual-guide-demo` (see `wrangler.jsonc` and the
+Its own Cloudflare worker, `akvantis-manual-a1-demo` (see `wrangler.jsonc` and the
 root `DEPLOY.md`).

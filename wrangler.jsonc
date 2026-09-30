@@ -2,7 +2,7 @@
   "$schema": "https://unpkg.com/wrangler/config-schema.json",
 
   // Brand-prefixed, like every worker in this folder — see DEPLOY.md at the root.
-  "name": "akvantis-a1-manual-guide-demo",
+  "name": "akvantis-manual-a1-demo",
 
   "compatibility_date": "2026-09-30",
   "assets": {
