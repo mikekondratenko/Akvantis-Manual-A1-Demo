@@ -115,13 +115,13 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
      turn (0.9 s), so opening grows the booklet instead of jumping. */
   function fit(){
     var phone = innerWidth < 768;
-    /* Above 1440 only the booklet grows (2026-09-30): its size at 1440 times
-       width / 1440; the chrome (brand, mark) stays as it is. Capped so it
-       never leaves the screen top to bottom. */
+    /* Desktop and up (2026-09-30): the booklet is always 80% of the viewport
+       height — narrowed only if the window is too narrow for it. */
     var padX = phone ? 32 : 96, padY = phone ? 176 : 192;
     var w = state.at === 0 ? W / 2 : W;
-    var k = Math.min((Math.min(innerWidth, 1440) - padX) / w, (innerHeight - padY) / H);
-    if (innerWidth > 1440) k = Math.min(k * innerWidth / 1440, (innerHeight - 48) / H);
+    var k = innerWidth >= 1024
+      ? Math.min(innerHeight * .8 / H, (innerWidth - padX) / w)
+      : Math.min((innerWidth - padX) / w, (innerHeight - padY) / H);
     var f = $('frame');
     f.style.width = W + 'px'; f.style.height = H + 'px';
     f.style.transform = 'scale(' + k.toFixed(3) + ')';
