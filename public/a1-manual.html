@@ -913,26 +913,57 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     }
     sheet.style.transform = 'translateX(' + shiftOf(s) + ')';
   }
+  /* Several turns can be in the air at once (2026-09-30): a click while a page
+     is still moving lifts the next page right away, under the one already
+     turning, like riffling through a booklet. They share one layer: the half
+     that stays put at the far side, the newest target's half at the near
+     side, and the leaves in between. A turn the other way while pages are
+     moving lets them land first (instantly) and starts from there. */
+  var turns = [], turnFwd = null, underNear = null, DUR = 900;
+  var EASE = 'cubic-bezier(.45,.05,.25,1)';
   function turnTo(a, b){
-    clearLayer();
-    var fwd = ordOf(b) > ordOf(a), dur = 900;
-    layer = document.createElement('div'); layer.className = 'turn-layer';
-    add(layer, copy(fwd ? a : b, 'l'));
-    add(layer, copy(fwd ? b : a, 'r'));
-    var leaf = add(layer, document.createElement('div')); leaf.className = 'turn-leaf';
+    var fwd = ordOf(b) > ordOf(a);
+    if (turns.length && fwd !== turnFwd){ turns.forEach(function(t){ t.anims.forEach(function(x){ x.cancel(); }); }); turns = []; rest(a); }
+    if (!turns.length){
+      clearLayer();
+      layer = document.createElement('div'); layer.className = 'turn-layer';
+      add(layer, copy(a, fwd ? 'l' : 'r'));                  /* the far half — the old one, where the leaves land: stays until they do */
+      el.classList.add('is-closed');                           /* the real sheet hides while the copies move */
+      sheet.appendChild(layer);
+    } else if (underNear){ underNear.remove(); }
+    turnFwd = fwd;
+    /* the near half under the new leaf: the target's */
+    underNear = copy(b, fwd ? 'r' : 'l');
+    if (underNear) layer.insertBefore(underNear, layer.children[1] || null);
+    var leaf = document.createElement('div'); leaf.className = 'turn-leaf';
     add(leaf, copy(a, fwd ? 'r' : 'l'));
     add(leaf, copy(b, fwd ? 'l' : 'r', true));
     var shade = add(leaf, document.createElement('div')); shade.className = 'turn-shade ' + (fwd ? 'is-r' : 'is-l');
-    el.classList.add('is-closed');            /* the real sheet hides while the copies move */
+    /* under the leaves already turning, above the under-halves */
+    var firstLeaf = layer.querySelector('.turn-leaf');
+    layer.insertBefore(leaf, firstLeaf);
     if (typeof b === 'number') go({ side:'inner', spread:b }, false);
-    sheet.appendChild(layer);
-    var ease = 'cubic-bezier(.45,.05,.25,1)';
-    anim = [
-      leaf.animate([{ transform:'rotateY(0deg)' }, { transform:'rotateY(' + (fwd ? -180 : 180) + 'deg)' }], { duration:dur, easing:ease, fill:'forwards' }),
-      shade.animate([{ opacity:0 }, { opacity:.35, offset:.5 }, { opacity:0 }], { duration:dur, fill:'forwards' }),
-      sheet.animate([{ transform:'translateX(' + shiftOf(a) + ')' }, { transform:'translateX(' + shiftOf(b) + ')' }], { duration:dur, easing:ease, fill:'forwards' })
-    ];
-    anim[0].onfinish = function(){ rest(b); };
+    var from = getComputedStyle(sheet).transform;
+    var t = { anims:[
+      leaf.animate([{ transform:'rotateY(0deg)' }, { transform:'rotateY(' + (fwd ? -180 : 180) + 'deg)' }], { duration:DUR, easing:EASE, fill:'forwards' }),
+      shade.animate([{ opacity:0 }, { opacity:.35, offset:.5 }, { opacity:0 }], { duration:DUR, fill:'forwards' })
+    ] };
+    sheet.getAnimations().forEach(function(x){ x.cancel(); });
+    sheet.style.transform = 'translateX(' + shiftOf(b) + ')';
+    sheet.animate([{ transform:from === 'none' ? 'translateX(0)' : from }, { transform:'translateX(' + shiftOf(b) + ')' }], { duration:DUR, easing:EASE });
+    turns.push(t);
+    t.anims[0].onfinish = function(){
+      turns.splice(turns.indexOf(t), 1);
+      if (!turns.length){ underNear = null; rest(cur); }
+    };
+  }
+  /* the states in reading order; a jump of several is turned page by page */
+  function walk(a, b){
+    var seq = ['L']; for (var k = 1; k <= SPREADS; k++) seq.push(k); seq.push('R');
+    var i = seq.indexOf(a), j = seq.indexOf(b), out = [];
+    if (i < 0 || j < 0) return [b];
+    while (i !== j){ i += j > i ? 1 : -1; out.push(seq[i]); }
+    return out;
   }
   addEventListener('hashchange', function(){
     var v = parse(location.hash);
@@ -940,8 +971,12 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     var s = stateOf(v);
     if (s === cur) return;
     var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var from = cur; cur = s;
-    if (from === null || reduce || !Element.prototype.animate) rest(s); else turnTo(from, s);
+    var from = cur;
+    if (from === null || reduce || !Element.prototype.animate){ cur = s; rest(s); return; }
+    walk(from, s).forEach(function(st, i){
+      var prev = i ? walk(from, s)[i - 1] : from;
+      cur = st; turnTo(prev, st);
+    });
   });
 
   /* ── AFTER EVERY RENDER ── */
