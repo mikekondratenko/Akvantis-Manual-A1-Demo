@@ -248,10 +248,10 @@ html.no-flip .flip{transition:none}
 .turn-layer{position:absolute;inset:0;z-index:5;transform-style:flat;perspective:1400mm;pointer-events:none}
 html.is-closed .sheet > .flip, html.is-closed .sheet > .fold{visibility:hidden}
 .sheet:has(.turn-layer){overflow:visible}
-.turn-leaf{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 50%;will-change:transform}
-.turn-copy img{-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.turn-leaf{position:absolute;inset:0;transform-style:flat;transform-origin:50% 50%;will-change:transform}
+.turn-copy img{-webkit-backface-visibility:visible;backface-visibility:visible}
+.turn-leaf > .turn-copy{-webkit-backface-visibility:visible!important;backface-visibility:visible!important}
 .turn-copy{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid!important}
-.turn-dusk{position:absolute;inset:0;background:linear-gradient(var(--paper),var(--paper)),var(--paper);box-shadow:inset 0 0 0 100vmax rgba(0,0,0,.06);opacity:1;pointer-events:none;z-index:2}
 .turn-shade{position:absolute;top:0;bottom:0;width:50%;opacity:0;pointer-events:none;backface-visibility:hidden}
 .turn-shade.is-r{left:50%;background:linear-gradient(to right, rgba(0,0,0,.5), rgba(0,0,0,0) 70%)}
 .turn-shade.is-l{left:0;background:linear-gradient(to left, rgba(0,0,0,.5), rgba(0,0,0,0) 70%)}
@@ -951,10 +951,6 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     /* the near half under the new leaf: the target's */
     underNear = copy(b, fwd ? 'r' : 'l');
     if (underNear) layer.insertBefore(underNear, layer.children[1] || null);
-    /* The page under a lifting leaf lies in its shadow (2026-09-30): it shows
-       dark at first and comes to light as the leaf lands. */
-    var dusk = null;
-    if (underNear){ dusk = document.createElement('div'); dusk.className = 'turn-dusk'; underNear.appendChild(dusk); }
     var leaf = document.createElement('div'); leaf.className = 'turn-leaf';
     add(leaf, copy(a, fwd ? 'r' : 'l'));
     add(leaf, copy(b, fwd ? 'l' : 'r', true));
@@ -978,7 +974,14 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
       t.anims.push(
       leaf.animate([{ transform:'rotateY(0deg)' }, { transform:'rotateY(' + (fwd ? -180 : 180) + 'deg)' }], { duration:DUR, easing:EASE, fill:'forwards' }),
       shade.animate([{ opacity:0 }, { opacity:.35, offset:.5 }, { opacity:0 }], { duration:DUR, fill:'forwards' }));
-      if (dusk) t.anims.push(dusk.animate([{ opacity:1 }, { opacity:1, offset:.45 }, { opacity:0 }], { duration:DUR, easing:EASE, fill:'forwards' }));
+      /* Faces swap at the half-turn by opacity, not by backface-visibility,
+         which some browsers ignore inside a scaled frame (2026-09-30): the
+         old page stayed put or the new one showed too early. */
+      var faces = leaf.querySelectorAll(':scope > .turn-copy');
+      var half = [{ opacity:1 }, { opacity:1, offset:.5 }, { opacity:0, offset:.5 }, { opacity:0 }];
+      var half2 = [{ opacity:0 }, { opacity:0, offset:.5 }, { opacity:1, offset:.5 }, { opacity:1 }];
+      if (faces.length === 2){ t.anims.push(faces[0].animate(half, { duration:DUR, easing:EASE, fill:'forwards' }), faces[1].animate(half2, { duration:DUR, easing:EASE, fill:'forwards' })); }
+      else if (faces.length === 1){ var back = faces[0].style.transform.indexOf('180') >= 0; t.anims.push(faces[0].animate(back ? half2 : half, { duration:DUR, easing:EASE, fill:'forwards' })); }
       t.anims[0].onfinish = function(){
         turns.splice(turns.indexOf(t), 1);
         if (!turns.length){ underNear = null; rest(cur); }
