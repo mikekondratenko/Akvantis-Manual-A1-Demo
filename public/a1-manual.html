@@ -251,6 +251,7 @@ html.is-closed .sheet > .flip, html.is-closed .sheet > .fold{visibility:hidden}
 .turn-leaf{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 50%;will-change:transform}
 .turn-copy img{-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .turn-copy{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid!important}
+.turn-dusk{position:absolute;inset:0;background:linear-gradient(var(--paper),var(--paper)),var(--paper);box-shadow:inset 0 0 0 100vmax rgba(0,0,0,.06);opacity:1;pointer-events:none;z-index:2}
 .turn-shade{position:absolute;top:0;bottom:0;width:50%;opacity:0;pointer-events:none;backface-visibility:hidden}
 .turn-shade.is-r{left:50%;background:linear-gradient(to right, rgba(0,0,0,.5), rgba(0,0,0,0) 70%)}
 .turn-shade.is-l{left:0;background:linear-gradient(to left, rgba(0,0,0,.5), rgba(0,0,0,0) 70%)}
@@ -950,6 +951,10 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     /* the near half under the new leaf: the target's */
     underNear = copy(b, fwd ? 'r' : 'l');
     if (underNear) layer.insertBefore(underNear, layer.children[1] || null);
+    /* The page under a lifting leaf lies in its shadow (2026-09-30): it shows
+       dark at first and comes to light as the leaf lands. */
+    var dusk = null;
+    if (underNear){ dusk = document.createElement('div'); dusk.className = 'turn-dusk'; underNear.appendChild(dusk); }
     var leaf = document.createElement('div'); leaf.className = 'turn-leaf';
     add(leaf, copy(a, fwd ? 'r' : 'l'));
     add(leaf, copy(b, fwd ? 'l' : 'r', true));
@@ -973,6 +978,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
       t.anims.push(
       leaf.animate([{ transform:'rotateY(0deg)' }, { transform:'rotateY(' + (fwd ? -180 : 180) + 'deg)' }], { duration:DUR, easing:EASE, fill:'forwards' }),
       shade.animate([{ opacity:0 }, { opacity:.35, offset:.5 }, { opacity:0 }], { duration:DUR, fill:'forwards' }));
+      if (dusk) t.anims.push(dusk.animate([{ opacity:1 }, { opacity:1, offset:.45 }, { opacity:0 }], { duration:DUR, easing:EASE, fill:'forwards' }));
       t.anims[0].onfinish = function(){
         turns.splice(turns.indexOf(t), 1);
         if (!turns.length){ underNear = null; rest(cur); }
