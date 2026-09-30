@@ -29,7 +29,7 @@ html,body,*{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-colo
 .frame iframe{-webkit-user-select:none;user-select:none}
 html,body{margin:0;height:100%;overflow:hidden}
 body{background:var(--black);color:var(--white);font-family:var(--font-primary);color-scheme:dark;-webkit-font-smoothing:antialiased}
-.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;touch-action:none}
 .frame{position:relative;flex:none;transform-origin:center center}
 /* the scale eases with a turn, but not on load or on resize */
 .frame.is-easing{transition:transform .9s cubic-bezier(.45,.05,.25,1)}
@@ -127,19 +127,34 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
     if (state.at === 0) return state.back ? (u >= .25 && u < .5 ? -1 : 0) : (u > .5 && u <= .75 ? 1 : 0);
     return u < .25 ? -1 : u > .75 ? 1 : 0;
   }
-  $('stage').addEventListener('click', function(e){ var d = edgeAt(e); if (d) step(d); });
+  $('stage').addEventListener('click', function(e){ if (performance.now() - swiped < 400) return; var d = edgeAt(e); if (d) step(d); });
   $('stage').addEventListener('mousemove', function(e){ $('stage').classList.toggle('is-edge', !!edgeAt(e)); });
   addEventListener('keydown', function(e){
     if (e.key === 'ArrowRight'){ e.preventDefault(); step(1); }
     else if (e.key === 'ArrowLeft'){ e.preventDefault(); step(-1); }
   });
-  /* swipe on touch screens */
-  var sx = null;
-  $('stage').addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, { passive:true });
+  /* Swipe on touch screens (2026-09-30): right to left turns forward, left
+     to right turns back — the way a page is turned by hand. Horizontal only:
+     a swipe that is mostly vertical is ignored, so a thumb resting on the
+     screen does not turn anything. A quick short flick counts too (speed),
+     and swipes in a row riffle, like quick clicks. The tap that ends a swipe
+     is not also taken as a click on a page edge. */
+  var sw = null, swiped = 0;
+  $('stage').addEventListener('touchstart', function(e){
+    if (e.touches.length !== 1){ sw = null; return; }
+    sw = { x:e.touches[0].clientX, y:e.touches[0].clientY, t:performance.now() };
+  }, { passive:true });
   $('stage').addEventListener('touchend', function(e){
-    if (sx === null) return; var dx = e.changedTouches[0].clientX - sx; sx = null;
-    if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
+    if (!sw) return;
+    var dx = e.changedTouches[0].clientX - sw.x, dy = e.changedTouches[0].clientY - sw.y;
+    var dt = performance.now() - sw.t; sw = null;
+    var fast = Math.abs(dx) / Math.max(dt, 1) > .35;
+    if (Math.abs(dx) > Math.abs(dy) * 1.2 && (Math.abs(dx) > 40 || (fast && Math.abs(dx) > 16))){
+      swiped = performance.now();
+      step(dx < 0 ? 1 : -1);
+    }
   });
+  $('stage').addEventListener('touchcancel', function(){ sw = null; });
   addEventListener('resize', fit);
   fit(); paint();
 }());
