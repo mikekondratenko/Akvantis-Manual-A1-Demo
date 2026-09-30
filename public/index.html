@@ -83,7 +83,11 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
 
   function hash(){ return state.at ? 'inner-' + state.at : (state.back ? 'back' : 'front'); }
   function paint(){
-    var base = 'a1-manual.html?media=sheet&flip=0&turn=1&bleed=1';
+    /* Cloudflare serves `a1-manual.html` at `/a1-manual` (307). The frame must be
+       asked for by its final address, or every turn — which changes only the
+       fragment — would reload it through the redirect and lose the animation.
+       Opened from disk there is no server, so the file name. */
+    var base = (location.protocol === 'file:' ? 'a1-manual.html' : 'a1-manual') + '?media=sheet&flip=0&turn=1&bleed=1';
     /* only the fragment changes: the frame does not reload, the document turns */
     var el = $('doc'), next = base + '#' + hash();
     if (el.getAttribute('src') !== next) el.setAttribute('src', next);
