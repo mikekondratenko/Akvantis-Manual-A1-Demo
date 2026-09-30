@@ -23,39 +23,53 @@
    around the sheet so a lifted page is not cut). Data: assets/manual-data.js.
    ───────────────────────────────────────────────────────────────────────────── */
 *{box-sizing:border-box}
+/* nothing on the page is text to copy: no selection, no highlight on a double click */
+html,body,*{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+::selection{background:transparent}
+.frame iframe{-webkit-user-select:none;user-select:none}
 html,body{margin:0;height:100%;overflow:hidden}
 body{background:var(--black);color:var(--white);font-family:var(--font-primary);color-scheme:dark;-webkit-font-smoothing:antialiased}
 .stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-.frame{position:relative;flex:none;transform-origin:center center}
+.frame{position:relative;flex:none;transform-origin:center center;transition:transform .9s cubic-bezier(.45,.05,.25,1)}
+@media (prefers-reduced-motion:reduce){ .frame{transition:none} }
 .frame iframe{position:absolute;left:-105mm;top:-74.25mm;width:calc(100% + 210mm);height:calc(100% + 148.5mm);
   border:0;background:transparent;pointer-events:none;color-scheme:dark}
 .stage.is-edge{cursor:pointer}
 /* the product mark, top right */
 .mark{position:fixed;top:calc(var(--space-24) + env(safe-area-inset-top));right:var(--space-24);z-index:2;color:var(--white);pointer-events:none}
 .mark svg{height:var(--space-24);width:auto;display:block}
-/* page counter + hint, bottom centre */
-.foot{position:fixed;left:0;right:0;bottom:calc(var(--space-24) + env(safe-area-inset-bottom));z-index:2;
-  display:flex;justify-content:center;gap:var(--space-16);align-items:center;font-size:var(--text-12);color:var(--black-250)}
-.foot button{font:inherit;color:var(--white);background:var(--white-08);border:0;border-radius:9999px;
-  width:var(--space-32);height:var(--space-32);display:flex;align-items:center;justify-content:center;cursor:pointer}
-.foot button:hover{background:var(--white-14)}
-.foot button:disabled{opacity:.3;cursor:default}
-.foot .where{min-width:var(--space-96);text-align:center;font-variant-numeric:tabular-nums}
+/* brand, top left — as the Manual's rail header: the Akvantis mark and the title */
+.brand{position:fixed;top:calc(var(--space-24) + env(safe-area-inset-top));left:var(--space-24);z-index:2;
+  display:flex;align-items:center;gap:var(--space-12);color:var(--white);font-size:var(--text-16);font-weight:600}
+.brand-mark{width:var(--space-24);height:var(--space-24);display:block}
+/* turn arrows at the viewport's left and right edges */
+.nav{position:fixed;top:50%;transform:translateY(-50%);z-index:2;width:var(--space-48);height:var(--space-48);
+  border:0;border-radius:9999px;background:var(--white-08);color:var(--white);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:background .15s,opacity .15s}
+.nav:hover{background:var(--white-14)}
+.nav:disabled{opacity:0;pointer-events:none}
+.nav.prev{left:var(--space-24)} .nav.next{right:var(--space-24)}
+/* phone: the arrows go to the bottom corners, under the thumb; the chrome shrinks */
+@media (max-width:767px){
+  .nav{top:auto;bottom:calc(var(--space-24) + env(safe-area-inset-bottom));transform:none;width:var(--space-56);height:var(--space-56)}
+  .nav.prev{left:var(--space-16)} .nav.next{right:var(--space-16)}
+  .brand{left:var(--space-16);font-size:var(--text-14)}
+  .mark{right:var(--space-16)}
+  .mark svg{height:var(--space-16)}
+}
 </style>
 </head>
 <body>
 <h1 style="position:absolute;left:-9999px">Akvantis A1 — Manual Guide</h1>
+<div class="brand"><svg class="brand-mark" width="24" height="24" viewBox="0 0 48.05 48.37" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24.0209 0.146484C10.777 0.146484 0 10.9305 0 24.1831C0 37.4356 10.777 48.2196 24.0209 48.2196C37.2649 48.2196 48.0418 37.4356 48.0418 24.1831C48.0418 10.9305 37.2694 0.146484 24.0209 0.146484ZM24.0209 45.1933C12.4445 45.1933 3.02432 35.7671 3.02432 24.1831C3.02432 12.5991 12.4445 3.17277 24.0209 3.17277C35.5974 3.17277 45.0175 12.5991 45.0175 24.1831C45.0175 35.7671 35.5974 45.1933 24.0209 45.1933Z"/><path d="M18.6985 21.7971C20.7543 21.5777 22.7324 21.8199 25.0258 22.6337C29.1968 24.1285 33.3587 23.6119 36.6891 21.6508L35.1632 15.8679C32.9658 16.8965 30.7957 17.3262 28.5572 17.2531C26.1405 17.1754 24.6375 16.3799 22.6411 15.8725C21.2385 15.5159 19.8223 15.4199 18.3102 15.5434C15.7655 15.7537 13.463 16.5811 11.3524 18.1034L12.8828 23.8817C14.7788 22.6977 16.4874 22.0302 18.7031 21.7925L18.6985 21.7971Z"/><path d="M28.5617 26.2453C26.145 26.1676 24.6419 25.3721 22.6455 24.8647C21.243 24.5081 19.8268 24.4121 18.3146 24.5356C15.77 24.7459 13.4675 25.5733 11.3569 27.0956L12.8873 32.8738C14.7832 31.6898 16.4918 31.0224 18.7075 30.7847C20.7633 30.5653 22.7415 30.8076 25.0348 31.6213C29.2058 33.1161 33.3677 32.5996 36.6981 30.6384L35.1722 24.8556C32.9748 25.8841 30.8048 26.3139 28.5662 26.2407L28.5617 26.2453Z"/></svg><span>Manual Guide</span></div>
 <div class="mark" aria-hidden="true"><svg viewBox="0 0 60 32" fill="currentColor" aria-hidden="true"><g clip-path="url(#dv-a1)"><path d="M58.3899 31.9991H53.6672C53.2877 31.9991 52.9802 31.6853 52.9802 31.2978V11.0141C52.9802 10.6222 52.666 10.3075 52.2821 10.3136C51.0791 10.3321 49.8667 10.3356 48.6439 10.3233C47.4169 10.311 46.2001 10.304 44.9928 10.3022C44.6142 10.3022 44.3076 9.98838 44.3076 9.60088V6.09052C44.3076 5.7223 44.5867 5.41633 44.9473 5.3909L46.7978 5.26027C48.4293 5.14367 49.6743 4.95342 50.533 4.69041C51.3917 4.4274 52.1216 3.9531 52.7226 3.26575C53.2636 2.64767 53.7926 1.70433 54.3103 0.434849C54.4177 0.171836 54.6675 0 54.9458 0H58.3899C58.7694 0 59.0768 0.313863 59.0768 0.70137V31.2986C59.0768 31.6861 58.7694 32 58.3899 32V31.9991Z"/><path d="M29.7047 0.376889C29.585 0.144889 29.3507 0 29.0967 0H16.4405C16.1856 0 15.9523 0.144889 15.8326 0.376889L0.0814639 30.9547C-0.162239 31.4284 0.170161 32 0.689429 32H6.05175C6.3075 32 6.5426 31.8533 6.66143 31.6196L11.272 22.5538C11.5269 22.0533 12.2184 22.0444 12.4845 22.5387L13.9355 25.2338C14.0569 25.4596 14.2877 25.5991 14.5374 25.5991H30.9499C31.2005 25.5991 31.4304 25.4587 31.5518 25.2338L33.0287 22.4907C33.2948 21.9964 33.9863 22.0044 34.2412 22.5058L38.8767 31.6196C38.9955 31.8533 39.2306 32 39.4864 32H44.8487C45.3679 32 45.7012 31.4284 45.4566 30.9547L29.7047 0.376889ZM13.101 18.9582L22.0879 1.288C22.2067 1.05422 22.4418 0.907556 22.6976 0.907556H22.8388C23.0946 0.907556 23.3297 1.05422 23.4485 1.288L32.4353 18.9582C32.6765 19.432 32.3432 20 31.8257 20H13.7107C13.1923 20 12.8599 19.432 13.101 18.9582Z"/></g><defs><clipPath id="dv-a1"><rect width="59.0769" height="32" fill="white"/></clipPath></defs></svg></div>
 
 <div class="stage" id="stage">
   <div class="frame" id="frame"><iframe id="doc" title="A1 Manual Guide — the printed booklet" tabindex="-1"></iframe></div>
 </div>
 
-<div class="foot">
-  <button type="button" id="prev" aria-label="Previous page"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg></button>
-  <span class="where" id="where" aria-live="polite"></span>
-  <button type="button" id="next" aria-label="Next page"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg></button>
-</div>
+<button type="button" class="nav prev" id="prev" aria-label="Previous page"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg></button>
+<button type="button" class="nav next" id="next" aria-label="Next page"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg></button>
 
 <script src="assets/manual-data.js"></script>
 <script>
@@ -80,9 +94,6 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
     /* only the fragment changes: the frame does not reload, the document turns */
     var el = $('doc'), next = base + '#' + hash();
     if (el.getAttribute('src') !== next) el.setAttribute('src', next);
-    var pages = 2 * N + 2;
-    $('where').textContent = state.at ? (2 * state.at) + '–' + (2 * state.at + 1) + ' / ' + pages
-                                      : (state.back ? pages + ' / ' + pages : '1 / ' + pages);
     $('prev').disabled = state.at === 0 && !state.back;
     $('next').disabled = state.at === 0 && state.back;
   }
@@ -97,11 +108,19 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
       else if (n > N){ state.at = 0; state.back = true; }
       else state.at = n;
     }
-    paint();
+    paint(); fit();
   }
 
+  /* Fit, recomputed on every resize and on every open/close: the booklet fills
+     the space between the chrome at any size (it scales up past 1440 too).
+     A closed booklet is one page wide, so it is fitted as one page — on a
+     phone that is what makes the cover readable. The scale eases with the
+     turn (0.9 s), so opening grows the booklet instead of jumping. */
   function fit(){
-    var k = Math.min(innerWidth * .86 / W, (innerHeight - 160) / H);
+    var phone = innerWidth < 768;
+    var padX = phone ? 32 : 176, padY = phone ? 176 : 192;
+    var w = state.at === 0 ? W / 2 : W;
+    var k = Math.min((innerWidth - padX) / w, (innerHeight - padY) / H);
     var f = $('frame');
     f.style.width = W + 'px'; f.style.height = H + 'px';
     f.style.transform = 'scale(' + k.toFixed(3) + ')';

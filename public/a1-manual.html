@@ -199,6 +199,10 @@ html.bleed, html.bleed body{background:transparent!important}
 /* the tool is color-scheme dark; a frame whose scheme differs gets an opaque
    white backdrop from the browser, so the bleeding frame matches it */
 html.bleed{color-scheme:dark}
+/* shown inside a viewer: the sheet cannot be selected or highlighted */
+html.bleed, html.bleed *{-webkit-user-select:none;user-select:none}
+html.bleed ::selection{background:transparent}
+html.bleed img{-webkit-user-drag:none}
 html.bleed .stage{padding:74.25mm 105mm}
 
 /* ═══════════════ THE SHEET ═══════════════
