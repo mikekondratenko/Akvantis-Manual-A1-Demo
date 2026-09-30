@@ -1,0 +1,181 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tools UI Kit — the top bar.
+
+   A navigation pill floating over a scrolling page: brand mark on the left, whatever the
+   page puts in the middle, one control on the right. Written first for the product
+   matrix, moved into the kit the day a fifteenth category stopped fitting, and moved out
+   of `kit.css` into its own file on 2026-09-10 — same reason as `panel.css` and
+   `swatch.css`: the passport page cannot load `kit.css` (it opens with
+   `html, body { height: 100dvh; overflow: hidden }`, and a reading document scrolls) and
+   was therefore wearing a hand-written copy of this bar. Requires `tokens.css`.
+
+   ── TWO SIZES, ONE BAR ──
+   56 on a phone and 72 from 768 up. Not a stylistic pair: on a 812-tall screen a fixed
+   72 pill plus the 16 it floats at is 11% of the page gone for the whole scroll, and a
+   bar that big over a single column of text reads as a site header on a page that has no
+   site. On a laptop the same 72 sits in a viewport twice as tall and carries a row of
+   sixteen links, and 56 would crowd them.
+
+   Everything inside follows, because the mark's inset is derived rather than typed: half
+   of whatever the bar has left after the mark. Nothing has to be restated at the
+   breakpoint, and the height stays animatable without the mark drifting off centre.
+
+   ── THE THREE NUMBERS ──
+   `--bar-h`    the current height; changes at the breakpoint.
+   `--bar-max`  the tallest it ever is. Pages pad their first line against *this* rather
+                than `--bar-h`, so a page does not reflow if the bar is ever animated.
+   `--bar-mark` the mark's HEIGHT, and the width too when the mark is a disc — which it
+                was everywhere this was first written, so the distinction never came up
+                and the name says the wrong one of the two. The padding is
+                `(--bar-h − --bar-mark) / 2`: half of what the bar has left over the mark,
+                put either side of it, so the mark sits in a square of air. That is a
+                statement about vertical clearance. A consumer whose mark is a wordmark
+                sets this to the wordmark's height and locks the height rather than the
+                width — the matrix does the same with the family lockups in its links,
+                for the same reason: height-locked, width free is what makes drawings of
+                different proportions read as one row.
+   `--bar-w`    the pill's width where there is room for it. 888 is the matrix's row of
+                links; a reading column sets its own so the bar and the text agree.
+
+   WHAT THE CONSUMER SUPPLIES
+   The bar is a shell. Section links, the ink's travel and whatever sits in the aside are
+   the page's, and so is anything drawn inside a link — the matrix puts family lockups in
+   its row and sizes them with a rule of its own.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root { --bar-h: 56px; --bar-max: 72px; --bar-mark: 40px; --bar-w: 888px;
+        --bar-top: var(--space-12); }
+@media (min-width: 768px) { :root { --bar-h: 72px; --bar-top: var(--space-16); } }
+
+.topbar {
+  position: fixed; top: var(--bar-top); left: 50%;
+  transform: translateX(-50%); z-index: 20;
+  /* Full width less the page's own inset on a phone, the named width once there is room
+     for it. `--bar-w` rather than a hardcoded 888 so a reading column can line the bar up
+     with its text instead of floating a wider pill over a narrower page. */
+  width: var(--bar-w); max-width: calc(100% - var(--space-24));
+  display: flex; align-items: stretch; gap: var(--space-16);
+  height: var(--bar-h);
+  padding: 0 calc((var(--bar-h) - var(--bar-mark)) / 2);
+  border-radius: 9999px;
+  overflow: hidden;
+  background: var(--frost-900);
+  backdrop-filter: blur(24px) saturate(120%);
+  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  box-shadow: inset 0 0 0 1px var(--white-07);
+  transition: transform .26s cubic-bezier(.2, 0, 0, 1),
+              border-radius .2s cubic-bezier(.2, 0, 0, 1);
+}
+
+/* ── The row is tightened to fit the bar, not the bar widened to fit the row ──
+   888 stays 888. A pill that sized itself to its contents would be a different width in
+   every mode the consumer offers, and a fixed element that changes width when you toggle
+   something is a fixed element that moves — the one thing a bar anchored to the top of the
+   viewport must not do.
+
+   So the padding gives instead. At 888 the row has 668 px between the mark and the aside,
+   and sixteen links at 12 px either side ask for 824 — measured, not guessed: the letters
+   and lockups themselves come to 380, the gaps to 60, and the padding to 384. Taking the
+   padding to 4 brings the total to 568 and leaves 100 px of slack, which is the margin
+   that absorbs a face rendering wider than its metrics.
+
+   From 768, the same breakpoint that starts centring the row: below it the bar is narrower
+   than 888 anyway and the row is meant to be swiped. */
+@media (min-width: 768px) {
+  .topbar-nav a { padding: 0 var(--space-4); }
+}
+
+/* ── Away on the way down, back on the way up ──
+   One height, and the bar leaves rather than shrinking: a shorter bar is still a bar in
+   the way, and what a reader going down a long page wants is the page. It travels its own
+   height plus the 16 it floats at, so it clears the viewport rather than hovering with a
+   sliver showing. The transform carries the centring with it, which is why the offset is
+   written as a two-axis translate and not as a `translateY`. */
+body.bar-away .topbar { transform: translate(-50%, calc(-100% - var(--bar-top))); }
+@media (prefers-reduced-motion: reduce) { .topbar { transition: none; } }
+
+/* Stretched to the bar's full height and holding an `svg` at 100% of it. The drawing does
+   not become 40 × 72 as that implies: with no `preserveAspectRatio` override a square
+   viewBox fits itself into the box and centres, so the width is what sets the size and the
+   height is what centres it. Written this way rather than as a centred 40 × 40 because a
+   shrink-to-fit box gives a percentage height nothing to resolve against. */
+.topbar-mark { width: var(--bar-mark); color: var(--white); flex-shrink: 0;
+               display: flex; align-items: center; }
+.topbar-mark svg { height: 100%; width: 100%; display: block; }
+
+/* Scrolls sideways rather than wrapping — a second line would double the bar's height for
+   a row that is only long on a phone. `overscroll-behavior-inline: contain` stops a swipe
+   that runs out of links from turning into a back-gesture, which is the one way a
+   horizontal row inside a fixed bar can lose a reader. */
+.topbar-nav { position: relative; display: flex; align-items: stretch;
+              gap: var(--space-4); flex: 1 1 auto; margin-left: var(--space-8);
+              overflow-x: auto; overflow-y: hidden;
+              overscroll-behavior-inline: contain;
+              -webkit-overflow-scrolling: touch;
+              scrollbar-width: none; }
+.topbar-nav::-webkit-scrollbar { display: none; }
+
+/* ── Centred once the row fits, ranged left while it does not ──
+   Only from 768 up. On a phone the row is longer than the screen by design and centring
+   an overflowing flex row moves its first item out of scroll range, which loses the item
+   rather than centring it. `safe` says exactly that: centre when it fits, fall back to the
+   start when it does not. */
+@media (min-width: 768px) { .topbar-nav { justify-content: safe center; } }
+
+.topbar-nav a { position: relative; flex-shrink: 0; display: flex; align-items: center;
+                padding: 0 var(--space-12);
+                font-size: var(--text-12); font-weight: 600; color: var(--black-250);
+                text-decoration: none; white-space: nowrap;
+                transition: color .15s; }
+.topbar-nav a:hover { color: var(--white); }
+.topbar-nav a.is-here { color: var(--white); }
+
+/* ── One rule that travels, not one per link ──
+   The position marker is a rule on the bar's bottom edge, not a plate behind the word: a
+   filled pill is the fill the segmented control uses for a *choice*, and this is not a
+   choice — it is where you are, and a position indicator should not look like a selected
+   option.
+
+   One element moved by script rather than an `::after` on the active link. A
+   pseudo-element belongs to its element, so moving the class from one link to the next
+   destroys one marker and creates another, and neither can animate. The consumer sets
+   `width`, `transform` and `.is-on`. */
+.topbar-ink { position: absolute; left: 0; bottom: 0; height: 5px; width: 0;
+              background: var(--accent); opacity: 0; pointer-events: none;
+              transform: translateX(0);
+              transition: transform .2s cubic-bezier(.2, 0, 0, 1),
+                          width     .2s cubic-bezier(.2, 0, 0, 1),
+                          opacity   .15s linear; }
+.topbar-ink.is-on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .topbar-ink { transition: opacity .18s linear; } }
+
+/* ── The right-hand slot ──
+   One control and its label, and one is the limit: the bar is a line, not a toolbar, and
+   the second thing put here is the thing that starts the row scrolling on a laptop.
+
+   The label is 12/600 like the links it sits beside rather than the 13 the sidebar uses —
+   a bar is a denser line than a panel and one size fits all of it. It lights when the
+   switch is on, so the pair reads as one control from across the room. */
+.topbar-aside { display: flex; align-items: center; gap: var(--space-8);
+                flex: 0 0 auto; align-self: center; padding-left: var(--space-8); }
+.topbar-aside-label { font-size: var(--text-12); font-weight: 600; color: var(--black-350);
+                      white-space: nowrap; transition: color .15s; }
+.topbar-aside:has(.toggle-switch[aria-checked="true"]) .topbar-aside-label { color: var(--white); }
+
+/* On frosted glass the switch's default off state needs its own ground — `--black-700` is
+   a solid grey and reads as a hole punched in the pane. */
+.topbar .toggle-switch { background: var(--white-12); }
+.topbar .toggle-switch[aria-checked="true"] { background: var(--accent); }
+
+/* ── ON A PHONE ──
+   The pill floats closer to the top edge and takes the full width less a 12 gutter, under
+   the notch inset where there is one. A centred 888-wide bar on a 375 screen was already
+   full-width by way of `max-width`; what this adds is the safe-area, which is the part a
+   `max-width` cannot know about. */
+@media (max-width: 767px) {
+  .topbar {
+    top: max(var(--bar-top), env(safe-area-inset-top));
+    max-width: calc(100% - var(--space-24)
+                    - env(safe-area-inset-left) - env(safe-area-inset-right));
+  }
+}

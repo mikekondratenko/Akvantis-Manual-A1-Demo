@@ -1,0 +1,1517 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tools UI Kit — components (Akvantis A1)
+
+   Ported verbatim from the Shokobox Card Generator, with the accent swapped to
+   Blue in tokens.css. Comments explaining *why* a rule is written the way it is
+   are kept from the donor, because they are the part that stops the next edit
+   from quietly undoing the reason.
+
+   Additions the donor does not have, because Card Generator has no such control:
+   .select, .slider, .value-row / .ends, .file-in, .swatch-input, .bottom-bar.
+   They are built from the same materials — 48px height, --black-700 ground,
+   --radius-8, accent only for state — so they sit in the kit rather than beside it.
+
+   Requires tokens.css. Load order: tokens.css → kit.css.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; height: 100dvh; overflow: hidden; }
+
+body {
+  font-family: var(--font-primary);
+  background: var(--black-1000);
+  color: var(--white);
+  font-size: var(--text-14);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+}
+
+button, input, select, textarea { font-family: inherit; }
+a { color: inherit; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ══════════════ APP SHELL ══════════════ */
+.app {
+  display: flex;
+  height: 100vh; height: 100dvh;
+  padding: 0 var(--space-24);
+  gap: var(--space-24);
+}
+
+/* ── SIDEBAR ──
+   The sidebar itself is just a transparent scroll column — each section is its own
+   separate rounded "tile" (.sidebar-tile) with a 12px gap between them, so the page
+   background shows through as seams instead of one continuous panel. Each tile carries
+   its own border-radius directly (not clipped via an outer overflow container), so the
+   rounding always holds no matter where the column is scrolled to. */
+.sidebar {
+  /* Above the viewport-wide canvas, so the column overlays the scene instead of cutting
+     a hole in it — and so its frosted plates have something behind them to blur. */
+  position: relative; z-index: 2;
+  width: var(--rail); min-width: var(--rail);
+  /* Full-viewport scroll column: the 24px inset lives *inside* the scroller as padding,
+     not as an outer margin. With a margin the container's edges sat 24px in from the
+     viewport, so scrolled tiles were clipped along that line. */
+  height: 100vh; height: 100dvh;
+  margin: 0; padding: var(--space-24) 0;
+  overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column;
+  gap: var(--space-12);
+  flex-shrink: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--black-500) transparent;
+}
+.sidebar::-webkit-scrollbar { width: 5px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--black-500); border-radius: 9999px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: var(--black-400); }
+
+.sidebar-tile {
+  background: var(--black-900);
+  border-radius: var(--radius-16);
+  flex-shrink: 0;
+}
+.sidebar-tile[hidden] { display: none; }
+
+/* ── FROSTED SURFACES ──
+   In the 3D view the page carries the scene behind the chrome, and opaque plates cut
+   holes in it. `.is-frosted` on .app swaps every black-grade surface for a translucent
+   one. Two rules make it work: blur only on the outer plates, since a nested
+   backdrop-filter would blur the plate again; and alpha 0.72, the point at which the
+   muted label grey still clears AA over the lightest ground this runs on. The edge is
+   an inset shadow so switching the variant on cannot shift the layout by a pixel.
+
+   The four values used to be declared right here, on this selector. They are in `tokens.css`
+   now, because a page that wants a frosted plate without opting its whole shell into the
+   variant could not reach them — and the matrix, which wants exactly that for its top bar and
+   its popups, had the numbers typed into five rules instead. This block is the switch; the
+   surface it switches to is a token. */
+.is-frosted .sidebar-tile {
+  background: var(--frost-900);
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+  box-shadow: var(--frost-edge);
+}
+/* background-COLOR, never the `background` shorthand. The shorthand resets every
+   longhand it does not name — background-image included — and .select carries its
+   chevron as an image. Setting it here is what used to make the chevron vanish the
+   moment the frosted variant was switched on. */
+.is-frosted .dark-input,
+.is-frosted .select,
+.is-frosted .file-in,
+.is-frosted .btn,
+.is-frosted .segmented,
+.is-frosted .iconseg,
+.is-frosted .toggle-switch { background-color: var(--frost-700); }
+.is-frosted .toggle-switch[aria-checked="true"] { background-color: var(--accent); }
+.is-frosted .sidebar-divider { background: var(--white-09); }
+/* Anything floating directly over the scene rather than inside a plate needs its own
+   blur — there is no frosted surface beneath it to do the job. */
+.is-frosted .view-tab .iconseg,
+.is-frosted .camera-tab .iconseg,
+.is-frosted .bottom-bar {
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+  box-shadow: var(--frost-edge);
+}
+.is-frosted .bottom-bar { background-color: var(--frost-900); border-color: transparent; }
+
+/* Each content tile — its own 24px-gap column, padded, with a small uppercase title
+   identifying the group. */
+.sidebar-panel { display: flex; flex-direction: column; gap: var(--space-24); padding: var(--space-16); }
+/* ── THE DEVICE PICKER ──
+   A custom listbox rather than a <select>, and the reason is the only thing in it: the
+   options are drawings. A native select renders text and nothing else, so the sixteen
+   models would have to be named — and the name of a mark is not the mark, which is the
+   same argument the sheet makes for drawing the model instead of typing it. Picking the
+   wrong lockup off a list of strings is a mistake you find on a printed label.
+
+   Everything it is built from is kit material: --black-800 ground, --radius-8, the
+   48 px control height, the input's border and focus behaviour. Nothing is restyled;
+   this is a shape the kit has no component for. */
+.dd { position: relative; }
+.dd-btn {
+  width: 100%; height: 48px;
+  display: flex; align-items: center; gap: var(--space-12);
+  padding: 0 var(--space-12);
+  background: var(--black-800); color: var(--white);
+  border: 1px solid var(--black-600); border-radius: var(--radius-8);
+  cursor: pointer; text-align: left;
+}
+.dd-btn:hover { border-color: var(--black-500); }
+.dd-btn:focus-visible { outline: none; border-color: var(--white); }
+.dd[data-open="true"] .dd-btn { border-color: var(--white); }
+.dd-chevron { margin-left: auto; flex-shrink: 0; color: var(--black-250); transition: transform .15s ease; }
+.dd[data-open="true"] .dd-chevron { transform: rotate(180deg); }
+
+/* The marks are line drawings of very different widths — 53 units to 351 — so the button
+   and the rows size them by height and let the width run, which is what the sheet does.
+
+   13 px, and the number is the widest mark rather than a choice about how big a thumbnail
+   should be. A row is 188 px across once the rail, the plate, the menu and the option have
+   taken their padding; SMARTANK is 10.4 wide to 1 tall, so any common height above 18 px
+   puts it past the edge — and one mark clamped to fit is sixteen marks at two sizes, which
+   is the comparison the picker exists to make. At 13 px the widest lands at 135 px and
+   every mark in the set is the same height as every other. */
+.dd-mark { display: flex; align-items: center; }
+/* The name, where the product is named rather than drawn. Same weight as a mark reads at —
+   this is the identity of the row, not a caption on one. */
+.dd-word { font-size: 15px; font-weight: 500; letter-spacing: .01em; color: var(--white); }
+.dd-mark.is-word { font-size: 15px; font-weight: 500; color: var(--white); }
+/* ── The generation, in grey, beside the mark ──
+   A tag and not a second mark: `A1` and `A1G2` are the same drawing, and the matrix is explicit
+   that the generation is words on the carton and a code everywhere else. Grey because it is a
+   qualifier on the mark rather than part of it — the same relationship a field name has to its
+   answer on the sheet, and the same colour that says so there. */
+.dd-gen { margin-left: var(--space-8); font-size: var(--text-11); letter-spacing: .04em;
+          color: var(--black-250); flex: 0 0 auto; }
+.dd-opt .dd-gen { margin-left: auto; }
+.dd-mark svg { display: block; height: 100%; width: auto; }
+
+.dd-menu {
+  position: absolute; z-index: 40; top: calc(100% + 6px); left: 0; right: 0;
+  max-height: 320px; overflow-y: auto;
+  padding: var(--space-8);
+  background: var(--black-800);
+  border: 1px solid var(--black-600); border-radius: var(--radius-8);
+  box-shadow: 0 16px 40px var(--scrim-60);
+  display: none;
+}
+.dd[data-open="true"] .dd-menu { display: block; }
+.dd-menu::-webkit-scrollbar { width: 5px; }
+.dd-menu::-webkit-scrollbar-track { background: transparent; }
+.dd-menu::-webkit-scrollbar-thumb { background: var(--black-500); border-radius: 9999px; }
+
+/* The group heading is the field label's type, because that is what it is: a name for the
+   rows under it. It is not selectable and it is not a row — five of these down the list is
+   what keeps sixteen near-identical lockups from reading as one long strip.
+
+   The rule above it does the same work at a glance, before the heading is read: the marks
+   inside a series differ by one character, so the boundary between K7 and M1 is the one
+   place scanning the list can go wrong. It is the kit's own divider — the same hairline
+   the sidebar uses between its sections. */
+.dd-group {
+  font-size: var(--text-11); font-weight: 400; color: var(--black-350);
+  letter-spacing: .04em; text-transform: uppercase;
+  padding: var(--space-12) var(--space-8) var(--space-8);
+  border-top: 1px solid var(--black-700);
+  margin-top: var(--space-8);
+}
+/* The first heading has the menu's own edge above it, and a rule 8 px inside a border is
+   two lines doing one job. */
+.dd-group:first-child { border-top: none; margin-top: 0; padding-top: var(--space-4); }
+
+.dd-opt {
+  width: 100%; min-height: 40px;
+  display: flex; align-items: center; gap: var(--space-12);
+  padding: var(--space-8);
+  background: none; border: none; border-radius: var(--radius-4);
+  color: var(--black-100); cursor: pointer; text-align: left;
+}
+.dd-opt:hover, .dd-opt.is-active { background: var(--black-700); color: var(--white); }
+.dd-opt[aria-selected="true"] { color: var(--white); }
+.dd-opt[aria-selected="true"]::after {
+  content: ''; margin-left: auto; flex-shrink: 0;
+  width: 6px; height: 6px; border-radius: 9999px; background: var(--accent);
+}
+
+/* ══════════════ THE EDITABLE LIST ══════════════
+   A list of rows somebody adds to, edits and removes: the Stick Maker's specification
+   band, the Digital Passport's technical data, the blocks that make up a page. It was
+   written in the Stick Maker and lived there, and the second tool that needed it drew
+   its own — two inputs side by side with a bare × — which is how one control becomes
+   two that nearly match. Moved here 2026-09-04, unchanged.
+
+   ── A ROW IS A CARD, NOT A LINE ──
+   Two fields belong to one thing, and a card says so: what it is called on top with the
+   control that removes it, what it says underneath. Side by side they read as a table
+   with a delete column, which is a different claim — that the two values are peers, and
+   that the list is a grid somebody could sort.
+
+   Built from the kit's own materials: `--black-800` a step off the plate it sits on,
+   `--radius-8` for a row inside a `--radius-16` plate, and the fields at 40 rather than
+   48 because a control inside a card is one level down from a control on a panel. */
+.spec-list { display: flex; flex-direction: column; gap: var(--space-8); }
+.spec-row {
+  position: relative;
+  background: var(--black-800); border-radius: var(--radius-8);
+  padding: var(--space-12);
+  display: flex; flex-direction: column; gap: var(--space-8);
+}
+.spec-row .dark-input { height: var(--number-40); }
+.spec-row-head { display: flex; align-items: center; gap: var(--space-8); }
+/* The name reads as the row's title rather than as another value: a step quieter than
+   the field under it, which carries the ink. */
+.spec-row-head .dark-input[data-field="label"] { font-size: var(--text-12); color: var(--black-100); }
+
+/* No rule of its own beyond not shrinking. It was painted `--accent` once — the colour
+   this kit gives to the thing you are meant to do, the chosen swatch, the switch that is
+   on — and a control that deletes a row is not that. Bare, it is `.icon-btn`'s white
+   glyph on a round translucent plate, which is what every other bare glyph here is. */
+.spec-remove { flex-shrink: 0; }
+
+/* ── ADD A ROW ──
+   Centred under the list, where the next row will appear — not above the first one,
+   which puts the control at the top and its result at the bottom of a list that may be
+   a screenful long. The button is `.icon-btn.icon-btn-md`; this rule only places it. */
+.spec-add-row { display: flex; justify-content: center; }
+
+/* ── THE PLATE TITLE AND THE COLLAPSIBLE PLATE MOVED OUT — 2026-09-04 ──
+   `.panel-title`, `button.panel-title`, `summary.panel-title`, `.panel-chevron`,
+   `.panel-fold` and `.panel-body` now live in `panel.css`, next to this file and
+   synced with it.
+
+   They left because three surfaces had grown three versions of one control: this
+   file drew the sign as a plus turning into a minus, the Stick Maker redeclared it
+   locally as a chevron, and the passport page — which cannot load this stylesheet,
+   because it opens with `overflow: hidden` on a document that scrolls — carried a
+   third copy lifted by hand. This file even had a reduced-motion rule for
+   `.panel-chevron`, a class it never defined.
+
+   Load order is `tokens.css → panel.css → kit.css`. A tool that links this file
+   without `panel.css` gets unstyled plate titles, which is loud enough to notice
+   on the first look rather than three weeks later. */
+
+
+.sidebar-header {
+  display: flex; align-items: center; gap: var(--space-8); padding: var(--space-16);
+}
+.sidebar-header svg { flex-shrink: 0; }
+.sidebar-title { font-size: var(--text-16); font-weight: 600; color: var(--white); line-height: 1.25; }
+.sidebar-subtitle { font-size: var(--text-12); font-weight: 400; color: var(--black-250); line-height: 1.25; }
+/* The logo opens the first plate rather than sitting in one of its own, so nested there
+   it inherits the panel's 16px and must not add its own on top. */
+.sidebar-panel > .sidebar-header { padding: 0; }
+/* Logo pinned left, toggle pinned right — the row that survives the collapse, so the
+   toggle is the one thing that has to stay reachable at both ends of the animation. */
+.sidebar-header.has-toggle { justify-content: space-between; }
+
+.sidebar-toggle {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex-shrink: 0;
+  border: none; border-radius: var(--radius-8);
+  background: transparent; color: var(--black-250);
+  cursor: pointer; transition: background-color .12s, color .12s;
+}
+.sidebar-toggle:hover { background: var(--black-700); color: var(--white); }
+.sidebar-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.is-frosted .sidebar-toggle:hover { background: var(--frost-700); }
+/* Collapsed there is no rail left to put away, so the button goes with it. */
+.app.is-collapsed .sidebar-toggle { display: none; }
+
+/* The mark, as a control. A button with none of a button's clothes: it has to read as
+   the logo it already is, and only its cursor says it can be clicked — and only once
+   the rail is gone, which is the one state where clicking it does anything. */
+.brand-btn {
+  display: flex; align-items: center;
+  padding: 0; border: 0; background: none;
+  color: inherit; cursor: default;
+  transition: opacity .12s;
+}
+.brand-btn:disabled { opacity: 1; }
+.app.is-collapsed .brand-btn { cursor: pointer; }
+.app.is-collapsed .brand-btn:hover { opacity: .72; }
+.brand-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: var(--radius-4); }
+
+/* ── COLLAPSE ──
+   Hide takes every tile but the logo one out of flow immediately — nothing is left
+   to reflow while the rail is this narrow — and animates the rail's own width down
+   to just what the header needs. .main and, through panHost, the box itself track
+   that width on every frame the JS driver in box.html ticks during the transition,
+   so the scene re-centres in step with the rail rather than jumping at the end. */
+.sidebar {
+  transition: width .32s cubic-bezier(.4, 0, .2, 1), min-width .32s cubic-bezier(.4, 0, .2, 1);
+}
+.app.is-collapsed .sidebar { width: var(--rail-collapsed); min-width: var(--rail-collapsed); }
+.app.is-collapsed .sidebar-tile:not(#logoTile) { display: none; }
+.app.is-collapsed #logoTile > .sidebar-panel > .panel-title,
+.app.is-collapsed #logoTile > .sidebar-panel > section,
+/* Dividers go with what they divide. The rule above takes the titles and the sections
+   out, and a divider that outlives both is a hairline ruling off nothing — which is
+   exactly how it looked: a stray stripe under the mark on an otherwise empty screen.
+   It never showed in the Box Maker because that tool's logo tile has no divider in it,
+   so the omission sat here unnoticed until a rail with one collapsed. */
+.app.is-collapsed #logoTile > .sidebar-panel > .sidebar-divider { display: none; }
+
+/* ── AND THE TOOL'S NAME GOES WITH THEM ──
+   ⚠ 2026-09-11. Collapsed, the rail is 120 wide and the head holds a 24 mark, an 8 gap and
+   whatever the tool is called. `Digital Passport` does not fit in what is left, so it
+   wrapped onto two lines and ran back over the mark — the one object that is supposed to
+   survive the collapse. It never showed in the Box Maker, whose name is two syllables
+   shorter, which is the whole reason it sat here unnoticed: a layout that depends on how
+   long a name happens to be is a layout that works until somebody names a tool.
+
+   Collapsed, the mark is the name. It is also the button that brings the rail back, so
+   there is nothing the words were adding. */
+.app.is-collapsed .sidebar-header .sidebar-title,
+.app.is-collapsed .sidebar-header .sidebar-subtitle { display: none; }
+
+/* Collapsed, the mark is not a panel any more — there is nothing under it to hold.
+   The plate comes off and the logo sits straight on the scene, like the projection
+   switch and the Akvantis mark opposite it. */
+.app.is-collapsed #logoTile,
+.app.is-frosted.is-collapsed #logoTile {
+  background: transparent; box-shadow: none;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+
+/* Centring, and the reason this is a margin rather than a JS number.
+   The box is centred on .main — the area beside the rail — because that is what
+   "centred" means while the rail is there. Collapsed, the rail is chrome floating
+   over the scene rather than a column beside it, so the box should centre on the
+   window instead. Pulling .main back under the collapsed rail makes its rect the
+   full width between the page's own 24px margins, and the camera follows it without
+   knowing anything changed: same panHost, same maths, one moving number.
+   Transitioned on the same curve as the rail so the two move as one. */
+.main { transition: margin-left .32s cubic-bezier(.4, 0, .2, 1); }
+.app.is-collapsed .main { margin-left: calc(-1 * (var(--rail-collapsed) + var(--space-24))); }
+
+/* Dividers are flex children inside a 24px-gap column, so their own margin is zeroed
+   there to avoid stacking on top of that gap. */
+.sidebar-divider { height: 1px; width: 100%; background: var(--black-700); flex-shrink: 0; }
+.sidebar-panel > .sidebar-divider { margin: 0; }
+
+.group-label {
+  font-size: var(--text-10); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--black-350); margin-bottom: var(--space-12);
+}
+.group-note { font-size: var(--text-11); color: var(--black-350); line-height: 1.5; }
+.group-note:empty { display: none; }
+
+/* ── QUIET RAIL ──
+   `.is-quiet` on the sidebar hides every explanatory note without removing one. The
+   prose stays in the markup and the code that computes it keeps running, so turning
+   the class off brings all of it back — including the warnings that only appear when
+   a number goes out of range. Deleting the notes instead would have thrown those away
+   along with the paragraphs nobody reads twice. */
+.sidebar.is-quiet .group-note,
+.sidebar.is-quiet .print-note { display: none; }
+
+/* With the prose gone the plates carry controls only, and the 24px rhythm that was
+   holding paragraphs apart leaves them looking padded out. Tightened to 16 — the same
+   number as the panel's own inset, so the gaps between groups and the gap to the edge
+   read as one measure instead of two. */
+.sidebar.is-quiet .sidebar-panel { gap: var(--space-16); }
+/* The rail's own mark lands on the same centre line: 24 of column padding plus 16 of
+   panel inset puts the header at 40, so a 40-tall header centres it at 60. */
+.sidebar.is-quiet .sidebar-panel > .sidebar-header {
+  height: 40px; margin-bottom: 0; align-items: center;
+}
+
+/* Generic "section is inert" treatment — stays visible so the layout doesn't jump,
+   but reads as switched off and can't be interacted with. */
+.section-disabled { opacity: .4; pointer-events: none; transition: opacity .15s ease; }
+
+/* Layout helpers */
+.row { display: flex; align-items: center; gap: var(--space-12); }
+.row .grow { flex: 1; }
+.stack { display: flex; flex-direction: column; gap: var(--space-8); }
+.cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-8); }
+.cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-8); }
+
+/* ══════════════ SEGMENTED CONTROL (generic, N segments) ══════════════ */
+.segmented {
+  position: relative; display: flex; height: 48px; padding: 4px;
+  border: 1px solid transparent; border-radius: var(--radius-8); background: var(--black-700);
+  transition: border-color .12s;
+}
+/* No border change on track hover — the per-segment highlight carries it. */
+.segmented-thumb {
+  position: absolute; top: 4px; left: 4px; bottom: 4px;
+  background: var(--white); border-radius: 6px;
+  transition: transform .2s cubic-bezier(.4,0,.2,1);
+  z-index: 1;
+}
+.segment-btn {
+  position: relative; z-index: 2; flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  border: none; background: transparent; border-radius: 6px;
+  color: var(--black-200); cursor: pointer; font-size: var(--text-13); font-weight: 600;
+  font-family: var(--font-primary);
+  transition: color .15s, background .15s; padding: 0 6px; text-align: center;
+}
+/* On the thumb, which is white: the label has to invert with it or the selected segment is
+   the only one you cannot read. */
+.segment-btn.is-active { color: var(--black-1000); }
+/* No hover state on an inactive segment, by design. The fill that used to appear under
+   the cursor competed with the thumb — two lit panels at once, one of which was not the
+   selection. The thumb is the only thing that ever fills a segment. */
+.segment-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: inherit; }
+.segment-icon svg { display: block; }
+
+/* An option that cannot be chosen. Dimmed and left in place rather than removed, so the group
+   does not change width when a choice becomes unavailable — and so the reason can live on the
+   button's own title instead of somewhere the cursor is not. */
+.segment-btn:disabled,
+.iconseg-btn:disabled { opacity: .35; cursor: default; }
+.segment-btn:disabled:hover,
+.iconseg-btn:disabled:hover { color: var(--black-200); }
+
+
+/* ══════════════ ICON TOGGLE (flat two/N-panel button group) ══════════════ */
+.iconseg {
+  position: relative;
+  display: flex; height: 64px; overflow: hidden;
+  border-radius: var(--radius-8);
+  background: var(--black-700); border: 1px solid transparent; transition: border-color .12s;
+}
+/* Full-bleed, not inset: the selected panel runs to the group's own edges. The group's
+   radius plus overflow:hidden rounds whichever end the thumb is parked against and
+   leaves the inner end square — which is what makes it read as a panel of the group
+   rather than a pill floating in it. */
+.iconseg-thumb {
+  position: absolute; top: 0; left: 0; bottom: 0;
+  background: var(--black-500);
+  transition: transform .2s cubic-bezier(.4,0,.2,1);
+  z-index: 1;
+}
+.iconseg-btn {
+  position: relative; z-index: 2; flex: 1 1 0%;
+  display: flex; align-items: center; justify-content: center; gap: var(--space-8);
+  background: transparent; border: none; color: var(--black-200);
+  font-size: var(--text-13); font-weight: 600; font-family: var(--font-primary);
+  padding: 0 var(--space-8); cursor: pointer; transition: color .15s;
+}
+/* No fill on hover — the thumb is the only thing that ever fills a panel. The label
+   lightening is all the feedback the cursor gets. */
+.iconseg-btn:not([aria-pressed="true"]):hover { color: var(--black-100); }
+.iconseg-btn[aria-pressed="true"] { color: var(--white); }
+.iconseg-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.iconseg-icon svg { display: block; }
+.iconseg-divider { display: none; }
+
+/* ══════════════ TOGGLE SWITCH ══════════════ */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); }
+.toggle-row-label { font-size: var(--text-13); font-weight: 600; color: inherit; }
+/* Icon + label pairing — both inherit color from this wrapper, so toggling .is-disabled
+   dims the icon and text together in one place. */
+.toggle-row-label-group { display: flex; align-items: center; gap: var(--space-8); color: var(--white); transition: color .15s ease; }
+.toggle-row-label-group.is-disabled { color: var(--black-350); }
+.toggle-row-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: inherit; }
+.toggle-row-icon svg { display: block; }
+.toggle-switch {
+  position: relative; width: 38px; height: 22px; border-radius: 9999px;
+  background: var(--black-700); border: none; padding: 0; cursor: pointer; flex-shrink: 0;
+  transition: background .2s ease;
+}
+.toggle-switch[disabled] { opacity: .4; pointer-events: none; }
+.toggle-knob {
+  position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 9999px;
+  background: var(--white); transition: transform .2s cubic-bezier(.4,0,.2,1);
+}
+.toggle-switch[aria-checked="true"] { background: var(--accent); }
+.toggle-switch[aria-checked="true"] .toggle-knob { background: var(--white); transform: translateX(16px); }
+
+/* ══════════════ INPUTS ══════════════ */
+/* ── THE RAIL'S OWN RHYTHM, ON THE SCALE ──
+   ⚠ THESE WERE 6 AND 10 — off the scale, and for no reason anyone could point at. Both
+   were inherited from the donor and neither was ever a decision; 6 and 10 are simply
+   what a hand types when it is eyeballing. Corrected 2026-09-13 to 8 and 12.
+
+   The pair has to stay a pair: the label belongs to the field under it, so the gap
+   inside a group must read as tighter than the gap between two groups. 8 against 12
+   keeps that at a ratio the eye resolves without measuring — 6 against 10 did too, but
+   only by accident, and an accident cannot be relied on the next time either number is
+   touched. Every field in every tool is laid out by these two lines. */
+.field-label { font-size: var(--text-11); font-weight: 400; color: var(--black-250); margin-bottom: var(--space-8); display: block; }
+.field-group { margin-bottom: var(--space-12); }
+.field-group:last-child { margin-bottom: 0; }
+.dark-input {
+  width: 100%; height: 48px; background: var(--black-700); border: 1px solid transparent;
+  border-radius: var(--radius-8);
+  color: var(--white); font-size: var(--text-13); font-weight: 500; font-family: var(--font-primary);
+  padding: 0 14px;
+  transition: border-color .12s, background .12s;
+}
+.dark-input::placeholder { color: var(--black-350); }
+.dark-input:hover { border-color: var(--black-500); }
+.dark-input:focus { outline: none; border-color: var(--white); }
+
+textarea.dark-input { height: auto; min-height: 48px; padding: 12px 14px; resize: vertical; line-height: 1.4; }
+
+/* Numeric variant — tabular figures so a value doesn't jitter as it is stepped. */
+.dark-input[type="number"] { font-weight: 600; font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+.dark-input[type="number"]::-webkit-outer-spin-button,
+.dark-input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* ── STEPPER ──
+   A numeric field with its own − / + ends. Not a restyled `appearance: auto` spinner:
+   the native one is 12px tall, appears on hover only, and cannot be held down. This is
+   one plate — the two buttons live inside the field's own border, so focus, hover and
+   the disabled state are stated once on the wrapper and the control never reads as
+   three objects sitting next to each other.
+
+   Kit.stepper() supplies the behaviour, including hold-to-repeat. */
+.stepper {
+  position: relative; display: flex; align-items: center;
+  height: 48px; padding: 4px; background: var(--black-700);
+  border: 1px solid transparent; border-radius: var(--radius-8);
+  transition: border-color .12s;
+}
+.stepper:hover { border-color: var(--black-500); }
+.stepper:focus-within { border-color: var(--white); }
+/* The input keeps .dark-input for its type, and gives up everything that belonged to
+   the plate — ground, border, radius — to the wrapper.
+
+   Centred, and the − / + sit on either side of it rather than both on one end. A value
+   pushed against the left edge with its controls bunched at the right reads as a text
+   field that happens to have buttons; centred between them it reads as one counter, and
+   the number stays put as it grows from 45 to 110. */
+.stepper .dark-input {
+  flex: 1; min-width: 0; width: auto; height: 100%; order: 2;
+  text-align: center; padding: 0 2px;
+  background: transparent; border: 0; border-radius: 0;
+}
+.stepper .dark-input:hover, .stepper .dark-input:focus { border-color: transparent; outline: none; }
+/* − takes the left end, + the right. The buttons are direct children of .stepper — a
+   wrapper around them would break `order`, since order only applies to flex children. */
+.stepper-btn:first-of-type { order: 1; }
+.stepper-btn:last-of-type  { order: 3; }
+/* Square, so the hover plate is a circle rather than a tall pill. It used to be 28 × 38
+   — the field's full inner height — and at that ratio a 9999px radius draws a lozenge,
+   which is a different shape from every other round target in the kit. 28 × 28 leaves
+   the plate a proper disc and still clears the 44px-tall field it sits in.
+
+   This is .icon-btn's behaviour at the stepper's size: no chrome until the cursor
+   arrives, then a disc behind the glyph. */
+.stepper-btn {
+  width: 28px; height: 28px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; border-radius: 50%;
+  color: var(--black-200); cursor: pointer;
+  transition: background .12s, color .12s;
+  -webkit-user-select: none; user-select: none; touch-action: none;
+}
+.stepper-btn:hover { background: var(--black-600); color: var(--white); }
+.stepper-btn:active { background: var(--black-500); }
+.stepper-btn:focus-visible {
+  outline: none; background: var(--black-600); color: var(--white);
+  box-shadow: 0 0 0 2px var(--white-32);
+}
+.is-frosted .stepper-btn:hover { background: var(--white-08); }
+.is-frosted .stepper-btn:active { background: var(--white-14); }
+/* At the end of its range the button stops being an offer. Dimmed rather than removed,
+   so the field does not change width when a value reaches its limit. */
+.stepper-btn[disabled] { opacity: .3; pointer-events: none; }
+.stepper-btn svg { display: block; pointer-events: none; }
+.is-frosted .stepper { background-color: var(--frost-700); }
+
+.field-row-2 { display: flex; gap: var(--space-8); }
+.field-row-2 .field-group { flex: 1; }
+.field-group-heading {
+  font-size: var(--text-11); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--black-200); margin: var(--space-16) 0 var(--space-8);
+}
+.field-group-heading:first-child { margin-top: 0; }
+
+/* ── SELECT ──
+   Not in the donor (Card Generator has no dropdown), but built from the same materials
+   as .dark-input so it cannot drift from it: same height, ground, radius and focus edge.
+   The chevron is a background image, which is why focus sets background-color and never
+   the `background` shorthand — the shorthand would wipe the chevron. */
+.select {
+  width: 100%; height: 48px; padding: 0 40px 0 14px;
+  background-color: var(--black-700); border: 1px solid transparent; border-radius: var(--radius-8);
+  color: var(--white); font-size: var(--text-13); font-weight: 500; font-family: var(--font-primary);
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23989B9A' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  transition: border-color .12s;
+}
+.select:hover { border-color: var(--black-500); }
+.select:focus { outline: none; border-color: var(--white); }
+.select:disabled { color: var(--black-350); cursor: not-allowed; }
+.select option { background: var(--black-700); color: var(--white); }
+
+/* ── FILE INPUT ──
+   The native control replaced by a label that looks like a button, and doubles as a
+   drop zone. The icon is what says so: a button that also accepts a dragged file has
+   no other way to advertise it, and people do not try dropping on something that looks
+   like a button unless something tells them they can.
+
+   ── IT ANSWERS THE CURSOR LIKE A BUTTON, NOT LIKE A FIELD ──
+   ⚠ HOVER USED TO REVEAL A SOLID EDGE — changed 2026-09-13, and the reason is a rule
+   worth stating once for the whole kit.
+
+   This kit has two hover languages and they are not interchangeable. A FIELD keeps a
+   transparent 1px border at rest and reveals it under the cursor: `.dark-input`,
+   `.select`, `.stepper`, `.dd-btn`, `.ui-checkbox`, `.ui-radio` all do this, and the
+   edge is right for them because an edge is what says "you may type inside this". A
+   BUTTON has no edge to reveal and lightens its own fill instead: `.btn` goes
+   `--black-700` → `--black-600`, and the whole plate moving is what says "press me".
+
+   `.file-in` sits exactly between the two — it is a `<label>` wrapping a hidden input,
+   so it IS a field — and it had been given the field's answer. But nobody reads it as a
+   field: it is a 48-tall pill with a verb on it, sitting in a column of `.btn`s that
+   look identical and behave differently. Two identical objects answering the cursor two
+   ways is the kind of difference that is felt before it is noticed. What a control IS
+   loses to what it LOOKS LIKE; it now lightens.
+
+   The transparent border stays even though nothing reveals it: the box is 48 tall with
+   `border-box` sizing, and taking the border away would take 2px out of the plate and
+   put this pill half a pixel off every `.btn` beside it.
+
+   `.is-dropping` is set while a file is dragged over it — a dashed accent edge. It was
+   dashed to keep it apart from the solid hover edge; now that hover has no edge at all
+   the distinction is free, and dashed is still the better drawing for "let go here". */
+.file-in {
+  display: flex; align-items: center; justify-content: center; gap: var(--space-8);
+  width: 100%; height: 48px; padding: 0 20px;
+  background: var(--black-700); border: 1px solid transparent; border-radius: 9999px;
+  color: var(--white); font-size: var(--text-13); font-weight: 600; cursor: pointer;
+  transition: border-color .12s, background-color .12s, color .12s;
+}
+.file-in:hover { background-color: var(--black-600); }
+.file-in input { display: none; }
+.file-in svg { flex-shrink: 0; color: var(--black-250); transition: color .12s; }
+.file-in:hover svg { color: var(--white); }
+.file-in.is-dropping {
+  border: 1px dashed var(--accent);
+  background-color: var(--black-600);
+  color: var(--white);
+}
+.file-in.is-dropping svg { color: var(--accent); }
+
+/* ── PICKER SWATCH ──
+   A swatch that opens the system colour picker. It wears a spectrum rather than the
+   colour currently chosen, because that is the one thing the two presets beside it
+   cannot say: those are the colours on offer, this is "any other". Showing it filled
+   with the current colour would make three discs that all claim to be a choice, with
+   nothing marking the one that leads somewhere else.
+
+   The native input sits on top at zero opacity — clicking anywhere on the disc opens
+   the picker, and the disc keeps the kit's shape instead of the browser's. */
+/* ⚠ `.swatch-pick` STOOD HERE AND IS GONE — it was the donor kit's name for the colour
+   picker disc, it had no users in this building, and `swatch.css` has the same component
+   under the name everything actually uses, `.swatch-custom`. Two names for one disc in
+   two files is how the two drift; and this one could not be used by the passport, which
+   cannot load `kit.css` at all. The wheel, the input and the selected state all live in
+   `swatch.css` now. */
+
+/* ── COLOUR SWATCH INPUT ──
+   The native <input type="color"> wearing the kit's swatch. It takes the *selected*
+   look of .swatch-btn — white ring on the edge, fill pulled in by 3px — rather than
+   the resting one, because a colour input always has a current value; there is no
+   unselected state for it to be in. The 3px comes from the wrapper's padding here
+   instead of the button's, which is the only way to reach inside the native control. */
+.swatch-input {
+  width: 32px; height: 32px; flex-shrink: 0; padding: 0; cursor: pointer;
+  background: transparent; border: 2px solid var(--white); border-radius: 50%;
+  transition: opacity .12s;
+}
+.swatch-input:hover { opacity: .78; }
+.swatch-input:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--white-32); }
+.swatch-input::-webkit-color-swatch-wrapper { padding: 3px; }
+.swatch-input::-webkit-color-swatch { border: 0; border-radius: 50%; }
+.swatch-input::-moz-color-swatch { border: 0; border-radius: 50%; }
+
+/* ══════════════ COLOR SWATCHES ══════════════ */
+/* ── THE COLOUR SWATCHES MOVED OUT — 2026-09-04 ──
+   `.color-block`, `.pair-row`, `.swatch-btn`, `.pair-name` and `.pantone-note` are in
+   `swatch.css` now, next to this file and synced with it. They left for the same reason
+   the collapsible plate did: the passport page states a finish — a disc and the name
+   under it — and it cannot load this stylesheet, so it was about to grow a second disc
+   that nearly matched this one. Load order: `tokens.css → panel.css → swatch.css →
+   kit.css`. */
+
+
+/* ══════════════ SLIDER ══════════════
+   The donor's range selector, geometry and all: a 7px bar at radius 4 — already a full
+   pill at that height — and a 24px round handle.
+
+   Colour is the dark reading of the library's two roles. Drawn there on white, track
+   --black/100 and fill --black/1000; inverted here the fill and handle go --white and
+   the empty part becomes a translucent white wash, so it sits at the edge of visible and
+   picks up whatever surface it is laid on. The accent stays out of it — this control
+   reports a value, it does not ask for a decision.
+
+   The visible bar is two plain elements with a native <input type="range"> laid over
+   them, invisible. Keyboard stepping, focus and value semantics come from the input; the
+   fill is a separate element because a gradient painted on the input cannot line up with
+   the handle — the thumb's centre travels from half a thumb in to half a thumb from the
+   far end, never the full width, so a percentage fill drifts by up to half a thumb at
+   the ends. Kit.range() does that arithmetic. */
+.value-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-8); gap: var(--space-8); }
+.value-row .val { font-size: var(--text-13); font-weight: 600; font-variant-numeric: tabular-nums; }
+.ends { display: flex; justify-content: space-between; font-size: var(--text-11); color: var(--black-350); margin-top: var(--space-4); }
+
+.range { position: relative; width: 100%; height: 32px; }
+.range-track {
+  position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+  height: 7px; border-radius: 4px;
+  background: var(--white-10);
+  z-index: 0;
+}
+/* Width is written from JS in px, measured to the handle's centre. */
+.range-fill {
+  position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  height: 7px; border-radius: 4px;
+  background: var(--white);
+  z-index: 1;
+}
+/* 24px tall, so WebKit centres the thumb on the runnable track with no margin fudge;
+   the taller 32px hit area belongs to .range itself. */
+.range-input {
+  position: absolute; left: 0; top: 4px;
+  width: 100%; height: 24px; margin: 0; padding: 0;
+  -webkit-appearance: none; appearance: none;
+  background: transparent; border: none; outline: none;
+  cursor: pointer; z-index: 2;
+}
+.range-input::-webkit-slider-runnable-track { height: 24px; background: transparent; border: none; }
+.range-input::-moz-range-track { height: 24px; background: transparent; border: none; }
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--white); border: none; cursor: pointer;
+  box-shadow: 0 2px 4px var(--scrim-32);
+}
+.range-input::-moz-range-thumb {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--white); border: none; cursor: pointer;
+  box-shadow: 0 2px 4px var(--scrim-32);
+}
+/* The ring is two shadows — a dark gap first, then the white ring — so the focus mark
+   reads against the handle whatever sits behind it. */
+.range-input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--black-900), 0 0 0 5px var(--white); }
+.range-input:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px var(--black-900), 0 0 0 5px var(--white); }
+.range.is-disabled { opacity: .4; pointer-events: none; }
+
+/* ══════════════ BUTTONS ══════════════ */
+.btn {
+  position: relative;
+  display: flex; align-items: center; justify-content: center; gap: var(--space-8);
+  width: 100%; height: 48px; padding: 0 20px; border-radius: 9999px; border: none;
+  background: var(--black-700); color: var(--white);
+  font-size: var(--text-13); font-weight: 600; font-family: var(--font-primary);
+  text-decoration: none; cursor: pointer;
+  transition: background .15s, color .15s, transform .08s;
+}
+/* `display: flex` above outranks the browser's own rule for the hidden attribute, so a
+   button marked hidden stays on screen. Every component in the kit that sets display has
+   to say this — .sidebar-tile and .bottom-bar already do. */
+.btn[hidden] { display: none; }
+.btn:hover { background: var(--black-600); }
+.btn:active { transform: scale(.98); }
+.btn.is-on { background: var(--accent); color: var(--accent-ink); }
+/* ⚠ `.btn` HAD NO DISABLED STATE AT ALL, which is not the same as never being disabled:
+   `button[disabled]` already stops answering the pointer, so the gap was silent — a dead
+   button that looked exactly like a live one, and the only way to find out was to press
+   it. Every other control in this kit dims at .35 (`.round-btn`, `.segment-btn`,
+   `.icon-btn` at .3), so this is the same number rather than a new one.
+
+   `:hover` has to be said again: it is a separate rule and would otherwise keep lighting
+   a button that cannot be pressed. */
+.btn:disabled { opacity: .35; cursor: default; }
+.btn:disabled:hover { background: var(--black-700); }
+.btn-ghost:disabled:hover { background: transparent; }
+.btn-ghost { background: transparent; box-shadow: inset 0 0 0 1px var(--black-700); }
+.btn-ghost:hover { background: var(--black-700); }
+
+/* ══════════════ DESTRUCTIVE BUTTON ══════════════
+   The one place red is allowed. `tokens.css` says so in four words — "Red — destructive
+   only" — and until now the only thing obeying that was a field in error, which is a
+   different idea wearing the same colour: an error is something that has ALREADY gone
+   wrong, and this is something that is ABOUT to. Both are red because both are the
+   opposite of the accent, which marks the thing you are meant to do.
+
+   ── QUIET AT REST, LOUD UNDER THE CURSOR ──
+   Outlined and red-inked at rest, filled only on hover. A button that deletes should not
+   be the brightest object in a rail full of buttons that do not — that is how somebody
+   presses it by reaching for the thing beside it. But the moment a cursor is on it, there
+   should be no doubt at all what it is about to do, so hover fills.
+
+   It is the same bargain `.print-btn` makes with the accent, upside down: the call to
+   action is bright at rest because you are meant to arrive at it, and this is quiet at
+   rest because you are not.
+
+   ── WHY `box-shadow` AND NOT `border` ──
+   `.btn` is 48 tall with no border, and a real border would make this one 50 or push its
+   text off-centre by a pixel. An inset shadow is drawn inside the box and costs no layout,
+   so a destructive button sits in a column of buttons at exactly their height.
+
+   Pair it with a confirmation for anything that cannot be undone. The colour is a warning,
+   not a safety catch. */
+.btn-danger {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--red-800);
+  color: var(--red-800);
+}
+.btn-danger:hover {
+  background: var(--red-1000);
+  box-shadow: inset 0 0 0 1px var(--red-1000);
+  color: var(--white);
+}
+.btn-danger:active { background: var(--red-800); box-shadow: inset 0 0 0 1px var(--red-800); }
+.btn-danger:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--red-800), 0 0 0 2px var(--white-32); }
+.btn-danger:disabled { opacity: .35; cursor: default; }
+.btn-danger:disabled:hover { background: transparent; color: var(--red-800); box-shadow: inset 0 0 0 1px var(--red-800); }
+
+/* ── AND THE SAME IDEA AT GLYPH SIZE ──
+   The ✕ that removes a row. It stays `.icon-btn`'s white glyph at rest, for the reason
+   written at `.spec-remove`: a row of controls where the destructive one is the only
+   coloured thing is a row that points at deletion. The red arrives with the cursor, which
+   is the moment it is useful. */
+/* ⚠ `.icon-btn.icon-btn-danger`, not `.icon-btn-danger` alone. `.icon-btn:hover` sets a
+   white plate at the same specificity and stands later in this file, so a single class
+   loses to it on source order and the ✕ lit up red on a WHITE plate — half the change
+   applying, which is worse than none of it. Two classes settle it without `!important`. */
+.icon-btn.icon-btn-danger:hover:not(:disabled) { background: rgba(250, 32, 65, .14); color: var(--red-800); }
+.icon-btn.icon-btn-danger:active:not(:disabled) { background: rgba(250, 32, 65, .22); }
+
+/* ══════════════ ROUND BUTTON ══════════════
+   A circle with one glyph in it and no words — the control you put on a canvas rather
+   than in a rail. `.icon-btn` is the other shape of the same idea and they do not
+   compete: `.icon-btn` is transparent until the cursor arrives and belongs *in* a row of
+   fields, where a plate of its own would be a second surface stacked on the one being
+   read. This one stands alone over an image, a scene or a preview, so it has to be
+   visible before anything is pointed at, and it has a body.
+
+   ── WHY IT IS ITS OWN SIZE AT EACH END ──
+   48 with a pointer, 32 with a thumb, and that is the opposite of what a target-size rule
+   would say. The rule is about targets that are hard to hit; this one floats over the
+   content in the corner a thumb reaches *by accident*, and a 48 circle parked there on a
+   phone covers the thing it is a control for. On a desktop there is room and nothing is
+   hit by mistake, so it takes the `.btn` height and lines up with everything else.
+
+   The two numbers are the component's, not the page's — no modifier class, because a
+   caller choosing between them is a caller who will pick wrong on one of the two screens.
+
+   ── THE HOVER IS THE ACCENT ──
+   Same bargain `.print-btn` makes: neutral at rest, the accent kept for the moment
+   somebody reaches for it. Blue is the UI accent here and not a brand colour.
+
+   Transitions are `.btn`'s, to the millisecond, because they are the same gesture. */
+.round-btn {
+  --round-size: 48px;
+  flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--round-size); height: var(--round-size); padding: 0;
+  border: none; border-radius: 9999px;
+  background: var(--black-700); color: var(--white);
+  cursor: pointer;
+  transition: background .15s, color .15s, transform .08s;
+}
+.round-btn[hidden] { display: none; }
+.round-btn svg { display: block; }
+.round-btn:hover:not(:disabled) { background: var(--accent); color: var(--accent-ink); }
+.round-btn:active:not(:disabled) { transform: scale(.98); }
+.round-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--white-32); }
+/* Dimmed rather than removed, the same as every other switched-off control in the kit: a
+   button that vanishes is a button somebody looks for. */
+.round-btn:disabled { opacity: .35; cursor: default; }
+/* A glyph drawn for the 48 is a glyph rattling around inside the 32. The scale factor is
+   the sizes' own ratio, so one number moves and the drawing follows it. */
+@media (max-width: 767px) {
+  .round-btn { --round-size: 32px; }
+  .round-btn svg { transform: scale(.667); }
+}
+
+/* The one filled call to action per tool. White at rest so it is the brightest object
+   on screen; the accent is reserved for its hover and active states (UI accent, not a
+   brand colour — same rule as the donor's Print button). */
+.print-btn {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 48px; padding: 0 20px; border-radius: 9999px; border: none;
+  background: var(--white); color: var(--black-1000);
+  font-size: var(--text-14); font-weight: 600; font-family: var(--font-primary);
+  cursor: pointer; transition: background .15s, transform .08s;
+}
+/* Icon is pulled out of the flow and pinned left, so the label stays optically centred
+   whether or not an icon is present. */
+.print-btn > svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); }
+.print-btn:hover { background: var(--accent-deep); }
+.print-btn:active { background: var(--accent-deep); transform: scale(.98); }
+.print-note { font-size: var(--text-10); color: var(--black-350); line-height: 1.5; }
+
+/* ── FOOTER ──
+   margin-top:auto has to live on .sidebar-tile itself (the actual flex child of
+   .sidebar) to push the footer tile to the bottom when content is short — a nested
+   child's auto margin wouldn't reach through to the outer flex container.
+
+   Asked for by class, not by :last-child. Every rail has a last tile; only some rails
+   have a footer. On the ones that do not, :last-child pushed an ordinary plate to the
+   bottom of the column and opened a gap that read as a missing section — the seams are
+   12px everywhere and that one was however much space happened to be left. */
+.sidebar-tile.is-footer { margin-top: auto; }
+.sidebar-footer { padding: var(--space-16); display: flex; flex-direction: column; gap: var(--space-8); }
+
+/* ══════════════ TOAST ══════════════
+   The confirmation that something landed. It says one thing and disappears, so it takes
+   no space in the layout, no border and no shadow — a fixed pill at the foot of the
+   screen, fading in and settling up 8px rather than sliding across, because a message
+   that travels asks to be followed. Fully rounded, not --radius-8: every other plate in
+   the kit is a surface you put things on and its radius is part of that language; this
+   one is a single line of text with nothing under it. */
+.toast {
+  position: fixed; left: 50%; bottom: 40px; z-index: 80;
+  transform: translateX(-50%) translateY(8px);
+  display: flex; align-items: center; gap: var(--space-8);
+  padding: 10px 18px; border-radius: 9999px;
+  background: var(--white); color: var(--black-1000);
+  font-family: var(--font-primary); font-size: var(--text-12); font-weight: 600;
+  white-space: nowrap;
+  opacity: 0; pointer-events: none;
+  transition: opacity .15s, transform .15s;
+}
+.toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* For a light stage. */
+.toast-invert { background: var(--black-1000); color: var(--white); }
+/* Optional leading chip — a colour that was copied, shown rather than named. */
+.toast-chip { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(17, 18, 17, .15); }
+.toast-invert .toast-chip { box-shadow: inset 0 0 0 1px var(--white-20); }
+
+/* ══════════════ CHECKBOX ══════════════
+   A real <input type="checkbox"> with appearance stripped, so keyboard, form submission
+   and :indeterminate keep working. Shares the input shell: --black-700 fill, transparent
+   1px border going --black-500 on hover and --white on focus. Checked fills white with a
+   --black-1000 glyph — the accent is not spent here, because a checkbox is a statement of
+   fact rather than a call to action. Square at --radius-4: the pill rule is for buttons,
+   and a round checkbox is a radio. */
+.ui-checkbox {
+  appearance: none; -webkit-appearance: none;
+  width: 20px; height: 20px; flex-shrink: 0; margin: 0;
+  border-radius: var(--radius-4);
+  background-color: var(--black-700);
+  background-repeat: no-repeat; background-position: center;
+  border: 1px solid transparent; cursor: pointer;
+  transition: background-color .15s, border-color .12s;
+}
+.ui-checkbox:hover { border-color: var(--black-500); }
+.ui-checkbox:focus-visible { outline: none; border-color: var(--white); }
+.ui-checkbox:checked {
+  background-color: var(--white);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'><path d='M3.2 8.4L6.4 11.6L12.8 4.8' stroke='%23111211' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+/* A white border would be invisible on a white fill, so the surface darkens instead. */
+.ui-checkbox:checked:hover { background-color: var(--black-100); }
+/* Mixed state — a parent whose children are only partly selected. */
+.ui-checkbox:indeterminate {
+  background-color: var(--white);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'><path d='M4 8H12' stroke='%23111211' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+}
+.checkbox-row { display: flex; align-items: center; gap: var(--space-12); }
+.checkbox-row label { font-size: var(--text-13); font-weight: 600; color: var(--white); cursor: pointer; }
+.checkbox-row.is-disabled { opacity: .4; pointer-events: none; }
+.checkbox-group { display: flex; flex-direction: column; gap: var(--space-12); }
+.checkbox-group .checkbox-group { padding-left: var(--space-32); margin-top: var(--space-12); }
+.is-frosted .ui-checkbox { background-color: var(--frost-700); }
+.is-frosted .ui-checkbox:checked { background-color: var(--white); }
+
+/* ══════════════ RADIO ══════════════
+   The checkbox's shell and state ladder, round and mutually exclusive. Kept as a real
+   <input type="radio"> so arrow-key navigation within a name group, form submission and
+   label clicks all keep working without script. */
+.ui-radio {
+  appearance: none; -webkit-appearance: none;
+  width: 20px; height: 20px; flex-shrink: 0; margin: 0;
+  border-radius: 50%;
+  background-color: var(--black-700);
+  background-repeat: no-repeat; background-position: center;
+  border: 1px solid transparent; cursor: pointer;
+  transition: background-color .15s, border-color .12s;
+}
+.ui-radio:hover { border-color: var(--black-500); }
+.ui-radio:focus-visible { outline: none; border-color: var(--white); }
+.ui-radio:checked {
+  background-color: var(--white);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'><circle cx='8' cy='8' r='3.4' fill='%23111211'/></svg>");
+}
+.ui-radio:checked:hover { background-color: var(--black-100); }
+.radio-row { display: flex; align-items: center; gap: var(--space-12); }
+.radio-row label { font-size: var(--text-13); font-weight: 600; color: var(--white); cursor: pointer; }
+.radio-row.is-disabled { opacity: .4; pointer-events: none; }
+.radio-group { display: flex; flex-direction: column; gap: var(--space-12); }
+.is-frosted .ui-radio { background-color: var(--frost-700); }
+.is-frosted .ui-radio:checked { background-color: var(--white); }
+
+/* ══════════════ ICON BUTTON ══════════════
+   A glyph standing on its own, with no chrome until the cursor arrives. Hover draws a
+   round plate behind it — white at a very low alpha, so it reads as the surface lifting
+   rather than as a new object, and it works over any of the kit's greys without a
+   per-surface value. The glyph never changes colour: the plate already says "this one".
+
+   Two sizes on the same 2:1 plate-to-glyph ratio — 32/16 for dense panels, 40/20 (.icon-btn-md)
+   for controls sitting alone in open space. Author the larger glyph on a 20px viewBox
+   rather than scaling the 16px one, or the stroke thickens and the two stop looking
+   like one family. */
+.icon-btn {
+  width: 32px; height: 32px; flex-shrink: 0; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: none; border-radius: 9999px;
+  color: var(--white); cursor: pointer;
+  transition: background .12s, opacity .12s;
+}
+.icon-btn-md { width: 40px; height: 40px; }
+/* ── A THIRD SIZE, ADDED 2026-09-04 ──
+   24/16 — the plate shrinks, the glyph does not. It is for a *row's* controls rather
+   than a panel's: three of the 32s at the end of a 268-wide rail row take 112 with their
+   gaps, and the name in front of them was being truncated to make room for buttons whose
+   targets were already comfortable. The glyph stays 16 because that is what is read; what
+   comes off is the ring of empty plate around it.
+
+   ⚠ 24 is under the 44 both platforms ask for, so it is for pointer surfaces only — a rail
+   in a desktop tool. Do not put it on anything a thumb has to hit. */
+.icon-btn-sm { width: 24px; height: 24px; }
+.icon-btn svg { display: block; }
+.icon-btn:hover:not(:disabled) { background: var(--white-08); }
+.icon-btn:active:not(:disabled) { background: var(--white-14); }
+.icon-btn:focus-visible {
+  outline: none; background: var(--white-08);
+  box-shadow: 0 0 0 2px var(--white-32);
+}
+.icon-btn:disabled { opacity: .3; cursor: default; }
+/* ── THE FORMAT BAR ──
+   Four 24px icon buttons over the textarea they act on. Sits directly on the panel rather
+   than on a plate of its own: a toolbar with a background of its own reads as a second
+   surface stacked on the field, and the field is what the person is looking at.
+
+   The 4 gap is the label's, so the row of buttons lines up with the label above it and
+   the field below rather than floating between them. */
+.fmt-bar {
+  display: flex; align-items: center; gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.icon-btn-group { display: inline-flex; align-items: center; gap: var(--space-4); }
+.icon-btn-group-md { gap: var(--space-8); }
+
+/* ══════════════ FIELD STATES ══════════════
+   The error edge. Border carries it and the fill stays --black-700, so the control still
+   reads as a field rather than as a warning that happens to accept typing. Hover steps to
+   --red-800 and focus returns to --red-1000 — the same hover→focus progression the
+   neutral field has, rather than dropping to the white focus edge and losing the error. */
+.dark-input.is-error,
+.select.is-error,
+.field-value-input.is-error,
+.stepper.is-error { border-color: var(--red-1000); }
+.dark-input.is-error:hover,
+.select.is-error:hover,
+.field-value-input.is-error:hover,
+.stepper.is-error:hover { border-color: var(--red-800); }
+.dark-input.is-error:focus,
+.select.is-error:focus,
+.field-value-input.is-error:focus,
+.stepper.is-error:focus-within { outline: none; border-color: var(--red-1000); }
+
+.field-error {
+  display: flex; align-items: center; gap: 6px;
+  font-size: var(--text-11); font-weight: 500; color: var(--red-1000); margin-top: 6px;
+}
+.field-error svg { flex-shrink: 0; }
+.field-label.is-error { color: var(--red-1000); }
+
+/* A number on its own, right-aligned, for a label/value row where the label is the
+   question and the field is just the answer. */
+.field-value-input {
+  width: 72px; height: 48px;
+  background: var(--black-700); border: 1px solid transparent; border-radius: var(--radius-8);
+  color: var(--white); font-size: var(--text-14); font-weight: 600; font-family: var(--font-primary);
+  text-align: right; padding: 0 16px;
+  font-variant-numeric: tabular-nums;
+  transition: border-color .12s;
+}
+.field-value-input:hover { border-color: var(--black-500); }
+.field-value-input:focus { outline: none; border-color: var(--white); }
+.field-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); }
+.field-row .field-label { margin-bottom: 0; }
+.is-frosted .field-value-input { background-color: var(--frost-700); }
+
+/* ══════════════ POPUP ══════════════
+   A panel that happens to float. Same plate as every other surface in the kit, so it
+   inherits the language rather than inventing a modal one: --black-900 ground, 24px
+   inset, 16px between blocks. The confirming action sits rightmost, closest to the
+   corner the cursor leaves from. */
+.popup {
+  position: relative; width: 468px; max-width: 100%;
+  display: flex; flex-direction: column; gap: var(--space-16);
+  padding: var(--space-24);
+  background: var(--black-900); border-radius: var(--radius-16);
+}
+.is-frosted .popup {
+  background: var(--frost-900);
+  backdrop-filter: var(--frost-blur); -webkit-backdrop-filter: var(--frost-blur);
+  box-shadow: var(--frost-edge);
+}
+/* ── POPUP OVERLAY ──
+   The kit had a popup and no way to show one. `.popup` is a plate, and a plate on its own
+   is a panel that happens to float — it needed the thing that makes it modal: a scrim that
+   dims what is behind, centres the plate and swallows clicks aimed past it.
+
+   `hidden` rather than a class, so the subtree leaves the accessibility tree instead of
+   merely going invisible, and `display: flex` has to be overridden explicitly — the same
+   note `.btn[hidden]` carries, for the same reason.
+
+   0.64 on black rather than a blur: a blurred backdrop competes with `.is-frosted`, which
+   already blurs, and two blurs stacked read as a rendering fault rather than a hierarchy. */
+.popup-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--space-24);
+  background: var(--scrim-64);
+}
+.popup-overlay[hidden] { display: none; }
+
+/* 16px in from the corner, overlapping the 24px content inset rather than pushing the
+   title inward. */
+.popup-close { position: absolute; top: var(--space-16); right: var(--space-16); }
+.popup-header { display: flex; flex-direction: column; gap: var(--space-12); padding-bottom: var(--space-24); }
+.popup-title { font-size: var(--text-24); font-weight: 600; line-height: 1.25; color: var(--white); }
+.popup-text { font-size: var(--text-14); font-weight: 400; line-height: 1.5; color: var(--black-200); }
+.popup-actions { display: flex; gap: var(--space-8); justify-content: flex-end; }
+.popup-actions .btn,
+.popup-actions .print-btn { width: 124px; }
+
+/* ══════════════ STATIC STATES ══════════════
+   `data-state` paints a control in a state it is not actually in. This exists for the
+   specimen page, which has to show hover, focus and active side by side without a
+   cursor in three places at once — and for screenshots, where a real :hover cannot be
+   captured. Product code never sets these: the pseudo-classes above are the real
+   behaviour, and these only mirror them. */
+[data-state="hover"].dark-input,
+[data-state="hover"].select,
+[data-state="hover"].field-value-input,
+[data-state="hover"].stepper,
+[data-state="hover"].ui-checkbox,
+[data-state="hover"].ui-radio { border-color: var(--black-500); }
+[data-state="focus"].dark-input,
+[data-state="focus"].select,
+[data-state="focus"].field-value-input,
+[data-state="focus"].stepper,
+[data-state="focus"].ui-checkbox,
+[data-state="focus"].ui-radio { border-color: var(--white); }
+[data-state="hover"].btn { background: var(--black-600); }
+[data-state="hover"].btn-danger {
+  background: var(--red-1000); box-shadow: inset 0 0 0 1px var(--red-1000); color: var(--white);
+}
+[data-state="hover"].icon-btn.icon-btn-danger { background: rgba(250, 32, 65, .14); color: var(--red-800); }
+[data-state="active"].btn { transform: scale(.98); }
+[data-state="hover"].print-btn,
+[data-state="active"].print-btn { background: var(--accent-deep); }
+[data-state="active"].print-btn { transform: scale(.98); }
+[data-state="hover"].icon-btn { background: var(--white-08); }
+[data-state="active"].icon-btn { background: var(--white-14); }
+[data-state="hover"].round-btn,
+[data-state="active"].round-btn { background: var(--accent); color: var(--accent-ink); }
+[data-state="active"].round-btn { transform: scale(.98); }
+[data-state="hover"].swatch-btn { opacity: .78; }
+[data-state="hover"].file-in { background-color: var(--black-600); }
+[data-state="hover"].stepper-btn { background: var(--black-600); color: var(--white); }
+[data-state="checked-hover"].ui-checkbox,
+[data-state="checked-hover"].ui-radio { background-color: var(--black-100); }
+
+/* ══════════════ MAIN / STAGE ══════════════
+   position:relative makes .main the anchor for the view tab, the caption and the bottom
+   bar. Those were pinned with `position: fixed; left: 300px` — the sidebar's width —
+   which is short by the page's 24px padding and the 24px flex gap. Anchoring to .main
+   removes the magic number and keeps everything in the layout. */
+.main {
+  position: relative;
+  flex: 1; min-width: 0; height: 100vh; height: 100dvh; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; padding: 32px 24px;
+}
+
+/* The stage box stays anchored to .main, because the controls inside it — the view tab,
+   the caption, the hint — should stay centred in the free area rather than in the window.
+   The canvas itself is a different matter: it is pinned to the whole viewport and runs
+   underneath the sidebar, which then overlays it. Confining it to .main cut the model off
+   wherever the column begins, and left the frosted chrome with nothing behind it to blur. */
+.stage {
+  position: fixed; inset: 0; z-index: 1;
+}
+.stage[hidden] { display: none; }
+/* width/height are not optional here. A canvas is a replaced element: it has an intrinsic
+   size from its drawing buffer, and for those `left:0; right:0` does not stretch the box
+   the way it would for a div. Without these the canvas laid out at buffer size — twice the
+   viewport on a 2× display — and hung off the bottom-right corner. */
+.stage canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  display: block; cursor: grab; touch-action: none;
+}
+.stage canvas.is-dragging, .stage canvas:active { cursor: grabbing; }
+
+/* Hint — bare text at the foot of the stage, no plate. It is the one thing on screen
+   that expects to be read once and then never again, so giving it a surface of its own
+   would leave a permanent object standing in for a temporary message. Muted grey and
+   pointer-events:none say the same thing: this is not part of the tool. */
+.stage-hint {
+  position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 20;
+  font-size: var(--text-11); font-weight: 500; color: var(--black-350);
+  white-space: nowrap; pointer-events: none;
+  transition: opacity .3s ease;
+}
+.stage-hint.is-hidden { opacity: 0; }
+
+/* View switch — the same icon toggle the sidebar controls use (.iconseg). The wrapper
+   does the pinning: buildIconToggle overwrites its target's className and the thumb is
+   positioned against it, so the target cannot also carry layout of its own. */
+.view-tab {
+  position: absolute; top: 28px; left: 0; right: 0; margin: 0 auto; z-index: 30;
+  width: 240px;
+}
+/* ── BRAND MARKS ──
+   The tool's own mark opens the rail; the company's sits at the top of the stage. Both
+   are inlined SVG on currentColor rather than <img>, so they take the kit's ink and
+   need no second file to keep in step with the theme. */
+.brand-a1 { height: 24px; width: auto; display: block; color: var(--white); }
+.brand-wave {
+  /* 43, not 28: the mark is 34 tall and the projection tabs are 64 starting at 28, so
+     their centre line is 60 down. Every mark on this row is aligned to that line rather
+     than to a shared top edge, which is what makes objects of different heights look
+     level instead of merely flush. */
+  position: absolute; top: 43px; right: 0; z-index: 30;
+  width: 34px; height: 34px; color: var(--black-250);
+  transition: color .2s ease;
+}
+.brand-wave:hover { color: var(--white); }
+
+/* ── An empty plate ──
+   A product that has a code and no photograph yet. The first version of this was a dashed
+   box with a camera glyph in it, which is a status message drawn twice: the dashes say
+   *missing*, the camera says *image*, and together they read as a fault rather than as work
+   that has not happened yet.
+
+   So: no border, and the company's mark at the centre. The frame was carrying the meaning
+   and now the mark does — a plate with a quiet wave on it is recognisably an Akvantis plate
+   waiting for its render, and an unbordered one sits in a row of photographs without drawing
+   a rectangle around the one item that has nothing to show. It is the same behaviour as a
+   photograph that has not loaded: the layout does not change, only the contents.
+
+   Sized as a fraction of the plate rather than in pixels, because the plate appears at three
+   sizes — grid card, product view, sidebar tile — and a mark that keeps its share of the box
+   looks deliberate at all three where a fixed 40px looks lost in the largest.
+
+   The plate is a filled square, not an outline. An outline draws attention to its own edge
+   — the border is the loudest thing in the row and it is around the one item with nothing
+   in it — where a fill one step off the page reads as a surface waiting for something. It
+   is the same silhouette a loaded photograph occupies, so nothing moves when the render
+   arrives.
+
+   The fill is white at 1%, not a step of the grey scale. A translucent white takes its value
+   from whatever it is laid on, so the same plate is right on the page, on a panel and on a
+   card without a second token per ground — and 1% is barely a surface at all, which is the
+   point: the plate is there to hold the position, not to be looked at. 24 on the corners, one step above everything else in the kit, because a large
+   empty square with small corners reads as a field and not as a plate.
+
+   Two knobs: `--plate-bg` for the surface and `--plate-ink` for the mark. The defaults are
+   dark enough to stay behind the type on the card, which is the whole intent — a shape
+   rather than a smudge, and quieter than anything real beside it. */
+.plate-empty {
+  display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 1; width: 100%; overflow: hidden;
+  background: var(--plate-bg, var(--white-01));
+  border-radius: var(--radius-24);
+}
+.plate-empty > svg,
+.wave-mark {
+  width: 22%; min-width: 32px; max-width: 96px; height: auto; flex: none;
+  color: var(--plate-ink, var(--black-700));
+}
+
+/* Camera / projection switch — the same control as the view tab, one notch wider
+   because its labels are longer. It sits at the top of the stage here rather than at
+   the foot of it as in the donor, so the bottom of the free area belongs to one object
+   only. */
+.camera-tab {
+  position: absolute; top: 28px; left: 0; right: 0; margin: 0 auto; z-index: 30;
+  width: 280px;
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+/* Away with the rail. Hiding the sidebar is a request for the box on its own — leaving
+   one control floating over an otherwise empty window makes it read as the subject
+   rather than as the chrome it is. It comes back with the rail; nothing is lost, and
+   the projection is the one setting you can see the state of without being told. */
+.app.is-collapsed .camera-tab {
+  opacity: 0; transform: translateY(-6px); pointer-events: none;
+}
+
+/* ── BOTTOM BAR ──
+   A floating pill over the scene rather than a strip in the layout, so it follows the
+   same frosted rule as everything else that sits on the stage.
+
+   Fixed width and centred: stretched edge to edge the track grew with the window, so
+   the same drag meant a different amount of travel on every screen.
+
+   Fully rounded, not --radius-12, and for the same reason as the toast: every other
+   plate in the kit is a surface you put things on, and its radius is part of that
+   language. This one holds a single control and nothing else.
+
+   The two end labels are the whole legend — there is no title and no percentage. A
+   slider between two named ends does not need a third thing telling you which slider
+   it is, and a number is precision this control does not have. The end the handle is
+   nearer is the lit one; the other steps back. */
+.bottom-bar {
+  position: absolute; left: 0; right: 0; bottom: 40px; margin: 0 auto; z-index: 20;
+  width: 360px;
+  display: flex; align-items: center; gap: var(--space-16);
+  padding: 10px 24px;
+  background: var(--black-900); border: 1px solid transparent; border-radius: 9999px;
+}
+.bottom-bar .range { flex: 1; min-width: 0; }
+.bottom-bar[hidden] { display: none; }
+.bottom-bar-end {
+  font-size: var(--text-14); font-weight: 500; white-space: nowrap;
+  color: var(--black-350); transition: color .15s ease;
+  -webkit-user-select: none; user-select: none;
+}
+.bottom-bar-end.is-near { color: var(--white); }
+/* Kept for tools that do want a caps title on the bar. */
+.bottom-bar-label {
+  font-size: var(--text-11); font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--black-250); white-space: nowrap;
+}
+.bottom-bar .val { font-size: var(--text-13); font-weight: 600; font-variant-numeric: tabular-nums; width: 42px; text-align: right; }
+
+/* ── SCENE PANEL ──
+   The scratch panel for dialling in a WebGL scene: lighting, relief, surface response.
+   Bottom-right, hidden until asked for, because it is for the person building the tool
+   rather than the person using it — the same role the donor's lighting panel plays.
+
+   Deliberately denser than the rest of the kit: 11px labels, 6px rows, no 48px controls.
+   A tuning panel is read while looking at something else, and every pixel it takes is a
+   pixel of the thing being tuned. */
+.scene-panel {
+  position: absolute; right: 0; bottom: 0; z-index: 40;
+  width: 220px; max-height: calc(100% - 32px); overflow-y: auto;
+  padding: 12px 14px 12px;
+  background: var(--black-800); border: 1px solid var(--black-600); border-radius: var(--radius-12);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.scene-panel[hidden] { display: none; }
+.is-frosted .scene-panel {
+  background-color: var(--frost-900); border-color: transparent;
+  backdrop-filter: var(--frost-blur); -webkit-backdrop-filter: var(--frost-blur);
+  box-shadow: var(--frost-edge);
+}
+.scene-panel-title {
+  font-size: var(--text-10); font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--black-350); margin: 6px 0 2px;
+}
+.scene-panel-title:first-child { margin-top: 0; }
+.scene-panel label {
+  display: grid; grid-template-columns: 58px 1fr 30px; align-items: center; gap: 8px;
+  font-size: var(--text-11); font-weight: 500; color: var(--black-250);
+}
+.scene-panel input[type="range"] {
+  width: 100%; height: 14px; margin: 0; accent-color: var(--accent);
+}
+.scene-panel .val {
+  font-size: var(--text-10); font-weight: 600; color: var(--black-200);
+  font-variant-numeric: tabular-nums; text-align: right;
+}
+/* Choice row — pills where a slider's track would be, so the label column still lines
+   up with every row above and below it. */
+.scene-panel-seg { display: flex; gap: 3px; }
+.scene-panel-seg button {
+  flex: 1; min-width: 0; padding: 4px 0; border: 0; border-radius: 9999px;
+  font-size: var(--text-9); font-weight: 600; font-family: var(--font-primary);
+  color: var(--black-300); background: var(--black-700); cursor: pointer;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: background .12s, color .12s;
+}
+.scene-panel-seg button:hover { color: var(--white); }
+.scene-panel-seg button.is-on { background: var(--accent); color: var(--accent-ink); }
+
+.scene-panel-row { display: flex; gap: 6px; margin-top: 8px; }
+.scene-panel-row button {
+  flex: 1; padding: 6px 0; border: 0; border-radius: 9999px;
+  font-size: var(--text-10); font-weight: 600; font-family: var(--font-primary);
+  color: var(--black-200); background: var(--black-700); cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.scene-panel-row button:hover { background: var(--black-600); color: var(--white); }
+.scene-panel-hint { font-size: var(--text-10); color: var(--black-400); margin-top: 8px; }
+
+.preview-caption {
+  position: absolute; left: 0; right: 0; bottom: 16px; z-index: 20;
+  font-size: var(--text-12); font-weight: 600; color: var(--black-250); text-align: center;
+}
+.preview-caption b, .preview-caption strong { color: var(--white); font-variant-numeric: tabular-nums; }
+
+/* ══════════════ TOP BAR ══════════════
+   ⚠ MOVED OUT — 2026-09-10. The bar lives in `topbar.css` now, beside `panel.css` and
+   `swatch.css`, and for the same reason those are separate files: the passport page
+   cannot load `kit.css` — it opens with `html, body { height: 100dvh; overflow: hidden }`
+   and a reading document scrolls — yet it wants this exact bar. It was wearing a
+   hand-written copy of it, which is the copy this move deletes.
+
+   A page that has `kit.css` and expects the bar links `topbar.css` alongside it. */
+
+/* ── CALENDAR ──
+   A month on a popover, anchored under the field it fills. It exists because a date typed
+   as `07.05.2026` is ambiguous to the person typing it — 7 May and 5 July are the same
+   eleven characters, and the field cannot say which it took. A grid with the weekday
+   letters over it can only be read one way.
+
+   The field stays a text input and stays typeable. This is an aid, not a gate: a date
+   somebody knows is faster from the keyboard than from twelve clicks through the months,
+   and a picker that refuses typing is a picker people fight. What the calendar guarantees
+   is that whatever arrives is written back in one format.
+
+   Positioned by the caller against the field, so the popover does not need to know where
+   it is on the page — see `Kit.calendar`. */
+.cal {
+  position: absolute; z-index: 60; min-width: 252px;
+  background: var(--black-800); border: 1px solid var(--black-600);
+  border-radius: var(--radius-12); padding: var(--space-12);
+  box-shadow: 0 12px 32px var(--scrim-50);
+  font-family: var(--font-primary);
+}
+.cal[hidden] { display: none; }
+
+.cal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-8); margin-bottom: var(--space-12);
+}
+/* The month is the label, and it is the widest thing in the head — stated centre so the
+   two arrows sit at the edges rather than crowding it. */
+.cal-title {
+  flex: 1 1 auto; text-align: center;
+  color: var(--white); font-size: var(--text-13); font-weight: 600;
+}
+.cal-nav {
+  flex: 0 0 auto; width: 28px; height: 28px; display: grid; place-items: center;
+  background: transparent; border: 0; border-radius: 50%;
+  color: var(--black-250); cursor: pointer; transition: background .12s, color .12s;
+}
+.cal-nav:hover { background: var(--black-700); color: var(--white); }
+.cal-nav:focus-visible { outline: 2px solid var(--white); outline-offset: 1px; }
+
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+/* Two letters, not three: the column is a 32px cell and `Mon` sets wider than it at any
+   weight worth reading. The row is a ruler for the grid under it, so it is muted. */
+.cal-dow {
+  height: 24px; display: grid; place-items: center;
+  color: var(--black-350); font-size: var(--text-11); font-weight: 500;
+}
+/* A circle, not a rounded box. The cell is a 1fr column and the mark inside it is 32 by 32
+   centred — a radius on a full-width cell would give a lozenge on the wider columns and the
+   selected day would be a different shape depending on which weekday it fell on. */
+.cal-day {
+  width: 32px; height: 32px; margin: 0 auto;
+  display: grid; place-items: center;
+  background: transparent; border: 0; border-radius: 50%;
+  color: var(--white); font-size: var(--text-12); font-weight: 500;
+  font-variant-numeric: tabular-nums; cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.cal-day:hover { background: var(--black-700); }
+.cal-day:focus-visible { outline: 2px solid var(--white); outline-offset: -2px; }
+/* The days either side of the month are drawn rather than blanked: a grid that starts
+   mid-row reads as broken, and the greyed neighbours say which row is which week. */
+.cal-day.is-out { color: var(--black-450); }
+/* Today is outlined and the selection is filled. Two different statements — one is where
+   the calendar is, the other is what the field says — and a person needs to tell them
+   apart at a glance on a month where they are the same cell. */
+.cal-day.is-today { box-shadow: inset 0 0 0 1px var(--black-400); }  /* the ring is round with the cell */
+.cal-day.is-on,
+.cal-day.is-on:hover { background: var(--accent); color: var(--accent-ink); }

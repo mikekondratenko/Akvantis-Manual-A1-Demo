@@ -1,0 +1,108 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Manual — the electronic setup guide.
+
+   ⚠ THIS FILE IS A HOLDING PATTERN.
+
+   The guide's design is being drawn and is not here yet. What is here is the
+   shell: tokens from the kit, a dark ground, a measure, and enough type to make
+   the placeholder look like Akvantis rather than like an unstyled document. When
+   the design arrives it replaces this file rather than extending it — nothing
+   below is a decision anybody made about how a manual should look.
+
+   What *is* a decision and should survive:
+
+   — **Tokens from the kit, layout local.** `kit.css` is instrument chrome for a
+     tool rail; a reading document has no use for it. `tokens.css` is the shared
+     language — ink, type, scale, radii — and that is the right seam. Same call
+     `Digital-Link/public/assets/dl.css` makes, and for the same reason.
+
+   — **Mobile first, and not as a figure of speech.** Every reader arrives by
+     scanning a carton, standing over it, phone in one hand, often with the water
+     off. Desktop is the secondary case.
+
+   — **A measure, not a viewport.** A manual is read, and prose set across a
+     1400 px screen is prose nobody finishes a paragraph of.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-primary);
+  font-size: var(--text-16);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding: var(--space-24) max(var(--space-24), env(safe-area-inset-left))
+           calc(var(--space-48) + env(safe-area-inset-bottom))
+           max(var(--space-24), env(safe-area-inset-right));
+}
+
+/* 560 rather than the Digital Link's 480: that page is a list of targets, this one
+   is prose, and prose wants a longer line than a stack of tap targets does. */
+.wrap { max-width: 560px; margin: 0 auto; }
+
+.head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-16);
+  padding-bottom: var(--space-24);
+  border-bottom: 1px solid var(--white-08);
+}
+.wordmark { display: block; width: 132px; height: auto; color: var(--white); }
+.wordmark svg { display: block; width: 100%; height: auto; }
+
+.eyebrow {
+  font-size: var(--text-12); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--black-300); margin: 0 0 var(--space-8);
+}
+.title { font-size: var(--text-28); line-height: 1.15; font-weight: 500; margin: 0; }
+.lede { font-size: var(--text-16); color: var(--black-250); margin: var(--space-16) 0 0; }
+
+.pending {
+  margin: var(--space-32) 0;
+  padding: var(--space-24);
+  border: 1px dashed var(--white-14); border-radius: var(--radius-16);
+  background: var(--white-03);
+}
+.pending p { margin: 0 0 var(--space-12); font-size: var(--text-14); color: var(--black-250); }
+.pending p:last-child { margin-bottom: 0; }
+
+.back {
+  display: inline-flex; align-items: center; gap: var(--space-8);
+  min-height: 44px;
+  color: var(--accent); text-decoration: none;
+  font-size: var(--text-14);
+}
+.back:hover { color: var(--accent-deep); }
+.back:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: var(--radius-4); }
+
+.foot {
+  margin-top: var(--space-48);
+  padding-top: var(--space-24);
+  border-top: 1px solid var(--white-08);
+  font-size: var(--text-12); color: var(--black-350);
+}
+.foot p { margin: 0 0 var(--space-4); }
+.foot a { color: var(--black-250); }
+
+@media (min-width: 720px) {
+  body { padding: var(--space-64) var(--space-32) var(--space-96); }
+  .title { font-size: var(--text-32); }
+}
+
+/* ── Coming soon ──
+   The mark and two words, centred in the viewport. `min-height: 100dvh` rather than `vh`:
+   on a phone the browser chrome eats the bottom of a `100vh` box and the line sits off
+   centre. The body's own padding is subtracted so the whole thing does not overflow by
+   exactly that much. */
+.soon {
+  min-height: calc(100dvh - var(--space-24) - var(--space-48));
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--space-24); text-align: center;
+}
+.soon .wordmark { width: 160px; }
+.soon-line { margin: 0; font-size: var(--text-14); letter-spacing: .08em; text-transform: uppercase;
+             color: var(--black-250); }

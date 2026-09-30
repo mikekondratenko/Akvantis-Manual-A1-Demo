@@ -1,0 +1,318 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tools UI Kit — tokens (Akvantis A1)
+
+   Cloned from the Shokobox Card Generator kit token block, one for one. The grey
+   scale, the type, the radii and the spacing are unchanged — those are what make
+   the two tools read as the same object. The only substitution is the accent:
+   Shokobox's Peach / Orange family is replaced by Blue, step for step, so every
+   rule that reached for --peach or --orange-1000 in the donor reaches for the
+   same slot here and needs no other edit.
+
+   Peach   #FE8455  →  Blue      #4EA1FF   (brand accent: toggles, slider, focus)
+   Orange  #FF7446  →  Blue-1000 #3D93FF   (UI accent: CTA hover / active only)
+
+   The type is the second substitution: Sora goes, Cy Grotesk Key takes its place —
+   the face the Akvantis drawings are already set in. See the @font-face note below.
+
+   Nothing in this file is Shokobox-specific and nothing in Shokobox depends on
+   this file — the donor repository is read-only for this project.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── CY GROTESK KEY ──
+   Self-hosted, because it is a licensed face and there is no CDN to point at. The OTF
+   in assets/fonts is the source; the woff2 beside it is what ships — 40 KB against 78,
+   and every browser this runs on takes it.
+
+   ONE CUT EVERYWHERE, AND THE RANGE IS DECLARED AS 100–900 ON PURPOSE. Two files sit in
+   assets/fonts — Key Regular (OS/2 300) and Key Medium (OS/2 500) — and the interface is
+   set entirely in Medium: at 10–13px on a dark ground the Regular ran thin, and light
+   text on dark already loses a fraction of a stem to the halation of the backlight.
+
+   Declared as a single weight, every rule in the kit asking for 500, 600 or 700 would
+   find no matching face and the browser would draw a synthetic bold instead — it smears
+   the stem and leaves the counters alone, so the same word came out at four densities
+   down one rail. Claiming the whole 100–900 range makes this file the match for every
+   weight the kit asks for: nothing is synthesised, and the real cut renders everywhere.
+
+   The markup keeps its 400/500/600/700. That is the intended hierarchy and it costs
+   nothing to leave in place — the day a Bold arrives, give it its own @font-face at 700,
+   narrow this one, and every rule picks it up untouched. To run the two present cuts as
+   a real pair instead of one: narrow this rule to `font-weight: 100 450` and point it at
+   the Regular file, then add a second at `font-weight: 500 900` for the Medium.
+
+   `font-display: swap` — the text is chrome around a 3D canvas, and a blank rail while a
+   44 KB file loads is worse than one frame of a fallback face. */
+@font-face {
+  font-family: 'Cy Grotesk Key';
+  src: url('../fonts/CyGrotesk-KeyMedium.woff2') format('woff2'),
+       url('../fonts/CyGrotesk-KeyMedium.otf') format('opentype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Ink and paper */
+  --black      : #111211;
+  --black-1000 : #111211;
+  --white      : #FCFFFE;
+
+  /* ── THE INK AT ALPHA ──
+     Every hairline, hover wash, pressed state and focus ring in the kit is the same white
+     laid on at a percentage. They were written inline — `rgba(252, 255, 254, 0.08)` in
+     thirty-odd places across the kit and the pages, half of them as `.08` and half as
+     `0.08`, and one of them as plain `255, 255, 255`, which is a different white nobody
+     meant to introduce. Named here, the ramp is a thing that can be looked at and reasoned
+     about instead of a number that gets retyped.
+
+     Translucent rather than a step of the grey scale on purpose: these sit on the page, on a
+     frosted plate and on a card, and an opaque grey that is right on one is wrong on the
+     other two. Written as a channel triple rather than mixed at use time so each stays one
+     value to change, and so they work where `color-mix` is not available.
+
+     THIRTEEN STEPS IS NOT A RAMP, IT IS A HISTORY. They are all here because they are all in
+     use, and naming them is the prerequisite for collapsing them — the roles underneath are
+     really five: surface, edge, hover, active, focus. See the note in ARCHITECTURE.md; the
+     merge is a design decision, not a rename, so it is not done in passing. */
+  --white-01   : rgba(252, 255, 254, .01);   /* the empty plate */
+  --white-03   : rgba(252, 255, 254, .03);   /* a surface lifted off the page */
+  --white-04   : rgba(252, 255, 254, .04);   /* hover, on a large surface */
+  --white-06   : rgba(252, 255, 254, .06);
+  --white-07   : rgba(252, 255, 254, .07);   /* the frosted edge, and most hairlines */
+  --white-08   : rgba(252, 255, 254, .08);   /* hover, on a control */
+  --white-09   : rgba(252, 255, 254, .09);
+  --white-10   : rgba(252, 255, 254, .10);
+  --white-12   : rgba(252, 255, 254, .12);
+  --white-14   : rgba(252, 255, 254, .14);   /* pressed */
+  --white-18   : rgba(252, 255, 254, .18);
+  --white-20   : rgba(252, 255, 254, .20);
+  --white-22   : rgba(252, 255, 254, .22);
+  --white-32   : rgba(252, 255, 254, .32);   /* the focus ring, everywhere */
+
+  /* ── SCRIM ──
+     Black at alpha, laid over the page rather than under the chrome: the ground behind a
+     modal and the shadow under a floating plate. Same argument as the ink ramp — they were
+     four inline values doing two jobs. */
+  --scrim-32   : rgba(0, 0, 0, .32);   /* the drop shadow under a lifted control */
+  --scrim-50   : rgba(0, 0, 0, .50);   /* the ground behind a modal */
+  --scrim-60   : rgba(0, 0, 0, .60);
+  --scrim-64   : rgba(0, 0, 0, .64);
+  --scrim-80   : rgba(0, 0, 0, .80);   /* the ground behind a desktop popup */
+  /* ── ON FROST, TILES ARE WHITE, NOT GREY (2026-09-28) ──
+     A grey tile on a frosted surface is a second, opaque surface fighting the blur. On
+     frost, anything that sits inside it is white at low alpha, so the blur shows through.
+     Any frosted container sets `--tile` / `--tile-hover` to these two. */
+  --on-frost        : var(--white-10);
+  --on-frost-hover  : var(--white-14);
+
+  /* ── FROSTED SURFACES ──
+     A translucent plate over a moving ground — the 3D stage in the Box Maker, the top bar and
+     the popups in the matrix. The values were declared inside `.is-frosted` in kit.css, which
+     was right while only that variant used them and wrong the moment a page wanted the same
+     plate without opting the whole shell into the variant: the matrix ended up with
+     `rgba(30, 32, 32, 0.72)` typed into five rules.
+
+     Declared here, applied there. `.is-frosted` in kit.css is still what swaps a shell's
+     surfaces over; this block is only what the surface *is*.
+
+     Alpha 0.72 is not a round number chosen for looks — it is the point at which the muted
+     label grey still clears AA over the lightest ground either tool puts behind it. */
+  --frost-900  : rgba(30, 32, 32, .72);   /* --black-900, translucent */
+  --frost-700  : rgba(40, 42, 42, .72);   /* --black-700, translucent */
+  --frost-blur : blur(24px) saturate(120%);
+  --frost-edge : inset 0 0 0 1px var(--white-07);
+
+  /* Grey scale — the sheet, the sidebar, every surface */
+  --black-50  : #F4F5F6;
+  --black-100 : #EAEBEC;
+  --black-150 : #CBCDCD;
+  --black-200 : #ADAFAF;
+  --black-250 : #989B9A;
+  --black-300 : #848786;
+  --black-350 : #656867;
+  --black-400 : #515353;
+  --black-450 : #474949;
+  --black-500 : #3C3E3E;
+  --black-600 : #323434;
+  --black-700 : #282A2A;
+  --black-800 : #232525;
+  --black-900 : #1E2020;
+
+  /* Blue — the brand accent. Occupies the slot Peach holds in the donor kit. */
+  --blue       : #4EA1FF;
+  --blue-900   : #4EA1FF;
+  --blue-100   : #DFECFF;
+  --blue-200   : #BEDAFF;
+  --blue-600   : #9FC8FF;
+  --blue-800   : #6FADFF;
+  --blue-1000  : #3D93FF;
+
+  /* Semantic aliases — what components should actually name. */
+  --accent      : var(--blue);
+  --accent-deep : var(--blue-1000);
+  --accent-ink  : var(--black-1000);
+
+  /* Red — destructive only */
+  --red-100  : #FFDDE2;
+  --red-200  : #FFBAC4;
+  --red-600  : #FF788C;
+  --red-800  : #FF4C67;
+  --red-1000 : #FA2041;
+
+  /* Green */
+  --green-100  : #CAF8D7;
+  --green-1000 : #244B2F;
+
+  /* Type */
+  --font-primary : 'Cy Grotesk Key', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono    : 'Spline Sans Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ── TYPE SCALE ──
+     This file named the face and then stopped, so every size in the kit and in three pages
+     was a pixel typed at the point of use. The count was twelve — 9, 10, 11, 12, 13, 14, 16,
+     24, 26, 28, 32, 56 — and nothing anywhere said which of them were the scale and which
+     were somebody matching a mockup. A register does not make the choice for you; it makes
+     the choice visible, which is the step before making it.
+
+     The chrome sizes are 10 to 14 and they carry almost everything: a label, a value, a menu
+     row, a note. The display sizes are what a page uses for a name or a number that has to be
+     read across a room, and they belong to pages rather than to controls — the kit itself
+     uses only 24, once.
+
+     26 AND 28 ARE BOTH HERE AND SHOULD NOT BOTH SURVIVE. They are one heading at two sizes on
+     two pages, which is the exact thing this block exists to expose. Collapsing them changes
+     what the pages look like, so it is a decision and not a rename. Same for 9, which is one
+     label on one page and one step below the smallest thing anybody else sets. */
+  --text-9   : 9px;
+  --text-10  : 10px;
+  --text-11  : 11px;
+  --text-12  : 12px;
+  --text-13  : 13px;
+  --text-14  : 14px;
+  --text-16  : 16px;
+  --text-24  : 24px;
+  --text-26  : 26px;
+  --text-28  : 28px;
+  --text-32  : 32px;
+  --text-56  : 56px;
+
+  /* ── RADIUS ──
+     Four corners off the same scale, so a 16px inset and a 16px corner are the same
+     measurement rather than two that happen to agree. */
+  --radius-4  : var(--number-4);
+  --radius-8  : var(--number-8);
+  --radius-12 : var(--number-12);
+  --radius-16 : var(--number-16);
+  --radius-24 : var(--number-24);
+
+  /* ── NUMBERS ──
+     The primitive scale, and the only place a pixel value is written down. Everything
+     dimensional in the kit reaches for a step of it rather than for a number, so a change
+     to the grid is a change to this block and to nothing else.
+
+     0, 2, 4, 8, 12, then 8 to 288. The head is finer than the tail on purpose: 2 and 4 are
+     hairlines and icon insets, where one step is the difference between two states of the
+     same control, and past 16 nothing on a 300px rail or a 1440px stage needs to land
+     between 24 and 32. 20 and 28 are absent for that reason rather than by oversight — a
+     scale that can express every even number is a scale that decides nothing.
+
+     288 is the ceiling because it is the widest measurement the shell has: the rail is 300
+     and its content is 288 wide once the plate takes its inset. Nothing above it would be
+     spacing; it would be a layout. */
+  --number-0   : 0px;
+  --number-2   : 2px;
+  --number-4   : 4px;
+  --number-8   : 8px;
+  --number-12  : 12px;
+  --number-16  : 16px;
+  --number-24  : 24px;
+  --number-32  : 32px;
+  --number-40  : 40px;
+  --number-48  : 48px;
+  --number-56  : 56px;
+  --number-64  : 64px;
+  --number-72  : 72px;
+  --number-80  : 80px;
+  --number-88  : 88px;
+  --number-96  : 96px;
+  --number-104 : 104px;
+  --number-112 : 112px;
+  --number-120 : 120px;
+  --number-128 : 128px;
+  --number-136 : 136px;
+  --number-144 : 144px;
+  --number-152 : 152px;
+  --number-160 : 160px;
+  --number-168 : 168px;
+  --number-176 : 176px;
+  --number-184 : 184px;
+  --number-192 : 192px;
+  --number-200 : 200px;
+  --number-208 : 208px;
+  --number-216 : 216px;
+  --number-224 : 224px;
+  --number-232 : 232px;
+  --number-240 : 240px;
+  --number-248 : 248px;
+  --number-256 : 256px;
+  --number-264 : 264px;
+  --number-272 : 272px;
+  --number-280 : 280px;
+  --number-288 : 288px;
+
+  /* ── SPACE ──
+     Gaps, padding and insets, named for what they measure. They alias the number scale
+     rather than restating it, so `--space-16` and `--radius-16` are provably the same
+     16 — which is the whole reason for the indirection: two independent lists of the same
+     numbers drift the first time one of them is edited. */
+  --space-0   : var(--number-0);
+  --space-2   : var(--number-2);
+  --space-4   : var(--number-4);
+  --space-8   : var(--number-8);
+  --space-12  : var(--number-12);
+  --space-16  : var(--number-16);
+  --space-24  : var(--number-24);
+  --space-32  : var(--number-32);
+  --space-40  : var(--number-40);
+  --space-48  : var(--number-48);
+  --space-56  : var(--number-56);
+  --space-64  : var(--number-64);
+  --space-72  : var(--number-72);
+  --space-80  : var(--number-80);
+  --space-88  : var(--number-88);
+  --space-96  : var(--number-96);
+  --space-104 : var(--number-104);
+  --space-112 : var(--number-112);
+  --space-120 : var(--number-120);
+  --space-128 : var(--number-128);
+  --space-136 : var(--number-136);
+  --space-144 : var(--number-144);
+  --space-152 : var(--number-152);
+  --space-160 : var(--number-160);
+  --space-168 : var(--number-168);
+  --space-176 : var(--number-176);
+  --space-184 : var(--number-184);
+  --space-192 : var(--number-192);
+  --space-200 : var(--number-200);
+  --space-208 : var(--number-208);
+  --space-216 : var(--number-216);
+  --space-224 : var(--number-224);
+  --space-232 : var(--number-232);
+  --space-240 : var(--number-240);
+  --space-248 : var(--number-248);
+  --space-256 : var(--number-256);
+  --space-264 : var(--number-264);
+  --space-272 : var(--number-272);
+  --space-280 : var(--number-280);
+  --space-288 : var(--number-288);
+
+  /* ── SHELL ──
+     Not on the scale, and stated here rather than forced onto it. 300 is the rail's own
+     measurement — 288 of content and the plate's 12 — and rounding it to 288 or 296 would
+     change the thing the number is for in order to tidy the list it sits in. */
+  --rail : 300px;
+  /* Collapsed rail: just the logo header — padding, the mark, a gap, the toggle
+     button. 108px is the content's own minimum; the extra 12 is breathing room
+     so the button never sits flush against the mark. */
+  --rail-collapsed : 120px;
+}

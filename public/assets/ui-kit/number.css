@@ -1,0 +1,54 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   NUMBER — a step number in a circle. Requires tokens.css (the face).
+
+   From Figma: the «Number» component (A1 Packaging, 985:462). Its `fill`
+   property is `data-fill` here, value for value, so markup can be checked
+   against the mock-up without translating names:
+
+     on      black disc, white figure             — the default
+     off     hairline outline, black figure
+     white   white disc, black figure             — over a dark picture
+     simple  no disc, larger figure
+
+   <span class="num">9</span>
+   <span class="num" data-fill="off">9</span>
+
+   ── ONE SIZE, EVERYTHING ELSE FROM IT ──
+   The mock-up uses the number at two sizes — 24 (figure 16) and 36 on a frame
+   (figure 24) — and both share one ratio: the figure is 2/3 of the disc, 5/6
+   for `simple`, and the `off` outline is 1/24. So one value is set,
+   `--num-size`, and the type size and the hairline are derived from it. A
+   document that measures in millimetres sets its size in its own units and
+   the number stays the same number.
+
+   ── PRINT COLOURS, NOT THE RAIL'S ──
+   The number lives on paper, not on the tools' dark rail, so its black and
+   white come from the mock-up's library (Black Shades / Black 100 #010006,
+   White Shades / White #FDFEFF) rather than the kit's `--black` #111211.
+   Override `--num-ink` and `--num-paper` on any ancestor. */
+.num{
+  --num-size  : var(--number-24, 24px);
+  --num-ink   : #010006;
+  --num-paper : #FDFEFF;
+
+  display:inline-flex;align-items:center;justify-content:center;flex:none;
+  box-sizing:border-box;
+  width:var(--num-size);height:var(--num-size);
+  border-radius:999px;overflow:hidden;
+  background:var(--num-ink);color:var(--num-paper);
+  font-family:var(--font-primary);font-weight:500;
+  font-size:calc(var(--num-size) * 2 / 3);line-height:1;
+  font-feature-settings:"lnum" 1, "pnum" 1;
+  text-align:center;white-space:nowrap;
+  /* a two-digit number (10, 16) stays inside the disc instead of widening it */
+  letter-spacing:-.02em;
+}
+.num[data-fill="off"]{
+  background:none;color:var(--num-ink);
+  border:calc(var(--num-size) / 24) solid var(--num-ink);
+}
+.num[data-fill="white"]{background:var(--num-paper);color:var(--num-ink)}
+.num[data-fill="simple"]{
+  background:none;color:var(--num-ink);
+  font-size:calc(var(--num-size) * 5 / 6);
+}

@@ -1,0 +1,136 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tools UI Kit — the colour swatch.
+
+   A finish as an object: a disc filled with the colour, and the name of the colour
+   under the row. It is a control in a rail — the Stick Maker picks a finish with it,
+   the Passport builder picks the finish a page shows — and a statement on a page,
+   where the same disc says which machine the reader is holding.
+
+   ⚠ Its own file because the page cannot load `kit.css` (see `panel.css` for that
+   argument), and a disc drawn twice is a disc that drifts. Requires `tokens.css`.
+
+   ── THE COLOUR IS DATA, NOT STYLE ──
+   Every consumer sets the fill as an inline `background` from the product matrix's own
+   hex. That is why `.is-active` uses `background-clip` with `!important`: the inline
+   shorthand resets every longhand it does not name, `background-clip` included, and
+   outranks a stylesheet.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.color-block { display: flex; flex-direction: column; gap: var(--space-8); }
+.pair-row { display: flex; gap: var(--space-8); flex-wrap: wrap; }
+.swatch-btn {
+  width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent;
+  cursor: pointer; padding: 0; position: relative; flex-shrink: 0;
+  transition: opacity .12s, border-color .12s, padding .12s;
+}
+/* Hover dims the disc; it does not grow it and it does not tint it. Growing moves the
+   swatch out from under the cursor and nudges the row; tinting changes the one thing the
+   control exists to show. */
+.swatch-btn:hover { opacity: .78; }
+.swatch-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--white-32); }
+/* Selected: the fill pulls in, the ring takes the edge — so a row of swatches does not
+   grow when one of them is chosen. Done with background-clip rather than a second
+   element, so the colour can keep arriving as an inline background on the button.
+   !important because that inline `background` is a shorthand: it resets every longhand
+   it does not name, background-clip included, and outranks this file. */
+.swatch-btn.is-active {
+  border-color: var(--white);
+  background-clip: content-box !important;
+  padding: 3px;
+}
+/* ── THE ONE THAT IS NOT A FINISH ──
+   A swatch whose colour is not on a list: the disc carries a real `<input type="color">`
+   stretched over it at zero opacity. The browser's picker, not one built here — it has
+   the eyedropper, it is reachable from the keyboard on every platform, and it is the one
+   the person already knows. Three things a wheel drawn in a rail would each have to earn.
+
+   Zero opacity rather than `hidden`, and this is the part that is easy to get wrong: a
+   hidden input cannot be clicked, and proxying a click to it opens the picker wherever
+   the browser feels like rather than under the swatch the person aimed at. So the input
+   *is* the hit area, and the disc behind it is only the fill.
+
+   Used for the ripple background's water. It has no place in a product finish row —
+   a finish is a thing that exists, not a colour somebody liked. */
+.swatch-custom { position: relative; overflow: hidden; display: block; padding: 0; }
+.swatch-custom.is-active { padding: 3px; }
+
+/* ── THE WHEEL IT WEARS WHILE NOTHING IS CHOSEN ──
+   The disc has to say "any other colour", and the drawing everybody reads that way is a
+   wheel. It belongs here rather than in the rail that uses it: it was an inline
+   `style.background` written from JavaScript, which meant the one visual element in the
+   row that is not data was drawn as if it were, and no other consumer of this file could
+   have it without copying the string.
+
+   ── WHY A CONIC GRADIENT AND NOT A LINEAR ONE ──
+   A linear ramp across a circle is a striped disc: the bands run edge to edge, the two
+   ends do not meet, and at 32px it reads as a smear. A wheel closes where it started,
+   which is what `conic-gradient` is for.
+
+   ── ⚠ IT WAS A HUE WHEEL AND IT IS NOT ANY MORE ──
+   Eight full-saturation hues at 45° bearings — red, orange, chartreuse, green, cyan,
+   blue, violet, magenta. Correct as a colour wheel and wrong as a component: it was the
+   only object in this kit wearing colours the kit does not own, so a 32px disc of clip
+   art sat in a rail where every other pixel is one of six greys and one blue. Changed
+   2026-09-13 to sweep THE KIT'S OWN PALETTE.
+
+   What it gives up is the claim "every hue is available", which was never true of the
+   drawing anyway — eight stops out of a continuum. What it keeps is the only thing the
+   disc has to say, which is "not one of the ones listed beside me": still a wheel, still
+   the one control in the row that is not a flat fill, and now made of this product.
+
+   ── THE SWEEP ──
+   Light at the top, the accent down the right, the deep green-teal at the bottom, the
+   neutral ramp back up the left. Four poles, evenly spaced, so no quadrant is a smear.
+
+   ⚠ `from 0deg`, not the `from -90deg` this carried while it was a hue wheel. That
+   quarter-turn was there to put red at twelve o'clock and it does not — `conic-gradient`
+   already measures from twelve, so `-90deg` put the first stop at NINE o'clock and the
+   old comment describing it was simply wrong for as long as it stood. Here the first stop
+   is white and it belongs at the top, which is what `0deg` does.
+   The bearing that matters is the one nobody asks for: `--blue-1000` into `--green-1000`
+   crosses a turquoise, which is the note the palette has no token for and the only place
+   in the kit it appears.
+
+   Written as `var()` and not as hexes, so the disc follows the palette rather than
+   holding a photograph of it.
+
+   No `!important`, and no guard. The rail writes an inline `background` the moment a
+   colour IS chosen, and inline already beats a stylesheet — so the wheel is what the disc
+   wears until there is a colour to wear instead, and clearing that inline value brings it
+   back. That is the whole state machine, in two places that cannot disagree. */
+.swatch-custom {
+  /* ⚠ THE WHEEL HAS TO FILL THE DISC, AND BY DEFAULT IT DOES NOT.
+     `.swatch-btn` carries a 2px transparent border so the selected ring can appear
+     without the disc changing size. A gradient is sized to the background POSITIONING
+     area, which is the padding box — 28 of the 32 — and then painted out into the border
+     box, so the wheel was drawn small and its edge colours smeared across the ring: a
+     pale band at nine o'clock, a dark one opposite, and the circle visibly not full.
+     `border-box` makes the positioning area the whole disc, which is what it looks like
+     and therefore what it should be.
+     ── AND IT IS `background-image`, NOT `background` ──
+     The shorthand INCLUDES `background-origin`, so written as `background:` it would
+     reset the line above it back to the padding box and undo the fix. The longhand leaves
+     the origin alone. Nothing else changes: an inline `background:` from the caller is
+     still a shorthand and still resets `background-image`, so a chosen colour covers the
+     wheel exactly as before. */
+  background-origin: border-box;
+  background-image: conic-gradient(from 0deg,
+    var(--white)        0deg,
+    var(--blue-200)    45deg,
+    var(--blue)        90deg,
+    var(--blue-1000)  135deg,
+    var(--green-1000) 180deg,
+    var(--black)      225deg,
+    var(--black-500)  270deg,
+    var(--black-150)  315deg,
+    var(--white)      360deg);
+}
+.swatch-input {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  opacity: 0; border: 0; padding: 0;
+  cursor: pointer;
+}
+
+.pair-name { font-size: var(--text-13); font-weight: 600; color: var(--white); }
+.pantone-note { font-size: var(--text-10); color: var(--black-350); line-height: 1.5; min-height: 14px; }

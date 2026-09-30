@@ -1,0 +1,1191 @@
+<!doctype html>
+<html lang="en" data-media="sheet" class="is-static">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Akvantis A1 — Installation guide</title>
+<meta name="description" content="Akvantis A1 Direct Flow Drinking System — installation guide. One printed side, and the ribbon behind the carton's QR.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="favicon.png?v=1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+<link rel="stylesheet" href="assets/ui-kit/tokens.css?v=kit8">
+<!-- Компоненты инструкции: номер — из кита, заголовки и кадр — свои (см. a1-manual-kit.html). -->
+<link rel="stylesheet" href="assets/ui-kit/number.css?v=kit8">
+<link rel="stylesheet" href="assets/ui-kit/topbar.css?v=kit8">
+<link rel="stylesheet" href="assets/manual-kit.css?v=6">
+<style>
+/* ─────────────────────────────────────────────────────────────────────────────
+   A1 — THE DOCUMENT.
+
+   This file is the artefact. `a1-manual-prototype.html` is the tool that shows
+   it; nothing about the tool is in here, and the tool imports this file in an
+   iframe exactly as a browser or a printer gets it. That separation is what lets
+   the print PDF come out of the document alone, with no dark chrome to strip.
+
+   ONE DOCUMENT, TWO MEDIA — `data-media` on <html>:
+     sheet     420 × 297 mm, one fold → the printed side
+     screen    the ribbon behind the carton's QR, mobile first
+
+   ДВЕ СТОРОНЫ, ОДИН ЛИСТ. Обе стороны лежат в разметке одновременно и повёрнуты
+   друг к другу спиной: бумага не перерисовывается при перевороте, она
+   поворачивается. `?side=front` задаёт сторону на открытии, `#front` / `#inner`
+   — меняет её потом, и только это второе анимируется. Адрес остаётся состоянием
+   документа; просто у стороны он теперь во фрагменте, потому что фрагмент — это
+   единственная часть ссылки, которую можно поменять, не перезагрузив страницу, а
+   переворот, который начинается с перезагрузки, — не переворот.
+
+   CONSTRUCTOR, 2026-09-26. The content is data now: manual.json holds the
+   cover's blocks, the spreads (each a hand-made image or laid out from
+   blocks) and the sections with their blocks; assets/manual-render.js builds
+   the sheet and the screen ribbon from it. This file is the shell and the
+   behaviour. Edit the manual in a1-manual-prototype.html, not here.
+
+   БУКЛЕТ, 2026-09-24. Один лист перестал вмещать инструкцию, и документ стал
+   книжечкой: обложка и N внутренних разворотов. Страниц 2N+2. Документ
+   вёрстается разворотами в порядке чтения, а не листами печати: разворот k —
+   страницы 2k и 2k+1, наружная сторона — задняя сторонка (стр. 2N+2) и
+   обложка (стр. 1). Спуск полос под печать — дело типографии.
+
+   Считаются развороты, а не листы (решение автора, 2026-09-24): вёрстке нужно
+   ровно столько разворотов, сколько в ней содержания. На скрепке из листов A3
+   собирается только нечётное N (1 → 4 стр., 3 → 8 стр.); при чётном страниц
+   не кратно четырём, и в книжечку входит вклейка — лист A4 с фальчиком.
+   `?spreads=N` — сколько разворотов (по умолчанию — `data-spreads` на листе;
+   старое `?sheets=M` понимается как 2M−1), `?pn=1` — номера страниц,
+   `#inner-k` — какой разворот открыт.
+
+   ЧИСТЫЙ ЛИСТ, 2026-09-23. Внутренняя сторона пуста — вёрстка пересобирается по
+   новой сетке. Наружная нарисована с макета (Figma, «A1 Manual — outer»).
+
+   ВНИМАНИЕ: прежняя редакция этого файла — шапка, семь секций и их компоненты —
+   в истории НЕ сохранена. `Manual/` — отдельный репозиторий, и `a1-manual.html`
+   в нём ни разу не коммитился (во внешнем репозитории Akvantis папка `Manual/`
+   в .gitignore, поэтому его коммиты к этому файлу отношения не имеют). Первое,
+   что стоит сделать с этим файлом, — закоммитить его.
+
+   TOKENS ONLY, AND DELIBERATELY NOT kit.css. kit.css is instrument chrome for a
+   rail-and-stage tool and opens `html, body { height: 100dvh; overflow: hidden }`,
+   which a document that is read and printed cannot have. tokens.css is the shared
+   language: the face, the greys, the accent, the radii, the space steps.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── НАЧЕРТАНИЕ ОБЛОЖКИ ──
+   Макет набран Cy Grotesk **Wide** Medium — это не тот же файл, что стоит в ките
+   (**Key** Medium), а другая ширина того же семейства, и подмена одной другой
+   меняет длину каждой строки. Файла Wide в репозитории нет: он стоит в системе
+   дизайнера, а не в проекте. Объявление ниже ждёт его по месту; пока файла нет,
+   строка падает на Key, и обложка набрана уже, чем в макете. Положить
+   `CyGrotesk-WideMedium.woff2` рядом с Key — и ничего больше править не нужно. */
+@font-face{
+  font-family:'Cy Grotesk Wide';
+  src:url('assets/fonts/CyGrotesk-WideMedium.woff2') format('woff2'),
+      url('assets/fonts/CyGrotesk-WideMedium.otf') format('opentype');
+  font-weight:100 900;
+  font-style:normal;
+  font-display:swap;
+}
+
+:root{
+  /* ── 1 · the light ground ── */
+  --paper      : var(--white);        /* #FCFFFE */
+  --paper-sunk : var(--black-50);     /* the well a frame sits in */
+  --ink        : var(--black);        /* headings, numbers, rules */
+  --ink-2      : var(--black-350);    /* captions */
+  --ink-3      : var(--black-250);    /* counts, meta */
+  --rule       : var(--black-150);
+  --rule-soft  : var(--black-100);
+
+  /* ── функциональный цвет ──
+     Три трубки — не акцент бренда: --blue #4EA1FF выбран под тёмный рейл и на
+     белой бумаге под мойкой в четверть миллиметра почти исчезает. Эти три
+     выбраны по различимости между собой на мелованной бумаге, и это их работа:
+     цвет — то, чем монтажник отличает одну линию от другой в тёмной тумбе. */
+  --tube-blue  : #1257C8;
+  --tube-black : var(--black);
+  --tube-red   : var(--red-1000);
+
+  /* Обложка. Из дизайн-библиотеки, а не из кита: бирюза — её акцент, серо-синий
+     — её же линия. Записаны здесь, потому что на листе они больше нигде. */
+  --cover-accent : #00849D;   /* Accent Turquoise 100 */
+  --cover-rule   : #ABB9DD;   /* White Shades / Grey 40 */
+  --cover-ink    : #010006;   /* Black Shades / Black 100 */
+  --font-cover   : 'Cy Grotesk Wide', 'Cy Grotesk Key', ui-sans-serif, -apple-system, sans-serif;
+
+  /* ── 2 · the printed type scale ── */
+  --pt-sub : 10pt;  --pt-name : 14pt; --pt-h2  : 13pt; --pt-n   : 9pt;
+  --pt-cap : 5.6pt; --pt-no   : 10pt;  --pt-tag : 6.5pt;
+  --pt-val : 8pt;   --pt-lab  : 5.6pt;
+
+  /* ── 3 · трим, фальц, панель ──
+     A3 landscape, один фальц на 210: закрытым это A4 portrait, раскрытым —
+     разворот A3, и у него две стороны — наружная (обложка и задняя сторонка) и
+     внутренняя, инструкция одним куском.
+
+     ПАНЕЛЬ — вот единица вёрстки, а не лист. Лист складывается, и то, что
+     читатель держит перед собой, — всегда одна панель 210 × 297. Поэтому сетка
+     принадлежит панели, а поля считаются от её краёв, включая край у фальца:
+     сгиб — это край страницы, и поле у него такое же, как у обреза. */
+  --sheet-w : 420mm; --sheet-h : 297mm;
+  --fold-x  : 210mm;
+  --page-w  : 210mm;
+
+  /* Поле. Было 6 мм на весь лист, стало 12 на каждую панель (2026-09-23, ×2):
+     шестимиллиметровое поле у фальца прижимало вёрстку к сгибу, а сгиб — это
+     место, где бумага гнётся и где палец держит лист. Одно число на все четыре
+     стороны обеих панелей. */
+  --safe : 12mm;
+  --gut  : 3.2mm;
+  /* ── МОДУЛЬНАЯ СЕТКА · 12 × 16 НА ПАНЕЛЬ ──
+     Выведена из панели, а не написана в миллиметрах: при 210 × 297 и поле 12 мм
+     это полоса 186 × 273 и модуль 12,57 × 14,06 мм. Поменяется поле, средник или
+     формат — сетка пересчитается сама. Одна и та же снаружи и внутри: стороны
+     различаются содержимым, а не разметкой полосы. */
+  --cols : 12;
+  --rows : 16;
+
+  /* ── 4 · ЕДИНИЦА МАКЕТА ──
+     Обложка нарисована на холсте 832 × 1180 — столько пикселей в панели у
+     макета. Координаты ниже переписаны из него числом в число, а переводит их
+     сюда одна пара множителей. Поэтому в разметке видны те же 48, 919, 1035.5,
+     что стоят в Figma, и любую из них можно сверить, не считая миллиметры.
+
+     Множителя два, по одному на ось: холст макета 832 × 1180 — это отношение
+     1,4187, а A3 — 1,4142. Разница 0,3 %, и она должна лечь в масштаб, а не в
+     смещение: композиция важнее, чем абсолютная квадратность отдельного
+     кружка, который от этого станет эллипсом на три сотых миллиметра. */
+  --ux : calc(210mm / 832);
+  --uy : calc(297mm / 1180);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+/* Комната вокруг листа. Она нужна документу, открытому самому по себе: без неё
+   белая бумага стоит на белом поле браузера и обрез не виден вовсе. В кадре
+   инструмента комнату рисует инструмент, своим холстом, — и там эта заливка не
+   просто лишняя, а вредная: кадр ровно по размеру листа, и единственный момент,
+   когда её видно, — середина переворота, где она и оказывается той белой плитой
+   позади повернувшихся сторон. Поэтому во вложенном документе её нет. */
+body{
+  background:var(--black-100);
+  color:var(--ink);
+  font-family:var(--font-primary);
+  font-size:var(--text-13);
+  line-height:1.4;
+  -webkit-font-smoothing:antialiased;
+}
+/* Полей у сцены нет: в кадре инструмента лист занимает его целиком, и любой
+   отступ здесь — это полоса чужого фона поверх бумаги и прокрутка на ровном
+   месте. Поля вокруг листа рисует комната инструмента, а не документ. */
+/* Прозрачным здесь не отделаться. У документа во фрейме есть собственная
+   базовая подложка, и она белая: `transparent` на `html` и на `body` её не
+   снимает — проверено, кадр остаётся белым ровно по своим границам. Видно это
+   становится в середине переворота, когда обе стороны стоят к зрителю ребром и
+   закрывать подложку больше нечем.
+
+   Поэтому вложенный документ комнату не гасит, а перекрашивает — в тот же тон,
+   которым рисует холст всякий инструмент на ките. Цвет взят из общего словаря,
+   а не списан с рейла: tokens.css — это то, что у документа и у инструмента
+   общее по построению. Если холст когда-нибудь станет другого тона, честный
+   способ — попросить его адресом (`?room=…`), а не заводить второй хекс. */
+html.is-embedded body{background:var(--black)}
+/* `?room=paper` — комнаты нет вовсе, под листом бумага. Так документ берут грани
+   трёхмерного вида: там лист режется на полосы, и на стыке двух граней их края
+   сглаживаются — через это сглаживание тёмная комната просвечивала пунктиром
+   поперёк бумаги. Под бумагой должна быть бумага. */
+html.room-paper, html.room-paper body{background:var(--paper)}
+.stage{display:flex;justify-content:center;padding:0}
+/* `?bleed=1`: room around the sheet for a lifted page; transparent, so the tool's canvas shows */
+html.bleed, html.bleed body{background:transparent!important}
+/* the tool is color-scheme dark; a frame whose scheme differs gets an opaque
+   white backdrop from the browser, so the bleeding frame matches it */
+html.bleed{color-scheme:dark}
+html.bleed .stage{padding:74.25mm 105mm}
+
+/* ═══════════════ THE SHEET ═══════════════
+   Лист — оболочка, а не вёрстка: он знает свой трим, свои фальцы и то, какой
+   стороной повёрнут. Вёрстка живёт на панели. */
+/* Бумаги у самого листа нет, и это не мелочь. Белым красит сторона, а сторона
+   поворачивается вместе с содержимым; заливка же на `.sheet` лежит в плоскости
+   экрана и никуда не поворачивается — в середине переворота, когда обе стороны
+   стоят к зрителю ребром, она остаётся стоять белым прямоугольником, и лист
+   выглядит не перевёрнутым, а погасшим. Лист — это держатель трима и фальца;
+   бумага принадлежит стороне. */
+.sheet{
+  width:var(--sheet-w);height:var(--sheet-h);
+  position:relative;overflow:hidden;
+  perspective:1400mm;
+}
+
+/* ── ПЕРЕВОРОТ ──
+   Полсекунды и одна ось. Стороны не показываются и не прячутся — они повёрнуты
+   спиной друг к другу и всё время обе в разметке: спрятанная сторона `display:
+   none` не переворачивается, она исчезает, а бумага, которая исчезает и
+   появляется с другой стороны, — это две бумаги.
+
+   `backface-visibility` и есть весь механизм: с какой стороны лист повёрнут,
+   такую и видно. Кривая — стандартная кита: быстро отрывается, мягко встаёт.
+
+   `is-static` снимает переход на первый кадр: сторона, заданная адресом,
+   принадлежит открытому документу, а не переключению, и лист не должен
+   переворачиваться сам по себе, пока его только открыли. */
+.flip{
+  position:absolute;inset:0;
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,0,.2,1);
+}
+.sheet[data-side="front"] .flip{transform:rotateY(180deg)}
+html.is-static .flip{transition:none}
+/* `?flip=0` — сторона меняется мгновенно. Так документ открывает инструмент: он
+   переворачивает кадр сам, на полноэкранном холсте, а сюда приходит только смена
+   стороны — в тот момент, когда лист стоит ребром и его не видно. Свой переворот
+   документ оставляет для того случая, когда его открыли самого по себе. */
+html.no-flip .flip{transition:none}
+/* page turn (?turn=1): copies of the old/new spread over the real sheet */
+.turn-layer{position:absolute;inset:0;z-index:5;transform-style:preserve-3d;pointer-events:none}
+html.is-closed .sheet > .flip, html.is-closed .sheet > .fold{visibility:hidden}
+.sheet:has(.turn-layer){overflow:visible}
+.turn-leaf{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 50%}
+.turn-copy{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid!important}
+.turn-shade{position:absolute;top:0;bottom:0;width:50%;opacity:0;pointer-events:none;backface-visibility:hidden}
+.turn-shade.is-r{left:50%;background:linear-gradient(to right, rgba(0,0,0,.5), rgba(0,0,0,0) 70%)}
+.turn-shade.is-l{left:0;background:linear-gradient(to left, rgba(0,0,0,.5), rgba(0,0,0,0) 70%)}
+@media (prefers-reduced-motion:reduce){ .flip{transition:none} }
+
+/* Сторона — это две панели встык, и больше ничего. Полей у стороны нет: поля
+   принадлежат панели, иначе у фальца их оказалось бы два — своё и общее. */
+.side{
+  position:absolute;inset:0;
+  display:grid;grid-template-columns:var(--page-w) var(--page-w);
+  background:var(--paper);
+  backface-visibility:hidden;
+}
+.side-front{transform:rotateY(180deg)}
+
+/* ПАНЕЛЬ — A4, одна из четырёх страниц издания: две снаружи, две внутри.
+
+   Сама панель — пустая коробка без полей и без сетки, и это сделано нарочно.
+   Слоёв в ней два: наборная полоса с сеткой и свободный слой обложки, и оба
+   лежат `inset: 0`, то есть ровно по обрезу страницы. Поля принадлежат полосе,
+   а не панели, потому что абсолютные координаты внутри контейнера с полем
+   считаются от разных краёв в разных случаях — у grid-контейнера это обошлось
+   сдвигом обложки на целое поле. Пустая коробка такой двусмысленности не имеет:
+   край страницы у обоих слоёв один и тот же. */
+.panel{position:relative;min-width:0;min-height:0}
+
+/* Наборная полоса: поле и модульная сетка. Всё, что стоит по колонкам, живёт
+   здесь. */
+.page-grid{
+  position:absolute;inset:0;
+  padding:var(--safe);
+  display:grid;
+  grid-template-columns:repeat(var(--cols),1fr);
+  grid-template-rows:repeat(var(--rows),1fr);
+  gap:var(--gut);
+}
+
+/* ── СЕТКА ПОВЕРХ ──
+   Показывается по `?grid=1`. Лежит в той же панели и повторяет её собственные
+   треки — не вторая сетка рядом с первой, а та же самая, обведённая. Контур
+   выпущен наружу на четверть средника, и между соседями остаётся половина: две
+   линии, отстоящие на целый средник, читаются полосой. */
+.grid-overlay{
+  grid-column:1/-1;grid-row:1/-1;
+  display:grid;
+  grid-template-columns:repeat(var(--cols),1fr);
+  grid-template-rows:repeat(var(--rows),1fr);
+  gap:var(--gut);
+  pointer-events:none;z-index:5;
+}
+html:not(.show-grid) .grid-overlay{display:none}
+/* Lines, not boxes: every column is a strip the full height of the type area,
+   every row a strip its full width, each drawn by its two edges — so the
+   verticals and horizontals cross through the gutters. Ink 30% darker than
+   --rule (#CBCDCD × 0.7; a plain hex, since html2canvas cannot read color-mix). */
+.grid-overlay{--grid-ink:#8E8F8F}
+.grid-overlay .gc{grid-row:1/-1;border-inline:.25mm solid var(--grid-ink)}
+.grid-overlay .gr{grid-column:1/-1;border-block:.25mm solid var(--grid-ink)}
+
+/* The document draws the guides; the tool only asks for them. Фальц один и
+   принадлежит листу, а не стороне: бумага складывается целиком, и на обороте
+   тот же сгиб. По умолчанию погашен — это лекало, а не краска. */
+.fold{position:absolute;border:0 dashed var(--red-1000);opacity:.4;pointer-events:none;z-index:6}
+.fold-v{left:var(--fold-x);top:0;bottom:0;border-left-width:1px}
+.fold-v::after{content:"фальц";position:absolute;top:2mm;left:2mm;font-size:6pt;color:var(--red-1000)}
+html:not(.show-fold) .fold{display:none}
+
+/* ── ЛИСТ БЕЗ ГРАФИКИ ──
+   `?art=0`. Рисунки гаснут, а не исчезают: `visibility` оставляет им место, и
+   видно ровно то, ради чего слой выключают, — сколько на листе текста и держит
+   ли вёрстка, когда картинка перестаёт держать кадр за неё. */
+html.no-art .panel img,
+html.no-art .panel :not(.grid-overlay)>svg{visibility:hidden}
+
+/* ── ЧИСТЫЙ ЛИСТ ──
+   `?content=0`. Гаснет содержимое панелей, и остаётся бумага: тот же формат, те
+   же поля, ничего на них. Направляющие остаются: фальц и сетка — не содержимое,
+   а слои поверх него, у каждого свой выключатель. */
+html.no-content .cover,
+html.no-content .page-grid>*:not(.grid-overlay){visibility:hidden}
+
+/* ═══════════════ COVER ═══════════════
+   The outer side: back page on the left, front on the right. A composition,
+   not a flow — its blocks (manual.json → cover.blocks) are placed in mock-up
+   units from the trim, the same numbers as in Figma. Built by
+   assets/manual-render.js; styled here.
+
+     .cv-text    a line or a paragraph — size, colour, alignment per block
+     .cv-img     a mark, a logo, a badge — placed and sized
+     .cv-photo   the page's picture: page-wide at scale 1, moved and scaled
+     .cv-rule    a hairline, horizontal or vertical */
+.cover{
+  position:absolute;inset:0;
+  overflow:hidden;
+  font-family:var(--font-cover);
+  color:var(--cover-ink);
+  font-feature-settings:"lnum" 1, "pnum" 1;
+}
+.cover>*{position:absolute;margin:0}
+.cv-text{font-weight:500;white-space:normal}
+.cv-img{display:block;object-fit:contain}
+.cv-photo{display:block;height:auto}
+.cv-rule{box-sizing:border-box}
+
+/* ═══════════════ PAGES BUILT FROM BLOCKS ═══════════════
+   A page of a spread in blocks mode: a 12-column flow inside the page's
+   margins. Sections take `--span` columns, frames take their span of the
+   section, rows form themselves. Numbers are the mock-up's: 13 u between
+   frames, the grid's own gutter between columns. */
+.page-flow{
+  position:absolute;inset:var(--safe);z-index:2;
+  display:grid;grid-template-columns:repeat(12, minmax(0, 1fr));
+  column-gap:var(--gut);row-gap:calc(24 * var(--u));
+  align-content:start;overflow:hidden;
+}
+.side-inner[data-mode="image"] .page-flow{display:none}
+/* In the constructor, a page whose content runs past its bottom margin says so. */
+html.is-embedded:not(.capture) .page-flow.is-over{outline:calc(3 * var(--u)) dashed var(--red-1000);outline-offset:calc(4 * var(--u))}
+.page-flow > .m-sec{grid-column:span var(--span, 12);min-width:0}
+.page-flow .m-sec > .m-title{margin-bottom:calc(24 * var(--u))}
+.page-flow .m-sec-body{display:flex;flex-direction:column;gap:calc(13 * var(--u))}
+.page-flow .m-grid{display:grid;grid-template-columns:repeat(var(--span, 12), minmax(0, 1fr));gap:calc(13 * var(--u)) var(--gut)}
+.page-flow .is-group .m-group{padding:calc(30 * var(--u)) calc(12 * var(--u)) calc(12 * var(--u))}
+.page-flow .m-rows{display:flex;flex-direction:column}
+.page-flow .m-rows > .m-items + .m-items{margin-top:calc(12 * var(--u));padding-top:calc(12 * var(--u));border-top:calc(1 * var(--u)) solid var(--cover-rule)}
+.page-flow .m-items{display:grid;grid-template-columns:repeat(auto-fill, minmax(calc(96 * var(--u)), 1fr));gap:calc(8 * var(--u)) calc(12 * var(--u))}
+.page-flow .is-narrow .m-items{grid-template-columns:1fr}
+.page-flow .m-item .m-label{text-align:center}
+.page-flow .m-specs{display:grid;grid-template-columns:repeat(var(--n), minmax(0, 1fr));gap:calc(16 * var(--u))}
+.page-flow .m-item-art > img{padding:8%;box-sizing:border-box}
+
+/* ═══════════════ РАЗВОРОТЫ ═══════════════
+   Внутренняя сторона — не одна, а N разворотов, и все они лежат в разметке
+   стопкой в одном месте листа, за обложкой. Виден один — открытый (`.is-on`).
+   Разворот, которого при заданном числе разворотов нет вовсе, помечен `.is-out` и
+   не показывается нигде: ни на листе, ни в ленте, ни в печати. */
+.side-inner.is-out{display:none!important}
+html:not([data-media="screen"]) .side-inner:not(.is-on){display:none}
+
+/* ── ГРАФИКА НА ВЕСЬ РАЗВОРОТ ──
+   Картинка, собранная сразу на разворот (из Figma, одним кадром), ложится на
+   обе страницы по обрезу. Растягивается ровно в трим: холст макета 1664 × 1180
+   отличается от A3 на 0,3 %, и это разница, которую лучше отдать масштабу, чем
+   полоске бумаги у края. Выше неё — только номера страниц и сетка. */
+.spread-art{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:fill;z-index:3;pointer-events:none;display:block;
+}
+html.no-art .spread-art,
+html.no-content .spread-art{visibility:hidden}
+
+/* ── НОМЕР СТРАНИЦЫ ── `?pn=1`
+   В нижнем внешнем углу: чётные — слева, нечётные — справа, как у любой книги,
+   — чтобы номер было видно, не раскрывая буклет до корешка. Стоит в нижнем поле
+   по его середине и по краю наборной полосы, а не по обрезу: поле — это рамка
+   страницы, и номер принадлежит ей. На обложке и задней сторонке номера нет. */
+.page-no{
+  position:absolute;z-index:4;display:none;
+  bottom:calc(var(--safe) / 2);transform:translateY(50%);
+  font-family:var(--font-cover);font-weight:500;font-size:9pt;line-height:1;
+  color:var(--ink);
+  font-feature-settings:"tnum" 1, "lnum" 1;
+}
+html.show-pn .page-no{display:block}
+.panel-l .page-no{left:var(--safe)}
+.panel-r .page-no{right:var(--safe)}
+
+/* ═══════════════ THE RIBBON — screen version ═══════════════
+   The same manual for a phone and a desktop (`?media=screen`): the same
+   sections, in the same order, laid out as a page that scrolls. Built by
+   assets/manual-render.js from manual.json, out of the manual kit
+   (assets/manual-kit.css), so a component changed there changes in both.
+
+   Mobile first — one column, 16 px gutters — and two steps up: 600 px (two
+   columns of frames) and 1024 px (the desktop: a 12-column flow where a
+   section takes its `span`, so In the box and Tools stand side by side as on
+   page 2). The cover is not part of the ribbon. */
+.ribbon{display:none}
+/* The ribbon is a page, and a page is paper — also inside the tool's frame.
+   `html.is-embedded body` paints the embedded SHEET's room black (the flip
+   needs it); the ribbon has no room, so it takes paper back, with the
+   specificity to win. */
+html[data-media="screen"] body,
+html.is-embedded[data-media="screen"] body{background:var(--paper)}
+[data-media="screen"] .stage{display:none}
+[data-media="screen"] .ribbon{display:block}
+
+.ribbon{margin:0 auto;padding:var(--space-24) var(--space-16) var(--space-64);color:var(--m-ink)}
+.r-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-16)}
+.r-logo{display:block;height:var(--space-40);width:auto}
+.ribbon .m-title{font-size:var(--text-32)}
+.r-flow{display:grid;grid-template-columns:minmax(0, 1fr);gap:var(--space-48);margin-top:var(--space-40)}
+/* 2026-09-29: шапка «Manual Guide» + A1 убрана — контент начинается сверху */
+/* 2026-09-29: the head block is back — «Manual Guide» and the A1 mark, the
+   first thing on the ribbon, then the sections. Sized from the type scale. */
+.r-head{align-items:center;gap:var(--space-16);padding-bottom:var(--space-16);border-bottom:var(--hairline) solid var(--rule-soft)}
+.ribbon .r-head .m-title{flex:1 1 auto;min-width:0;white-space:nowrap;font-size:var(--text-24);line-height:var(--space-32)}
+/* the A1 mark, small, behind a vertical divider */
+.ribbon .r-head .r-logo{box-sizing:content-box;flex:0 0 auto;width:auto;height:var(--space-24);
+  padding:var(--space-8) 0 var(--space-8) var(--space-16);border-left:var(--hairline) solid var(--rule-soft)}
+@media (min-width:1024px){ .ribbon .r-head .r-logo{height:var(--space-32)} }
+.ribbon .r-head + .r-flow{margin-top:0}
+.r-flow > .m-sec{min-width:0;scroll-margin-top:calc(var(--r-bar-h) + env(safe-area-inset-top) + var(--space-8))}
+.r-flow > .m-sec.is-cont{margin-top:calc(var(--space-40) * -1)}
+.ribbon .m-sec > .m-title{margin-bottom:var(--space-24)}
+/* 2026-09-29: accordion — one heading for every block, each folds away */
+.acc-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);cursor:pointer;list-style:none;
+  -webkit-tap-highlight-color:transparent;padding-bottom:var(--space-16);border-bottom:0;min-height:var(--space-32)}
+.acc-head::-webkit-details-marker{display:none}
+.acc-head::marker{content:''}
+.ribbon .acc-head .m-title{margin:0;font-size:var(--text-24);line-height:var(--space-32)}
+.acc-chev{flex:0 0 auto;width:var(--space-8);height:var(--space-8);margin-right:var(--space-4);border-right:var(--space-2) solid var(--ink);border-bottom:var(--space-2) solid var(--ink);
+  transform:translateY(-25%) rotate(45deg);transition:transform var(--r-dur) var(--r-ease)}
+.m-sec.is-acc:not(.is-open) .acc-chev{transform:translateY(0) rotate(-45deg)}
+.m-sec.is-acc:not(.is-open) .acc-head{padding-bottom:0}
+/* every spacing that depends on open/closed follows the section's .is-open
+   class (set by the script at the START of the motion, both ways) and moves
+   with the height — nothing snaps at the end of the animation */
+.m-sec.is-acc,.m-sec.is-acc .acc-head{transition:padding var(--r-acc-dur) var(--r-ease)}
+.acc-chev{transition-duration:var(--r-acc-dur)}
+@media (prefers-reduced-motion: reduce){ .m-sec.is-acc,.m-sec.is-acc .acc-head,.acc-chev{transition:none} }
+.acc-head:focus-visible{outline:var(--space-2) solid var(--m-ink);outline-offset:var(--space-4);border-radius:var(--radius-4)}
+.r-flow > .m-sec.is-acc{border-bottom:var(--hairline) solid var(--rule-soft);padding:var(--space-16) 0}
+.r-flow > .m-sec.is-acc:last-child{border-bottom:0}
+/* an OPEN section: the same air above and below its bottom divider —
+   content → divider and divider → next title — 24 on a phone, 32 from 1024 */
+html{--acc-gap:var(--space-24)}
+@media (min-width:1024px){ html{--acc-gap:var(--space-32)} }
+.r-flow > .m-sec.is-acc.is-open{padding-bottom:var(--acc-gap)}
+.r-flow > .m-sec.is-acc.is-open + .m-sec.is-acc{padding-top:var(--acc-gap)}
+.r-flow{row-gap:0}
+.ribbon .m-sec-body{display:flex;flex-direction:column;gap:var(--space-12)}
+.ribbon .is-group .m-group{padding:var(--space-32) var(--space-12) var(--space-16);height:100%;box-sizing:border-box}
+
+/* Rows of In the box and Tools. On a phone each row scrolls sideways on its
+   own, snapping to a card, and shows a third of the next card so the scroll
+   announces itself. From 1024 px the rows wrap instead of scrolling. */
+.r-row{
+  display:flex;gap:var(--space-12);
+  overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x mandatory;scroll-padding:0 var(--space-12);
+  margin:0 calc(var(--space-12) * -1);padding:0 var(--space-12) var(--space-4);
+  scrollbar-width:none;
+}
+.r-row::-webkit-scrollbar{display:none}
+@media (hover:hover){ .ribbon .r-row{cursor:grab} .ribbon .r-row:active{cursor:grabbing} }
+.r-row img{-webkit-user-drag:none;user-select:none}
+.ribbon .r-row > .m-item{flex:0 0 38%;scroll-snap-align:start}
+.ribbon .m-rows > .m-items + .m-items{margin-top:var(--space-16);padding-top:var(--space-16);border-top:var(--hairline) solid var(--rule)}
+.ribbon .r-row .m-label{font-size:var(--text-14);line-height:var(--lh-snug);text-align:center}
+.ribbon .m-item .m-desc{display:block;margin-top:var(--space-2);font-size:var(--text-12);line-height:var(--lh-snug);font-weight:var(--fw-medium);color:var(--ink-3)}
+.ribbon .r-row .m-item-art > img{padding:8%;box-sizing:border-box}
+
+/* frames */
+.ribbon .m-grid{display:grid;grid-template-columns:minmax(0, 1fr);gap:var(--space-12);align-items:start}
+
+/* issues — Troubleshooting: cards in the column grid, 2 across, 3 from 1024 */
+.ribbon .m-issues{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:var(--gg);align-items:start}
+@media (min-width:1024px){ .ribbon .m-issues{grid-template-columns:repeat(3, minmax(0, 1fr))} }
+/* the issue card itself is a manual-kit component (assets/manual-kit.css, .m-issue);
+   only its place on the grid is set here */
+
+/* specs */
+.ribbon .m-specs{display:flex;flex-wrap:nowrap;gap:var(--space-16);overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x mandatory;scroll-padding:0 var(--gm);margin:0 calc(var(--gm) * -1);padding:var(--space-4) var(--gm) var(--space-4);
+  scrollbar-width:none}
+.ribbon .m-specs::-webkit-scrollbar{display:none}
+.ribbon .m-spec{flex:0 0 auto;min-width:var(--space-112);scroll-snap-align:start}
+.ribbon .m-spec-icon{background:none}
+@media (hover:hover){ .ribbon .m-specs{cursor:grab} .ribbon .m-specs:active{cursor:grabbing} }
+.ribbon .m-spec-value{font-size:var(--text-14)}
+.ribbon .m-spec-what{font-size:var(--text-11)}
+.ribbon .m-text{font-size:var(--text-16)}
+
+@media (min-width:600px){
+  .ribbon{padding:var(--space-32) var(--space-24) var(--space-80)}
+  .ribbon .r-row > .m-item{flex-basis:22%}
+  .ribbon .m-grid{grid-template-columns:repeat(2, minmax(0, 1fr))}
+}
+@media (min-width:1024px){
+  .ribbon{padding:var(--space-48) var(--space-32) var(--space-96)}
+  .r-flow{grid-template-columns:minmax(0, 1fr);gap:0}
+  .r-flow > .m-sec{grid-column:1 / -1}
+  .r-flow > .m-sec.is-cont{margin-top:calc(var(--space-48) * -1)}
+  .ribbon .r-row{overflow:visible;flex-wrap:wrap;margin:0;padding:0 0 var(--space-4);cursor:auto}
+  .ribbon .r-row > .m-item{flex:0 0 calc((100% - 5 * var(--space-12)) / 6)}
+  /* a narrow section: its cards stack and keep the wide section's card size */
+  .ribbon .is-narrow .r-row{flex-direction:column;align-items:center}
+  .ribbon .is-narrow .r-row > .m-item{flex:none;width:62%}
+  .ribbon .m-grid{grid-template-columns:repeat(3, minmax(0, 1fr));gap:var(--space-16)}
+}
+
+/* ── THE BAR — section stepper, pinned to the bottom ──
+   The kit's top bar (topbar.css), used as it is: frosted pill, mark, a row of
+   section links that scrolls sideways on a phone, the ink rule under the
+   section being read, the count on the right. The only local rule is where it
+   is anchored: at the bottom, where a thumb is. Links are built from the
+   sections that have a title. */
+.r-bar{display:none}
+[data-media="screen"] .r-bar{display:flex}
+/* 2026-09-29: белая панель во всю ширину вьюпорта, прижата к низу — без
+   скругления и без отступа; frost — белый. Нижний inset уходит внутрь панели. */
+[data-media="screen"] .r-bar.topbar{top:0;bottom:auto;left:0;transform:none;
+  width:100%;max-width:none;border-radius:0;
+  height:calc(var(--r-bar-h) + env(safe-area-inset-top));
+  padding-top:env(safe-area-inset-top);
+  background:var(--r-frost-paper);
+  box-shadow:inset 0 calc(var(--hairline) * -1) 0 var(--rule-soft)}
+[data-media="screen"] body.bar-away .r-bar.topbar{transform:translateY(-100%)}
+[data-media="screen"] .ribbon{padding-top:calc(var(--r-bar-h) + env(safe-area-inset-top) + var(--space-24));padding-bottom:var(--space-64)}
+/* 2026-09-29: в панели нет знака и счётчика — только секции */
+/* The Akvantis mark: fixed at the left margin of the bar from 768; on a phone
+   it is the first thing IN the scrolling row, so it leaves with the row as the
+   reader moves through the sections. */
+.r-bar .topbar-aside{display:none}
+/* desktop: the product on the right of the bar — the A1 photo (ui-kit/photos,
+   trimmed, white-grey) and the A1 mark (ui-kit/devices/devices.js), on the
+   right margin, the same height as the Akvantis mark on the left */
+.r-product{display:none}
+@media (min-width:1024px){
+  .r-product{display:flex;align-items:center;gap:var(--space-12);flex:0 0 auto;margin-right:var(--gm);height:100%}
+  .r-product-img{height:calc(var(--r-bar-h) - var(--space-16));width:auto;display:block}
+  .r-product-mark{display:block;height:var(--space-24);color:var(--ink)}
+  .r-product-mark svg{height:100%;width:auto;display:block}
+}
+.r-bar .topbar-mark{color:var(--ink);width:var(--space-32);height:var(--space-32);align-self:center;margin-left:var(--gm)}
+.r-bar .topbar-mark svg{height:100%}
+.topbar-mark-in{display:none}
+/* No side padding on the bar itself: the row scrolls under the whole width of
+   the viewport and only its content is inset by the margin, so nothing is cut
+   off 12 px short of the edge. */
+[data-media="screen"] .r-bar.topbar{padding-left:0;padding-right:0}
+.r-bar .topbar-nav{margin-left:0;padding:0 var(--gm);scroll-padding:0 var(--gm)}
+/* ON A PHONE the bar goes to the bottom, where the thumb is, and carries no
+   mark. From 768 it is the top bar with the mark at the left margin. */
+@media (max-width:767px){
+  [data-media="screen"] .r-bar.topbar{top:auto;bottom:0;
+    height:calc(var(--r-bar-h) + env(safe-area-inset-bottom));padding-top:0;padding-bottom:env(safe-area-inset-bottom);
+    box-shadow:inset 0 var(--hairline) 0 var(--rule-soft)}
+  [data-media="screen"] body.bar-away .r-bar.topbar{transform:translateY(100%)}
+  [data-media="screen"] .ribbon{padding-top:var(--space-24);padding-bottom:calc(var(--r-bar-h) + env(safe-area-inset-bottom) + var(--space-24))}
+  .r-flow > .m-sec{scroll-margin-top:var(--space-8)}
+  .r-bar .topbar-mark-in{display:none}
+}
+@media (max-width:767px){
+  .r-bar .topbar-mark{display:none}
+  .topbar-mark-in{display:flex;align-items:center;flex:0 0 auto;width:var(--space-32);height:100%;
+    color:var(--ink);margin-right:var(--space-12)}
+  .topbar-mark-in svg{width:100%;height:auto;display:block}
+}
+.r-bar .topbar-nav a{color:var(--ink-3);flex-direction:column;justify-content:center;gap:var(--space-4);
+  font-size:var(--text-16);padding:0 var(--space-12)}
+@media (min-width:768px){ .r-bar .topbar-nav a{padding:0 var(--space-12)} }
+.topbar-num{display:flex;align-items:center;justify-content:center;width:var(--space-16);height:var(--space-16);
+  border-radius:50%;background:var(--black);color:var(--white);font-size:var(--text-10);font-weight:var(--fw-semibold);line-height:1;
+  font-variant-numeric:tabular-nums;transition:transform var(--r-dur) var(--r-ease)}
+/* active: badge and digit grow 80 %, from the bottom edge so the label below
+   does not move and the badge grows up into the bar's free space */
+.r-bar .topbar-num{transform-origin:50% 100%}
+.r-bar .topbar-nav a.is-here .topbar-num{transform:scale(var(--r-num-active))}
+.r-bar .topbar-label{font-size:var(--text-16);font-weight:var(--fw-semibold);line-height:var(--lh-tight)}
+@media (prefers-reduced-motion: reduce){ .topbar-num{transition:none} }
+.r-bar .topbar-nav a:hover,.r-bar .topbar-nav a.is-here{color:var(--ink)}
+/* the kit's 888 is the matrix's row; eight section names need a little more */
+.r-count{font-size:var(--text-12);font-weight:var(--fw-semibold);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ── MODULAR GRID ON SCREEN ── `?grid=1`, the tool's «Guides» button (G).
+   The breakpoints and columns of docs/DESIGN.md (same as Shokobox):
+   360 · 6 cols · margin 12 / 768 · 8 · 16 / 1024 · 12 · 24 / 1440 · 12 · 32 /
+   1920 · 20 · 24, gutter 8 throughout. The ribbon takes its side margins from
+   the same three variables, so the lines and the content share one edge.
+   Lines, not boxes, like the sheet's overlay — same ink. */
+html[data-media="screen"]{--gc:6;--gg:var(--space-8);--gm:var(--space-12)}
+@media (min-width:768px){ html[data-media="screen"]{--gc:8;--gm:var(--space-16)} }
+@media (min-width:1024px){ html[data-media="screen"]{--gc:12;--gm:var(--space-24)} }
+@media (min-width:1440px){ html[data-media="screen"]{--gm:var(--space-32)} }
+@media (min-width:1920px){ html[data-media="screen"]{--gc:20;--gm:var(--space-24)} }
+[data-media="screen"] .ribbon{max-width:none;padding-left:var(--gm);padding-right:var(--gm)}
+
+/* ── CONTENT ON THE GRID ──
+   Everything in the flow is sized in columns of the grid above, not in
+   percentages: a card is `--span-*` columns wide plus the gutters between
+   them, so its edges land on the guide lines. `--col` is one column, measured
+   against the flow's own width (it is the size container). Rows that scroll
+   bleed to the screen edge but start on the first column. */
+html[data-media="screen"]{--span-item:2;--span-frame:6;--span-issue:3}
+@media (min-width:768px){ html[data-media="screen"]{--span-frame:4;--span-issue:4} }
+@media (min-width:1920px){ html[data-media="screen"]{--span-item:3;--span-frame:5;--span-issue:6} }
+.r-flow{container-type:inline-size;
+  --col:calc((100cqw - (var(--gc) - 1) * var(--gg)) / var(--gc));
+  --w-item:calc(var(--span-item) * var(--col) + (var(--span-item) - 1) * var(--gg))}
+html[data-media="screen"] .ribbon .r-row{gap:var(--gg);margin:0 calc(var(--gm) * -1);padding:0 var(--gm) var(--space-4);scroll-padding:0 var(--gm)}
+html[data-media="screen"] .ribbon .r-row > .m-item{flex:0 0 var(--w-item);min-width:0}
+@media (min-width:1024px){
+  html[data-media="screen"] .ribbon .r-row{overflow:visible;flex-wrap:wrap;margin:0;padding:0 0 var(--space-4);row-gap:var(--gg)}
+}
+/* In the box, Tools: all the parts of a section are ONE row, scrolled sideways
+   at every width. The .m-items groups dissolve into it (display:contents), so
+   each card is still `--span-item` columns wide and snaps to a column edge. */
+html[data-media="screen"] .ribbon .m-rows{display:flex;gap:var(--gg);overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x mandatory;scroll-padding:0 var(--gm);margin:0 calc(var(--gm) * -1);padding:0 var(--gm) var(--space-4);scrollbar-width:none}
+html[data-media="screen"] .ribbon .m-rows::-webkit-scrollbar{display:none}
+html[data-media="screen"] .ribbon .m-rows > .m-items{display:contents}
+html[data-media="screen"] .ribbon .m-rows > .m-items + .m-items{margin:0;padding:0;border:0}
+html[data-media="screen"] .ribbon .m-rows .m-item{scroll-snap-align:start}
+/* scroll hint (built by hints()): white fade + round arrow on the right edge */
+.r-scroll{position:relative}
+.r-scroll::after{content:"";position:absolute;top:0;bottom:0;right:calc(var(--gm) * -1);width:var(--space-48);
+  background:linear-gradient(to right, var(--r-paper-0), var(--paper));pointer-events:none;
+  opacity:0;transition:opacity var(--r-dur) var(--r-ease)}
+.r-next{position:absolute;right:0;top:calc(var(--w-item) / 2);transform:translate(0, -50%);z-index:2;
+  width:var(--space-32);height:var(--space-32);border-radius:50%;border:0;padding:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--white);color:var(--black);box-shadow:0 0 0 var(--hairline) var(--rule), var(--r-lift);
+  opacity:0;pointer-events:none;transition:opacity var(--r-dur) var(--r-ease)}
+.r-scroll.has-more::after,.r-scroll.has-more .r-next{opacity:1}
+.r-scroll.has-more .r-next{pointer-events:auto}
+.r-next:focus-visible{outline:var(--space-2) solid var(--accent);outline-offset:var(--space-2)}
+/* DESKTOP: In the box and Tools lie on the grid without scrolling, so both fit
+   the first screen. A part is one column (1024–1919, 12 cols) or two (1920,
+   20 cols): In the box = 15 parts = two rows, Tools = one row. */
+@media (min-width:1024px){
+  html[data-media="screen"]{--span-part:1}
+  html[data-media="screen"] .ribbon .m-rows{display:grid;grid-template-columns:repeat(var(--gc), minmax(0, 1fr));
+    column-gap:var(--gg);row-gap:var(--space-24);overflow:visible;margin:0;padding:0;cursor:auto;scroll-snap-type:none}
+  html[data-media="screen"] .ribbon .m-rows .m-item{grid-column:span var(--span-part);flex:none;width:auto}
+  html[data-media="screen"] .ribbon .m-rows .m-item-art > img{padding:4%}
+  html[data-media="screen"] .ribbon .m-rows .m-label{font-size:var(--text-12)}
+  html[data-media="screen"] .ribbon .m-item .m-desc{font-size:var(--text-11)}
+}
+@media (min-width:1920px){ html[data-media="screen"]{--span-part:1} }
+
+/* ── DESKTOP MEASURE ── from 1024 the content sits in the middle of the grid:
+   8 of 12 columns (2 left empty each side), 14 of 20 from 1920 (3 each side).
+   The side padding is exactly `--g-off` columns + their gutters, so the band
+   starts and ends on guide lines, and the content grids inside it count its
+   own columns (`--gc` is redefined on the flow). The top bar stays full width. */
+@media (min-width:1024px){
+  html[data-media="screen"]{--g-off:2;--g-in:8}
+  html[data-media="screen"] .ribbon{
+    --g-col:calc((100% - 2 * var(--gm) - (var(--gc) - 1) * var(--gg)) / var(--gc));
+    padding-left:calc(var(--gm) + var(--g-off) * (var(--g-col) + var(--gg)));
+    padding-right:calc(var(--gm) + var(--g-off) * (var(--g-col) + var(--gg)))}
+  html[data-media="screen"] .r-flow{--gc:var(--g-in)}
+}
+@media (min-width:1920px){ html[data-media="screen"]{--g-off:3;--g-in:14} }
+@media (hover:hover){ html[data-media="screen"] .ribbon .m-rows{cursor:grab} html[data-media="screen"] .ribbon .m-rows:active{cursor:grabbing} }
+html[data-media="screen"] .ribbon .m-grid{grid-template-columns:repeat(var(--gc), minmax(0, 1fr));gap:var(--gg)}
+html[data-media="screen"] .ribbon .m-grid > .m-fig{grid-column:span var(--span-frame)}
+html[data-media="screen"] .ribbon .m-grid > .m-fig[style*="grid-column"]{grid-column:1 / -1}
+html[data-media="screen"] .ribbon .m-issues{grid-template-columns:repeat(var(--gc), minmax(0, 1fr));gap:var(--gg)}
+html[data-media="screen"] .ribbon .m-issue{grid-column:span var(--span-issue)}
+html[data-media="screen"] .ribbon .m-specs{gap:var(--gg)}
+html[data-media="screen"] .ribbon .m-spec{flex:0 0 var(--w-item);min-width:0}
+.r-guides{display:none}
+html[data-media="screen"].show-grid .r-guides{
+  display:grid;position:fixed;inset:0;box-sizing:border-box;
+  padding:0 var(--gm);
+  grid-template-columns:repeat(var(--gc), minmax(0, 1fr));column-gap:var(--gg);
+  pointer-events:none;z-index:15}
+.r-guides i{border-inline:var(--hairline-half) solid var(--r-guide-ink)}
+html[data-media="screen"].show-grid .r-guides i:nth-child(n+7){display:none}
+@media (min-width:768px){ html[data-media="screen"].show-grid .r-guides i:nth-child(-n+8){display:block} }
+@media (min-width:1024px){ html[data-media="screen"].show-grid .r-guides i:nth-child(-n+12){display:block} }
+@media (min-width:1920px){ html[data-media="screen"].show-grid .r-guides i:nth-child(-n+20){display:block} }
+
+/* no sheet furniture on screen */
+html[data-media="screen"] .page-no{display:none}
+
+/* Печать — плоско и вся книжечка: наружная сторона, за ней внутренние
+   развороты по порядку, каждый своей страницей 420 × 297. Без поворота: лицом к
+   зрителю повёрнутая сторона ушла бы в PDF зеркальной. Это развороты чтения, а
+   не листы печати — спуск полос делает типография. */
+@media print{
+  @page{size:420mm 297mm;margin:0}
+  body{background:var(--paper)}
+  .fold{display:none}
+  .sheet{perspective:none;height:auto;overflow:visible}
+  .flip{position:static;transform:none!important;transition:none;transform-style:flat;display:flex;flex-direction:column}
+  .side{position:relative;inset:auto;height:var(--sheet-h);backface-visibility:visible;transform:none;break-after:page}
+  .side-front{order:-1}
+  html:not([data-media="screen"]) .side-inner:not(.is-out){display:grid}
+}
+/* ── СНИМОК СТОРОНЫ ── `?capture=1`
+   Те же правила, что у печати: сторона плоско, без поворота и без второй
+   стороны за спиной. Так документ отдаёт себя картинкой трёхмерному виду
+   инструмента — там лист гнётся сеткой, и документ на нём — текстура. */
+html.capture .fold{display:none}
+html.capture .sheet{perspective:none}
+html.capture .flip{transform:none!important;transition:none;transform-style:flat}
+html.capture .side{backface-visibility:visible;transform:none}
+html.capture .sheet[data-side="inner"] .side-front{display:none}
+html.capture .sheet[data-side="front"] .side-inner{display:none}
+</style>
+</head>
+<body>
+<div class="stage">
+<!-- THE SHEET. A shell: the cover's blocks and every inner spread are built by
+     assets/manual-render.js from manual.json. -->
+<div class="sheet" data-side="inner">
+  <div class="flip">
+    <div class="side side-front" aria-label="Cover">
+      <div class="panel panel-l"><div class="page-grid"><div class="grid-overlay" aria-hidden="true"></div></div><div class="cover cover-back"></div></div>
+      <div class="panel panel-r"><div class="page-grid"><div class="grid-overlay" aria-hidden="true"></div></div><div class="cover cover-face"></div></div>
+    </div>
+  </div>
+  <div class="fold fold-v"></div>
+</div>
+</div>
+
+<!-- THE RIBBON — screen version (?media=screen). Built from the same data. -->
+<main class="ribbon" id="r-top" aria-label="Akvantis A1 — installation guide">
+  <header class="topbar r-bar" aria-label="Sections">
+    <a class="topbar-mark" href="#r-top" aria-label="Top"><svg viewBox="0 0 48.05 48.37" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24.0209 0.146484C10.777 0.146484 0 10.9305 0 24.1831C0 37.4356 10.777 48.2196 24.0209 48.2196C37.2649 48.2196 48.0418 37.4356 48.0418 24.1831C48.0418 10.9305 37.2694 0.146484 24.0209 0.146484ZM24.0209 45.1933C12.4445 45.1933 3.02432 35.7671 3.02432 24.1831C3.02432 12.5991 12.4445 3.17277 24.0209 3.17277C35.5974 3.17277 45.0175 12.5991 45.0175 24.1831C45.0175 35.7671 35.5974 45.1933 24.0209 45.1933Z"/><path d="M18.6985 21.7971C20.7543 21.5777 22.7324 21.8199 25.0258 22.6337C29.1968 24.1285 33.3587 23.6119 36.6891 21.6508L35.1632 15.8679C32.9658 16.8965 30.7957 17.3262 28.5572 17.2531C26.1405 17.1754 24.6375 16.3799 22.6411 15.8725C21.2385 15.5159 19.8223 15.4199 18.3102 15.5434C15.7655 15.7537 13.463 16.5811 11.3524 18.1034L12.8828 23.8817C14.7788 22.6977 16.4874 22.0302 18.7031 21.7925L18.6985 21.7971Z"/><path d="M28.5617 26.2453C26.145 26.1676 24.6419 25.3721 22.6455 24.8647C21.243 24.5081 19.8268 24.4121 18.3146 24.5356C15.77 24.7459 13.4675 25.5733 11.3569 27.0956L12.8873 32.8738C14.7832 31.6898 16.4918 31.0224 18.7075 30.7847C20.7633 30.5653 22.7415 30.8076 25.0348 31.6213C29.2058 33.1161 33.3677 32.5996 36.6981 30.6384L35.1722 24.8556C32.9748 25.8841 30.8048 26.3139 28.5662 26.2407L28.5617 26.2453Z"/></svg></a>
+    <nav class="topbar-nav" aria-label="Sections"><span class="topbar-mark-in" aria-hidden="true"><svg viewBox="0 0 48.05 48.37" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24.0209 0.146484C10.777 0.146484 0 10.9305 0 24.1831C0 37.4356 10.777 48.2196 24.0209 48.2196C37.2649 48.2196 48.0418 37.4356 48.0418 24.1831C48.0418 10.9305 37.2694 0.146484 24.0209 0.146484ZM24.0209 45.1933C12.4445 45.1933 3.02432 35.7671 3.02432 24.1831C3.02432 12.5991 12.4445 3.17277 24.0209 3.17277C35.5974 3.17277 45.0175 12.5991 45.0175 24.1831C45.0175 35.7671 35.5974 45.1933 24.0209 45.1933Z"/><path d="M18.6985 21.7971C20.7543 21.5777 22.7324 21.8199 25.0258 22.6337C29.1968 24.1285 33.3587 23.6119 36.6891 21.6508L35.1632 15.8679C32.9658 16.8965 30.7957 17.3262 28.5572 17.2531C26.1405 17.1754 24.6375 16.3799 22.6411 15.8725C21.2385 15.5159 19.8223 15.4199 18.3102 15.5434C15.7655 15.7537 13.463 16.5811 11.3524 18.1034L12.8828 23.8817C14.7788 22.6977 16.4874 22.0302 18.7031 21.7925L18.6985 21.7971Z"/><path d="M28.5617 26.2453C26.145 26.1676 24.6419 25.3721 22.6455 24.8647C21.243 24.5081 19.8268 24.4121 18.3146 24.5356C15.77 24.7459 13.4675 25.5733 11.3569 27.0956L12.8873 32.8738C14.7832 31.6898 16.4918 31.0224 18.7075 30.7847C20.7633 30.5653 22.7415 30.8076 25.0348 31.6213C29.2058 33.1161 33.3677 32.5996 36.6981 30.6384L35.1722 24.8556C32.9748 25.8841 30.8048 26.3139 28.5662 26.2407L28.5617 26.2453Z"/></svg></span><span class="topbar-ink"></span></nav>
+    <div class="topbar-aside"><span class="r-count" aria-live="polite"></span></div>
+    <div class="r-product" aria-label="Akvantis A1"><img class="r-product-img" src="assets/photos/trimmed/a1-wg.png" alt="" width="72" height="192"><span class="r-product-mark"><svg viewBox="0 0 60 32" fill="currentColor" aria-hidden="true"><g clip-path="url(#dv-a1)"><path d="M58.3899 31.9991H53.6672C53.2877 31.9991 52.9802 31.6853 52.9802 31.2978V11.0141C52.9802 10.6222 52.666 10.3075 52.2821 10.3136C51.0791 10.3321 49.8667 10.3356 48.6439 10.3233C47.4169 10.311 46.2001 10.304 44.9928 10.3022C44.6142 10.3022 44.3076 9.98838 44.3076 9.60088V6.09052C44.3076 5.7223 44.5867 5.41633 44.9473 5.3909L46.7978 5.26027C48.4293 5.14367 49.6743 4.95342 50.533 4.69041C51.3917 4.4274 52.1216 3.9531 52.7226 3.26575C53.2636 2.64767 53.7926 1.70433 54.3103 0.434849C54.4177 0.171836 54.6675 0 54.9458 0H58.3899C58.7694 0 59.0768 0.313863 59.0768 0.70137V31.2986C59.0768 31.6861 58.7694 32 58.3899 32V31.9991Z"/><path d="M29.7047 0.376889C29.585 0.144889 29.3507 0 29.0967 0H16.4405C16.1856 0 15.9523 0.144889 15.8326 0.376889L0.0814639 30.9547C-0.162239 31.4284 0.170161 32 0.689429 32H6.05175C6.3075 32 6.5426 31.8533 6.66143 31.6196L11.272 22.5538C11.5269 22.0533 12.2184 22.0444 12.4845 22.5387L13.9355 25.2338C14.0569 25.4596 14.2877 25.5991 14.5374 25.5991H30.9499C31.2005 25.5991 31.4304 25.4587 31.5518 25.2338L33.0287 22.4907C33.2948 21.9964 33.9863 22.0044 34.2412 22.5058L38.8767 31.6196C38.9955 31.8533 39.2306 32 39.4864 32H44.8487C45.3679 32 45.7012 31.4284 45.4566 30.9547L29.7047 0.376889ZM13.101 18.9582L22.0879 1.288C22.2067 1.05422 22.4418 0.907556 22.6976 0.907556H22.8388C23.0946 0.907556 23.3297 1.05422 23.4485 1.288L32.4353 18.9582C32.6765 19.432 32.3432 20 31.8257 20H13.7107C13.1923 20 12.8599 19.432 13.101 18.9582Z"/></g><defs><clipPath id="dv-a1"><rect width="59.0769" height="32" fill="white"/></clipPath></defs></svg></span></div>
+  </header>
+</main>
+
+<div class="r-guides" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+<script src="assets/manual-data.js?v=5"></script>
+<script src="assets/manual-render.js?v=9"></script>
+<script>
+(function(){
+  'use strict';
+  var q = new URLSearchParams(location.search);
+  var el = document.documentElement;
+  var sheet = document.querySelector('.sheet');
+  var embedded = window.self !== window.top;
+
+  /* ── HOW THE DOCUMENT WAS ASKED FOR ── all of it in the address, so the page
+     opened on its own looks exactly as it does inside the tool. */
+  if (q.get('media')) el.dataset.media = q.get('media');
+  if (embedded) el.classList.add('is-embedded');
+  ['mm', 'fold', 'grid', 'tags'].forEach(function(k){ if (q.get(k) === '1') el.classList.add('show-' + k); });
+  if (q.get('art') === '0') el.classList.add('no-art');
+  if (q.get('content') === '0') el.classList.add('no-content');
+  if (q.get('flip') === '0') el.classList.add('no-flip');
+  if (q.get('room') === 'paper') el.classList.add('room-paper');
+  if (q.get('capture') === '1') el.classList.add('capture');
+  if (q.get('pn') === '1') el.classList.add('show-pn');
+  var TURN = q.get('turn') === '1';
+  if (q.get('bleed') === '1') el.classList.add('bleed');
+
+  /* ── THE DATA ──
+     Inside the constructor the data is the one being edited, and it arrives
+     by message — unsaved changes included, uploaded pictures as blob URLs
+     (`blobs`: path → URL). Opened on its own, the document reads manual.json.
+     The constructor is asked first; if nobody answers, the file is read. */
+  var DATA = null, BLOBS = {};
+  function resolve(p){ return BLOBS[p] || p; }
+
+  addEventListener('message', function(e){
+    var d = e.data;
+    if (!d || d.type !== 'a1-data' || !d.data) return;
+    apply(d.data, d.blobs);
+  });
+  function fromFile(){
+    fetch('manual.json', { cache:'no-store' })
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .catch(function(err){
+        console.warn('manual.json: ' + err + ' — using assets/manual-data.js');
+        if (!window.MANUAL_DATA) throw err;
+        return JSON.parse(JSON.stringify(window.MANUAL_DATA));
+      })
+      .then(function(d){ if (!DATA) apply(d, {}); })
+      .catch(function(err){ console.error('manual.json: ' + err); });
+  }
+  if (embedded){
+    try { window.parent.postMessage({ type:'a1-need-data' }, '*'); } catch (err) {}
+    setTimeout(function(){ if (!DATA) fromFile(); }, 900);
+  } else fromFile();
+
+  /* ── SIDE AND SPREAD ──
+     `?side=front`, `?spread=k` — how the document opened: no transition, it was
+     not turned, it was opened this way. `#front`, `#inner-k` — it was turned:
+     a fragment changes without a reload, which is the only reason the turn can
+     be seen. `#inner` is the first spread; `#front` keeps the spread that was
+     open, so turning back returns to it. */
+  var spread = 0, SPREADS = 1;
+  function clampSpread(k){ return Math.max(1, Math.min(SPREADS, k | 0 || 1)); }
+  function go(v, animate){
+    if (!v) return;
+    var k = v.spread ? clampSpread(v.spread) : clampSpread(spread || 1);
+    if (!animate) el.classList.add('is-static');
+    spread = k;
+    sheet.dataset.spread = k;
+    sheet.querySelectorAll('.side-inner').forEach(function(sd){
+      sd.classList.toggle('is-on', +sd.dataset.spread === k);
+    });
+    sheet.dataset.side = v.side;
+    if (!animate) release();
+  }
+  function parse(h){
+    h = (h || '').replace(/^#/, '').replace(/^side=/, '');
+    if (h === 'front') return { side:'front' };
+    if (h === 'back') return { side:'front', closed:'R' };
+    var m = /^inner(?:-(\d+))?$/.exec(h);
+    return m ? { side:'inner', spread:m[1] ? +m[1] : 1 } : null;
+  }
+  /* The transition is taken off for the frame the side is assigned in and put
+     back two frames later — putting it back in the same frame is not taking it
+     off at all. */
+  function release(){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){ el.classList.remove('is-static'); });
+    });
+  }
+  /* ── PAGE TURN (`?turn=1`) ── 2026-09-30
+     The booklet as the tool's 2D view shows it when the 3D snapshots are not
+     available (opened from disk): it behaves like the 3D booklet — pages turn
+     over the spine, and before the first spread / after the last one it closes
+     to the cover (`#front`) or the back cover (`#back`), standing alone in the
+     middle. Everything that moves is a copy of a half of a side, clipped;
+     the real sheet is hidden while a turn runs and while the booklet is closed.
+
+     A state is 'L' (closed, cover up), 'R' (closed, back cover up) or a spread
+     number. Its halves: a spread has both; closed 'L' only the cover face on
+     the right, closed 'R' only the back cover on the left. A turn forward
+     shows under the leaf the old left half and the new right half; the leaf
+     carries the old right half in front and the new left half on its back.
+     Backward is the mirror. */
+  function sideEl(v){
+    return v === 'L' || v === 'R' ? sheet.querySelector('.side-front')
+                                  : sheet.querySelector('.side-inner[data-spread="' + v + '"]');
+  }
+  function copy(v, half, back){
+    if (v === 'L' && half === 'l') return null;
+    if (v === 'R' && half === 'r') return null;
+    var src = sideEl(v); if (!src) return null;
+    var c = src.cloneNode(true);
+    c.classList.add('is-on', 'turn-copy');
+    c.removeAttribute('aria-label');
+    c.style.transform = back ? 'rotateY(180deg)' : 'none';
+    c.style.clipPath = half === 'l' ? 'inset(0 50% 0 0)' : 'inset(0 0 0 50%)';
+    return c;
+  }
+  function stateOf(v){
+    if (!v) return 1;
+    if (v.side === 'front') return v.closed === 'R' ? 'R' : 'L';
+    return clampSpread(v.spread);
+  }
+  function ordOf(s){ return s === 'L' ? 0 : s === 'R' ? SPREADS + 1 : s; }
+  function shiftOf(s){ return s === 'L' ? '-25%' : s === 'R' ? '25%' : '0%'; }
+  var layer = null, anim = null, cur = null;
+  function clearLayer(){ if (anim){ anim.forEach(function(x){ x.cancel(); }); anim = null; } if (layer){ layer.remove(); layer = null; } }
+  function add(parent, node){ if (node) parent.appendChild(node); return node; }
+  /* a state shown at rest */
+  function rest(s){
+    clearLayer();
+    if (s === 'L' || s === 'R'){
+      el.classList.add('is-closed');
+      layer = document.createElement('div'); layer.className = 'turn-layer';
+      add(layer, copy(s, s === 'L' ? 'r' : 'l'));
+      sheet.appendChild(layer);
+    } else {
+      el.classList.remove('is-closed');
+      go({ side:'inner', spread:s }, false);
+    }
+    sheet.style.transform = 'translateX(' + shiftOf(s) + ')';
+  }
+  function turnTo(a, b){
+    clearLayer();
+    var fwd = ordOf(b) > ordOf(a), dur = 900;
+    layer = document.createElement('div'); layer.className = 'turn-layer';
+    add(layer, copy(fwd ? a : b, 'l'));
+    add(layer, copy(fwd ? b : a, 'r'));
+    var leaf = add(layer, document.createElement('div')); leaf.className = 'turn-leaf';
+    add(leaf, copy(a, fwd ? 'r' : 'l'));
+    add(leaf, copy(b, fwd ? 'l' : 'r', true));
+    var shade = add(leaf, document.createElement('div')); shade.className = 'turn-shade ' + (fwd ? 'is-r' : 'is-l');
+    el.classList.add('is-closed');            /* the real sheet hides while the copies move */
+    if (typeof b === 'number') go({ side:'inner', spread:b }, false);
+    sheet.appendChild(layer);
+    var ease = 'cubic-bezier(.45,.05,.25,1)';
+    anim = [
+      leaf.animate([{ transform:'rotateY(0deg)' }, { transform:'rotateY(' + (fwd ? -180 : 180) + 'deg)' }], { duration:dur, easing:ease, fill:'forwards' }),
+      shade.animate([{ opacity:0 }, { opacity:.35, offset:.5 }, { opacity:0 }], { duration:dur, fill:'forwards' }),
+      sheet.animate([{ transform:'translateX(' + shiftOf(a) + ')' }, { transform:'translateX(' + shiftOf(b) + ')' }], { duration:dur, easing:ease, fill:'forwards' })
+    ];
+    anim[0].onfinish = function(){ rest(b); };
+  }
+  addEventListener('hashchange', function(){
+    var v = parse(location.hash);
+    if (!TURN){ go(v, true); return; }
+    var s = stateOf(v);
+    if (s === cur) return;
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var from = cur; cur = s;
+    if (from === null || reduce || !Element.prototype.animate) rest(s); else turnTo(from, s);
+  });
+
+  /* ── AFTER EVERY RENDER ── */
+  var first = true;
+  function apply(data, blobs){
+    DATA = data; BLOBS = blobs || {};
+    window.ManualRender.render(document, DATA, { resolve:resolve });
+    SPREADS = Math.max(1, (DATA.spreads || []).length);
+    sheet.dataset.spreads = SPREADS;
+    pages();
+    grids();
+    if (first){
+      var h = parse(location.hash);
+      var start = { side:q.get('side') === 'front' ? 'front' : 'inner', spread:+q.get('spread') || 1 };
+      if (h && h.side === 'inner') start = h; else if (h) start.side = 'front';
+      go(start, false);
+      if (TURN){ cur = stateOf(h && h.side === 'front' ? h : start); rest(cur); }
+      first = false;
+    } else if (TURN && cur !== null) rest(cur);
+    else go({ side:sheet.dataset.side || 'inner', spread:spread }, false);
+    bar.refresh();
+    rows();
+    requestAnimationFrame(function(){
+      var over = window.ManualRender.overflow(document);
+      if (embedded) try { window.parent.postMessage({ type:'a1-overflow', pages:over }, '*'); } catch (err) {}
+    });
+    if (el.classList.contains('capture')) capture();
+  }
+
+  /* Page numbers from the spread's place in the booklet, not from markup:
+     a page cannot disagree with where it is. Covers carry none. */
+  function pages(){
+    var P = 2 * SPREADS + 2;
+    sheet.querySelectorAll('.side-inner').forEach(function(sd){
+      var k = +sd.dataset.spread;
+      sd.setAttribute('aria-label', 'Spread ' + k + ' \u00b7 pages ' + (2 * k) + '\u2013' + (2 * k + 1));
+      sd.querySelectorAll('.panel').forEach(function(panel){
+        var no = document.createElement('span');
+        no.className = 'page-no'; no.setAttribute('aria-hidden', 'true');
+        no.textContent = panel.dataset.page;
+        panel.appendChild(no);
+      });
+    });
+    var front = sheet.querySelector('.side-front');
+    front.querySelector('.panel-l').dataset.page = P;
+    front.querySelector('.panel-r').dataset.page = 1;
+  }
+
+  /* The grid overlay's lines — drawn, not written: one node per column and one
+     per row, placed on the page's own tracks, so the layer cannot disagree
+     with the grid the layout stands on. */
+  function grids(){
+    var cs = getComputedStyle(el);
+    var cols = parseInt(cs.getPropertyValue('--cols'), 10) || 12;
+    var rows = parseInt(cs.getPropertyValue('--rows'), 10) || 16;
+    document.querySelectorAll('.grid-overlay').forEach(function(o){
+      if (o.childElementCount) return;
+      var f = document.createDocumentFragment(), i, n;
+      for (i = 1; i <= cols; i++){ n = document.createElement('i'); n.className = 'gc'; n.style.gridColumn = i; f.appendChild(n); }
+      for (i = 1; i <= rows; i++){ n = document.createElement('i'); n.className = 'gr'; n.style.gridRow = i; f.appendChild(n); }
+      o.appendChild(f);
+    });
+  }
+
+  /* ── THE BAR FOLLOWS THE READER ──
+     The section whose top has passed the upper third of the screen is the one
+     being read: its link lights, the ink slides under it, the count says where
+     we are, and the row scrolls the link into view on a phone. A tap scrolls to
+     the section. Only in the ribbon — the sheet has no bar. */
+  var bar = (function(){
+    var root = document.querySelector('.r-bar');
+    var nav = root.querySelector('.topbar-nav'), ink = root.querySelector('.topbar-ink');
+    var count = root.querySelector('.r-count');
+    var links = [], secs = [], cur = -1;
+    function mark(i){
+      if (!links.length) return;
+      i = Math.max(0, Math.min(links.length - 1, i));
+      if (i === cur) return;
+      cur = i;
+      links.forEach(function(a, j){ a.classList.toggle('is-here', j === i); });
+      var a = links[i];
+      ink.style.width = a.offsetWidth + 'px';
+      ink.style.transform = 'translateX(' + a.offsetLeft + 'px)';
+      ink.classList.add('is-on');
+      count.textContent = (i + 1) + ' / ' + links.length;
+      nav.scrollTo({ left:Math.max(0, a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2), behavior:'smooth' });
+    }
+    function spy(){
+      if (el.dataset.media !== 'screen' || !secs.length) return;
+      var line = innerHeight / 3, i = 0;
+      secs.forEach(function(sec, j){ if (sec && sec.getBoundingClientRect().top <= line) i = j; });
+      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) i = secs.length - 1;
+      mark(i);
+    }
+    function refresh(){
+      links = [].slice.call(nav.querySelectorAll('a'));
+      secs = links.map(function(a){ return document.getElementById(a.hash.slice(1)); });
+      links.forEach(function(a, j){
+        a.addEventListener('click', function(e){
+          e.preventDefault();
+          if (secs[j]){
+            var d = secs[j].querySelector('details.acc'); if (d) d.open = true;
+            secs[j].scrollIntoView({ behavior:'smooth', block:'start' });
+          }
+        });
+      });
+      cur = -1; spy();
+    }
+    root.querySelector('.topbar-mark').addEventListener('click', function(e){
+      e.preventDefault(); scrollTo({ top:0, behavior:'smooth' });
+    });
+    addEventListener('scroll', spy, { passive:true });
+    addEventListener('resize', function(){ var i = cur; cur = -1; mark(i); });
+    return { refresh:refresh };
+  }());
+
+  /* ── ROWS SCROLL BY HAND, ALSO WITH A MOUSE ──
+     A phone swipes a row natively. A mouse has no sideways swipe, so a row can
+     be dragged: press, pull, let go — and it settles on the nearest card the
+     way a swipe does. Touch and pen keep the native scroll. */
+  /* ── SCROLL HINT ── a row that runs past the screen gets a round arrow on
+     its right edge over a white fade: it says «there is more», and a tap moves
+     the row by one card. It shows only while the row really overflows and
+     leaves once the end is reached. */
+  function hints(){
+    document.querySelectorAll('.ribbon .m-rows, .ribbon .m-specs').forEach(function(row){
+      if (row.parentNode.classList.contains('r-scroll')) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'r-scroll';
+      row.parentNode.insertBefore(wrap, row);
+      wrap.appendChild(row);
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'r-next'; btn.setAttribute('aria-label', 'Scroll right');
+      btn.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg>';
+      wrap.appendChild(btn);
+      function upd(){
+        var more = row.scrollWidth - row.clientWidth - row.scrollLeft > 4;
+        wrap.classList.toggle('has-more', more);
+      }
+      btn.addEventListener('click', function(){
+        var card = row.querySelector('.m-item, .m-spec');
+        row.scrollBy({ left:card ? card.getBoundingClientRect().width : row.clientWidth * .8, behavior:'smooth' });
+      });
+      row.addEventListener('scroll', upd, { passive:true });
+      addEventListener('resize', upd);
+      /* a closed accordion measures nothing: re-check when it opens */
+      var acc = row.closest('details'); if (acc) acc.addEventListener('toggle', upd);
+      upd();
+    });
+  }
+
+  /* ── ACCORDION MOTION ── open and close slide over --r-acc-dur (0.3 s).
+     <details> itself only snaps, so the click is taken over: the body's height
+     is animated from 0 to its measured height (or back) and `open` is set
+     before opening / after closing. Delegated, because the ribbon is rebuilt
+     on every render. Reduced motion: the native snap. */
+  (function(){
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    /* opens that do not go through the click (the bar, reduced motion) */
+    document.addEventListener('toggle', function(e){
+      var d = e.target;
+      if (d.classList && d.classList.contains('acc') && !d.dataset.anim) d.parentNode.classList.toggle('is-open', d.open);
+    }, true);
+    function dur(){ return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--r-acc-dur')) * 1000 || 300; }
+    document.addEventListener('click', function(e){
+      var sum = e.target.closest('.ribbon summary.acc-head');
+      if (!sum || reduce.matches) return;
+      var det = sum.parentNode, body = det.querySelector('.m-sec-body');
+      if (!body || det.dataset.anim) return;
+      e.preventDefault();
+      det.dataset.anim = '1';
+      var opening = !det.open;
+      det.parentNode.classList.toggle('is-open', opening);
+      if (opening) det.open = true;
+      var h = body.scrollHeight;
+      var a = body.animate(
+        opening ? [{ height:'0px', opacity:0 }, { height:h + 'px', opacity:1 }]
+                : [{ height:h + 'px', opacity:1 }, { height:'0px', opacity:0 }],
+        { duration:dur(), easing:getComputedStyle(document.documentElement).getPropertyValue('--r-ease').trim() || 'ease' });
+      body.style.overflow = 'hidden';
+      a.onfinish = a.oncancel = function(){
+        if (!opening) det.open = false;
+        body.style.overflow = '';
+        delete det.dataset.anim;
+      };
+    });
+  }());
+
+  function rows(){
+    hints();
+    document.querySelectorAll('.ribbon .m-rows, .ribbon .r-row, .ribbon .m-specs').forEach(function(row){
+      var drag = null;
+      row.addEventListener('pointerdown', function(e){
+        if (e.pointerType !== 'mouse' || row.scrollWidth <= row.clientWidth) return;
+        drag = { x:e.clientX, left:row.scrollLeft };
+        row.style.scrollSnapType = 'none';
+        row.setPointerCapture(e.pointerId);
+      });
+      row.addEventListener('pointermove', function(e){ if (drag) row.scrollLeft = drag.left - (e.clientX - drag.x); });
+      function end(){ if (!drag) return; drag = null; row.style.scrollSnapType = ''; }
+      row.addEventListener('pointerup', end);
+      row.addEventListener('pointercancel', end);
+      row.addEventListener('dragstart', function(e){ e.preventDefault(); });
+    });
+  }
+
+  /* ── A PICTURE OF A SIDE, FOR THE 3D VIEW ── `?capture=1`
+     The document draws its side into a bitmap and hands it to whatever it is
+     embedded in, by message. Redrawn after every render, so an edit in the
+     constructor reaches the 3D sheet too. Waits for fonts and pictures: a
+     snapshot taken before them is a sheet without its content. */
+  var capT = 0, capN = 0;
+  function key(){ return sheet.dataset.side === 'front' ? 'front' : 'inner-' + spread; }
+  function lib(){
+    if (window.html2canvas) return Promise.resolve();
+    return new Promise(function(res, rej){
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  function ready(){
+    var imgs = [].slice.call(document.images).map(function(im){
+      return im.complete ? Promise.resolve() : new Promise(function(r){ im.addEventListener('load', r); im.addEventListener('error', r); });
+    });
+    return Promise.all(imgs.concat([document.fonts ? document.fonts.ready : Promise.resolve()]));
+  }
+  function capture(){
+    if (!embedded) return;
+    clearTimeout(capT);
+    capT = setTimeout(function(){
+      var n = ++capN;
+      Promise.all([ready(), lib()]).then(function(){
+        if (n !== capN) return null;
+        return html2canvas(sheet, { scale:2, backgroundColor:null, logging:false });
+      }).then(function(cv){
+        if (!cv || n !== capN) return;
+        return createImageBitmap(cv).then(function(bmp){
+          window.parent.postMessage({ type:'a1-capture', side:key(), bitmap:bmp }, '*', [bmp]);
+        });
+      }).catch(function(err){
+        window.parent.postMessage({ type:'a1-capture', side:key(), error:String(err) }, '*');
+      });
+    }, 250);
+  }
+}());
+</script>
+
+</body>
+</html>

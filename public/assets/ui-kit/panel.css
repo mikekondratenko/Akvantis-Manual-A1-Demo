@@ -1,0 +1,152 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tools UI Kit — the plate title and the collapsible plate.
+
+   ⚠ WHY THIS IS ITS OWN FILE
+   One control had grown three descriptions. `kit.css` drew it with a plus that
+   turns into a minus; the Stick Maker redeclared the sign locally as a chevron
+   and every plate in that tool used the local version; the passport page, which
+   cannot load `kit.css` at all, carried a third copy lifted by hand. Three
+   drawings of one object, and `kit.css` even had a `prefers-reduced-motion` rule
+   for `.panel-chevron` — a class it did not define anywhere.
+
+   So the control moved here, where every consumer can reach it: the rail tools
+   load `tokens.css → panel.css → kit.css`, and a reading document loads
+   `tokens.css → panel.css` and whatever else it needs. One definition, and the
+   plate in the Box Maker, the Stick Maker, the product matrix and a passport page
+   is the same plate.
+
+   Requires `tokens.css`. Load before `kit.css`.
+
+   ── ONE MECHANISM ──
+   `button.panel-title` + `.panel-fold`: script toggles `aria-expanded` and
+   `data-open`, the fold animates 0fr → 1fr, and the sign turns. Everywhere — the
+   Box Maker's rail, the Stick Maker's four plates, the product matrix, and the page
+   a scanned carton opens.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── PLATE TITLE ──
+   14 / 600, sentence case. It was 12 / 700 in caps with .08em of tracking, and caps
+   is what a heading reaches for when it has no size to spend — a plate's name set at
+   12 next to a group's at 10 is two points of difference, which is not a hierarchy
+   anyone reads, so the caps were carrying it instead. Four more points and a lighter
+   weight say the same thing without shouting, and they leave the group label its own
+   job.
+
+   `--black-100` rather than `--black-250` for the same reason: a title that has
+   stopped being loud has to be legible. The collapsible variant lifts to white on
+   hover. */
+.panel-title {
+  font-size: var(--text-14); font-weight: 600; letter-spacing: 0;
+  color: var(--black-100);
+}
+
+/* ── THE WHOLE STRIP IS THE TARGET, NOT THE WORDS ──
+   It was `width: 100%; padding: 0`, which sounds like the full row and is not: the
+   plate holds a 16px inset, so a click one pixel above the title or level with the
+   sign on the far right landed on the plate and did nothing. On a closed plate —
+   where the title is the only thing in it — that meant most of the visible object
+   was inert.
+
+   The negative margin takes the box out to the tile's edges and the padding puts the
+   content back exactly where it was, so this is transparent to layout: the button's
+   bottom margin cancels its own bottom padding and the panel's 24px gap still
+   measures from the same line. The radius matches `.sidebar-tile`, because on a
+   closed plate the hover plate *is* the tile.
+
+   Expanded, the same strip stays the target and nothing below it becomes clickable —
+   a body full of inputs that also collapses the plate is a body where every miss
+   closes the panel.
+
+   The hover plate is on the closed state only. Closed, the strip *is* the tile and
+   the wash under the cursor says the whole object is the button. Open, the strip is
+   the top edge of a panel already showing everything it has — lighting it offers to
+   reveal something that is not hidden. The colour lift answers the cursor in both
+   states; only the plate is conditional. */
+button.panel-title {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-12);
+  width: calc(100% + var(--space-32));
+  margin: calc(-1 * var(--space-16));
+  padding: var(--space-16);
+  border-radius: var(--radius-16);
+  background: none; border: 0; cursor: pointer;
+  font-family: inherit; text-align: left;
+  transition: color .12s, background .12s;
+}
+button.panel-title:hover { color: var(--white); }
+button.panel-title[aria-expanded="false"]:hover { background: var(--white-04); }
+button.panel-title:focus-visible {
+  outline: none; color: var(--white);
+  box-shadow: 0 0 0 2px var(--white-32);
+}
+/* Open, the plate continues below the strip, so the bottom corners belong to the
+   body. */
+button.panel-title[aria-expanded="true"] { border-radius: var(--radius-16) var(--radius-16) 0 0; }
+
+/* ⚠ THERE WAS A SECOND VARIANT HERE, ON `<summary>`, AND IT IS GONE — 2026-09-04.
+   It existed so a reading document could fold a section without JavaScript. The cost
+   was that `<details>` cannot animate its height: that plate snapped open while every
+   plate in every rail eased on the fold's curve, which is exactly the "same control,
+   two behaviours" this file was created to end. One mechanism now — the button and the
+   fold below — and a page with no script answers the no-JS case by opening every fold
+   instead of by drawing a different control. */
+
+/* ── THE SIGN ──
+   A chevron on a 16 box at 1.6 — the weight every other glyph in this kit is drawn
+   at, so it sits at the same optical density as the stepper's ends and the card
+   rows' arrows rather than looking heavier than its neighbours. Closed it points
+   right, open it points down: the rotation is the state, and it is read before the
+   label is.
+
+   ⚠ It replaces `.panel-sign`, the plus that turned into a minus, which was the
+   kit's drawing until 2026-09-04. Both were defensible on their own; having both was
+   not — the Stick Maker showed a chevron and the Box Maker a plus for the same
+   action in the same rail. The chevron won because it is what three of the four
+   surfaces already used and because a plus reads as *add* on a rail whose other
+   pluses do add things. */
+.panel-chevron {
+  flex: none; color: var(--black-250);
+  transform: rotate(-90deg);
+  transition: transform .2s cubic-bezier(.4, 0, .2, 1);
+}
+[aria-expanded="true"] .panel-chevron { transform: rotate(0deg); }
+
+/* ── THE FOLD ──
+   `hidden` cannot be animated: the element is gone on the first frame, so the plate
+   jumps to its new height and the sign turns against nothing. This wraps the body in
+   a grid whose single row goes 0fr → 1fr, which is the one way to animate to a
+   height nobody has measured — `height: auto` is not interpolable and a JS
+   `scrollHeight` is a number that goes stale the moment a field wraps.
+
+   The child clips, and `min-height: 0` is what lets it: a grid item's automatic
+   minimum size is its content, so without that the row refuses to go below the height
+   of what is in it and nothing moves.
+
+   Closed, the subtree is `inert` — set by script, not by CSS, because a fold that
+   merely has no height still holds focusable inputs, and a Tab that lands inside a
+   collapsed plate is a cursor that has left the screen.
+
+   ── The gap travels with the fold, and it goes inside the clip ──
+   `hidden` took the element out of the flow and the panel's 24px gap went with it. A
+   fold is still a flex item at zero height, so the gap stayed and a closed plate
+   carried 24px of nothing under its title. So the panel stops applying a gap at all,
+   and the separation moves onto the first item *inside* the clipping child, where it
+   is content and gets clipped with everything else. `padding-top` on the clip does
+   not work: `overflow: hidden` clips content, not padding, so the fold measured 24
+   tall while claiming to be nothing. */
+.sidebar-panel:has(> .panel-fold) { gap: 0; }
+.panel-fold {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows .24s cubic-bezier(.4, 0, .2, 1);
+}
+.panel-fold[data-open="true"] { grid-template-rows: 1fr; }
+.panel-fold > * { overflow: hidden; min-height: 0; }
+.panel-fold > * > :first-child { margin-top: var(--space-24); }
+
+.panel-body { display: flex; flex-direction: column; gap: var(--space-16); }
+.panel-body[hidden] { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-fold { transition: none; }
+  .panel-chevron { transition: none; }
+}

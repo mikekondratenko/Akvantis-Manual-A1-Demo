@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+
+  // Brand-prefixed, like every worker in this folder — see DEPLOY.md at the root.
+  "name": "akvantis-a1-manual-guide-demo",
+
+  "compatibility_date": "2026-09-30",
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page"
+  }
+}

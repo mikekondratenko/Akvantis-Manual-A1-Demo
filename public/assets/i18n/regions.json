@@ -1,0 +1,29 @@
+{
+  "default": "en",
+  "regions": [
+    {
+      "code": "en",
+      "file": "index.html",
+      "name": "Global",
+      "language": "English",
+      "short": "En",
+      "icon": "globe"
+    },
+    {
+      "code": "de",
+      "file": "de.html",
+      "name": "Germany",
+      "language": "Deutsch",
+      "short": "De",
+      "icon": "pin"
+    },
+    {
+      "code": "uk",
+      "file": "uk.html",
+      "name": "Україна",
+      "language": "Українська",
+      "short": "Ua",
+      "icon": "pin"
+    }
+  ]
+}

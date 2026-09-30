@@ -1,0 +1,229 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   MANUAL KIT — the components of the A1 manual.
+   Requires the kit's tokens.css and number.css.
+
+   Taken from the mock-up (Figma «Akvantis A1 Packaging», spreads A1 manual
+   02–03 / 04–05) number for number. Every size is in mock-up units, `--u`: a
+   page in Figma is 832 × 1180, and 1 u is one of its pixels. That is why the
+   rules below read 36.955, 22.349, 16 — the same numbers as in Figma, so any
+   of them can be checked without arithmetic.
+
+     sheet (print)   1 u = 210 mm / 832 ≈ 0.252 mm   — set by the document
+     screen          1 u = 1 px
+     specimen        1 u = 1 px                       — a1-manual-kit.html
+
+   Components
+     .m-title     section title — «Installation», «First Start», «Manual Guide»
+     .m-legend    group title — «In the box», «Tools», «Safety & warranty»
+     .m-label     label — «Prepare», «2x», «Drill»
+     .m-group     group frame; its .m-legend sits on the top rule
+     .m-fig       step frame: rule, radius, number in the corner, picture
+                  inside; with no picture it is the placeholder (grey plate)
+     .m-badge     small white tile on a frame — the bit or tool a step needs
+     .m-item      one thing in the box: picture tile and its count
+     .m-spec      one figure of Safety & warranty: value and what it is
+     .m-issue     one Troubleshooting issue: title, then cause → solution pairs
+     .m-ph        the placeholder's caption; disappears once the art arrives
+     .num         the number — from the kit (number.css); only its size is set here
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root{
+  --u : calc(210mm / 832);
+
+  /* The mock-up library's colours, named as in Figma so they can be found. */
+  --m-ink     : #010006;   /* Black Shades / Black 100 */
+  --m-paper   : #FDFEFF;   /* White Shades / White     */
+  --m-grey-20 : #E9EEF6;   /* White Shades / Grey 20 — the frame with no picture */
+  --m-ink-2   : #6B7070;   /* second-level captions («supply», «ambient») */
+}
+[data-media="screen"]{--u:1px}
+
+/* ── SCREEN TOKENS ──
+   The ribbon uses the kit (tokens.css: --space-*, --text-*, --radius-*,
+   colours). What the kit does not have yet is named here ONCE, built from kit
+   values, and every rule below uses only token names. tokens.css is a synced
+   copy (ui-kit/sync.mjs), so these live here, in the manual kit,
+   until promoted into ui-kit/kit/tokens.css. Breakpoint widths in @media stay literal — CSS
+   cannot read a variable there; they are the ones in docs/DESIGN.md. */
+:root{
+  --hairline      : 1px;
+  --hairline-half : .5px;
+  --r-bar-h       : var(--space-80);
+  --r-frost-paper : rgba(252, 255, 254, .72);  /* --white at 72 % */
+  --r-paper-0     : rgba(252, 255, 254, 0);    /* --white at 0 % */
+  --r-lift        : 0 var(--space-2) var(--space-8) rgba(17, 18, 17, .16); /* --black at 16 % */
+  --r-guide-ink   : #8E8F8F;                    /* the sheet's guide ink */
+  --r-dur         : .2s;
+  --r-acc-dur     : .3s;                        /* accordion open / close */
+  --r-ease        : cubic-bezier(.2, 0, 0, 1);
+  --r-num-active  : 1.8;
+  --lh-tight      : 1.2;
+  --lh-snug       : 1.3;
+  --lh-body       : 1.4;
+  --fw-medium     : 500;
+  --fw-semibold   : 600;
+}
+
+
+/* ── TYPE ──
+   One face for everything — Cy Grotesk Key Medium — and three steps. The
+   sizes are the mock-up's own, fractions included: 36.955 and 22.349 are sizes
+   rescaled with the mock-up, and rounding them would drift from it by half a
+   pixel on every line. */
+.m-title, .m-legend, .m-label{
+  margin:0;
+  font-family:var(--font-primary);font-weight:500;font-style:normal;
+  color:var(--m-ink);
+  font-feature-settings:"lnum" 1, "pnum" 1;
+}
+.m-title { font-size:calc(36.955 * var(--u)); line-height:1.12; }
+.m-legend{ font-size:calc(22.349 * var(--u)); line-height:1.12; white-space:nowrap; }
+.m-label { font-size:calc(16 * var(--u));     line-height:1.46; }
+
+/* ── GROUP WITH ITS TITLE ON THE RULE ──
+   3 u rule, 16 u radius. The title is not above the frame but in it: it sits
+   on the top rule 12 u from the corner and breaks it with a paper-coloured
+   ground and 8 u of side padding — as «Safety & warranty» does in the mock-up.
+   The ground is the page colour, so a group is only ever laid on paper. */
+.m-group{
+  position:relative;box-sizing:border-box;
+  border:calc(3 * var(--u)) solid var(--m-ink);
+  border-radius:calc(16 * var(--u));
+}
+.m-group > .m-legend{
+  position:absolute;
+  left:calc(12 * var(--u));top:calc(-11 * var(--u));
+  padding:0 calc(8 * var(--u));
+  background:var(--paper, var(--m-paper));
+}
+
+/* ── STEP FRAME ──
+   2 u rule, 16 u radius, everything inside clipped by the rule. The number sits
+   in the top-left corner, 8 u inside the rule, at 36 u.
+
+   The placeholder is the same frame without a picture: the Grey 20 ground
+   shows while there is no art and is covered once there is. There is no
+   separate placeholder component on purpose — a frame whose markup changes
+   when a picture arrives is two components that will drift apart.
+
+   The picture comes through `data-art="<folder>/<name>"`: the document loads
+   assets/art/<folder>/<name>.svg, or .png. A plain <img> inside works too. */
+.m-fig{
+  position:relative;box-sizing:border-box;margin:0;
+  overflow:hidden;
+  border:calc(2 * var(--u)) solid var(--m-ink);
+  border-radius:calc(16 * var(--u));
+  background:var(--m-grey-20);
+}
+.m-fig > img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;display:block;
+}
+.m-fig > .num{
+  --num-size:calc(36 * var(--u));
+  position:absolute;z-index:2;
+  left:calc(8 * var(--u));top:calc(8 * var(--u));
+}
+/* A label in the frame's top-right corner — «Prepare». */
+.m-fig > .m-label{
+  position:absolute;z-index:2;
+  right:calc(18 * var(--u));top:calc(8 * var(--u));
+}
+
+/* ── BADGE ──
+   The white tile in a frame's corner that names what the step needs — the Ø12
+   bit, the drill, the wrench. 2 u rule, 8 u radius, 72 u square in the
+   mock-up. It holds a picture of the tool; until there is one, its text says
+   which. Badges gather in `.m-badges`, placed by `data-at` (tl, tr, bl, br). */
+.m-badges{
+  position:absolute;z-index:2;display:flex;gap:calc(4 * var(--u));
+}
+.m-badges[data-at="tl"]{left:calc(8 * var(--u));top:calc(52 * var(--u))}
+.m-badges[data-at="tr"]{right:calc(8 * var(--u));top:calc(8 * var(--u))}
+.m-badges[data-at="bl"]{left:calc(8 * var(--u));bottom:calc(8 * var(--u))}
+.m-badges[data-at="br"]{right:calc(8 * var(--u));bottom:calc(8 * var(--u))}
+.m-badge{
+  box-sizing:border-box;position:relative;overflow:hidden;
+  /* square while it holds a picture; a long name widens it instead of spilling */
+  min-width:calc(72 * var(--u));height:calc(72 * var(--u));
+  padding-left:calc(6 * var(--u));padding-right:calc(6 * var(--u));
+  white-space:nowrap;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding-top:calc(6 * var(--u));
+  border:calc(2 * var(--u)) solid var(--m-ink);
+  border-radius:calc(8 * var(--u));
+  background:var(--m-paper);
+  font-family:var(--font-primary);font-weight:500;color:var(--m-ink);
+  font-size:calc(14 * var(--u));line-height:1.2;
+  font-feature-settings:"lnum" 1, "pnum" 1;
+}
+
+/* ── ITEM — one thing in the box ──
+   A picture and its count under it, on the page itself — no ground of its own.
+   The picture area is square; while the art is missing it carries the item's
+   name (.m-ph), so the layout reads before a single render exists. */
+.m-item{display:flex;flex-direction:column;align-items:center;gap:calc(8 * var(--u));margin:0}
+.m-item-art{
+  position:relative;width:100%;aspect-ratio:1;
+  border-radius:calc(12 * var(--u));background:none;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.m-item-art > img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.m-item > .m-label{text-align:center}
+
+/* ── PLACEHOLDER CAPTION ──
+   Says what will be drawn here. Grey, small, centred; gone as soon as the
+   document has loaded the art (`data-art-on`). */
+.m-ph{
+  padding:calc(8 * var(--u));text-align:center;
+  font-family:var(--font-primary);font-weight:500;
+  font-size:calc(12 * var(--u));line-height:1.3;color:var(--m-ink-2);
+}
+[data-art-on] > .m-ph{display:none}
+/* the caption is for the empty frame only — a loaded picture replaces it */
+.m-item-art:has(> img) > .m-ph, .m-fig:has(> img) > .m-ph{display:none}
+/* object pictures on transparency are fitted into a frame, not cropped by it */
+.m-fig > img.is-fit{object-fit:contain;padding:12%;box-sizing:border-box}
+
+/* ── TEXT ── a paragraph block: 14 u / 1.5 on the sheet */
+.m-text{margin:0;font-family:var(--font-primary);font-weight:500;color:var(--m-ink);font-size:calc(14 * var(--u));line-height:1.5}
+.m-fig > .m-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+
+/* ── SPEC — one figure of Safety & warranty ──
+   Icon (32 u), value (12 u / 1.54), and what the value is (8 u, grey). */
+.m-spec{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:calc(2 * var(--u));text-align:center;margin:0;
+  font-family:var(--font-primary);font-weight:500;
+}
+.m-spec-icon{display:block;width:calc(32 * var(--u));height:calc(32 * var(--u));border-radius:calc(8 * var(--u));background:var(--m-grey-20)}
+.m-spec-icon > img{display:block;width:100%;height:100%}
+.m-spec-icon[data-art-on]{background:none}
+.m-spec-value{font-size:calc(12 * var(--u));line-height:1.54;color:var(--m-ink);font-feature-settings:"lnum" 1, "pnum" 1}
+.m-spec-what {font-size:calc(8 * var(--u));line-height:1.3;color:var(--m-ink-2)}
+
+/* ── ISSUE — one Troubleshooting case ──
+   A card: the issue as its title, then one or more «Possible cause / Solution»
+   pairs, a soft rule between pairs. Screen component (tokens, not u): the
+   cards stand in the ribbon's column grid, 2 across on a phone, 3 on desktop;
+   that layout belongs to the page, the card to the kit.
+
+     <article class="m-issue">
+       <h3 class="m-issue-h">No water</h3>
+       <ul><li><span class="m-issue-k">Possible cause</span><p>…</p>
+               <span class="m-issue-k">Solution</span><p>…</p></li></ul>
+     </article>                                                              */
+.m-issue{box-sizing:border-box;border:var(--hairline) solid var(--black-150);border-radius:var(--radius-12);
+  padding:var(--space-12);color:var(--m-ink);font-family:var(--font-primary);font-weight:var(--fw-medium);background:var(--m-paper)}
+.m-issue-h{margin:0 0 var(--space-12);font-family:var(--font-primary);font-weight:var(--fw-semibold);font-size:var(--text-14);line-height:var(--lh-snug)}
+.m-issue ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--space-12)}
+.m-issue li + li{border-top:var(--hairline) solid var(--black-100);padding-top:var(--space-12)}
+.m-issue-k{display:block;font-size:var(--text-10);font-weight:var(--fw-semibold);color:var(--black-250);margin-bottom:var(--space-2)}
+.m-issue p{margin:0 0 var(--space-8);font-size:var(--text-12);line-height:var(--lh-body)}
+.m-issue p:last-child{margin-bottom:0}
+@media (min-width:1024px){
+  .m-issue{padding:var(--space-16)}
+  .m-issue-h{font-size:var(--text-16)}
+  .m-issue-k{font-size:var(--text-11)}
+  .m-issue p{font-size:var(--text-14)}
+}
