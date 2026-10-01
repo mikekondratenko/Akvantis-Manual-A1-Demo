@@ -186,28 +186,39 @@ window.MANUAL_DATA = {
           "label": "Main",
           "items": [
             {
-              "art": "assets/screen/a1-unit.webp",
-              "name": "A1 unit",
+              "art": "assets/art/box/system-unit.png",
+              "name": "A1 Unit",
               "count": "1x",
-              "desc": "Filtration module"
+              "desc": "Filtration module",
+              "label": "A1 Unit"
             },
             {
-              "art": "assets/art/box/cartridges.png",
-              "name": "Cartridges RO · PCB",
-              "count": "2x",
-              "desc": "Membrane and carbon filter"
+              "art": "assets/art/box/pcb-filter.png",
+              "name": "PCB Filter",
+              "count": "1x",
+              "desc": "Sediment + carbon",
+              "label": "PCB Filter"
             },
             {
-              "art": "assets/art/box/mineralizer.png",
-              "name": "Post-filter",
+              "art": "assets/art/box/ro-filter.png",
+              "name": "RO Filter",
               "count": "1x",
-              "desc": "Mineralizer, in-line"
+              "desc": "Reverse osmosis membrane",
+              "label": "RO Filter"
             },
             {
               "art": "assets/art/box/power-adapter.png",
-              "name": "Power adapter",
+              "name": "Power Adapter",
               "count": "1x",
-              "desc": "230 V~ to module"
+              "desc": "230 V~ to module",
+              "label": "Power Adapter"
+            },
+            {
+              "art": "assets/art/box/mineralizer-filter.png",
+              "name": "Mineralizer",
+              "count": "1x",
+              "desc": "Post-filter, in-line",
+              "label": "Mineralizer"
             }
           ]
         },
@@ -217,40 +228,60 @@ window.MANUAL_DATA = {
           "label": "Fittings and drain",
           "items": [
             {
-              "art": "assets/art/box/fitting-straight.png",
-              "name": "Straight fitting",
-              "count": "1x",
-              "desc": "Tube connector"
-            },
-            {
-              "art": "assets/art/box/fitting-3-8-straight.png",
-              "name": "Straight fitting 3/8\"",
+              "art": "assets/art/box/l-type-connector-3-8.png",
+              "name": "3/8\" L-Type Connector",
               "count": "2x",
-              "desc": "Tube to thread, 3/8\""
+              "desc": "",
+              "label": "3/8\" L-Type Connector"
             },
             {
-              "art": "assets/art/box/fitting-3-8.png",
-              "name": "Elbow 3/8\"",
+              "art": "assets/art/box/l-type-connector-1-4.png",
+              "name": "1/4\" L-Type Connector",
+              "count": "1x",
+              "desc": "",
+              "label": "1/4\" L-Type Connector"
+            },
+            {
+              "art": "assets/art/box/inlet-3-way-ball-valve.png",
+              "name": "Inlet 3-Way Ball Valve",
+              "count": "1x",
+              "desc": "",
+              "label": "Inlet 3-Way Ball Valve"
+            },
+            {
+              "art": "assets/art/box/straight-connector-3-8.png",
+              "name": "3/8\" Straight Connector",
               "count": "2x",
-              "desc": "90° tube connector"
+              "desc": "",
+              "label": "3/8\" Straight Connector"
             },
             {
-              "art": "assets/art/box/fitting-1-4.png",
-              "name": "Elbow 1/4\"",
+              "art": "assets/art/box/thread-connector-3-8-x-3-4.png",
+              "name": "3/8\" × 3/8\" Connector",
               "count": "1x",
-              "desc": "90° tube connector"
+              "desc": "Optional · tube 3/8\" × thread 3/8\"",
+              "label": "3/8\" × 3/8\" Connector"
             },
             {
-              "art": "assets/art/box/feed-valve.png",
-              "name": "Feed valve",
+              "art": "assets/art/box/thread-connector-3-8-x-3-4.png",
+              "name": "3/8\" × 1/4\" Connector",
               "count": "1x",
-              "desc": "Taps the cold water line"
+              "desc": "Optional · tube 3/8\" × thread 1/4\"",
+              "label": "3/8\" × 1/4\" Connector"
             },
             {
-              "art": "assets/art/box/drain-saddle.png",
-              "name": "Drain saddle",
+              "art": "assets/art/box/reducing-bushing-1-2m-to-3-8f.png",
+              "name": "Thread Adapter 1/2\" → 3/8\"",
               "count": "1x",
-              "desc": "Clamps onto the sink drain"
+              "desc": "Optional",
+              "label": "Thread Adapter 1/2\" → 3/8\""
+            },
+            {
+              "art": "assets/art/box/thread-adapter-3-8m-to-1-2f.png",
+              "name": "Thread Adapter 3/8\" → 1/2\"",
+              "count": "1x",
+              "desc": "Optional",
+              "label": "Thread Adapter 3/8\" → 1/2\""
             }
           ]
         },
@@ -260,10 +291,25 @@ window.MANUAL_DATA = {
           "label": "Lock clips",
           "items": [
             {
-              "art": "assets/art/box/lock-clips.png",
-              "name": "Lock clips",
-              "count": "12x",
-              "desc": "Secure each tube joint"
+              "art": "assets/art/box/lock-clip-blue.png",
+              "name": "Clip 3/8\"",
+              "count": "7x",
+              "desc": "Blue",
+              "label": "Clip 3/8\""
+            },
+            {
+              "art": "assets/art/box/lock-clip-red.png",
+              "name": "Clip 3/8\"",
+              "count": "2x",
+              "desc": "Red",
+              "label": "Clip 3/8\""
+            },
+            {
+              "art": "assets/art/box/lock-clip-grey.png",
+              "name": "Clip 1/4\"",
+              "count": "2x",
+              "desc": "Grey",
+              "label": "Clip 1/4\""
             }
           ]
         },
@@ -273,28 +319,39 @@ window.MANUAL_DATA = {
           "label": "Tubes and key",
           "items": [
             {
-              "art": "assets/art/box/tube-blue.png",
-              "name": "Tube, blue",
+              "art": "assets/art/box/pe-tubing-3-8-blue.png",
+              "name": "3/8\" PE Tubing",
               "count": "1x",
-              "desc": "Pure water, to the faucet"
+              "desc": "Blue",
+              "label": "3/8\" PE Tubing"
             },
             {
-              "art": "assets/art/box/tube-red.png",
-              "name": "Tube, red",
+              "art": "assets/art/box/pe-tubing-3-8-red.png",
+              "name": "3/8\" PE Tubing",
               "count": "1x",
-              "desc": "Inlet, from the feed valve"
+              "desc": "Red",
+              "label": "3/8\" PE Tubing"
             },
             {
-              "art": "assets/art/box/tube-gray.png",
-              "name": "Tube, grey",
+              "art": "assets/art/box/pe-tubing-1-4-grey.png",
+              "name": "1/4\" PE Tubing",
               "count": "1x",
-              "desc": "Waste, to the drain"
+              "desc": "Grey",
+              "label": "1/4\" PE Tubing"
             },
             {
               "art": "assets/art/tools/pipe-key.png",
-              "name": "Tube key",
+              "name": "Tube Key",
               "count": "1x",
-              "desc": "Releases tube fittings"
+              "desc": "",
+              "label": "Tube Key"
+            },
+            {
+              "art": "assets/art/box/drain-saddle.png",
+              "name": "Drain Saddle",
+              "count": "1x",
+              "desc": "",
+              "label": "Drain Saddle"
             }
           ]
         }
@@ -314,33 +371,38 @@ window.MANUAL_DATA = {
           "items": [
             {
               "art": "assets/art/tools/drill-driver.png",
-              "name": "Drill",
-              "count": "Drill",
-              "desc": "Countertop and drain holes"
+              "name": "Drill Driver",
+              "count": "",
+              "desc": "",
+              "label": "Drill Driver"
             },
             {
-              "name": "Drill bit Ø12",
-              "count": "Ø12",
-              "art": "assets/art/tools/bit-12.png",
-              "desc": "Faucet hole"
-            },
-            {
-              "name": "Drill bit Ø6",
-              "count": "Ø6",
               "art": "assets/art/tools/bit-6.png",
-              "desc": "Drain saddle hole"
+              "name": "Ø6",
+              "count": "",
+              "desc": "Drill bit",
+              "label": "Ø6"
             },
             {
-              "name": "Wrench",
-              "count": "Wrench",
+              "art": "assets/art/tools/bit-12.png",
+              "name": "Ø12",
+              "count": "",
+              "desc": "Drill bit",
+              "label": "Ø12"
+            },
+            {
               "art": "assets/art/tools/wrench.png",
-              "desc": "Faucet nut, feed valve"
+              "name": "Wrench",
+              "count": "",
+              "desc": "",
+              "label": "Wrench"
             },
             {
-              "name": "Screwdriver",
-              "count": "Screwdriver",
               "art": "assets/art/tools/screwdriver.png",
-              "desc": "Drain saddle clamp"
+              "name": "Screwdriver",
+              "count": "",
+              "desc": "",
+              "label": "Screwdriver"
             }
           ]
         }
@@ -382,7 +444,7 @@ window.MANUAL_DATA = {
         {
           "id": "b8",
           "type": "step",
-          "art": "assets/art/box/mineralizer.png",
+          "art": "assets/art/box/mineralizer-filter.png",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 6
@@ -398,7 +460,7 @@ window.MANUAL_DATA = {
         {
           "id": "b10",
           "type": "step",
-          "art": "assets/art/box/fitting-straight.png",
+          "art": "assets/art/box/straight-connector-3-8.png",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 6
@@ -406,7 +468,7 @@ window.MANUAL_DATA = {
         {
           "id": "b11",
           "type": "step",
-          "art": "assets/art/box/fitting-3-8.png",
+          "art": "assets/art/box/l-type-connector-3-8.png",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 6
@@ -414,7 +476,7 @@ window.MANUAL_DATA = {
         {
           "id": "b12",
           "type": "step",
-          "art": "assets/art/box/fitting-1-4.png",
+          "art": "assets/art/box/l-type-connector-1-4.png",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 6
@@ -431,7 +493,7 @@ window.MANUAL_DATA = {
         {
           "id": "b13",
           "type": "step",
-          "art": "assets/art/box/feed-valve.png",
+          "art": "assets/art/box/inlet-3-way-ball-valve.png",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 6
@@ -455,7 +517,7 @@ window.MANUAL_DATA = {
         {
           "id": "b16",
           "type": "step",
-          "art": "assets/art/box/tube-blue.png",
+          "art": "assets/art/box/pe-tubing-3-8-blue.png",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 6,
@@ -464,7 +526,7 @@ window.MANUAL_DATA = {
         {
           "id": "b17",
           "type": "step",
-          "art": "assets/art/box/tube-red.png",
+          "art": "assets/art/box/pe-tubing-3-8-red.png",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 6
@@ -472,7 +534,7 @@ window.MANUAL_DATA = {
         {
           "id": "b18",
           "type": "step",
-          "art": "assets/art/box/tube-gray.png",
+          "art": "assets/art/box/pe-tubing-1-4-grey.png",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 6
@@ -547,7 +609,7 @@ window.MANUAL_DATA = {
         {
           "id": "b25",
           "type": "step",
-          "art": "assets/art/box/mineralizer.png",
+          "art": "assets/art/box/mineralizer-filter.png",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 6
@@ -563,7 +625,7 @@ window.MANUAL_DATA = {
         {
           "id": "b27",
           "type": "step",
-          "art": "assets/art/box/fitting-straight.png",
+          "art": "assets/art/box/straight-connector-3-8.png",
           "fit": "contain",
           "ratio": "4 / 3",
           "span": 6

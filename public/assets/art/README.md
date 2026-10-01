@@ -26,15 +26,20 @@
 
 ### `box/` — «In the box»
 
-В вёрстке сейчас используются сводные кадры:
-a1-unit · cartridges · power-adapter · feed-valve · **fittings** (все фитинги
-одним кадром) · **lock-clips** (все клипсы) · tube-blue · tube-gray ·
-tube-red · drain-saddle
+Имена как в Figma (Akvantis A1 Packaging → in-box) и как в оригинальной
+инструкции, в kebab-case; размер дюймами через дефис (3/8" → `3-8`),
+M — наружная резьба, F — внутренняя. Источник: Dropbox
+`Akvantis A1 Packaging/Manual/3D/RENDER/In-box/png`.
 
-Отдельные предметы — про запас, на случай если сводный кадр придётся разбить:
-fitting-3-8 · fitting-1-4 · fitting-straight · fitting-3-8-straight ·
-clip-blue · clip-gray · clip-red · clip-white ·
-mineralizer · mineralizer-iso · mineralizer-v2
+system-unit · pcb-filter · ro-filter · mineralizer-filter · power-adapter ·
+straight-connector-3-8 · thread-connector-3-8-x-3-4 ·
+reducing-bushing-1-2m-to-3-8f · thread-adapter-3-8m-to-1-2f ·
+l-type-connector-3-8 · l-type-connector-1-4 · inlet-3-way-ball-valve ·
+drain-saddle · lock-clips · pe-tubing-3-8-blue · pe-tubing-3-8-red ·
+pe-tubing-1-4-grey
+
+Старый сводный кадр `cartridges` (RO + PCB вместе) ещё стоит в разделах
+Installation и First Start — новой пары одним кадром пока нет.
 
 ### `tools/` — «Tools»
 
