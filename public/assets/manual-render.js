@@ -96,8 +96,9 @@
         return '<figure class="m-item"><div class="m-item-art">' +
                img(i.art, ctx.resolve) +
                (i.name ? '<span class="m-ph">' + esc(i.name) + '</span>' : '') +
-               '</div><figcaption class="m-label">' + esc(i.count || '') +
-               (i.desc && ctx.medium === 'screen' ? '<span class="m-desc">' + esc(i.desc) + '</span>' : '') +
+               '</div><figcaption class="m-label">' + esc(ctx.medium === 'screen' && i.label && !/^\d+x/.test(i.count || '') ? '' : (i.count || '')) +
+               (ctx.medium === 'screen' && (i.label || i.desc) ? '<span class="m-desc' + (/^\d+x/.test(i.count || '') ? '' : ' is-name') + '">' + esc(i.label || i.desc) + '</span>' : '') +
+               (ctx.medium === 'screen' && i.sub ? '<span class="m-desc m-sub">' + esc(i.sub) + '</span>' : '') +
                '</figcaption></figure>';
       }).join('');
       return h('div', { 'class':'m-items r-row', role:'group', 'aria-label':b.label || null, 'data-block':b.id }, it);
@@ -113,8 +114,38 @@
     /* Troubleshooting: one card per issue, its causes and solutions listed
        inside. The cards sit in the ribbon's column grid — two across on a
        phone, three from 1024 (see a1-manual.html). */
-    table: function(b){
+    table: function(b, ctx){
       var cols = b.cols || ['Issue', 'Possible cause', 'Solution'];
+      /* Variant B — a table (2026-10-01): the symptom on the left, once, and
+         every «cause — what to do» as a row on the right. Chosen per block
+         (`view: "table"`) or for the whole page (`opts.tableView`, the kit). */
+      if ((ctx.tableView || b.view) === 'table'){
+        var body = (b.rows || []).map(function(r){
+          var its = r.items || [];
+          return its.map(function(it, k){
+            return '<tr' + (k === 0 ? ' class="is-first"' : '') + '>' +
+                   (k === 0 ? '<th scope="row" rowspan="' + its.length + '">' + esc(r.problem || '') + '</th>' : '') +
+                   '<td class="m-fault-cause">' + esc(it.cause || '') + '</td>' +
+                   '<td class="m-fault-fix">' + esc(it.solution || '') + '</td></tr>';
+          }).join('');
+        }).join('');
+        /* Phone (variant C, 2026-10-01): a table does not fit 390 px. The same
+           rows as a list of symptoms that open one by one — scan the list,
+           tap yours, read the causes. The table is hidden there, the list
+           here (manual-kit.css). */
+        var list = (b.rows || []).map(function(r){
+          var its = r.items || [];
+          return '<details class="m-fault"><summary><span class="m-fault-t">' + esc(r.problem || '') + '</span>' +
+                 '<span class="m-fault-chev" aria-hidden="true"></span></summary><ol>' +
+                 its.map(function(it){
+                   return '<li><p class="m-fault-cause">' + esc(it.cause || '') + '</p><p class="m-fault-fix">' + esc(it.solution || '') + '</p></li>';
+                 }).join('') + '</ol></details>';
+        }).join('');
+        return h('div', { 'class':'m-faults-wrap', 'data-block':b.id },
+          '<div class="m-faultlist">' + list + '</div>' +
+          '<table class="m-faults"><thead><tr><th scope="col">' + esc(cols[0]) + '</th><th scope="col">' +
+          esc(cols[1]) + '</th><th scope="col">' + esc(cols[2]) + '</th></tr></thead><tbody>' + body + '</tbody></table>');
+      }
       var cards = (b.rows || []).map(function(r){
         var its = (r.items || []).map(function(it){
           return '<li><span class="m-issue-k">' + esc(cols[1]) + '</span><p>' + esc(it.cause || '') + '</p>' +
@@ -244,8 +275,9 @@
     var main = doc.querySelector('.ribbon');
     if (!main) return;
     var meta = data.meta || {};
-    var head = '<header class="r-head"><h1 class="m-title">' + esc(String(meta.screenTitle || 'Manual Guide').replace(/\n/g, ' ')) + '</h1>' +
-               (meta.screenLogo ? '<img class="r-logo" src="' + esc(ctx.resolve(meta.screenLogo)) + '" alt="A1">' : '') + '</header>';
+    /* 2026-10-01: no head block — the page starts with the first section. The
+       product is in the bar (photo left, A1 mark right). */
+    var head = '';
     /* Screen: every section is one accordion with one kind of heading (the
        group frames of the sheet are not used here). A section without a title
        continues the previous one, so its blocks go into that one's body and
@@ -266,7 +298,11 @@
     }).join('');
     var bar = main.querySelector('.r-bar');
     main.querySelectorAll(':scope > :not(.r-bar)').forEach(function(e){ e.remove(); });
-    main.insertAdjacentHTML('beforeend', head + '<div class="r-flow">' + body + '</div>');
+    /* The Akvantis mark closes the page (2026-10-01): grey, centred, after the
+       last section — it left the bar. The drawing is the bar's own. */
+    var markSvg = bar && bar.querySelector('.topbar-mark svg');
+    var foot = markSvg ? '<footer class="r-foot" aria-label="Akvantis">' + markSvg.outerHTML + '</footer>' : '';
+    main.insertAdjacentHTML('beforeend', head + '<div class="r-flow">' + body + '</div>' + foot);
     if (bar){
       var nav = bar.querySelector('.topbar-nav');
       nav.querySelectorAll('a').forEach(function(a){ a.remove(); });
@@ -284,7 +320,7 @@
 
   function render(doc, data, opts){
     opts = opts || {};
-    var ctx = { nums:number(data), resolve:opts.resolve || function(p){ return p; } };
+    var ctx = { nums:number(data), resolve:opts.resolve || function(p){ return p; }, tableView:opts.tableView || '' };
     renderSheet(doc, data, ctx);
     renderRibbon(doc, data, ctx);
   }

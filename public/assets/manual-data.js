@@ -4,7 +4,14 @@ window.MANUAL_DATA = {
   "meta": {
     "title": "Akvantis A1 — Installation guide",
     "screenTitle": "Manual\nGuide",
-    "screenLogo": "assets/brand/a1-logo.svg"
+    "screenLogo": "assets/brand/a1-logo.svg",
+    "screenHero": "assets/photos/hero/a1-wg.png",
+    "screenKind": "Direct Flow Drinking System",
+    "screenBrand": "Akvantis",
+    "screenFinish": {
+      "label": "White & Grey",
+      "hex": "#E4E7E9"
+    }
   },
   "cover": {
     "mode": "blocks",
@@ -381,14 +388,16 @@ window.MANUAL_DATA = {
               "name": "Ø6",
               "count": "",
               "desc": "Drill bit",
-              "label": "Ø6"
+              "label": "Drill Bit",
+              "sub": "Ø6"
             },
             {
               "art": "assets/art/tools/bit-12.png",
               "name": "Ø12",
               "count": "",
               "desc": "Drill bit",
-              "label": "Ø12"
+              "label": "Drill Bit",
+              "sub": "Ø12"
             },
             {
               "art": "assets/art/tools/wrench.png",
@@ -727,7 +736,8 @@ window.MANUAL_DATA = {
                 }
               ]
             }
-          ]
+          ],
+          "view": "table"
         }
       ]
     },

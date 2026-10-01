@@ -12,7 +12,7 @@
 <!-- Компоненты инструкции: номер — из кита, заголовки и кадр — свои (см. a1-manual-kit.html). -->
 <link rel="stylesheet" href="assets/ui-kit/number.css?v=kit8">
 <link rel="stylesheet" href="assets/ui-kit/topbar.css?v=kit8">
-<link rel="stylesheet" href="assets/manual-kit.css?v=6">
+<link rel="stylesheet" href="assets/manual-kit.css?v=11">
 <style>
 /* ─────────────────────────────────────────────────────────────────────────────
    A1 — THE DOCUMENT.
@@ -454,6 +454,63 @@ html.is-embedded[data-media="screen"] body{background:var(--paper)}
   padding:var(--space-8) 0 var(--space-8) var(--space-16);border-left:var(--hairline) solid var(--rule-soft)}
 @media (min-width:1024px){ .ribbon .r-head .r-logo{height:var(--space-32)} }
 .ribbon .r-head + .r-flow{margin-top:0}
+/* ── HERO (2026-10-01) ── as the product passport opens: the machine centred,
+   then the guide's name, the A1 mark and one grey line of what it is. Replaces
+   the one-line head and its divider. */
+.ribbon .r-hero{display:block;text-align:center;padding:0 0 var(--space-32);border-bottom:var(--hairline) solid var(--rule-soft)}
+.r-hero-shot{height:var(--space-232, 232px);display:flex;align-items:center;justify-content:center}
+.r-hero-shot img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.r-hero-title{margin:var(--space-24) 0 0;font-size:var(--text-16);font-weight:var(--fw-medium);line-height:var(--lh-tight);color:var(--ink)}
+.r-hero-name{display:block}
+.ribbon .r-hero .r-logo{display:block;height:var(--space-32);width:auto;margin:var(--space-12) auto 0;padding:0;border:0}
+.r-hero-kind{margin:var(--space-8) 0 0;font-size:var(--text-13);line-height:var(--lh-snug);color:var(--ink-3)}
+/* ── THE PRODUCT IN THE BAR (2026-10-01) ── the photo on the left edge, the A1
+   mark on the right; both stay out while the hero is on screen (it shows the
+   same two) and come in once the first screen is scrolled past. */
+@media (min-width:1024px){
+  .r-bar .r-product-img{position:absolute;left:var(--gm);top:50%;transform:translateY(-50%)}
+  .r-bar .r-product-img, .r-bar .r-product-mark{opacity:0;transition:opacity var(--r-dur) var(--r-ease)}
+  body.past-hero .r-bar .r-product-img, body.past-hero .r-bar .r-product-mark{opacity:1}
+}
+/* ── ROWS RUN EDGE TO EDGE (2026-10-01) ── from 768 the sideways rows of In the
+   box and Tools use the whole viewport: the container is as wide as the screen,
+   and its side padding puts the first card back on the content's left edge. */
+@media (min-width:768px){
+  html[data-media="screen"] .ribbon .r-scroll:has(> .m-rows){width:100vw;margin-left:calc(50% - 50vw)}
+  html[data-media="screen"] .ribbon .r-scroll > .m-rows{--bleed:calc((100vw - 100cqw) / 2);
+    margin:0;padding:0 var(--bleed) var(--space-4);scroll-padding:0 var(--bleed)}
+  html[data-media="screen"] .ribbon .r-scroll:has(> .m-rows)::after{right:0}
+}
+/* no head block any more (2026-10-02): nothing above the first section */
+.ribbon > .r-flow{margin-top:0}
+@media (max-width:1023px){ html[data-media="screen"] body .ribbon{padding-top:0} }
+/* ── SAFETY SPECS AS TILES (2026-10-02) ── phone and tablet: a grid of cards on
+   the column grid, not a scrolling row — two across on a phone (3 of 6
+   columns), four on a tablet (2 of 8). The desktop keeps the row. */
+@media (max-width:1023px){
+  html[data-media="screen"] .ribbon .m-specs{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:var(--gg);
+    overflow:visible;margin:0;padding:0;cursor:auto;scroll-snap-type:none}
+  html[data-media="screen"] .ribbon .m-spec{flex:none;min-width:0;padding:var(--space-16) var(--space-12);
+    border-radius:var(--radius-16);background:var(--paper-sunk)}
+  html[data-media="screen"] .ribbon .m-spec-icon{width:var(--space-48);height:var(--space-48)}
+  html[data-media="screen"] .ribbon .m-spec-icon img{width:100%;height:100%}
+  html[data-media="screen"] .ribbon .m-spec-value{margin-top:var(--space-8);font-size:var(--text-24);line-height:var(--lh-tight)}
+  html[data-media="screen"] .ribbon .m-spec-what{font-size:var(--text-14)}
+  .ribbon .r-scroll:has(> .m-specs)::after{display:none}
+}
+@media (min-width:768px) and (max-width:1023px){
+  html[data-media="screen"] .ribbon .m-specs{grid-template-columns:repeat(3, minmax(0, 1fr))}
+}
+/* the Akvantis mark: out of the bar, to the end of the page — grey, centred */
+[data-media="screen"] .r-bar .topbar-mark, [data-media="screen"] .r-bar .topbar-mark-in{display:none}
+.r-foot{display:flex;justify-content:center;padding:var(--space-48) 0 var(--space-16);color:var(--ink-3)}
+.r-foot svg{width:var(--space-32);height:var(--space-32);display:block}
+/* the same block as the passport's hero (passport.css): picture 232, brand
+   16/500, mark 32, kind 13 grey, the finish — a 32 disc and its name 13/600 */
+.r-hero-finish{display:flex;flex-direction:column;align-items:center;gap:var(--space-8);margin-top:var(--space-12)}
+.r-hero-disc{width:var(--space-32);height:var(--space-32);border-radius:50%;box-shadow:inset 0 0 0 var(--hairline) var(--rule)}
+.r-hero-finish-name{font-size:var(--text-13);font-weight:var(--fw-semibold);color:var(--ink)}
+
 .r-flow > .m-sec{min-width:0;scroll-margin-top:calc(var(--r-bar-h) + env(safe-area-inset-top) + var(--space-8))}
 .r-flow > .m-sec.is-cont{margin-top:calc(var(--space-40) * -1)}
 .ribbon .m-sec > .m-title{margin-bottom:var(--space-24)}
@@ -501,8 +558,10 @@ html{--acc-gap:var(--space-24)}
 .r-row img{-webkit-user-drag:none;user-select:none}
 .ribbon .r-row > .m-item{flex:0 0 38%;scroll-snap-align:start}
 .ribbon .m-rows > .m-items + .m-items{margin-top:var(--space-16);padding-top:var(--space-16);border-top:var(--hairline) solid var(--rule)}
-.ribbon .r-row .m-label{font-size:var(--text-14);line-height:var(--lh-snug);text-align:center}
-.ribbon .m-item .m-desc{display:block;margin-top:var(--space-2);font-size:var(--text-12);line-height:var(--lh-snug);font-weight:var(--fw-medium);color:var(--ink-3)}
+.ribbon .r-row .m-label{font-size:var(--text-24);line-height:var(--lh-tight);text-align:center}  /* the count: 1x, 7x */
+.ribbon .m-item .m-desc{display:block;margin-top:var(--space-4);font-size:var(--text-14);line-height:var(--lh-snug);font-weight:var(--fw-medium);color:var(--ink-3)}  /* the name: grey, kit --black-250 */
+.ribbon .m-item .m-desc.is-name{color:var(--ink)}
+.ribbon .m-item .m-desc.m-sub{margin-top:0;color:var(--ink-3)}  /* a size under a black name: Drill Bit / Ø6 */  /* no count (Tools): the name is the caption, black */
 .ribbon .r-row .m-item-art > img{padding:8%;box-sizing:border-box}
 
 /* frames */
@@ -587,7 +646,8 @@ html{--acc-gap:var(--space-24)}
 .r-bar .topbar-nav{margin-left:0;padding:0 var(--gm);scroll-padding:0 var(--gm)}
 /* ON A PHONE the bar goes to the bottom, where the thumb is, and carries no
    mark. From 768 it is the top bar with the mark at the left margin. */
-@media (max-width:767px){
+/* 2026-10-01: the tablet too — the bar is at the bottom below 1024 */
+@media (max-width:1023px){
   [data-media="screen"] .r-bar.topbar{top:auto;bottom:0;
     height:calc(var(--r-bar-h) + env(safe-area-inset-bottom));padding-top:0;padding-bottom:env(safe-area-inset-bottom);
     box-shadow:inset 0 var(--hairline) 0 var(--rule-soft)}
@@ -643,6 +703,10 @@ html[data-media="screen"]{--span-item:2;--span-frame:6;--span-issue:3}
 .r-flow{container-type:inline-size;
   --col:calc((100cqw - (var(--gc) - 1) * var(--gg)) / var(--gc));
   --w-item:calc(var(--span-item) * var(--col) + (var(--span-item) - 1) * var(--gg))}
+/* Phone (2026-10-01): two and a half cards in view of a row, so the pictures
+   are bigger and the half card says the row goes on. The view is the content
+   width plus the right margin the row bleeds into. */
+@media (max-width:767px){ .r-flow{--w-item:calc((100cqw + var(--gm) - 2 * var(--gg)) / 2.5)} }
 html[data-media="screen"] .ribbon .r-row{gap:var(--gg);margin:0 calc(var(--gm) * -1);padding:0 var(--gm) var(--space-4);scroll-padding:0 var(--gm)}
 html[data-media="screen"] .ribbon .r-row > .m-item{flex:0 0 var(--w-item);min-width:0}
 @media (min-width:1024px){
@@ -669,20 +733,19 @@ html[data-media="screen"] .ribbon .m-rows .m-item{scroll-snap-align:start}
   opacity:0;pointer-events:none;transition:opacity var(--r-dur) var(--r-ease)}
 .r-scroll.has-more::after,.r-scroll.has-more .r-next{opacity:1}
 .r-scroll.has-more .r-next{pointer-events:auto}
+/* no arrow (2026-10-01): the half card at the edge says the row goes on */
+.r-scroll .r-next{display:none}
 .r-next:focus-visible{outline:var(--space-2) solid var(--accent);outline-offset:var(--space-2)}
-/* DESKTOP: In the box and Tools lie on the grid without scrolling, so both fit
-   the first screen. A part is one column (1024–1919, 12 cols) or two (1920,
-   20 cols): In the box = 15 parts = two rows, Tools = one row. */
+/* DESKTOP (2026-10-01): In the box and Tools are one row here too, scrolled
+   sideways (drag with the mouse, or the trackpad) — six and a half cards in
+   view, the half card says the row goes on. */
 @media (min-width:1024px){
-  html[data-media="screen"]{--span-part:1}
-  html[data-media="screen"] .ribbon .m-rows{display:grid;grid-template-columns:repeat(var(--gc), minmax(0, 1fr));
-    column-gap:var(--gg);row-gap:var(--space-24);overflow:visible;margin:0;padding:0;cursor:auto;scroll-snap-type:none}
-  html[data-media="screen"] .ribbon .m-rows .m-item{grid-column:span var(--span-part);flex:none;width:auto}
+  .r-flow{--w-item:calc((100cqw - 6 * var(--gg)) / 6.5)}
+  html[data-media="screen"] .ribbon .m-rows{margin:0;padding:0 0 var(--space-4);scroll-padding:0}
   html[data-media="screen"] .ribbon .m-rows .m-item-art > img{padding:4%}
-  html[data-media="screen"] .ribbon .m-rows .m-label{font-size:var(--text-12)}
-  html[data-media="screen"] .ribbon .m-item .m-desc{font-size:var(--text-11)}
+  html[data-media="screen"] .ribbon .m-rows .m-desc{font-size:var(--text-12)}
+  .r-scroll::after{right:0}
 }
-@media (min-width:1920px){ html[data-media="screen"]{--span-part:1} }
 
 /* ── DESKTOP MEASURE ── from 1024 the content sits in the middle of the grid:
    8 of 12 columns (2 left empty each side), 14 of 20 from 1920 (3 each side).
@@ -775,7 +838,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
 <div class="r-guides" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
 <script src="assets/manual-data.js?v=5"></script>
-<script src="assets/manual-render.js?v=9"></script>
+<script src="assets/manual-render.js?v=13"></script>
 <script>
 (function(){
   'use strict';
@@ -1120,11 +1183,19 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
           }
         });
       });
-      cur = -1; spy();
+      cur = -1; spy(); hero();
     }
     root.querySelector('.topbar-mark').addEventListener('click', function(e){
       e.preventDefault(); scrollTo({ top:0, behavior:'smooth' });
     });
+    /* past the hero: the bar may show the product (see the CSS) */
+    function hero(){
+      var h = document.querySelector('.ribbon .r-hero');
+      document.body.classList.toggle('past-hero', !h || h.getBoundingClientRect().bottom < nav.getBoundingClientRect().bottom);
+    }
+    addEventListener('scroll', hero, { passive:true });
+    addEventListener('resize', hero);
+    hero();
     addEventListener('scroll', spy, { passive:true });
     addEventListener('resize', function(){ var i = cur; cur = -1; mark(i); });
     return { refresh:refresh };
@@ -1206,6 +1277,14 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     hints();
     document.querySelectorAll('.ribbon .m-rows, .ribbon .r-row, .ribbon .m-specs').forEach(function(row){
       var drag = null;
+      /* A closed accordion is display:none, and that throws a row's sideways
+         scroll away. Keep the last position and put it back on opening
+         (2026-10-01). */
+      row.addEventListener('scroll', function(){ if (row.clientWidth) row.dataset.sl = row.scrollLeft; }, { passive:true });
+      var accRow = row.closest('details');
+      if (accRow) accRow.addEventListener('toggle', function(){
+        if (accRow.open && row.dataset.sl) requestAnimationFrame(function(){ row.style.scrollBehavior = 'auto'; row.scrollLeft = +row.dataset.sl; row.style.scrollBehavior = ''; });
+      });
       row.addEventListener('pointerdown', function(e){
         if (e.pointerType !== 'mouse' || row.scrollWidth <= row.clientWidth) return;
         drag = { x:e.clientX, left:row.scrollLeft };
