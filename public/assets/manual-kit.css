@@ -303,7 +303,7 @@
 .m-page{display:grid;grid-template-columns:minmax(0, 1fr);gap:var(--space-12)}
 .m-card{
   --m-card-in:var(--space-12);          /* number and caption to the frame's edge */
-  --num-size:var(--space-32);
+  --num-size:var(--space-40);            /* 2026-10-07: 40 at every width — 32 read too small on a phone */
   position:relative;margin:0;min-width:0;
   aspect-ratio:var(--w) / var(--h);
   container-type:inline-size;
@@ -334,7 +334,11 @@
   /* an inset shadow, not a border: Chrome rounds a 1.5 px / 2.5 px border down to
      a whole pixel, a shadow keeps the half */
   box-shadow:inset 0 0 0 var(--m-card-rule) var(--m-ink);border-radius:inherit}
-.m-card > .num{position:absolute;z-index:2;left:var(--m-card-in);top:var(--m-card-in)}
+/* 2026-10-07: THE SIZE IS SET ON THE NUMBER ITSELF. It used to be set on the card
+   and never arrived: the kit's `.num` declares its own `--num-size` (24 px), which
+   wins over an inherited one — so every step number was 24 px at every width.
+   Now 40 px, the same on a phone, a tablet and a desktop. */
+.m-card > .num{--num-size:var(--space-40);position:absolute;z-index:2;left:var(--m-card-in);top:var(--m-card-in)}
 .m-card > .m-cap{position:absolute;z-index:2;left:var(--m-card-in);bottom:var(--m-card-in);max-width:calc(100% - 2 * var(--m-card-in))}
 
 /* ── CAPTION ── the white pill that names the action. `data-mode="black"`
