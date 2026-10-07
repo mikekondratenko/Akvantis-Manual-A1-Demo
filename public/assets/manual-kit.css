@@ -313,7 +313,10 @@
    and an 8 px corner next to a neighbour with 2 and 16. The frame is drawn
    here instead: `--m-card-rule` and `--m-card-r`, the same on every card at
    every width. The picture's own rule lies under ours (see `--bleed`). */
-.m-card{--m-card-rule:var(--space-2);--m-card-r:var(--radius-16);overflow:hidden;border-radius:var(--m-card-r)}
+.m-card{--m-card-rule:1.5px;--m-card-r:var(--radius-16);overflow:hidden;border-radius:var(--m-card-r)}
+/* 2026-10-07: the rule by width — phone 1.5 px · tablet and desktop 2 px · 1600 and wider 2.5 px */
+@media (min-width:768px){ .m-card{--m-card-rule:2px} }
+@media (min-width:1600px){ .m-card{--m-card-rule:2.5px} }
 .m-card-art{
   /* The pictures carry no rule of their own any more (clean exports, 2026-10-07), but
      they are still the whole card frame of the page, 2 u of which lay under the rule.
@@ -328,7 +331,9 @@
   background:var(--m-grey-20);
 }
 .m-card::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-  border:var(--m-card-rule) solid var(--m-ink);border-radius:inherit}
+  /* an inset shadow, not a border: Chrome rounds a 1.5 px / 2.5 px border down to
+     a whole pixel, a shadow keeps the half */
+  box-shadow:inset 0 0 0 var(--m-card-rule) var(--m-ink);border-radius:inherit}
 .m-card > .num{position:absolute;z-index:2;left:var(--m-card-in);top:var(--m-card-in)}
 .m-card > .m-cap{position:absolute;z-index:2;left:var(--m-card-in);bottom:var(--m-card-in);max-width:calc(100% - 2 * var(--m-card-in))}
 
