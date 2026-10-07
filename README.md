@@ -47,7 +47,7 @@ and `assets/uploads` from `../Manual/public`.
 Here `manual.json` / `manual-data.js` point at light copies instead of the print PNGs: the
 pages are `assets/screen/page-NN.webp` (one file per page, `imageL` + `imageR` of a spread —
 page 2 … page 17 for the 8 spreads). After a new export, convert each
-`../Manual/public/assets/art/pages/page-NN.png` to `assets/screen/page-NN.webp` under the same
+`../Manual/public/assets/art/pages/page-NN.webp` to `assets/screen/page-NN.webp` under the same
 number; the data does not change. Page numbers are off unless the booklet is asked for with
 `?pn=1`, and the page art is exported without the folio.
 
@@ -62,3 +62,15 @@ Languages: `assets/manual-texts.js` (en · de · uk) is a copy of the one in `..
 
 Its own Cloudflare worker, `akvantis-manual-a1-demo` (see `wrangler.jsonc` and the
 root `DEPLOY.md`).
+
+## Zoom and page numbers (2026-10-07)
+
+- **Zoom** (the printed booklet, 2D and 3D): the mouse wheel, a pinch on a touch screen and a
+  pinch on a trackpad (Chrome: wheel + ctrl; Safari: gesture events) scale the booklet 1× … 4×
+  about the point under the cursor / between the fingers. Zoomed in 2D, a drag moves it (and a
+  swipe no longer turns the page — tap the page's outer half); in 3D a drag still turns the
+  booklet, two fingers move it. Back at 1× it returns to the middle. `zoom` in `index.html`.
+- **Page numbers** are drawn onto the page pictures when the textures are composed («/ 02»,
+  Cy Grotesk Key 500, the document's own `.page-no` metrics); the covers carry none. The flat
+  fallback asks the document for them with `pn=1`.
+- **Pictures are WebP** everywhere (`assets/art`, `assets/photos`); the PNG sources are in git history.

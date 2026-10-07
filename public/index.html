@@ -60,10 +60,12 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
    bar switches what the manual is looked at on: print · desktop · tablet ·
    mobile, icons only. The three screen views are the manual's screen version
    (a1-manual?media=screen) in a frame of that size. */
-#gl{position:fixed;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .4s ease}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .4s ease;touch-action:none}
 #gl.is-on{opacity:1}
 .stage.is-3d{cursor:grab}
 .stage.is-3d.is-drag{cursor:grabbing}
+.stage.is-zoom{cursor:grab}
+.stage.is-zoom.is-drag{cursor:grabbing}
 .stage.is-edge,.stage.is-3d.is-edge{cursor:pointer}
 [hidden]{display:none!important}
 .modes{position:fixed;z-index:3;left:50%;transform:translateX(-50%);top:calc(var(--space-16) * var(--ui, 1) + env(safe-area-inset-top));
@@ -117,7 +119,7 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
 <!-- three.js r128 — the same build the constructor uses; without it (or without WebGL) the booklet is the flat one -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="assets/sheet3d.js?v=7"></script>
-<script src="assets/manual-data.js?v=12"></script>
+<script src="assets/manual-data.js?v=13"></script>
 <script>
 (function(){
   'use strict';
@@ -163,6 +165,7 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
   /* a phone gets pages at half size: nine spreads at full size are ~280 MB of texture */
   var SMALL = Math.min(screen.width, screen.height) < 768 || (navigator.deviceMemory && navigator.deviceMemory <= 4);
   var PW = SMALL ? 832 : 1664, PH = SMALL ? 1180 : 2360;
+  var FONT = "'Cy Grotesk Key', ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
   function loadSide(i){
     if (!GL || i >= LIST.length) return;
     var it = LIST[i], a = new Image(), b = new Image(), n = 0;
@@ -171,6 +174,17 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
       var cv = document.createElement('canvas'); cv.width = PW * 2; cv.height = PH;
       var cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height);
       cx.drawImage(a, 0, 0, PW, PH); cx.drawImage(b, PW, 0, PW, PH);
+      /* Page numbers — the document's own `.page-no` (a1-manual.html), drawn on
+         the picture: «/ 02», Cy Grotesk Key 500, 16 u, 17 u from the top,
+         46 u from the left edge / 48 u from the right. From the spread's place
+         in the booklet; the covers carry none. */
+      if (i > 0){
+        var u = PW / 832, two = function(n){ return '/ ' + ('0' + n).slice(-2); };
+        cx.fillStyle = '#000'; cx.textBaseline = 'top';
+        cx.font = '500 ' + (16 * u) + 'px ' + FONT;
+        cx.textAlign = 'left';  cx.fillText(two(2 * i), 46 * u, 18 * u);
+        cx.textAlign = 'right'; cx.fillText(two(2 * i + 1), PW * 2 - 48 * u, 18 * u);
+      }
       window.Sheet3D.setTexture(it.key, cv);
       if (i === 0) $('gl').classList.add('is-on');   /* the cover is in: show the booklet */
       loadSide(i + 1);
@@ -184,10 +198,31 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
   var CAM3D = { yaw:-24, pitch:14 };
   var cam = { yaw:0, pitch:0, fold:180, k:1, m:0 };   /* m: 0 = 2D … 1 = 3D, eased */
   var hinge = 'L', lastInner = 1;
+  /* ── ZOOM (2026-10-07) ──
+     z: 1 = the fitted booklet … 4; x, y: where the booklet is moved to, px of
+     the screen. The wheel, a pinch on a touch screen and a pinch on a trackpad
+     all change z about the point under the cursor / between the fingers; a
+     zoomed booklet is moved by dragging (in 3D a drag still turns it — there
+     it is moved with two fingers). Back at 1 it returns to the middle. */
+  var zoom = { z:1, x:0, y:0 }, ZMAX = 4;
+  function zoomClamp(){
+    zoom.z = Math.max(1, Math.min(ZMAX, zoom.z));
+    var mx = (zoom.z - 1) * innerWidth * .6, my = (zoom.z - 1) * innerHeight * .6;
+    zoom.x = Math.max(-mx, Math.min(mx, zoom.x)); zoom.y = Math.max(-my, Math.min(my, zoom.y));
+    stage.classList.toggle('is-zoom', zoom.z > 1.001 && !(GL && state.mode === '3d'));
+  }
+  function zoomShow(){ zoomClamp(); if (GL) apply3d(); else fit(); }
+  /* to `z`, keeping the point (cx, cy) of the screen where it is */
+  function zoomAt(z, cx, cy){
+    z = Math.max(1, Math.min(ZMAX, z));
+    var ox = cx - innerWidth / 2, oy = cy - innerHeight / 2, r = z / zoom.z;
+    zoom.x = ox - (ox - zoom.x) * r; zoom.y = oy - (oy - zoom.y) * r; zoom.z = z;
+    zoomShow();
+  }
   function apply3d(){
     if (!GL) return;
     var v = cam.fold;
-    window.Sheet3D.set({ yaw:cam.yaw, pitch:cam.pitch, fit:cam.k, panX:0, panY:0,
+    window.Sheet3D.set({ yaw:cam.yaw, pitch:cam.pitch, fit:cam.k * zoom.z, panX:zoom.x, panY:zoom.y,
                          fold:hinge === 'L' ? v : 0, foldR:hinge === 'L' ? 180 : 180 - v,
                          spreads:N, open:state.at || (hinge === 'R' ? N : lastInner) });
   }
@@ -248,7 +283,7 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
   function setMode(m){
     if (state.mode === m) return;
     state.mode = m;
-    rows();
+    rows(); zoomClamp();
     camTo(m === '3d' ? CAM3D : { yaw:0, pitch:0 }, m === '3d' ? 1 : 0);
   }
 
@@ -286,7 +321,7 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
     if (GL){ window.Sheet3D.resize(); fitGL(); apply3d(); return; }
     var f = $('frame');
     f.style.width = W + 'px'; f.style.height = H + 'px';
-    f.style.transform = 'scale(' + scaleFor(state.at === 0 ? W / 2 : W).toFixed(3) + ')';
+    f.style.transform = 'translate(' + zoom.x.toFixed(1) + 'px,' + zoom.y.toFixed(1) + 'px) scale(' + (scaleFor(state.at === 0 ? W / 2 : W) * zoom.z).toFixed(3) + ')';
   }
 
   /* ── WHAT IS ON THE STAGE ── */
@@ -304,7 +339,7 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
     }
     if (GL) return;
     /* only the fragment changes: the frame does not reload, the document turns */
-    var el = $('doc'), next = name + '?media=sheet&flip=0&turn=1&bleed=1#' + hash();
+    var el = $('doc'), next = name + '?media=sheet&flip=0&turn=1&bleed=1&pn=1#' + hash();
     if (el.getAttribute('src') !== next) el.setAttribute('src', next);
   }
   function rows(){
@@ -363,12 +398,18 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
     if (state.at === 0) return state.back ? (u >= .25 && u < .5 ? -1 : 0) : (u > .5 && u <= .75 ? 1 : 0);
     return u < .25 ? -1 : u > .75 ? 1 : 0;
   }
-  var down = null, drag = null, swiped = 0;
+  var down = null, drag = null, pan = null, pinch = null, swiped = 0;
   function onStage(e){ return !(e.target.closest && e.target.closest('.modes, .views')); }
   addEventListener('pointerdown', function(e){
     if (state.view !== 'sheet' || !onStage(e) || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    if (pinch) return;
     down = { x:e.clientX, y:e.clientY };
-    if (GL && state.mode === '3d'){
+    if (zoom.z > 1.001 && !(GL && state.mode === '3d')){
+      pan = { x:e.clientX, y:e.clientY, zx:zoom.x, zy:zoom.y };
+      stage.classList.add('is-drag');
+      if (e.pointerType === 'mouse') e.preventDefault();
+    }
+    else if (GL && state.mode === '3d'){
       camAnim = null;
       drag = { x:e.clientX, y:e.clientY, yaw:cam.yaw, pitch:cam.pitch };
       stage.classList.add('is-drag');
@@ -376,6 +417,8 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
     }
   });
   addEventListener('pointermove', function(e){
+    if (pinch) return;
+    if (pan){ zoom.x = pan.zx + e.clientX - pan.x; zoom.y = pan.zy + e.clientY - pan.y; zoomShow(); return; }
     if (drag){
       cam.yaw = drag.yaw + (e.clientX - drag.x) * .4;
       cam.pitch = Math.max(-85, Math.min(85, drag.pitch - (e.clientY - drag.y) * .4));
@@ -386,7 +429,7 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
   });
   ['pointerup', 'pointercancel'].forEach(function(k){
     addEventListener(k, function(e){
-      var d = down; down = null; drag = null; stage.classList.remove('is-drag');
+      var d = down; down = null; drag = null; pan = null; stage.classList.remove('is-drag');
       if (k !== 'pointerup' || !d || performance.now() - swiped < 400) return;
       if (Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y) > 5) return;
       var dir = edgeAt(e); if (dir) step(dir);
@@ -402,7 +445,7 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
      the finger turns the booklet itself, and a page is turned by a tap. */
   var sw = null;
   addEventListener('touchstart', function(e){
-    if (state.view !== 'sheet' || (GL && state.mode === '3d') || e.touches.length !== 1 || !onStage(e)){ sw = null; return; }
+    if (state.view !== 'sheet' || (GL && state.mode === '3d') || e.touches.length !== 1 || !onStage(e) || zoom.z > 1.001){ sw = null; return; }
     sw = { x:e.touches[0].clientX, y:e.touches[0].clientY, t:performance.now() };
   }, { passive:true });
   addEventListener('touchend', function(e){
@@ -417,9 +460,51 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
   });
   addEventListener('touchcancel', function(){ sw = null; });
 
-  addEventListener('resize', fit);
+  /* ── ZOOM BY HAND ── wheel · pinch on a touch screen · pinch on a trackpad */
+  addEventListener('wheel', function(e){
+    if (state.view !== 'sheet' || !onStage(e)) return;
+    e.preventDefault();
+    var d = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1);
+    /* a trackpad pinch arrives as a wheel with ctrl held, in small steps */
+    zoomAt(zoom.z * Math.exp(-d * (e.ctrlKey ? .01 : .0015)), e.clientX, e.clientY);
+  }, { passive:false });
+  function span(t){ return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); }
+  function mid(t){ return { x:(t[0].clientX + t[1].clientX) / 2, y:(t[0].clientY + t[1].clientY) / 2 }; }
+  addEventListener('touchstart', function(e){
+    if (state.view !== 'sheet' || e.touches.length !== 2 || !onStage(e)) return;
+    var m = mid(e.touches);
+    pinch = { d:span(e.touches) || 1, z:zoom.z, mx:m.x, my:m.y };
+    down = null; drag = null; pan = null; sw = null; stage.classList.remove('is-drag');
+  }, { passive:true });
+  addEventListener('touchmove', function(e){
+    if (!pinch || e.touches.length !== 2) return;
+    e.preventDefault();
+    var m = mid(e.touches);
+    /* two fingers move the booklet as well as scale it */
+    zoom.x += m.x - pinch.mx; zoom.y += m.y - pinch.my; pinch.mx = m.x; pinch.my = m.y;
+    zoomAt(pinch.z * span(e.touches) / pinch.d, m.x, m.y);
+  }, { passive:false });
+  ['touchend', 'touchcancel'].forEach(function(k){
+    addEventListener(k, function(e){ if (pinch && e.touches.length < 2){ pinch = null; swiped = performance.now(); } });
+  });
+  /* Safari on a Mac reports a trackpad pinch as gesture events, not as a wheel */
+  var gz = 0;
+  addEventListener('gesturestart', function(e){ if (state.view !== 'sheet') return; e.preventDefault(); gz = zoom.z; });
+  addEventListener('gesturechange', function(e){
+    if (state.view !== 'sheet') return; e.preventDefault();
+    if (!pinch && gz) zoomAt(gz * e.scale, e.clientX, e.clientY);
+  });
+  addEventListener('gestureend', function(e){ gz = 0; });
+
+  addEventListener('resize', function(){ zoomClamp(); fit(); });
   rows(); fit(); paint();
-  if (GL){ apply3d(); loadSide(0); }
+  if (GL){
+    apply3d();
+    /* the numbers are drawn in the kit's face: wait for it (not for long) before the first texture */
+    var go = function(){ if (go.done) return; go.done = true; loadSide(0); };
+    try { document.fonts.load("500 32px 'Cy Grotesk Key'").then(go, go); } catch (err){ go(); }
+    setTimeout(go, 1500);
+  }
 }());
 </script>
 </body>

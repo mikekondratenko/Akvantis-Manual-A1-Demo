@@ -5,7 +5,7 @@ window.MANUAL_DATA = {
     "title": "Akvantis A1 — Installation guide",
     "screenTitle": "Manual\nGuide",
     "screenLogo": "assets/brand/a1-logo.svg",
-    "screenHero": "assets/photos/hero/a1-wg.png",
+    "screenHero": "assets/photos/hero/a1-wg.webp",
     "screenKind": "Direct Flow Drinking System",
     "screenBrand": "Akvantis",
     "screenFinish": {
@@ -233,35 +233,35 @@ window.MANUAL_DATA = {
           "label": "Main",
           "items": [
             {
-              "art": "assets/art/box/system-unit.png",
+              "art": "assets/art/box/system-unit.webp",
               "name": "A1 Unit",
               "count": "1x",
               "desc": "Filtration module",
               "label": "A1 Unit"
             },
             {
-              "art": "assets/art/box/pcb-filter.png",
+              "art": "assets/art/box/pcb-filter.webp",
               "name": "2-in-1 Sediment + Carbon Filter",
               "count": "1x",
               "desc": "Cartridge I",
               "label": "2-in-1 Sediment + Carbon Filter"
             },
             {
-              "art": "assets/art/box/ro-filter.png",
+              "art": "assets/art/box/ro-filter.webp",
               "name": "RO Membrane",
               "count": "1x",
               "desc": "Cartridge II",
               "label": "RO Membrane"
             },
             {
-              "art": "assets/art/box/power-adapter.png",
+              "art": "assets/art/box/power-adapter.webp",
               "name": "Power Adapter",
               "count": "1x",
               "desc": "230 V~ to module",
               "label": "Power Adapter"
             },
             {
-              "art": "assets/art/box/mineralizer-filter.png",
+              "art": "assets/art/box/mineralizer-filter.webp",
               "name": "Mineralizator",
               "count": "1x",
               "desc": "Cartridge III",
@@ -275,56 +275,56 @@ window.MANUAL_DATA = {
           "label": "Fittings and drain",
           "items": [
             {
-              "art": "assets/art/box/l-type-connector-3-8.png",
+              "art": "assets/art/box/l-type-connector-3-8.webp",
               "name": "3/8\" L-Type Connector",
               "count": "2x",
               "desc": "",
               "label": "3/8\" L-Type Connector"
             },
             {
-              "art": "assets/art/box/l-type-connector-1-4.png",
+              "art": "assets/art/box/l-type-connector-1-4.webp",
               "name": "1/4\" L-Type Connector",
               "count": "1x",
               "desc": "",
               "label": "1/4\" L-Type Connector"
             },
             {
-              "art": "assets/art/box/inlet-3-way-ball-valve.png",
+              "art": "assets/art/box/inlet-3-way-ball-valve.webp",
               "name": "Inlet 3-Way Ball Valve",
               "count": "1x",
               "desc": "",
               "label": "Inlet 3-Way Ball Valve"
             },
             {
-              "art": "assets/art/box/straight-connector-3-8.png",
+              "art": "assets/art/box/straight-connector-3-8.webp",
               "name": "3/8\" Straight Connector",
               "count": "2x",
               "desc": "",
               "label": "3/8\" Straight Connector"
             },
             {
-              "art": "assets/art/box/thread-connector-3-8-x-3-4.png",
+              "art": "assets/art/box/thread-connector-3-8-x-3-4.webp",
               "name": "3/8\" × 3/8\" Connector",
               "count": "1x",
               "desc": "Optional · tube 3/8\" × thread 3/8\"",
               "label": "3/8\" × 3/8\" Connector"
             },
             {
-              "art": "assets/art/box/thread-connector-3-8-x-3-4.png",
+              "art": "assets/art/box/thread-connector-3-8-x-3-4.webp",
               "name": "3/8\" × 1/4\" Connector",
               "count": "1x",
               "desc": "Optional · tube 3/8\" × thread 1/4\"",
               "label": "3/8\" × 1/4\" Connector"
             },
             {
-              "art": "assets/art/box/reducing-bushing-1-2m-to-3-8f.png",
+              "art": "assets/art/box/reducing-bushing-1-2m-to-3-8f.webp",
               "name": "Thread Adapter 1/2\" → 3/8\"",
               "count": "1x",
               "desc": "Optional",
               "label": "Thread Adapter 1/2\" → 3/8\""
             },
             {
-              "art": "assets/art/box/thread-adapter-3-8m-to-1-2f.png",
+              "art": "assets/art/box/thread-adapter-3-8m-to-1-2f.webp",
               "name": "Thread Adapter 3/8\" → 1/2\"",
               "count": "1x",
               "desc": "Optional",
@@ -338,21 +338,21 @@ window.MANUAL_DATA = {
           "label": "Lock clips",
           "items": [
             {
-              "art": "assets/art/box/lock-clip-blue.png",
+              "art": "assets/art/box/lock-clip-blue.webp",
               "name": "Clip 3/8\"",
               "count": "7x",
               "desc": "Blue",
               "label": "Clip 3/8\""
             },
             {
-              "art": "assets/art/box/lock-clip-red.png",
+              "art": "assets/art/box/lock-clip-red.webp",
               "name": "Clip 3/8\"",
               "count": "2x",
               "desc": "Red",
               "label": "Clip 3/8\""
             },
             {
-              "art": "assets/art/box/lock-clip-grey.png",
+              "art": "assets/art/box/lock-clip-grey.webp",
               "name": "Clip 1/4\"",
               "count": "2x",
               "desc": "Grey",
@@ -366,35 +366,35 @@ window.MANUAL_DATA = {
           "label": "Tubes and key",
           "items": [
             {
-              "art": "assets/art/box/pe-tubing-3-8-blue.png",
+              "art": "assets/art/box/pe-tubing-3-8-blue.webp",
               "name": "3/8\" PE Tubing",
               "count": "1x",
               "desc": "Blue",
               "label": "3/8\" PE Tubing"
             },
             {
-              "art": "assets/art/box/pe-tubing-3-8-red.png",
+              "art": "assets/art/box/pe-tubing-3-8-red.webp",
               "name": "3/8\" PE Tubing",
               "count": "1x",
               "desc": "Red",
               "label": "3/8\" PE Tubing"
             },
             {
-              "art": "assets/art/box/pe-tubing-1-4-grey.png",
+              "art": "assets/art/box/pe-tubing-1-4-grey.webp",
               "name": "1/4\" PE Tubing",
               "count": "1x",
               "desc": "Grey",
               "label": "1/4\" PE Tubing"
             },
             {
-              "art": "assets/art/tools/pipe-key.png",
+              "art": "assets/art/tools/pipe-key.webp",
               "name": "Tube Key",
               "count": "1x",
               "desc": "",
               "label": "Tube Key"
             },
             {
-              "art": "assets/art/box/drain-saddle.png",
+              "art": "assets/art/box/drain-saddle.webp",
               "name": "Drain Saddle",
               "count": "1x",
               "desc": "",
@@ -417,14 +417,14 @@ window.MANUAL_DATA = {
           "label": "Tools",
           "items": [
             {
-              "art": "assets/art/tools/drill-driver.png",
+              "art": "assets/art/tools/drill-driver.webp",
               "name": "Drill Driver",
               "count": "",
               "desc": "",
               "label": "Drill Driver"
             },
             {
-              "art": "assets/art/tools/bit-6.png",
+              "art": "assets/art/tools/bit-6.webp",
               "name": "Ø6",
               "count": "",
               "desc": "Drill bit",
@@ -432,7 +432,7 @@ window.MANUAL_DATA = {
               "sub": "Ø6"
             },
             {
-              "art": "assets/art/tools/bit-12.png",
+              "art": "assets/art/tools/bit-12.webp",
               "name": "Ø12",
               "count": "",
               "desc": "Drill bit",
@@ -440,14 +440,14 @@ window.MANUAL_DATA = {
               "sub": "Ø12"
             },
             {
-              "art": "assets/art/tools/wrench.png",
+              "art": "assets/art/tools/wrench.webp",
               "name": "Wrench",
               "count": "",
               "desc": "",
               "label": "Wrench"
             },
             {
-              "art": "assets/art/tools/screwdriver.png",
+              "art": "assets/art/tools/screwdriver.webp",
               "name": "Screwdriver",
               "count": "",
               "desc": "",
@@ -482,7 +482,7 @@ window.MANUAL_DATA = {
                 {
                   "x": 45,
                   "y": 19,
-                  "art": "assets/photos/trimmed/k1-st.png",
+                  "art": "assets/photos/trimmed/k1-st.webp",
                   "name": "Faucet K1",
                   "desc": "Drinking Water Faucet",
                   "button": "Buy K1",
@@ -491,17 +491,17 @@ window.MANUAL_DATA = {
                 {
                   "x": 36,
                   "y": 57,
-                  "ref": "assets/art/box/system-unit.png"
+                  "ref": "assets/art/box/system-unit.webp"
                 },
                 {
                   "x": 22,
                   "y": 64,
-                  "ref": "assets/art/box/pcb-filter.png"
+                  "ref": "assets/art/box/pcb-filter.webp"
                 },
                 {
                   "x": 22.5,
                   "y": 72.5,
-                  "ref": "assets/art/box/ro-filter.png"
+                  "ref": "assets/art/box/ro-filter.webp"
                 }
               ]
             }
@@ -588,7 +588,7 @@ window.MANUAL_DATA = {
                 {
                   "x": 59,
                   "y": 25,
-                  "art": "assets/photos/trimmed/k1-st.png",
+                  "art": "assets/photos/trimmed/k1-st.webp",
                   "name": "Faucet K1",
                   "desc": "Drinking Water Faucet",
                   "button": "Buy K1",
@@ -597,58 +597,58 @@ window.MANUAL_DATA = {
                 {
                   "x": 40.5,
                   "y": 61,
-                  "ref": "assets/art/box/drain-saddle.png"
+                  "ref": "assets/art/box/drain-saddle.webp"
                 },
                 {
                   "x": 56,
                   "y": 70,
-                  "ref": "assets/art/box/mineralizer-filter.png"
+                  "ref": "assets/art/box/mineralizer-filter.webp"
                 },
                 {
                   "x": 23.5,
                   "y": 68,
-                  "ref": "assets/art/box/inlet-3-way-ball-valve.png"
+                  "ref": "assets/art/box/inlet-3-way-ball-valve.webp"
                 },
                 {
                   "x": 72,
                   "y": 63,
-                  "ref": "assets/art/box/system-unit.png"
+                  "ref": "assets/art/box/system-unit.webp"
                 },
                 {
                   "x": 49.8,
                   "y": 62.5,
-                  "ref": "assets/art/box/pe-tubing-1-4-grey.png",
+                  "ref": "assets/art/box/pe-tubing-1-4-grey.webp",
                   "desc": "Grey · drain, from the unit to the drain saddle"
                 },
                 {
                   "x": 40.6,
                   "y": 75.3,
-                  "ref": "assets/art/box/pe-tubing-3-8-red.png",
+                  "ref": "assets/art/box/pe-tubing-3-8-red.webp",
                   "desc": "Red · water inlet, from the valve to the unit"
                 },
                 {
                   "x": 56.3,
                   "y": 51,
-                  "ref": "assets/art/box/pe-tubing-3-8-blue.png",
+                  "ref": "assets/art/box/pe-tubing-3-8-blue.webp",
                   "desc": "Blue · pure water, from the unit to the faucet"
                 },
                 {
                   "x": 55.7,
                   "y": 77.1,
-                  "ref": "assets/art/box/straight-connector-3-8.png",
+                  "ref": "assets/art/box/straight-connector-3-8.webp",
                   "desc": "Two, on both ends of the mineralizator"
                 },
                 {
                   "x": 61.1,
                   "y": 85.9,
-                  "ref": "assets/art/box/l-type-connector-3-8.png",
+                  "ref": "assets/art/box/l-type-connector-3-8.webp",
                   "desc": "On the Inlet and Pure ports; a 1/4\" one on Drain"
                 }
               ]
             }
           ],
           "product": {
-            "photo": "assets/photos/trimmed/k1-st.png",
+            "photo": "assets/photos/trimmed/k1-st.webp",
             "name": "Faucet K1",
             "kind": "Drinking Water Faucet",
             "button": "Buy K1",
@@ -730,7 +730,7 @@ window.MANUAL_DATA = {
                 {
                   "x": 33,
                   "y": 30,
-                  "art": "assets/photos/trimmed/k3.png",
+                  "art": "assets/photos/trimmed/k3.webp",
                   "name": "Faucet K3",
                   "desc": "Drinking Water Faucet",
                   "button": "Buy K3",
@@ -739,58 +739,58 @@ window.MANUAL_DATA = {
                 {
                   "x": 41,
                   "y": 61,
-                  "ref": "assets/art/box/drain-saddle.png"
+                  "ref": "assets/art/box/drain-saddle.webp"
                 },
                 {
                   "x": 56.5,
                   "y": 70,
-                  "ref": "assets/art/box/mineralizer-filter.png"
+                  "ref": "assets/art/box/mineralizer-filter.webp"
                 },
                 {
                   "x": 24.5,
                   "y": 68,
-                  "ref": "assets/art/box/inlet-3-way-ball-valve.png"
+                  "ref": "assets/art/box/inlet-3-way-ball-valve.webp"
                 },
                 {
                   "x": 72,
                   "y": 63,
-                  "ref": "assets/art/box/system-unit.png"
+                  "ref": "assets/art/box/system-unit.webp"
                 },
                 {
                   "x": 50.4,
                   "y": 62.5,
-                  "ref": "assets/art/box/pe-tubing-1-4-grey.png",
+                  "ref": "assets/art/box/pe-tubing-1-4-grey.webp",
                   "desc": "Grey · drain, from the unit to the drain saddle"
                 },
                 {
                   "x": 41.1,
                   "y": 75.3,
-                  "ref": "assets/art/box/pe-tubing-3-8-red.png",
+                  "ref": "assets/art/box/pe-tubing-3-8-red.webp",
                   "desc": "Red · water inlet, from the valve to the unit"
                 },
                 {
                   "x": 56.5,
                   "y": 60.5,
-                  "ref": "assets/art/box/pe-tubing-3-8-blue.png",
+                  "ref": "assets/art/box/pe-tubing-3-8-blue.webp",
                   "desc": "Blue · pure water, from the unit to the faucet"
                 },
                 {
                   "x": 56.2,
                   "y": 77.1,
-                  "ref": "assets/art/box/straight-connector-3-8.png",
+                  "ref": "assets/art/box/straight-connector-3-8.webp",
                   "desc": "Two, on both ends of the mineralizator"
                 },
                 {
                   "x": 61.6,
                   "y": 85.9,
-                  "ref": "assets/art/box/l-type-connector-3-8.png",
+                  "ref": "assets/art/box/l-type-connector-3-8.webp",
                   "desc": "On the Inlet and Pure ports; a 1/4\" one on Drain"
                 }
               ]
             }
           ],
           "product": {
-            "photo": "assets/photos/trimmed/k3.png",
+            "photo": "assets/photos/trimmed/k3.webp",
             "name": "Faucet K3",
             "kind": "Drinking Water Faucet",
             "button": "Buy K3",
