@@ -5,24 +5,37 @@ step: `public/` is the site.
 
 ```
 public/
-  index.html            the page — the booklet alone: no rail, no guides, no 3D
+  index.html            the page — the booklet in 2D / 3D and the three screen views; no rail, no guides
   a1-manual.html        ⚠ copy of ../Manual/public/a1-manual.html — edit there, copy here
   manual.json           ⚠ copy of the constructor's data (…/Manual/public/manual.json)
   assets/
     manual-data.js      ⚠ the same data as a script — what index.html feeds the booklet
-    manual-kit.css  manual-render.js  art/  brand/  …   ⚠ copies from ../Manual/public/assets
+    manual-kit.css  manual-render.js  manual-texts.js  sheet3d.js  art/  brand/  …   ⚠ copies from ../Manual/public/assets
     ui-kit/ fonts/      synced from ../ui-kit — do not edit here
 ```
 
 ## What it shows
 
-The printed A1 booklet in 2D, opening on the closed cover. Pages turn over the spine:
-click the outer half of a page, the arrows at the bottom, the ← → keys, or swipe. Back from
-the first spread closes the booklet on the cover, forward from the last closes it on the
-back cover. The A1 mark stands top right and does nothing.
+The printed A1 booklet, opening on the closed cover — and, since 2026-10-07, the manual's
+screen version too.
 
-Not here, on purpose: the sidebar and constructor, the Desktop / Tablet / Mobile views, the
-grid guides, 3D.
+- **2D / 3D** — two bare icons above the booklet (a flat square, an isometric cube). Both are
+  the WebGL booklet of the constructor (`assets/sheet3d.js`, three.js r128 from cdnjs): 2D is
+  that booklet strictly face-on, 3D is the same booklet at an angle, turned by dragging.
+  Its pages are the page pictures of `manual-data.js` (`imageL` / `imageR`), two to a
+  texture — no capture frames. Without WebGL, three.js or a page picture (and from `file://`)
+  the page falls back to the flat booklet, `a1-manual?turn=1`, and the icons are hidden.
+- **Views** — a small vertical bar on the right (along the bottom on a phone), icons only:
+  print · desktop · tablet · mobile. The last three show `a1-manual?media=screen` in a frame
+  of 1440 × 900, 768 × 1024, 390 × 844.
+- Pages turn over the spine: click the outer half of a page, the ← → keys, or swipe (in 3D a
+  swipe turns the booklet itself, a tap turns the page). Back from the first spread closes
+  the booklet on the cover, forward from the last closes it on the back cover.
+
+Run locally with `./serve.sh` (http://localhost:8091/) — the page asks for `/a1-manual`
+without the extension, as Cloudflare serves it.
+
+Not here, on purpose: the sidebar and the constructor, the grid guides.
 
 ## Updating
 
@@ -30,6 +43,20 @@ The content is made in `../Manual` (the constructor, `a1-manual-prototype.html`)
 there. To bring it here, copy `manual.json`, `assets/manual-data.js`, `a1-manual.html`,
 `assets/manual-render.js`, `assets/manual-kit.css` and any new pictures under `assets/art`
 and `assets/uploads` from `../Manual/public`.
+
+Here `manual.json` / `manual-data.js` point at light copies instead of the print PNGs: the
+pages are `assets/screen/page-NN.webp` (one file per page, `imageL` + `imageR` of a spread —
+page 2 … page 17 for the 8 spreads). After a new export, convert each
+`../Manual/public/assets/art/pages/page-NN.png` to `assets/screen/page-NN.webp` under the same
+number; the data does not change. Page numbers are off unless the booklet is asked for with
+`?pn=1`, and the page art is exported without the folio.
+
+The phone / tablet / desktop version (`?media=screen`) is built from cards, not page images:
+`assets/art/cards/pNN-k.webp` (same files and paths as in `../Manual/public`), with numbers and
+captions set in HTML. See "Screen version from cards" in `../Manual/README.md`.
+
+Languages: `assets/manual-texts.js` (en · de · uk) is a copy of the one in `../Manual/public/assets`
+— edit it there and copy it here. `?media=screen&lang=de` opens German, `&lang=uk` Ukrainian.
 
 ## Deploy
 

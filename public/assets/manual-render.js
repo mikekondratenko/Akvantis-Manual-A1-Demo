@@ -10,16 +10,30 @@
    ── THE DATA ──
      cover     mode "blocks" — free blocks on the back page and the front page,
                placed in mock-up units (a page is 832 × 1180 u);
-               mode "image" — one picture for the whole outer side.
+               mode "image" — a picture per page: `imageL` (the back page)
+               and `imageR` (the front). `image` — one picture for the
+               whole outer side — is the older form and still works.
      spreads   the inner spreads in reading order. Each is either
-               mode "image" — one picture for the whole spread (made by hand in
-               Figma), or
+               mode "image" — a picture per page, exported from Figma page by
+               page: `imageL` (the even page) and `imageR` (the odd one), each
+               832 × 1180 u. One spread = L + R (2026-10-06). `image` — one
+               picture for the whole spread — is the older form and still
+               works; a page picture, where there is one, lies over it. Or
                mode "blocks" — its two pages laid out from the sections
                assigned to them.
      sections  the content, in reading order: a title or a group frame, the
                print page it sits on (0 — screen only), its width on the page
                in columns of 12, and its blocks.
-     blocks    step · image · items · specs · text.
+     blocks    step · image · items · specs · text · table,
+               page — one printed page of picture cards for the screen: each
+               card is its art (the frame from Figma without number and
+               caption), its place on the page in mock-up units, and the
+               number and caption as text (2026-10-07),
+               indicators — the legend of the four lights.
+
+   ── LANGUAGES ──
+   The data is English. `localize(data, dict)` gives the same data in another
+   language — see assets/manual-texts.js and the shell (a1-manual.html).
 
    ── LAYOUT IS AUTOMATIC ──
    A page in blocks mode is a 12-column flow inside the page's margins: a
@@ -28,8 +42,9 @@
    one exception: it is a composition, and its blocks are placed.
 
    ── STEP NUMBERS ARE COUNTED, NOT TYPED ──
-   Every step block gets the next number in reading order; a section set to
-   `numbering: "restart"` starts again at 1. A block may still pin its own
+   Every section that has a title starts its steps at 1 (2026-10-02). A section
+   with no title is the same chapter carried onto the next page, so it goes on
+   counting; `numbering: "continue"` / `"restart"` on a section overrides either. A block may still pin its own
    `n`. Inserting a step renumbers the rest — which is the point of a
    constructor.
    ───────────────────────────────────────────────────────────────────────────── */
@@ -55,7 +70,7 @@
   function number(data){
     var n = 0, map = {};
     (data.sections || []).forEach(function(sec){
-      if (sec.numbering === 'restart') n = 0;
+      if (sec.numbering ? sec.numbering === 'restart' : !!String(sec.title || '').trim()) n = 0;
       (sec.blocks || []).forEach(function(b){
         if (b.type !== 'step') return;
         n = b.n ? +b.n : n + 1;
@@ -79,9 +94,16 @@
                                    : (+b.span >= 12 ? 'grid-column:1 / -1;' : '')) +
            'aspect-ratio:' + (b.ratio || '4 / 3');
   }
+  /* The kit's number (ui-kit/kit/number.css). Two figures say so, and the kit
+     sets them smaller — the disc stays a circle. */
+  function num(n, cls){
+    var t = String(n);
+    return '<span class="num' + (cls ? ' ' + cls : '') + '"' + (t.length > 1 ? ' data-digits="' + Math.min(t.length, 2) + '"' : '') +
+           (cls ? ' aria-hidden="true"' : '') + '>' + esc(t) + '</span>';
+  }
   var BLOCK = {
     step: function(b, ctx){
-      var fig = '<span class="num">' + ctx.nums[b.id] + '</span>' +
+      var fig = num(ctx.nums[b.id]) +
                 (b.label ? '<span class="m-label">' + esc(b.label) + '</span>' : '') +
                 img(b.art, ctx.resolve, b.fit === 'contain' ? 'is-fit' : '');
       return h('figure', { 'class':'m-fig', style:figStyle(b, ctx), 'data-block':b.id }, fig);
@@ -157,8 +179,71 @@
     },
     text: function(b){
       return h('p', { 'class':'m-text', 'data-block':b.id }, lines(b.text || ''));
+    },
+    /* One printed page of cards (2026-10-07). The art is a picture; the
+       number and the caption are kit components over it, so they keep a
+       readable size on a phone and can be translated. `x y w h` are the
+       card's place on the page in mock-up units: a phone stacks the cards and
+       keeps each one's proportion, from 768 they stand as on the page. */
+    page: function(b, ctx){
+      var cards = (b.cards || []).map(function(c){
+        var st = '--x:' + (+c.x || 0) + ';--y:' + (+c.y || 0) + ';--w:' + (+c.w || 1) + ';--h:' + (+c.h || 1);
+        return '<figure class="m-card" style="' + st + '">' +
+               '<img class="m-card-art" src="' + esc(ctx.resolve(c.art || '')) + '" alt="" loading="lazy" decoding="async">' +
+               (c.n ? num(c.n) : '') +
+               /* `hotspots` (2026-10-07): a "+" on a part of the picture. `x y` — its
+                  place in % of the card; `ref` — the art path of an item of «In the
+                  box», whose picture and name the pop-up shows; or `art` / `name` /
+                  `desc` given outright (the faucets are not in the box). */
+               (c.hotspots || []).map(function(hs){
+                 var it = hs.ref ? (ctx.items || {})[hs.ref] : null;
+                 var name = hs.name || (it && (it.label || it.name)) || '', art = hs.art || (it && it.art) || '';
+                 var desc = hs.desc || (it && it.desc) || '';
+                 if (!name && !art) return '';
+                 return '<button type="button" class="hotspot m-hot" style="left:' + (+hs.x || 0) + '%;top:' + (+hs.y || 0) + '%" aria-haspopup="dialog" aria-label="' + esc(name) +
+                        '" data-art="' + esc(ctx.resolve(art)) + '" data-name="' + esc(name) + '" data-desc="' + esc(desc) + '"' +
+                        /* a part that is sold apart (the faucets): the pop-up gets a button to its page */
+                        (hs.url ? ' data-url="' + esc(hs.url) + '" data-btn="' + esc(hs.button || 'Buy') + '"' : '') + '></button>';
+               }).join('') +
+               (c.caption ? '<figcaption class="m-cap"' + (c.mode ? ' data-mode="' + esc(c.mode) + '"' : '') + '>' +
+                 (c.info ? CAP_INFO : '') + '<span>' + esc(c.caption) + '</span></figcaption>' : '') +
+               '</figure>';
+      }).join('');
+      /* `product` (2026-10-07): what the printed page sells with a QR code, the
+         screen sells with a block under the page — the product's photo from
+         the library (ui-kit/photos), its name and kind, and a button that
+         goes to its page. */
+      var pr = b.product, buy = '';
+      if (pr && pr.url){
+        buy = '<div class="m-buy" data-buy="' + esc(b.id) + '">' +
+              '<span class="m-buy-art">' + (pr.photo ? '<img src="' + esc(ctx.resolve(pr.photo)) + '" alt="" loading="lazy" decoding="async">' : '') + '</span>' +
+              '<span class="m-buy-text"><strong class="m-buy-name">' + esc(pr.name || '') + '</strong>' +
+              (pr.kind ? '<span class="m-buy-kind">' + esc(pr.kind) + '</span>' : '') + '</span>' +
+              '<a class="btn m-buy-btn" href="' + esc(pr.url) + '" target="_blank" rel="noopener">' + esc(pr.button || 'Buy') + '</a></div>';
+      }
+      return h('div', { 'class':'m-page', 'data-block':b.id, 'data-page':b.page || null,
+                        style:'--pw:' + (+b.w || 736) + ';--ph:' + (+b.h || 1026) }, cards) + buy;
+    },
+    /* The four lights: a key (on · flashing · breathing), a row per light
+       with its states, and the alarms. Colours are names, the kit paints them. */
+    indicators: function(b){
+      function light(c, m){ return '<i class="m-light" data-c="' + esc(c || 'ink') + '" data-m="' + esc(m || 'on') + '"></i>'; }
+      function states(list){
+        return '<ul class="m-ind-states">' + (list || []).map(function(s){
+          return '<li>' + (s.lights ? '<span class="m-ind-lights">' + s.lights.map(function(c){ return light(c, s.m || 'flashing'); }).join('') + '</span>'
+                                    : light(s.c, s.m)) + '<span>' + esc(s.t || '') + '</span></li>';
+        }).join('') + '</ul>';
+      }
+      var key = '<div class="m-ind-row is-key"><h3 class="m-ind-name">' + esc(b.label || 'Indicator') + '</h3>' +
+                states([{ m:'on', t:(b.key || [])[0] || 'on' }, { m:'flashing', t:(b.key || [])[1] || 'flashing' }, { m:'breathing', t:(b.key || [])[2] || 'breathing' }]) + '</div>';
+      var rows = (b.rows || []).map(function(r){
+        return '<div class="m-ind-row' + (r.alarm ? ' is-alarm' : '') + '"><h3 class="m-ind-name">' + esc(r.name || '') + '</h3>' + states(r.states) + '</div>';
+      }).join('');
+      return h('div', { 'class':'m-ind', 'data-block':b.id }, key + rows);
     }
   };
+  var CAP_INFO = '<svg class="m-cap-i" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="currentColor"/>' +
+                 '<circle class="m-cap-i-in" cx="10" cy="5.7" r="1.5"/><rect class="m-cap-i-in" x="8.9" y="8.5" width="2.2" height="6.8" rx=".3"/></svg>';
   function block(b, ctx){ return (BLOCK[b.type] || function(){ return ''; })(b, ctx); }
 
   /* ── A SECTION ──
@@ -173,12 +258,13 @@
     function flush(){
       if (!run.length) return;
       if (runKind === 'grid') out += '<div class="m-grid">' + run.join('') + '</div>';
+      else if (runKind === 'pages') out += '<div class="m-pages">' + run.join('') + '</div>';
       else if (runKind === 'rows') out += '<div class="m-rows">' + run.join('') + '</div>';
       else out += run.join('');
       run = []; runKind = null;
     }
     blocks.forEach(function(b){
-      var kind = (b.type === 'step' || b.type === 'image') ? 'grid' : b.type === 'items' ? 'rows' : 'solo';
+      var kind = (b.type === 'step' || b.type === 'image') ? 'grid' : b.type === 'items' ? 'rows' : b.type === 'page' ? 'pages' : 'solo';
       if (kind !== runKind || kind === 'solo') flush();
       runKind = kind;
       run.push(block(b, ctx));
@@ -228,6 +314,11 @@
     }
   };
 
+  /* One page's picture (a Figma export of that page), laid over the page to the trim. */
+  function pageArt(src, alt, ctx){
+    return '<img class="page-art" src="' + esc(ctx.resolve(src)) + '" alt="' + esc(alt) + '">';
+  }
+
   /* ── THE SHEET ── */
   function renderSheet(doc, data, ctx){
     var sheet = doc.querySelector('.sheet'), flip = sheet.querySelector('.flip');
@@ -235,15 +326,21 @@
 
     /* cover */
     var cov = data.cover || {};
-    front.querySelectorAll('.spread-art').forEach(function(e){ e.remove(); });
+    front.querySelectorAll('.spread-art, .page-art').forEach(function(e){ e.remove(); });
     ['back', 'front'].forEach(function(p){
       var layer = front.querySelector(p === 'back' ? '.panel-l .cover' : '.panel-r .cover');
       layer.innerHTML = cov.mode === 'image' ? '' :
         (cov.blocks || []).filter(function(b){ return (b.page || 'front') === p; })
           .map(function(b){ return (COVER[b.type] || function(){ return ''; })(b, ctx); }).join('');
     });
-    if (cov.mode === 'image' && cov.image)
-      front.insertAdjacentHTML('beforeend', '<img class="spread-art" src="' + esc(ctx.resolve(cov.image)) + '" alt="Cover">');
+    if (cov.mode === 'image'){
+      if (cov.image)
+        front.insertAdjacentHTML('beforeend', '<img class="spread-art" src="' + esc(ctx.resolve(cov.image)) + '" alt="Cover">');
+      /* a picture per page: back on the left, front on the right */
+      [['imageL', '.panel-l', 'Back cover'], ['imageR', '.panel-r', 'Cover']].forEach(function(p){
+        if (cov[p[0]]) front.querySelector(p[1]).insertAdjacentHTML('beforeend', pageArt(cov[p[0]], p[2], ctx));
+      });
+    }
 
     /* inner spreads */
     flip.querySelectorAll('.side-inner').forEach(function(e){ e.remove(); });
@@ -254,7 +351,8 @@
       side.className = 'side side-inner';
       side.dataset.spread = k;
       side.dataset.mode = sp.mode || 'blocks';
-      var page = function(n, cls){
+      var img = sp.mode === 'image';
+      var page = function(n, cls, src){
         var flow = '';
         if (sp.mode !== 'image'){
           flow = (data.sections || []).filter(function(s){ return +s.page === n; })
@@ -262,9 +360,10 @@
         }
         return '<div class="panel ' + cls + '" data-page="' + n + '">' +
                '<div class="page-grid"><div class="grid-overlay" aria-hidden="true"></div></div>' +
-               '<div class="page-flow">' + flow + '</div></div>';
+               '<div class="page-flow">' + flow + '</div>' +
+               (img && src ? pageArt(src, 'Page ' + n, ctx) : '') + '</div>';
       };
-      side.innerHTML = page(pl, 'panel-l') + page(pr, 'panel-r') +
+      side.innerHTML = page(pl, 'panel-l', sp.imageL) + page(pr, 'panel-r', sp.imageR) +
         (sp.mode === 'image' && sp.image ? '<img class="spread-art" src="' + esc(ctx.resolve(sp.image)) + '" alt="Pages ' + pl + '–' + pr + '">' : '');
       flip.insertBefore(side, front);
     });
@@ -287,6 +386,22 @@
       var titled = s.title && String(s.title).trim();
       var inner = sectionBody(s, ctx, 'screen');
       if (!titled && accs.length){ accs[accs.length - 1].inner += inner; return; }
+      /* `group` (2026-10-07): consecutive sections of one group are ONE section
+         on screen — one heading, one entry in the bar — and each of them is a
+         stage inside it under its own small heading (`navTitle`). A row of
+         links at the top of the section jumps to a stage. */
+      if (s.group){
+        var last = accs[accs.length - 1];
+        var name = String(s.navTitle || s.title).replace(/\n/g, ' ');
+        var stage = '<div class="m-stage" id="' + esc(s.id) + '" data-section="' + esc(s.id) + '"><h3 class="m-stage-title">' + esc(name) + '</h3>' + inner + '</div>';
+        if (!last || last.group !== (s.groupId || s.group)){
+          last = { sec:{ id:s.groupId || 'group-' + s.id, title:s.group, span:s.span }, titled:true, group:s.groupId || s.group, inner:'', stages:[] };
+          accs.push(last);
+        }
+        last.stages.push('<a href="#' + esc(s.id) + '">' + esc(name) + '</a>');
+        last.inner += stage;
+        return;
+      }
       accs.push({ sec:s, titled:titled, inner:inner });
     });
     var body = accs.map(function(a, idx){
@@ -294,25 +409,34 @@
       return h('section', { 'class':'m-sec is-acc' + (idx < accs.length - 3 ? ' is-open' : ''), id:s.id, 'data-section':s.id, style:'--span:' + span },
         '<details class="acc"' + (idx < accs.length - 3 ? ' open' : '') + '><summary class="acc-head"><h2 class="m-title">' + lines(a.titled ? s.title : '') + '</h2>' +
         '<span class="acc-chev" aria-hidden="true"></span></summary>' +
-        '<div class="m-sec-body">' + a.inner + '</div></details>');
+        '<div class="m-sec-body">' + (a.stages && a.stages.length > 1 ? '<nav class="m-stages">' + a.stages.join('') + '</nav>' : '') + a.inner + '</div></details>');
     }).join('');
     var bar = main.querySelector('.r-bar');
     main.querySelectorAll(':scope > :not(.r-bar)').forEach(function(e){ e.remove(); });
     /* The Akvantis mark closes the page (2026-10-01): grey, centred, after the
        last section — it left the bar. The drawing is the bar's own. */
     var markSvg = bar && bar.querySelector('.topbar-mark svg');
-    var foot = markSvg ? '<footer class="r-foot" aria-label="Akvantis">' + markSvg.outerHTML + '</footer>' : '';
+    /* 2026-10-07: no mark at the foot — the page ends with its last section, on a
+       phone, a tablet and a desktop alike. */
+    var foot = '';
     main.insertAdjacentHTML('beforeend', head + '<div class="r-flow">' + body + '</div>' + foot);
     if (bar){
       var nav = bar.querySelector('.topbar-nav');
       nav.querySelectorAll('a').forEach(function(a){ a.remove(); });
-      var n = 0;
+      var n = 0, seen = {};
       (data.sections || []).forEach(function(s){
         if (!s.title || s.nav === false) return;
+        /* a group is one entry */
+        if (s.group){
+          var gid = s.groupId || 'group-' + s.id;
+          if (seen[gid]) return;
+          seen[gid] = 1;
+          s = { id:gid, title:s.group };
+        }
         var a = doc.createElement('a');
         a.href = '#' + s.id;
-        a.innerHTML = '<span class="topbar-num" aria-hidden="true">' + (++n) + '</span><span class="topbar-label">' +
-                      esc(String(s.title).replace(/\n/g, ' ')) + '</span>';
+        a.innerHTML = num(++n, 'topbar-num') + '<span class="topbar-label">' +
+                      esc(String(s.navTitle || s.title).replace(/\n/g, ' ')) + '</span>';
         nav.appendChild(a);
       });
     }
@@ -320,7 +444,12 @@
 
   function render(doc, data, opts){
     opts = opts || {};
-    var ctx = { nums:number(data), resolve:opts.resolve || function(p){ return p; }, tableView:opts.tableView || '' };
+    /* items of the manual by their picture — what a hotspot's `ref` points at */
+    var items = {};
+    (data.sections || []).forEach(function(sec){ (sec.blocks || []).forEach(function(b){
+      (b.items || []).forEach(function(i){ if (i.art && !items[i.art]) items[i.art] = i; });
+    }); });
+    var ctx = { items:items, nums:number(data), resolve:opts.resolve || function(p){ return p; }, tableView:opts.tableView || '' };
     renderSheet(doc, data, ctx);
     renderRibbon(doc, data, ctx);
   }
@@ -343,5 +472,30 @@
     return out;
   }
 
-  window.ManualRender = { render:render, overflow:overflow, number:number, PAGE_W:PAGE_W, PAGE_H:PAGE_H };
+  /* ── LANGUAGES (2026-10-07) ──
+     English is the original and stays in the data. `dict` maps an English
+     string to the reader's language (built from assets/manual-texts.js); the
+     result is a copy of the data with every text that has a row replaced.
+     Paths, ids and settings are never looked up. A string with no row stays
+     English. */
+  var NOT_TEXT = { id:1, art:1, src:1, icon:1, type:1, style:1, mode:1, view:1, c:1, m:1, image:1, imageL:1, imageR:1,
+                   color:1, align:1, dir:1, fit:1, ratio:1, numbering:1, lights:1, hex:1, ref:1, groupId:1, url:1, photo:1, screenLogo:1, screenHero:1 };
+  function localize(data, dict){
+    if (!dict) return data;
+    function walk(o){
+      if (typeof o === 'string') return Object.prototype.hasOwnProperty.call(dict, o) ? dict[o] : o;
+      if (Array.isArray(o)) return o.map(walk);
+      if (o && typeof o === 'object'){
+        var out = {};
+        for (var k in o) out[k] = NOT_TEXT[k] ? o[k] : walk(o[k]);
+        return out;
+      }
+      return o;
+    }
+    var out = {};
+    for (var k in data) out[k] = k === 'sections' ? walk(data[k]) : data[k];
+    return out;
+  }
+
+  window.ManualRender = { localize:localize, render:render, overflow:overflow, number:number, PAGE_W:PAGE_W, PAGE_H:PAGE_H };
 }());

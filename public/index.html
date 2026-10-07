@@ -13,9 +13,10 @@
 <style>
 /* ─────────────────────────────────────────────────────────────────────────────
    A1 MANUAL GUIDE — DEMO. The Manual constructor with everything but the
-   booklet taken out, for showing a client: no rail, no guides, no 3D. The
-   printed booklet in 2D; its pages turn — click the outer half of a page,
-   or the arrow keys. Back from the first spread closes it on the cover,
+   booklet taken out, for showing a client: no rail, no guides. The printed
+   booklet in 2D or 3D (2026-10-07: the icons above it), and the manual's
+   screen version on a desktop, a tablet and a phone (the bar on the right).
+   Its pages turn — click the outer half of a page, or the arrow keys. Back from the first spread closes it on the cover,
    forward from the last closes it on the back cover.
 
    The booklet itself is a1-manual.html — the same document as in ../Manual,
@@ -50,6 +51,47 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
   .mark{right:var(--space-16)}
   .mark svg{height:var(--space-16)}
 }
+
+/* ── 2D / 3D · THE FOUR VIEWS (2026-10-07) ──
+   The printed booklet is the WebGL booklet of the constructor (assets/sheet3d.js):
+   2D is that booklet seen strictly face-on, 3D is the same booklet held at an
+   angle and turned by dragging. Above it two bare icons switch between them — a
+   flat square and an isometric cube, no plates. On the right a small vertical
+   bar switches what the manual is looked at on: print · desktop · tablet ·
+   mobile, icons only. The three screen views are the manual's screen version
+   (a1-manual?media=screen) in a frame of that size. */
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .4s ease}
+#gl.is-on{opacity:1}
+.stage.is-3d{cursor:grab}
+.stage.is-3d.is-drag{cursor:grabbing}
+.stage.is-edge,.stage.is-3d.is-edge{cursor:pointer}
+[hidden]{display:none!important}
+.modes{position:fixed;z-index:3;left:50%;transform:translateX(-50%);top:calc(var(--space-16) * var(--ui, 1) + env(safe-area-inset-top));
+  display:flex;gap:var(--space-4)}
+.modes button,.views button{appearance:none;border:0;margin:0;padding:0;background:none;cursor:pointer;color:var(--white);
+  display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.modes button{width:var(--space-40);height:var(--space-40);opacity:.4;transition:opacity .15s}
+.modes button svg{width:var(--space-24);height:var(--space-24);display:block}
+.modes button[aria-pressed="true"]{opacity:1}
+@media (hover:hover){ .modes button:hover{opacity:1} }
+.modes button:focus-visible,.views button:focus-visible{outline:2px solid var(--white-32);outline-offset:2px;border-radius:var(--radius-8)}
+.views{position:fixed;z-index:3;right:calc(var(--space-24) * var(--ui, 1));top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:var(--space-4);padding:var(--space-4);border-radius:var(--radius-16);background:var(--black-900)}
+.views button{width:var(--space-40);height:var(--space-40);border-radius:var(--radius-12);opacity:.48;transition:opacity .15s, background .15s}
+.views button svg{width:20px;height:20px;display:block}
+.views button[aria-pressed="true"]{opacity:1;background:var(--black-700)}
+@media (hover:hover){ .views button:hover{opacity:1} }
+/* a screen view: the manual's screen version in a frame of the device's size */
+.device{position:relative;flex:none;transform-origin:center center;overflow:hidden;background:var(--white);border-radius:var(--space-24)}
+.device[data-view="mobile"]{border-radius:var(--space-40)}
+.device[data-view="tablet"]{border-radius:var(--space-32)}
+.device iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--white);color-scheme:light;-webkit-user-select:auto;user-select:auto}
+.stage.is-screen{touch-action:auto}
+/* phone: the bar lies along the bottom edge, so it does not cover the booklet */
+@media (max-width:767px){
+  .views{top:auto;right:auto;left:50%;bottom:calc(var(--space-16) + env(safe-area-inset-bottom));transform:translateX(-50%);flex-direction:row}
+  /* under the header row: beside the title there is no room for them */
+  .modes{top:calc(var(--space-64) + env(safe-area-inset-top))}
 }
 </style>
 </head>
@@ -58,41 +100,236 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
 <div class="brand"><svg class="brand-mark" width="24" height="24" viewBox="0 0 48.05 48.37" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24.0209 0.146484C10.777 0.146484 0 10.9305 0 24.1831C0 37.4356 10.777 48.2196 24.0209 48.2196C37.2649 48.2196 48.0418 37.4356 48.0418 24.1831C48.0418 10.9305 37.2694 0.146484 24.0209 0.146484ZM24.0209 45.1933C12.4445 45.1933 3.02432 35.7671 3.02432 24.1831C3.02432 12.5991 12.4445 3.17277 24.0209 3.17277C35.5974 3.17277 45.0175 12.5991 45.0175 24.1831C45.0175 35.7671 35.5974 45.1933 24.0209 45.1933Z"/><path d="M18.6985 21.7971C20.7543 21.5777 22.7324 21.8199 25.0258 22.6337C29.1968 24.1285 33.3587 23.6119 36.6891 21.6508L35.1632 15.8679C32.9658 16.8965 30.7957 17.3262 28.5572 17.2531C26.1405 17.1754 24.6375 16.3799 22.6411 15.8725C21.2385 15.5159 19.8223 15.4199 18.3102 15.5434C15.7655 15.7537 13.463 16.5811 11.3524 18.1034L12.8828 23.8817C14.7788 22.6977 16.4874 22.0302 18.7031 21.7925L18.6985 21.7971Z"/><path d="M28.5617 26.2453C26.145 26.1676 24.6419 25.3721 22.6455 24.8647C21.243 24.5081 19.8268 24.4121 18.3146 24.5356C15.77 24.7459 13.4675 25.5733 11.3569 27.0956L12.8873 32.8738C14.7832 31.6898 16.4918 31.0224 18.7075 30.7847C20.7633 30.5653 22.7415 30.8076 25.0348 31.6213C29.2058 33.1161 33.3677 32.5996 36.6981 30.6384L35.1722 24.8556C32.9748 25.8841 30.8048 26.3139 28.5662 26.2407L28.5617 26.2453Z"/></svg><span>Manual Guide</span></div>
 <div class="mark" aria-hidden="true"><svg viewBox="0 0 60 32" fill="currentColor" aria-hidden="true"><g clip-path="url(#dv-a1)"><path d="M58.3899 31.9991H53.6672C53.2877 31.9991 52.9802 31.6853 52.9802 31.2978V11.0141C52.9802 10.6222 52.666 10.3075 52.2821 10.3136C51.0791 10.3321 49.8667 10.3356 48.6439 10.3233C47.4169 10.311 46.2001 10.304 44.9928 10.3022C44.6142 10.3022 44.3076 9.98838 44.3076 9.60088V6.09052C44.3076 5.7223 44.5867 5.41633 44.9473 5.3909L46.7978 5.26027C48.4293 5.14367 49.6743 4.95342 50.533 4.69041C51.3917 4.4274 52.1216 3.9531 52.7226 3.26575C53.2636 2.64767 53.7926 1.70433 54.3103 0.434849C54.4177 0.171836 54.6675 0 54.9458 0H58.3899C58.7694 0 59.0768 0.313863 59.0768 0.70137V31.2986C59.0768 31.6861 58.7694 32 58.3899 32V31.9991Z"/><path d="M29.7047 0.376889C29.585 0.144889 29.3507 0 29.0967 0H16.4405C16.1856 0 15.9523 0.144889 15.8326 0.376889L0.0814639 30.9547C-0.162239 31.4284 0.170161 32 0.689429 32H6.05175C6.3075 32 6.5426 31.8533 6.66143 31.6196L11.272 22.5538C11.5269 22.0533 12.2184 22.0444 12.4845 22.5387L13.9355 25.2338C14.0569 25.4596 14.2877 25.5991 14.5374 25.5991H30.9499C31.2005 25.5991 31.4304 25.4587 31.5518 25.2338L33.0287 22.4907C33.2948 21.9964 33.9863 22.0044 34.2412 22.5058L38.8767 31.6196C38.9955 31.8533 39.2306 32 39.4864 32H44.8487C45.3679 32 45.7012 31.4284 45.4566 30.9547L29.7047 0.376889ZM13.101 18.9582L22.0879 1.288C22.2067 1.05422 22.4418 0.907556 22.6976 0.907556H22.8388C23.0946 0.907556 23.3297 1.05422 23.4485 1.288L32.4353 18.9582C32.6765 19.432 32.3432 20 31.8257 20H13.7107C13.1923 20 12.8599 19.432 13.101 18.9582Z"/></g><defs><clipPath id="dv-a1"><rect width="59.0769" height="32" fill="white"/></clipPath></defs></svg></div>
 
+<!-- 2D / 3D: a flat square and an isometric cube, no plates -->
+<div class="modes" id="modes" role="group" aria-label="2D or 3D" hidden>
+  <button type="button" data-mode="2d" aria-label="2D" title="2D" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.75" y="4.75" width="14.5" height="14.5" rx="1.5"/></svg></button>
+  <button type="button" data-mode="3d" aria-label="3D" title="3D" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.25 19.75 7.6v8.8L12 20.75 4.25 16.4V7.6L12 3.25Z"/><path d="M4.25 7.6 12 12l7.75-4.4M12 12v8.75"/></svg></button>
+</div>
+<!-- what the manual is looked at on: print · desktop · tablet · mobile -->
+<div class="views" id="views" role="group" aria-label="View"><button type="button" data-view="sheet" aria-label="Print" title="Print" aria-pressed="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5.5C8.2 4.3 5.6 3.8 2.5 4v11c3.1-.2 5.7.3 7.5 1.5 1.8-1.2 4.4-1.7 7.5-1.5V4c-3.1-.2-5.7.3-7.5 1.5Z"/><path d="M10 5.5v11"/></svg></button><button type="button" data-view="desktop" aria-label="Desktop" title="Desktop" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="3.5" width="15" height="10" rx="1.5"/><path d="M7.5 16.5h5M10 13.5v3"/></svg></button><button type="button" data-view="tablet" aria-label="Tablet" title="Tablet" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2.5" width="12" height="15" rx="2"/><path d="M9 14.75h2"/></svg></button><button type="button" data-view="mobile" aria-label="Mobile" title="Mobile" aria-pressed="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="8" height="15" rx="2"/><path d="M9.25 14.75h1.5"/></svg></button></div>
+
+<canvas id="gl" aria-label="A1 Manual Guide — the printed booklet" hidden></canvas>
 <div class="stage" id="stage">
-  <div class="frame" id="frame"><iframe id="doc" title="A1 Manual Guide — the printed booklet" tabindex="-1"></iframe></div>
+  <div class="frame" id="frame" hidden><iframe id="doc" title="A1 Manual Guide — the printed booklet" tabindex="-1"></iframe></div>
+  <div class="device" id="device" hidden><iframe id="screen" title="A1 Manual Guide — the screen version"></iframe></div>
 </div>
 
-
-
-<script src="assets/manual-data.js"></script>
+<!-- three.js r128 — the same build the constructor uses; without it (or without WebGL) the booklet is the flat one -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="assets/sheet3d.js?v=7"></script>
+<script src="assets/manual-data.js?v=12"></script>
 <script>
 (function(){
   'use strict';
   var $ = function(id){ return document.getElementById(id); };
   var DATA = window.MANUAL_DATA || { spreads:[] };
   var N = Math.max(1, (DATA.spreads || []).length);
-  /* at: 0 = closed; back: closed on the back cover */
-  var state = { at:0, back:false };
+  /* view: sheet | desktop | tablet | mobile; mode: 2d | 3d (the sheet only);
+     at: 0 = closed; back: closed on the back cover */
+  var state = { view:'sheet', mode:'2d', at:0, back:false };
   var MM = 96 / 25.4, W = Math.round(420 * MM), H = Math.round(297 * MM);
+  var VIEWS = { desktop:[1440, 900], tablet:[768, 1024], mobile:[390, 844] };
+  var stage = $('stage');
+  var FILE = location.protocol === 'file:';
 
-  /* the document asks its parent for the manual; answer with the bundled copy */
+  /* the documents ask their parent for the manual; answer with the bundled copy */
   addEventListener('message', function(e){
-    if (e.data && e.data.type === 'a1-need-data' && e.source === $('doc').contentWindow)
+    if (!e.data || e.data.type !== 'a1-need-data') return;
+    if (e.source === $('doc').contentWindow || e.source === $('screen').contentWindow)
       e.source.postMessage({ type:'a1-data', data:JSON.parse(JSON.stringify(DATA)), blobs:{} }, '*');
   });
 
+  /* ══ THE BOOKLET IN WEBGL ══
+     assets/sheet3d.js is the constructor's booklet. There it is fed with
+     photographs of the document; here every page already IS a picture
+     (`imageL` / `imageR` of the cover and of each spread), so a spread's
+     texture is its two pages drawn side by side — no capture frames, no
+     html2canvas. If WebGL, three.js or a page picture is missing, the page
+     falls back to the flat booklet (the document turning its own pages). */
+  function sides(){
+    var c = DATA.cover || {}, out = [], ok = c.mode === 'image' && c.imageL && c.imageR;
+    out.push({ key:'front', L:c.imageL, R:c.imageR });
+    (DATA.spreads || []).forEach(function(sp, i){
+      if (sp.mode !== 'image' || !sp.imageL || !sp.imageR) ok = false;
+      out.push({ key:'inner-' + (i + 1), L:sp.imageL, R:sp.imageR });
+    });
+    return ok ? out : null;
+  }
+  var GL = false, LIST = sides();
+  if (LIST && window.THREE && window.Sheet3D && !FILE){
+    try { $('gl').hidden = false; window.Sheet3D.init($('gl')); GL = true; }
+    catch (err){ GL = false; $('gl').hidden = true; console.warn('3D booklet: ' + err + ' — showing the flat one'); }
+  }
+  /* a phone gets pages at half size: nine spreads at full size are ~280 MB of texture */
+  var SMALL = Math.min(screen.width, screen.height) < 768 || (navigator.deviceMemory && navigator.deviceMemory <= 4);
+  var PW = SMALL ? 832 : 1664, PH = SMALL ? 1180 : 2360;
+  function loadSide(i){
+    if (!GL || i >= LIST.length) return;
+    var it = LIST[i], a = new Image(), b = new Image(), n = 0;
+    function done(){
+      if (++n < 2 || !GL) return;
+      var cv = document.createElement('canvas'); cv.width = PW * 2; cv.height = PH;
+      var cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height);
+      cx.drawImage(a, 0, 0, PW, PH); cx.drawImage(b, PW, 0, PW, PH);
+      window.Sheet3D.setTexture(it.key, cv);
+      if (i === 0) $('gl').classList.add('is-on');   /* the cover is in: show the booklet */
+      loadSide(i + 1);
+    }
+    function fail(){ if (!GL) return; GL = false; console.warn('3D booklet: ' + it.key + ' did not load — showing the flat one'); rows(); paint(); fit(); }
+    a.onload = b.onload = done; a.onerror = b.onerror = fail;
+    a.src = it.L; b.src = it.R;
+  }
+
+  /* the camera, the fold and the hinge — the constructor's own model */
+  var CAM3D = { yaw:-24, pitch:14 };
+  var cam = { yaw:0, pitch:0, fold:180, k:1, m:0 };   /* m: 0 = 2D … 1 = 3D, eased */
+  var hinge = 'L', lastInner = 1;
+  function apply3d(){
+    if (!GL) return;
+    var v = cam.fold;
+    window.Sheet3D.set({ yaw:cam.yaw, pitch:cam.pitch, fit:cam.k, panX:0, panY:0,
+                         fold:hinge === 'L' ? v : 0, foldR:hinge === 'L' ? 180 : 180 - v,
+                         spreads:N, open:state.at || (hinge === 'R' ? N : lastInner) });
+  }
+  var ease = function(u){ return u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; };
+  var still = function(){ return window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches; };
+  var foldAnim = null;
+  function setFold(to, animate, done){
+    if (!animate || still()){ foldAnim = null; cam.fold = to; fitGL(); apply3d(); if (done) done(); return; }
+    var from = cam.fold, t0 = performance.now(), me = {};
+    foldAnim = me;
+    (function frame(now){
+      if (foldAnim !== me) return;
+      var u = Math.min(1, (now - t0) / 800);
+      cam.fold = from + (to - from) * ease(u);
+      fitGL(); apply3d();
+      if (u < 1) requestAnimationFrame(frame); else { foldAnim = null; if (done) done(); }
+    })(t0);
+  }
+  /* close on the cover ('L') or on the back cover ('R'); from the other hinge it lies flat first */
+  function closeTo(side){
+    state.at = 0; state.back = side === 'R';
+    if (side === 'R') lastInner = N;
+    if (hinge === side || cam.fold < .5){ hinge = side; setFold(180, true); return; }
+    setFold(0, true, function(){ hinge = side; setFold(180, true); });
+  }
+  function goTo(at){
+    at = Math.max(0, Math.min(N, at));
+    if (at === state.at) return;
+    if (!at){ closeTo('L'); return; }
+    state.at = at; lastInner = at; state.back = false;
+    apply3d();
+    if (cam.fold > 90) setFold(0, true);
+  }
+  function step3d(dir){
+    if (state.at === 0){
+      if (!state.back && dir > 0) goTo(1);
+      else if (state.back && dir < 0){ state.at = N; state.back = false; lastInner = N; setFold(0, true); }
+      return;
+    }
+    var next = state.at + dir;
+    if (next < 1) closeTo('L'); else if (next > N) closeTo('R'); else goTo(next);
+  }
+  var camAnim = null;
+  function camTo(t, m){
+    var from = { yaw:cam.yaw, pitch:cam.pitch, m:cam.m }, t0 = performance.now(), me = {};
+    camAnim = me;
+    if (still()){ cam.yaw = t.yaw; cam.pitch = t.pitch; cam.m = m; camAnim = null; fitGL(); apply3d(); return; }
+    (function frame(now){
+      if (camAnim !== me) return;
+      var u = Math.min(1, (now - t0) / 600), e = ease(u);
+      cam.yaw = from.yaw + (t.yaw - from.yaw) * e;
+      cam.pitch = from.pitch + (t.pitch - from.pitch) * e;
+      cam.m = from.m + (m - from.m) * e;
+      fitGL(); apply3d();
+      if (u < 1) requestAnimationFrame(frame); else camAnim = null;
+    })(t0);
+  }
+  function setMode(m){
+    if (state.mode === m) return;
+    state.mode = m;
+    rows();
+    camTo(m === '3d' ? CAM3D : { yaw:0, pitch:0 }, m === '3d' ? 1 : 0);
+  }
+
+  /* ── FIT ──
+     One rule for the flat booklet and the WebGL one: on a desktop the booklet
+     is 80 % of the viewport's height (narrowed only if the window is too
+     narrow); on a phone it takes the width. A closed booklet is one page
+     wide and is fitted as one page — the size eases with the fold, so opening
+     grows it instead of jumping. Held in the hand (3D) it stands a little
+     smaller: a turned sheet reaches past its own rectangle. */
+  function room(){
+    var phone = innerWidth < 768;
+    return { padX:phone ? 32 : 176, padY:phone ? 200 : 192 };
+  }
+  function scaleFor(w){          /* px per px of the sheet, for a booklet `w` wide */
+    var r = room();
+    return innerWidth >= 1024 ? Math.min(innerHeight * .8 / H, (innerWidth - r.padX) / w)
+                              : Math.min((innerWidth - r.padX) / w, (innerHeight - r.padY) / H);
+  }
+  function fitGL(){
+    if (!GL) return;
+    var open = scaleFor(W), shut = scaleFor(W / 2), t = cam.fold / 180;
+    var k = (open + (shut - open) * t) * (1 - .14 * cam.m);
+    /* sheet3d's `fit` is the share of the canvas the open spread takes */
+    cam.k = k / Math.min(innerWidth / W, innerHeight / H);
+  }
+  function fit(){
+    if (state.view !== 'sheet'){
+      var v = VIEWS[state.view], r = room(), d = $('device');
+      var k = Math.min(1, (innerWidth - r.padX) / v[0], (innerHeight - (innerWidth < 768 ? 176 : 144)) / v[1]);
+      d.style.width = v[0] + 'px'; d.style.height = v[1] + 'px';
+      d.style.transform = 'scale(' + k.toFixed(3) + ')';
+      return;
+    }
+    if (GL){ window.Sheet3D.resize(); fitGL(); apply3d(); return; }
+    var f = $('frame');
+    f.style.width = W + 'px'; f.style.height = H + 'px';
+    f.style.transform = 'scale(' + scaleFor(state.at === 0 ? W / 2 : W).toFixed(3) + ')';
+  }
+
+  /* ── WHAT IS ON THE STAGE ── */
   function hash(){ return state.at ? 'inner-' + state.at : (state.back ? 'back' : 'front'); }
   function paint(){
-    /* Cloudflare serves `a1-manual.html` at `/a1-manual` (307). The frame must be
+    /* Cloudflare serves `a1-manual.html` at `/a1-manual` (307). A frame must be
        asked for by its final address, or every turn — which changes only the
        fragment — would reload it through the redirect and lose the animation.
        Opened from disk there is no server, so the file name. */
-    var base = (location.protocol === 'file:' ? 'a1-manual.html' : 'a1-manual') + '?media=sheet&flip=0&turn=1&bleed=1';
+    var name = FILE ? 'a1-manual.html' : 'a1-manual';
+    if (state.view !== 'sheet'){
+      var sc = $('screen');
+      if (!sc.getAttribute('src')) sc.setAttribute('src', name + '?media=screen');
+      return;
+    }
+    if (GL) return;
     /* only the fragment changes: the frame does not reload, the document turns */
-    var el = $('doc'), next = base + '#' + hash();
+    var el = $('doc'), next = name + '?media=sheet&flip=0&turn=1&bleed=1#' + hash();
     if (el.getAttribute('src') !== next) el.setAttribute('src', next);
   }
-  function step(dir){
+  function rows(){
+    var sheet = state.view === 'sheet';
+    $('gl').hidden = !(sheet && GL);
+    $('frame').hidden = !(sheet && !GL);
+    $('device').hidden = sheet;
+    $('device').dataset.view = state.view;
+    $('modes').hidden = !(sheet && GL);
+    stage.classList.toggle('is-screen', !sheet);
+    stage.classList.toggle('is-3d', sheet && GL && state.mode === '3d');
+    [].forEach.call($('modes').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', b.dataset.mode === state.mode ? 'true' : 'false'); });
+    [].forEach.call($('views').querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', b.dataset.view === state.view ? 'true' : 'false'); });
+  }
+  $('modes').addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (b){ setMode(b.dataset.mode); b.blur(); }   /* blur: the arrow keys turn pages, they must not ring the icon */
+  });
+  $('views').addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b || b.dataset.view === state.view) return;
+    state.view = b.dataset.view; b.blur();
+    rows(); paint(); fit();
+  });
+
+  /* ── THE FLAT BOOKLET (fallback) ── the document turns its own pages */
+  function stepFlat(dir){
     if (state.at === 0){
       if (!state.back && dir > 0) state.at = 1;
       else if (state.back && dir < 0){ state.back = false; state.at = N; }
@@ -105,54 +342,70 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
     }
     var f = $('frame'); f.classList.add('is-easing');
     paint(); fit();
-    clearTimeout(step.t); step.t = setTimeout(function(){ f.classList.remove('is-easing'); }, 950);
+    clearTimeout(stepFlat.t); stepFlat.t = setTimeout(function(){ f.classList.remove('is-easing'); }, 950);
   }
+  function step(dir){ if (state.view !== 'sheet') return; if (GL) step3d(dir); else stepFlat(dir); }
 
-  /* Fit, recomputed on every resize and on every open/close: the booklet fills
-     the space between the chrome at any size (it scales up past 1440 too).
-     A closed booklet is one page wide, so it is fitted as one page — on a
-     phone that is what makes the cover readable. The scale eases with the
-     turn (0.9 s), so opening grows the booklet instead of jumping. */
-  function fit(){
-    var phone = innerWidth < 768;
-    /* Desktop and up (2026-09-30): the booklet is always 80% of the viewport
-       height — narrowed only if the window is too narrow for it. */
-    var padX = phone ? 32 : 96, padY = phone ? 176 : 192;
-    var w = state.at === 0 ? W / 2 : W;
-    var k = innerWidth >= 1024
-      ? Math.min(innerHeight * .8 / H, (innerWidth - padX) / w)
-      : Math.min((innerWidth - padX) / w, (innerHeight - padY) / H);
-    var f = $('frame');
-    f.style.width = W + 'px'; f.style.height = H + 'px';
-    f.style.transform = 'scale(' + k.toFixed(3) + ')';
-  }
-
-  /* click zones: the outer half of each page; a closed booklet is one page in the middle */
+  /* ── TURNING BY HAND ──
+     A click on the outer half of a page turns it — found on the paper itself
+     in WebGL (a bent, turned page does not sit where its rectangle would), by
+     the frame's quarters in the flat booklet. In 3D a drag turns the booklet
+     in the hand instead; a press that moved more than 5 px is not a click. */
   function edgeAt(e){
+    if (state.view !== 'sheet') return 0;
+    if (GL){
+      var h = window.Sheet3D.hit(e.clientX, e.clientY);
+      return h && h.s >= .5 ? (h.even ? -1 : 1) : 0;
+    }
     var r = $('frame').getBoundingClientRect();
     if (e.clientY < r.top || e.clientY > r.bottom || e.clientX < r.left || e.clientX > r.right) return 0;
     var u = (e.clientX - r.left) / r.width;
     if (state.at === 0) return state.back ? (u >= .25 && u < .5 ? -1 : 0) : (u > .5 && u <= .75 ? 1 : 0);
     return u < .25 ? -1 : u > .75 ? 1 : 0;
   }
-  $('stage').addEventListener('click', function(e){ if (performance.now() - swiped < 400) return; var d = edgeAt(e); if (d) step(d); });
-  $('stage').addEventListener('mousemove', function(e){ $('stage').classList.toggle('is-edge', !!edgeAt(e)); });
+  var down = null, drag = null, swiped = 0;
+  function onStage(e){ return !(e.target.closest && e.target.closest('.modes, .views')); }
+  addEventListener('pointerdown', function(e){
+    if (state.view !== 'sheet' || !onStage(e) || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    down = { x:e.clientX, y:e.clientY };
+    if (GL && state.mode === '3d'){
+      camAnim = null;
+      drag = { x:e.clientX, y:e.clientY, yaw:cam.yaw, pitch:cam.pitch };
+      stage.classList.add('is-drag');
+      if (e.pointerType === 'mouse') e.preventDefault();
+    }
+  });
+  addEventListener('pointermove', function(e){
+    if (drag){
+      cam.yaw = drag.yaw + (e.clientX - drag.x) * .4;
+      cam.pitch = Math.max(-85, Math.min(85, drag.pitch - (e.clientY - drag.y) * .4));
+      apply3d();
+      return;
+    }
+    if (!down && e.pointerType === 'mouse') stage.classList.toggle('is-edge', onStage(e) && !!edgeAt(e));
+  });
+  ['pointerup', 'pointercancel'].forEach(function(k){
+    addEventListener(k, function(e){
+      var d = down; down = null; drag = null; stage.classList.remove('is-drag');
+      if (k !== 'pointerup' || !d || performance.now() - swiped < 400) return;
+      if (Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y) > 5) return;
+      var dir = edgeAt(e); if (dir) step(dir);
+    });
+  });
   addEventListener('keydown', function(e){
+    if (state.view !== 'sheet') return;
     if (e.key === 'ArrowRight'){ e.preventDefault(); step(1); }
     else if (e.key === 'ArrowLeft'){ e.preventDefault(); step(-1); }
   });
-  /* Swipe on touch screens (2026-09-30): right to left turns forward, left
-     to right turns back — the way a page is turned by hand. Horizontal only:
-     a swipe that is mostly vertical is ignored, so a thumb resting on the
-     screen does not turn anything. A quick short flick counts too (speed),
-     and swipes in a row riffle, like quick clicks. The tap that ends a swipe
-     is not also taken as a click on a page edge. */
-  var sw = null, swiped = 0;
-  $('stage').addEventListener('touchstart', function(e){
-    if (e.touches.length !== 1){ sw = null; return; }
+  /* Swipe on touch screens: right to left turns forward, left to right turns
+     back. Horizontal only; a quick short flick counts too. Not in 3D — there
+     the finger turns the booklet itself, and a page is turned by a tap. */
+  var sw = null;
+  addEventListener('touchstart', function(e){
+    if (state.view !== 'sheet' || (GL && state.mode === '3d') || e.touches.length !== 1 || !onStage(e)){ sw = null; return; }
     sw = { x:e.touches[0].clientX, y:e.touches[0].clientY, t:performance.now() };
   }, { passive:true });
-  $('stage').addEventListener('touchend', function(e){
+  addEventListener('touchend', function(e){
     if (!sw) return;
     var dx = e.changedTouches[0].clientX - sw.x, dy = e.changedTouches[0].clientY - sw.y;
     var dt = performance.now() - sw.t; sw = null;
@@ -162,9 +415,11 @@ body{background:var(--black);color:var(--white);font-family:var(--font-primary);
       step(dx < 0 ? 1 : -1);
     }
   });
-  $('stage').addEventListener('touchcancel', function(){ sw = null; });
+  addEventListener('touchcancel', function(){ sw = null; });
+
   addEventListener('resize', fit);
-  fit(); paint();
+  rows(); fit(); paint();
+  if (GL){ apply3d(); loadSide(0); }
 }());
 </script>
 </body>

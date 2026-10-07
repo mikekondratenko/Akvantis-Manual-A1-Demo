@@ -25,7 +25,16 @@
    The number lives on paper, not on the tools' dark rail, so its black and
    white come from the mock-up's library (Black Shades / Black 100 #010006,
    White Shades / White #FDFEFF) rather than the kit's `--black` #111211.
-   Override `--num-ink` and `--num-paper` on any ancestor. */
+   Override `--num-ink` and `--num-paper` on any ancestor.
+
+   ── TWO DIGITS (2026-10-07) ──
+   10 and up do not fit a disc at 2/3: at 16 px (the section bar) the figures
+   touched the edge and were cut. Markup says how many figures there are —
+   `data-digits="2"` — and the figure drops to 13/24 of the disc (13 px in a
+   24 disc, as drawn in the mock-up for «16») with tighter spacing. The disc
+   never widens: a row of numbers stays a row of equal circles.
+
+   <span class="num" data-digits="2">12</span> */
 .num{
   --num-size  : var(--number-24, 24px);
   --num-ink   : #010006;
@@ -40,9 +49,11 @@
   font-size:calc(var(--num-size) * 2 / 3);line-height:1;
   font-feature-settings:"lnum" 1, "pnum" 1;
   text-align:center;white-space:nowrap;
-  /* a two-digit number (10, 16) stays inside the disc instead of widening it */
   letter-spacing:-.02em;
 }
+/* a two-digit number (10, 16) stays inside the disc instead of widening it */
+.num[data-digits="2"]{font-size:calc(var(--num-size) * 13 / 24);letter-spacing:-.05em}
+.num[data-fill="simple"][data-digits="2"]{font-size:calc(var(--num-size) * 5 / 6);letter-spacing:-.02em}
 .num[data-fill="off"]{
   background:none;color:var(--num-ink);
   border:calc(var(--num-size) / 24) solid var(--num-ink);

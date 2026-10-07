@@ -13,7 +13,7 @@
     }
   },
   "cover": {
-    "mode": "blocks",
+    "mode": "image",
     "image": "",
     "blocks": [
       {
@@ -164,18 +164,58 @@
         "w": 100,
         "h": 127
       }
-    ]
+    ],
+    "imageL": "assets/screen/page-18.webp",
+    "imageR": "assets/screen/page-01.webp"
   },
   "spreads": [
     {
       "id": "sp1",
       "mode": "image",
-      "image": "assets/screen/spread-02-03.webp"
+      "imageL": "assets/screen/page-02.webp",
+      "imageR": "assets/screen/page-03.webp"
     },
     {
       "id": "sp2",
       "mode": "image",
-      "image": "assets/screen/spread-04-05.webp"
+      "imageL": "assets/screen/page-04.webp",
+      "imageR": "assets/screen/page-05.webp"
+    },
+    {
+      "id": "sp3",
+      "mode": "image",
+      "imageL": "assets/screen/page-06.webp",
+      "imageR": "assets/screen/page-07.webp"
+    },
+    {
+      "id": "sp4",
+      "mode": "image",
+      "imageL": "assets/screen/page-08.webp",
+      "imageR": "assets/screen/page-09.webp"
+    },
+    {
+      "id": "sp5",
+      "mode": "image",
+      "imageL": "assets/screen/page-10.webp",
+      "imageR": "assets/screen/page-11.webp"
+    },
+    {
+      "id": "sp6",
+      "mode": "image",
+      "imageL": "assets/screen/page-12.webp",
+      "imageR": "assets/screen/page-13.webp"
+    },
+    {
+      "id": "sp7",
+      "mode": "image",
+      "imageL": "assets/screen/page-14.webp",
+      "imageR": "assets/screen/page-15.webp"
+    },
+    {
+      "id": "sp8",
+      "mode": "image",
+      "imageL": "assets/screen/page-16.webp",
+      "imageR": "assets/screen/page-17.webp"
     }
   ],
   "sections": [
@@ -200,17 +240,17 @@
             },
             {
               "art": "assets/art/box/pcb-filter.png",
-              "name": "PCB Filter",
+              "name": "2-in-1 Sediment + Carbon Filter",
               "count": "1x",
-              "desc": "Sediment + carbon",
-              "label": "PCB Filter"
+              "desc": "Cartridge I",
+              "label": "2-in-1 Sediment + Carbon Filter"
             },
             {
               "art": "assets/art/box/ro-filter.png",
-              "name": "RO Filter",
+              "name": "RO Membrane",
               "count": "1x",
-              "desc": "Reverse osmosis membrane",
-              "label": "RO Filter"
+              "desc": "Cartridge II",
+              "label": "RO Membrane"
             },
             {
               "art": "assets/art/box/power-adapter.png",
@@ -221,10 +261,10 @@
             },
             {
               "art": "assets/art/box/mineralizer-filter.png",
-              "name": "Mineralizer",
+              "name": "Mineralizator",
               "count": "1x",
-              "desc": "Post-filter, in-line",
-              "label": "Mineralizer"
+              "desc": "Cartridge III",
+              "label": "Mineralizator"
             }
           ]
         },
@@ -365,7 +405,7 @@
     },
     {
       "id": "tools",
-      "title": "Tools",
+      "title": "Tools required",
       "style": "group",
       "page": 2,
       "span": 3,
@@ -414,195 +454,743 @@
             }
           ]
         }
-      ]
+      ],
+      "navTitle": "Tools"
     },
     {
       "id": "overview",
       "title": "Overview",
       "style": "title",
-      "page": 2,
+      "page": 0,
       "span": 12,
       "blocks": [
         {
-          "id": "b6",
-          "type": "image",
-          "art": "assets/screen/a1-unit.webp",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 12,
-          "caption": "A1 under the sink — the installed system"
+          "id": "pg03",
+          "type": "page",
+          "page": 3,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p03-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 736,
+              "h": 1026,
+              "hotspots": [
+                {
+                  "x": 45,
+                  "y": 19,
+                  "art": "assets/photos/trimmed/k1-st.png",
+                  "name": "Faucet K1",
+                  "desc": "Drinking Water Faucet",
+                  "button": "Buy K1",
+                  "url": "https://akvantis.de"
+                },
+                {
+                  "x": 36,
+                  "y": 57,
+                  "ref": "assets/art/box/system-unit.png"
+                },
+                {
+                  "x": 22,
+                  "y": 64,
+                  "ref": "assets/art/box/pcb-filter.png"
+                },
+                {
+                  "x": 22.5,
+                  "y": 72.5,
+                  "ref": "assets/art/box/ro-filter.png"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
     {
-      "id": "installation",
-      "title": "Installation",
+      "id": "faucet-k1",
+      "title": "Installation / Faucet K1",
       "style": "title",
-      "page": 3,
+      "page": 0,
       "span": 12,
       "blocks": [
         {
-          "id": "b7",
-          "type": "step",
-          "art": "assets/art/box/cartridges.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
+          "id": "pg04",
+          "type": "page",
+          "page": 4,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p04-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 362,
+              "h": 449,
+              "n": 1,
+              "caption": "Drill hole"
+            },
+            {
+              "art": "assets/art/cards/p04-2.webp",
+              "x": 374,
+              "y": 0,
+              "w": 362,
+              "h": 506,
+              "n": 2,
+              "caption": "Insert K1 faucet"
+            },
+            {
+              "art": "assets/art/cards/p04-3.webp",
+              "x": 0,
+              "y": 462,
+              "w": 362,
+              "h": 564,
+              "n": 3,
+              "caption": "Overview"
+            },
+            {
+              "art": "assets/art/cards/p04-4.webp",
+              "x": 374,
+              "y": 519,
+              "w": 362,
+              "h": 276,
+              "n": 4,
+              "caption": "Tighten nut"
+            },
+            {
+              "art": "assets/art/cards/p04-5.webp",
+              "x": 374,
+              "y": 808,
+              "w": 362,
+              "h": 218,
+              "n": 5,
+              "caption": "Hand-tighten, no tools"
+            }
+          ]
         },
         {
-          "id": "b8",
-          "type": "step",
-          "art": "assets/art/box/mineralizer-filter.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b9",
-          "type": "step",
-          "art": "assets/art/box/power-adapter.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b10",
-          "type": "step",
-          "art": "assets/art/box/straight-connector-3-8.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b11",
-          "type": "step",
-          "art": "assets/art/box/l-type-connector-3-8.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b12",
-          "type": "step",
-          "art": "assets/art/box/l-type-connector-1-4.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
+          "id": "pg05",
+          "type": "page",
+          "page": 5,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p05-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 736,
+              "h": 1026,
+              "caption": "Overview with K1 Faucet",
+              "hotspots": [
+                {
+                  "x": 59,
+                  "y": 25,
+                  "art": "assets/photos/trimmed/k1-st.png",
+                  "name": "Faucet K1",
+                  "desc": "Drinking Water Faucet",
+                  "button": "Buy K1",
+                  "url": "https://akvantis.de"
+                },
+                {
+                  "x": 40.5,
+                  "y": 61,
+                  "ref": "assets/art/box/drain-saddle.png"
+                },
+                {
+                  "x": 56,
+                  "y": 70,
+                  "ref": "assets/art/box/mineralizer-filter.png"
+                },
+                {
+                  "x": 23.5,
+                  "y": 68,
+                  "ref": "assets/art/box/inlet-3-way-ball-valve.png"
+                },
+                {
+                  "x": 72,
+                  "y": 63,
+                  "ref": "assets/art/box/system-unit.png"
+                },
+                {
+                  "x": 49.8,
+                  "y": 62.5,
+                  "ref": "assets/art/box/pe-tubing-1-4-grey.png",
+                  "desc": "Grey · drain, from the unit to the drain saddle"
+                },
+                {
+                  "x": 40.6,
+                  "y": 75.3,
+                  "ref": "assets/art/box/pe-tubing-3-8-red.png",
+                  "desc": "Red · water inlet, from the valve to the unit"
+                },
+                {
+                  "x": 56.3,
+                  "y": 51,
+                  "ref": "assets/art/box/pe-tubing-3-8-blue.png",
+                  "desc": "Blue · pure water, from the unit to the faucet"
+                },
+                {
+                  "x": 55.7,
+                  "y": 77.1,
+                  "ref": "assets/art/box/straight-connector-3-8.png",
+                  "desc": "Two, on both ends of the mineralizator"
+                },
+                {
+                  "x": 61.1,
+                  "y": 85.9,
+                  "ref": "assets/art/box/l-type-connector-3-8.png",
+                  "desc": "On the Inlet and Pure ports; a 1/4\" one on Drain"
+                }
+              ]
+            }
+          ],
+          "product": {
+            "photo": "assets/photos/trimmed/k1-st.png",
+            "name": "Faucet K1",
+            "kind": "Drinking Water Faucet",
+            "button": "Buy K1",
+            "url": "https://akvantis.de"
+          }
         }
-      ]
+      ],
+      "navTitle": "Faucet K1",
+      "group": "Installation",
+      "groupId": "installation"
     },
     {
-      "id": "installation-2",
-      "title": "",
+      "id": "faucet-k3",
+      "title": "Installation / Faucet K3",
       "style": "title",
-      "page": 4,
+      "page": 0,
       "span": 12,
       "blocks": [
         {
-          "id": "b13",
-          "type": "step",
-          "art": "assets/art/box/inlet-3-way-ball-valve.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
+          "id": "pg06",
+          "type": "page",
+          "page": 6,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p06-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 362,
+              "h": 622,
+              "n": 1,
+              "caption": "Insert K3 faucet"
+            },
+            {
+              "art": "assets/art/cards/p06-2.webp",
+              "x": 374,
+              "y": 0,
+              "w": 362,
+              "h": 506,
+              "n": 2,
+              "caption": "Connect blue tube"
+            },
+            {
+              "art": "assets/art/cards/p06-3.webp",
+              "x": 0,
+              "y": 635,
+              "w": 362,
+              "h": 391,
+              "n": 3,
+              "caption": "Attach connector"
+            },
+            {
+              "art": "assets/art/cards/p06-4.webp",
+              "x": 374,
+              "y": 519,
+              "w": 362,
+              "h": 507,
+              "n": 4,
+              "caption": "Connect to mineralizator"
+            }
+          ]
         },
         {
-          "id": "b14",
-          "type": "step",
-          "art": "assets/art/box/drain-saddle.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b15",
-          "type": "step",
-          "art": "assets/art/box/lock-clips.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b16",
-          "type": "step",
-          "art": "assets/art/box/pe-tubing-3-8-blue.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6,
-          "label": "Prepare"
-        },
-        {
-          "id": "b17",
-          "type": "step",
-          "art": "assets/art/box/pe-tubing-3-8-red.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b18",
-          "type": "step",
-          "art": "assets/art/box/pe-tubing-1-4-grey.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
+          "id": "pg07",
+          "type": "page",
+          "page": 7,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p07-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 736,
+              "h": 1026,
+              "caption": "Overview with K3 Faucet",
+              "hotspots": [
+                {
+                  "x": 33,
+                  "y": 30,
+                  "art": "assets/photos/trimmed/k3.png",
+                  "name": "Faucet K3",
+                  "desc": "Drinking Water Faucet",
+                  "button": "Buy K3",
+                  "url": "https://akvantis.de"
+                },
+                {
+                  "x": 41,
+                  "y": 61,
+                  "ref": "assets/art/box/drain-saddle.png"
+                },
+                {
+                  "x": 56.5,
+                  "y": 70,
+                  "ref": "assets/art/box/mineralizer-filter.png"
+                },
+                {
+                  "x": 24.5,
+                  "y": 68,
+                  "ref": "assets/art/box/inlet-3-way-ball-valve.png"
+                },
+                {
+                  "x": 72,
+                  "y": 63,
+                  "ref": "assets/art/box/system-unit.png"
+                },
+                {
+                  "x": 50.4,
+                  "y": 62.5,
+                  "ref": "assets/art/box/pe-tubing-1-4-grey.png",
+                  "desc": "Grey · drain, from the unit to the drain saddle"
+                },
+                {
+                  "x": 41.1,
+                  "y": 75.3,
+                  "ref": "assets/art/box/pe-tubing-3-8-red.png",
+                  "desc": "Red · water inlet, from the valve to the unit"
+                },
+                {
+                  "x": 56.5,
+                  "y": 60.5,
+                  "ref": "assets/art/box/pe-tubing-3-8-blue.png",
+                  "desc": "Blue · pure water, from the unit to the faucet"
+                },
+                {
+                  "x": 56.2,
+                  "y": 77.1,
+                  "ref": "assets/art/box/straight-connector-3-8.png",
+                  "desc": "Two, on both ends of the mineralizator"
+                },
+                {
+                  "x": 61.6,
+                  "y": 85.9,
+                  "ref": "assets/art/box/l-type-connector-3-8.png",
+                  "desc": "On the Inlet and Pure ports; a 1/4\" one on Drain"
+                }
+              ]
+            }
+          ],
+          "product": {
+            "photo": "assets/photos/trimmed/k3.png",
+            "name": "Faucet K3",
+            "kind": "Drinking Water Faucet",
+            "button": "Buy K3",
+            "url": "https://akvantis.de"
+          }
         }
-      ]
+      ],
+      "navTitle": "Faucet K3",
+      "group": "Installation",
+      "groupId": "installation"
+    },
+    {
+      "id": "valve",
+      "title": "Installation / Valve",
+      "style": "title",
+      "page": 0,
+      "span": 12,
+      "blocks": [
+        {
+          "id": "pg08",
+          "type": "page",
+          "page": 8,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p08-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 424,
+              "h": 333,
+              "n": 1,
+              "caption": "Unscrew cold hose"
+            },
+            {
+              "art": "assets/art/cards/p08-2.webp",
+              "x": 437,
+              "y": 0,
+              "w": 299,
+              "h": 333,
+              "n": 2,
+              "caption": "Insert 3-way valve"
+            },
+            {
+              "art": "assets/art/cards/p08-3.webp",
+              "x": 0,
+              "y": 346,
+              "w": 486,
+              "h": 334,
+              "n": 3,
+              "caption": "Tighten connections"
+            },
+            {
+              "art": "assets/art/cards/p08-4.webp",
+              "x": 499,
+              "y": 346,
+              "w": 237,
+              "h": 334,
+              "n": 4,
+              "caption": "Insert red tube"
+            },
+            {
+              "art": "assets/art/cards/p08-5.webp",
+              "x": 0,
+              "y": 693,
+              "w": 237,
+              "h": 333,
+              "n": 5,
+              "caption": "Lock with clip"
+            },
+            {
+              "art": "assets/art/cards/p08-6.webp",
+              "x": 250,
+              "y": 693,
+              "w": 486,
+              "h": 333,
+              "n": 6
+            }
+          ]
+        }
+      ],
+      "navTitle": "Valve",
+      "group": "Installation",
+      "groupId": "installation"
+    },
+    {
+      "id": "drain",
+      "title": "Installation / Drain",
+      "style": "title",
+      "page": 0,
+      "span": 12,
+      "blocks": [
+        {
+          "id": "pg09",
+          "type": "page",
+          "page": 9,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p09-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 299,
+              "h": 333,
+              "n": 1,
+              "caption": "Drill hole in pipe"
+            },
+            {
+              "art": "assets/art/cards/p09-2.webp",
+              "x": 312,
+              "y": 0,
+              "w": 424,
+              "h": 333,
+              "n": 2,
+              "caption": "Fit drain clamp"
+            },
+            {
+              "art": "assets/art/cards/p09-3.webp",
+              "x": 0,
+              "y": 346,
+              "w": 736,
+              "h": 334,
+              "n": 3,
+              "caption": "Insert gray tube"
+            },
+            {
+              "art": "assets/art/cards/p09-4.webp",
+              "x": 0,
+              "y": 693,
+              "w": 736,
+              "h": 333
+            }
+          ]
+        }
+      ],
+      "navTitle": "Drain",
+      "group": "Installation",
+      "groupId": "installation"
+    },
+    {
+      "id": "tubes",
+      "title": "Installation / Tubes",
+      "style": "title",
+      "page": 0,
+      "span": 12,
+      "blocks": [
+        {
+          "id": "pg10",
+          "type": "page",
+          "page": 10,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p10-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 736,
+              "h": 333,
+              "n": 1,
+              "caption": "Find the ports"
+            },
+            {
+              "art": "assets/art/cards/p10-2.webp",
+              "x": 0,
+              "y": 346,
+              "w": 362,
+              "h": 334,
+              "n": 2,
+              "caption": "Remove plugs"
+            },
+            {
+              "art": "assets/art/cards/p10-3.webp",
+              "x": 374,
+              "y": 346,
+              "w": 362,
+              "h": 391,
+              "n": 3
+            },
+            {
+              "art": "assets/art/cards/p10-4.webp",
+              "x": 0,
+              "y": 693,
+              "w": 362,
+              "h": 333,
+              "n": 4,
+              "caption": "Insert L-connectors"
+            },
+            {
+              "art": "assets/art/cards/p10-5.webp",
+              "x": 374,
+              "y": 750,
+              "w": 362,
+              "h": 276,
+              "n": 5
+            }
+          ]
+        },
+        {
+          "id": "pg11",
+          "type": "page",
+          "page": 11,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p11-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 362,
+              "h": 333,
+              "n": 6,
+              "caption": "Insert tubes"
+            },
+            {
+              "art": "assets/art/cards/p11-2.webp",
+              "x": 374,
+              "y": 0,
+              "w": 362,
+              "h": 333,
+              "n": 7
+            },
+            {
+              "art": "assets/art/cards/p11-3.webp",
+              "x": 0,
+              "y": 346,
+              "w": 736,
+              "h": 680,
+              "n": 8,
+              "caption": "20 mm inside the fitting",
+              "info": true
+            }
+          ]
+        }
+      ],
+      "navTitle": "Tubes",
+      "group": "Installation",
+      "groupId": "installation"
+    },
+    {
+      "id": "mineralizator",
+      "title": "Installation / Mineralizator",
+      "style": "title",
+      "page": 0,
+      "span": 12,
+      "blocks": [
+        {
+          "id": "pg12",
+          "type": "page",
+          "page": 12,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p12-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 362,
+              "h": 564,
+              "n": 1,
+              "caption": "Attach 2× straight connector"
+            },
+            {
+              "art": "assets/art/cards/p12-2.webp",
+              "x": 374,
+              "y": 0,
+              "w": 362,
+              "h": 449,
+              "n": 2
+            },
+            {
+              "art": "assets/art/cards/p12-3.webp",
+              "x": 0,
+              "y": 577,
+              "w": 362,
+              "h": 449,
+              "n": 3,
+              "caption": "Lock with clips"
+            },
+            {
+              "art": "assets/art/cards/p12-4.webp",
+              "x": 374,
+              "y": 462,
+              "w": 362,
+              "h": 564,
+              "n": 4,
+              "caption": "Lock with clips"
+            }
+          ]
+        },
+        {
+          "id": "pg13",
+          "type": "page",
+          "page": 13,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p13-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 736,
+              "h": 1026,
+              "n": 5,
+              "caption": "Mineralizator installed"
+            }
+          ]
+        }
+      ],
+      "navTitle": "Mineralizator",
+      "group": "Installation",
+      "groupId": "installation"
     },
     {
       "id": "first-start",
       "title": "First Start",
       "style": "title",
-      "page": 5,
+      "page": 0,
       "span": 12,
       "blocks": [
         {
-          "id": "b19",
-          "type": "step",
-          "art": "assets/art/tools/drill-driver.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
+          "id": "pg14",
+          "type": "page",
+          "page": 14,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p14-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 736,
+              "h": 506,
+              "n": 1,
+              "caption": "Check both filters are locked in"
+            },
+            {
+              "art": "assets/art/cards/p14-2.webp",
+              "x": 0,
+              "y": 519,
+              "w": 362,
+              "h": 507,
+              "n": 2,
+              "caption": "Check tubes and clips"
+            },
+            {
+              "art": "assets/art/cards/p14-3.webp",
+              "x": 374,
+              "y": 519,
+              "w": 362,
+              "h": 507,
+              "n": 3,
+              "caption": "Check drain tube"
+            }
+          ]
         },
         {
-          "id": "b20",
-          "type": "step",
-          "art": "assets/art/tools/bits.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b21",
-          "type": "step",
-          "art": "assets/art/tools/wrench-screwdriver.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b22",
-          "type": "step",
-          "art": "assets/art/tools/pipe-key.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b23",
-          "type": "step",
-          "art": "assets/screen/a1-unit.webp",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b24",
-          "type": "step",
-          "art": "assets/art/box/cartridges.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
+          "id": "pg15",
+          "type": "page",
+          "page": 15,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p15-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 299,
+              "h": 276,
+              "n": 4,
+              "caption": "Open inlet valve"
+            },
+            {
+              "art": "assets/art/cards/p15-2.webp",
+              "x": 312,
+              "y": 0,
+              "w": 424,
+              "h": 506,
+              "n": 5,
+              "caption": "Open faucet"
+            },
+            {
+              "art": "assets/art/cards/p15-3.webp",
+              "x": 0,
+              "y": 288,
+              "w": 299,
+              "h": 218,
+              "n": 6,
+              "caption": "Plug in"
+            },
+            {
+              "art": "assets/art/cards/p15-4.webp",
+              "x": 0,
+              "y": 519,
+              "w": 736,
+              "h": 507,
+              "n": 7,
+              "caption": "Ready to drink"
+            }
+          ]
         }
       ]
     },
@@ -612,31 +1200,69 @@
       "style": "title",
       "page": 0,
       "span": 12,
-      "numbering": "restart",
       "blocks": [
         {
-          "id": "b25",
-          "type": "step",
-          "art": "assets/art/box/mineralizer-filter.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b26",
-          "type": "step",
-          "art": "assets/art/box/power-adapter.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
-        },
-        {
-          "id": "b27",
-          "type": "step",
-          "art": "assets/art/box/straight-connector-3-8.png",
-          "fit": "contain",
-          "ratio": "4 / 3",
-          "span": 6
+          "id": "pg16",
+          "type": "page",
+          "page": 16,
+          "w": 736,
+          "h": 1026,
+          "cards": [
+            {
+              "art": "assets/art/cards/p16-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 362,
+              "h": 276,
+              "n": 1,
+              "caption": "Close inlet valve"
+            },
+            {
+              "art": "assets/art/cards/p16-2.webp",
+              "x": 374,
+              "y": 0,
+              "w": 362,
+              "h": 391,
+              "n": 2,
+              "caption": "Open faucet until water stops"
+            },
+            {
+              "art": "assets/art/cards/p16-3.webp",
+              "x": 0,
+              "y": 288,
+              "w": 362,
+              "h": 276,
+              "n": 3,
+              "caption": "Release old filter"
+            },
+            {
+              "art": "assets/art/cards/p16-4.webp",
+              "x": 374,
+              "y": 404,
+              "w": 362,
+              "h": 391,
+              "n": 4,
+              "caption": "Insert new filter until click"
+            },
+            {
+              "art": "assets/art/cards/p16-5.webp",
+              "x": 0,
+              "y": 577,
+              "w": 362,
+              "h": 449,
+              "n": 5,
+              "caption": "Open valve & faucet"
+            },
+            {
+              "art": "assets/art/cards/p16-6.webp",
+              "x": 374,
+              "y": 808,
+              "w": 362,
+              "h": 218,
+              "n": 6,
+              "caption": "Hold 3 s to reset"
+            }
+          ]
         }
       ]
     },
@@ -737,6 +1363,112 @@
             }
           ],
           "view": "table"
+        }
+      ]
+    },
+    {
+      "id": "indicators",
+      "title": "Indicators",
+      "style": "title",
+      "page": 0,
+      "span": 12,
+      "numbering": "restart",
+      "blocks": [
+        {
+          "id": "ind1",
+          "type": "indicators",
+          "label": "Indicator",
+          "key": [
+            "on",
+            "flashing",
+            "breathing"
+          ],
+          "rows": [
+            {
+              "name": "I · II  Filter",
+              "states": [
+                {
+                  "c": "blue",
+                  "m": "on",
+                  "t": "Filter OK"
+                },
+                {
+                  "c": "red",
+                  "m": "flashing",
+                  "t": "Replace soon"
+                },
+                {
+                  "c": "red",
+                  "m": "on",
+                  "t": "Replace now"
+                }
+              ]
+            },
+            {
+              "name": "Flush",
+              "states": [
+                {
+                  "c": "blue",
+                  "m": "on",
+                  "t": "Ready"
+                },
+                {
+                  "c": "red",
+                  "m": "flashing",
+                  "t": "Flushing"
+                },
+                {
+                  "c": "red",
+                  "m": "on",
+                  "t": "Fault"
+                }
+              ]
+            },
+            {
+              "name": "Power",
+              "states": [
+                {
+                  "c": "blue",
+                  "m": "breathing",
+                  "t": "Standby"
+                },
+                {
+                  "c": "blue",
+                  "m": "on",
+                  "t": "Working"
+                },
+                {
+                  "c": "red",
+                  "m": "flashing",
+                  "t": "Fault"
+                }
+              ]
+            },
+            {
+              "name": "All flashing + beep",
+              "alarm": true,
+              "states": [
+                {
+                  "lights": [
+                    "blue",
+                    "blue",
+                    "blue",
+                    "blue"
+                  ],
+                  "t": "Water ran 30 min non-stop — restart the unit"
+                },
+                {
+                  "lights": [
+                    "blue",
+                    "blue",
+                    "blue",
+                    "red"
+                  ],
+                  "t": "Leak detected — close inlet valve, restart"
+                }
+              ]
+            }
+          ]
         }
       ]
     },

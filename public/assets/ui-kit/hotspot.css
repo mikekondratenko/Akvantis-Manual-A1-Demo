@@ -1,0 +1,47 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   HOTSPOT — a "+" in a black disc on a picture: «there is more about this
+   part, press». Requires tokens.css. Added 2026-10-07 (A1 manual, overview
+   pictures); a sibling of NUMBER (number.css): the same black disc, the same
+   print colours, a plus where the figure is.
+
+   <button type="button" class="hotspot" aria-label="A1 Unit"></button>
+
+   It is a <button>: what it opens (a pop-up, a panel) is the page's business,
+   so it needs a name — `aria-label` — and nothing inside it. The plus is drawn,
+   not typed, so it stays crisp and centred at any size.
+
+   ── ONE SIZE, EVERYTHING ELSE FROM IT ──
+   `--hot-size` (32 by default; 40 on a wide screen is the manual's choice).
+   The plus is 3/8 of the disc across, its stroke 1/16.
+
+   ── BLACK ONLY, NOTHING AROUND IT ──
+   One look: black disc, white plus — the number's default. No rim and no
+   moving ring (both tried and taken off, 2026-10-07): it is a quiet mark.
+   Where it stands relative to the part is the page's choice (the manual
+   draws it 10 px to the right of the point it marks).
+   Pressed: scale .94, as the kit's `.btn`.
+
+   Colours are the number's: override `--hot-ink` / `--hot-paper` on any ancestor.
+   Placing it (position, left, top) is the page's job, not the kit's.
+   ───────────────────────────────────────────────────────────────────────────── */
+.hotspot{
+  --hot-size  : var(--number-32, 32px);
+  --hot-ink   : #010006;
+  --hot-paper : #FDFEFF;
+
+  position:relative;display:inline-block;flex:none;box-sizing:border-box;
+  width:var(--hot-size);height:var(--hot-size);padding:0;margin:0;
+  border:0;border-radius:999px;
+  background:var(--hot-ink);color:var(--hot-paper);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:transform .08s;
+}
+.hotspot::before,.hotspot::after{
+  content:'';position:absolute;left:50%;top:50%;
+  width:calc(var(--hot-size) * 3 / 8);height:calc(var(--hot-size) / 16);
+  margin:calc(var(--hot-size) / -32) 0 0 calc(var(--hot-size) * -3 / 16);
+  background:currentColor;border-radius:999px;
+}
+.hotspot::after{transform:rotate(90deg)}
+.hotspot:active{transform:scale(.94)}
+.hotspot:focus-visible{outline:calc(var(--hot-size) / 16) solid var(--hot-ink);outline-offset:calc(var(--hot-size) / 8)}

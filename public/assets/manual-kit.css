@@ -56,7 +56,7 @@
   --r-dur         : .2s;
   --r-acc-dur     : .3s;                        /* accordion open / close */
   --r-ease        : cubic-bezier(.2, 0, 0, 1);
-  --r-num-active  : 1.8;
+  --r-num-active  : 1.6;
   --lh-tight      : 1.2;
   --lh-snug       : 1.3;
   --lh-body       : 1.4;
@@ -283,3 +283,233 @@
 .m-fault li{padding:var(--space-12) 0;border-top:var(--hairline) solid var(--black-100)}
 .m-fault li p{margin:0;font-size:var(--text-16);line-height:var(--lh-body);font-weight:var(--fw-medium)}
 .m-faultlist .m-fault-fix{margin-top:var(--space-4);color:var(--black-350)}
+
+
+/* ═══════════════ CARD · CAPTION · PAGE (2026-10-07) ═══════════════
+   The printed manual's picture frames on screen. A card is its art — the
+   frame exported from Figma WITHOUT the number and the caption — and those two
+   set in type over it: `.num` (ui-kit/kit/number.css) top left, `.m-cap`
+   bottom left. So a caption is the same size on a card that fills a phone and
+   on one that is a third of a page, and it can be translated.
+
+   `.m-page` is one printed page of cards. Each card carries its place on the
+   page in mock-up units (`--x --y --w --h`, page `--pw --ph`).
+     phone   one column: every card as wide as the container, its own
+             proportion kept (`--w / --h`)
+     768+    the cards stand as on the printed page, one page across the
+             container, pages one under another — tablet and desktop alike
+   UI sizes step with the breakpoint, they do not scale with the picture. */
+.m-pages{display:grid;grid-template-columns:minmax(0, 1fr);gap:var(--space-12)}
+.m-page{display:grid;grid-template-columns:minmax(0, 1fr);gap:var(--space-12)}
+.m-card{
+  --m-card-in:var(--space-12);          /* number and caption to the frame's edge */
+  --num-size:var(--space-32);
+  position:relative;margin:0;min-width:0;
+  aspect-ratio:var(--w) / var(--h);
+  container-type:inline-size;
+}
+/* ONE FRAME FOR EVERY CARD (2026-10-07). The art has its rule and corner drawn
+   in, in the card's own scale — so a card shown at half size had a 1 px rule
+   and an 8 px corner next to a neighbour with 2 and 16. The frame is drawn
+   here instead: `--m-card-rule` and `--m-card-r`, the same on every card at
+   every width. The picture's own rule lies under ours (see `--bleed`). */
+.m-card{--m-card-rule:var(--space-2);--m-card-r:var(--radius-16);overflow:hidden;border-radius:var(--m-card-r)}
+.m-card-art{
+  /* 2026-10-07: the art is moved out by exactly as much as its own 2 u rule is
+     thicker than ours (2 px), so the two rules share an inner edge. Whatever
+     is drawn inside the card — the small inset tiles, 4 u from the rule in
+     Figma — keeps that distance. (It was 4 u flat, which ate the gap: the
+     tiles touched the frame.) */
+  --bleed:calc(2 * 100cqw / var(--w) - var(--m-card-rule));
+  position:absolute;left:calc(var(--bleed) * -1);top:calc(var(--bleed) * -1);
+  width:calc(100% + 2 * var(--bleed));height:calc(100% + 2 * var(--bleed));max-width:none;
+  display:block;object-fit:cover;
+  background:var(--m-grey-20);
+}
+.m-card::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  border:var(--m-card-rule) solid var(--m-ink);border-radius:inherit}
+.m-card > .num{position:absolute;z-index:2;left:var(--m-card-in);top:var(--m-card-in)}
+.m-card > .m-cap{position:absolute;z-index:2;left:var(--m-card-in);bottom:var(--m-card-in);max-width:calc(100% - 2 * var(--m-card-in))}
+
+/* ── CAPTION ── the white pill that names the action. `data-mode="black"`
+   inverts it; `.m-cap-i` is the information mark in front of the text. */
+.m-cap{
+  --cap-ink:var(--m-ink);--cap-paper:var(--m-paper);
+  display:inline-flex;align-items:center;gap:var(--space-8);box-sizing:border-box;margin:0;
+  min-height:var(--space-24);padding:var(--space-4) var(--space-8);
+  border-radius:var(--radius-12);
+  background:var(--cap-paper);color:var(--cap-ink);
+  font-family:var(--font-primary);font-weight:var(--fw-medium);
+  font-size:var(--text-14);line-height:var(--lh-tight);
+  font-feature-settings:"lnum" 1, "pnum" 1;
+}
+.m-cap[data-mode="black"]{--cap-ink:var(--m-paper);--cap-paper:var(--m-ink)}
+.m-cap-i{flex:none;width:var(--space-16);height:var(--space-16);margin-left:calc(var(--space-4) * -1)}
+.m-cap-i-in{fill:var(--cap-paper)}
+@media (min-width:768px){
+  .m-pages{gap:var(--space-24)}
+  .m-page{display:block;position:relative;aspect-ratio:var(--pw) / var(--ph)}
+  .m-page > .m-card{
+    position:absolute;aspect-ratio:auto;
+    left:calc(var(--x) / var(--pw) * 100%);top:calc(var(--y) / var(--ph) * 100%);
+    width:calc(var(--w) / var(--pw) * 100%);height:calc(var(--h) / var(--ph) * 100%);
+  }
+}
+/* 2026-10-07: the desktop keeps the tablet's principle — one page across the
+   container (the 8-column measure), pages one under another. No spread, no
+   breakout: every section of the manual has the same width. */
+@media (min-width:1440px){
+  .m-card{--m-card-in:var(--space-16);--num-size:var(--space-40)}
+  .m-cap{min-height:var(--space-32);padding:var(--space-4) var(--space-12);border-radius:var(--radius-16);font-size:var(--text-16)}
+  .m-cap-i{width:var(--space-24);height:var(--space-24);margin-left:calc(var(--space-8) * -1)}
+}
+
+/* ── HOTSPOT · POP-UP (2026-10-07) ──
+   The "+" is the kit's `.hotspot` (ui-kit/kit/hotspot.css: black disc, white
+   plus, a slow ring); `.m-hot` only puts it on the card, centred on its `left`
+   / `top`, and makes it 40 on a wide screen. A tap opens `.m-pop`, a
+   <dialog>: the part's picture (a cut-out, no plate), its name, a line about it,
+   a round close button. Closes on the button, on the scrim and on Esc. */
+/* `left` / `top` are the part itself; the disc stands `--m-hot-dx` (10 px) to its
+   right, so the part stays visible */
+.m-hot{--m-hot-dx:10px;position:absolute;z-index:2;margin:calc(var(--hot-size) / -2) 0 0 calc(var(--hot-size) / -2 + var(--m-hot-dx))}
+/* a phone: 24 — the tubes and fittings stand close together, and 32 would overlap */
+@media (max-width:767px){ .m-hot{--hot-size:var(--space-24)} }
+@media (min-width:1440px){ .m-hot{--hot-size:var(--space-40)} }
+.m-pop{box-sizing:border-box;width:min(22.5rem, calc(100vw - 2 * var(--space-16)));max-height:calc(100vh - 2 * var(--space-16));
+  margin:auto;padding:var(--space-12);border:0;border-radius:var(--radius-24, 24px);overflow:auto;
+  background:var(--m-paper);color:var(--m-ink);font-family:var(--font-primary);
+  box-shadow:0 var(--space-16) var(--space-48) rgba(1, 0, 6, .24)}
+.m-pop:focus{outline:none}
+.m-pop::backdrop{background:rgba(1, 0, 6, .4)}
+.m-pop[open]{animation:m-pop-in .25s cubic-bezier(.2, .7, .2, 1)}
+@keyframes m-pop-in{from{opacity:0;transform:translateY(var(--space-16))}}
+@media (prefers-reduced-motion: reduce){ .m-pop[open]{animation:none} }
+.m-pop-art{display:flex;align-items:center;justify-content:center;box-sizing:border-box;aspect-ratio:4 / 3;padding:var(--space-24);
+  /* 2026-10-07: no plate — the pictures are cut-outs and stand on the pop-up's own white */
+  }
+.m-pop-art img{max-width:100%;max-height:100%;display:block;object-fit:contain}
+.m-pop-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-16);padding:var(--space-16) var(--space-8) var(--space-8)}
+.m-pop-text{flex:1 1 auto;min-width:0}
+/* the button of a part sold apart (K1, K3): the kit's .btn, bottom right */
+.m-pop .btn[hidden]{display:none}
+.m-pop-name{margin:0;font-size:var(--text-20, 20px);font-weight:var(--fw-semibold);line-height:var(--lh-tight)}
+.m-pop-desc{margin:var(--space-4) 0 0;font-size:var(--text-14);font-weight:var(--fw-medium);line-height:var(--lh-tight);opacity:.56}
+.m-pop-desc:empty{display:none}
+.m-pop-x{position:absolute;right:var(--space-12);top:var(--space-12);box-sizing:border-box;width:var(--space-40);height:var(--space-40);padding:0;
+  border:0;border-radius:50%;background:var(--m-grey-20);color:var(--m-ink);cursor:pointer;transition:background .15s, color .15s, transform .08s}
+.m-pop-x::before,.m-pop-x::after{content:'';position:absolute;left:50%;top:50%;width:var(--space-16);height:var(--space-2);
+  margin:calc(var(--space-2) / -2) 0 0 calc(var(--space-16) / -2);background:currentColor;border-radius:1px;transform:rotate(45deg)}
+.m-pop-x::after{transform:rotate(-45deg)}
+.m-pop-x:active{transform:scale(.94)}
+.m-pop-x:focus-visible{outline:var(--space-2) solid var(--m-ink);outline-offset:var(--space-2)}
+@media (hover:hover){ .m-pop-x:hover{background:var(--m-ink);color:var(--m-paper)} }
+
+/* ── STAGES ── a section in several parts (Installation: Faucet K1 … Mineralizator).
+   `.m-stages` — the links to the parts, at the top of the section; `.m-stage` —
+   a part under its own heading, one step smaller than the section's. */
+.m-stages{display:flex;flex-wrap:wrap;gap:var(--space-8);margin:0 0 var(--space-24)}
+.m-stages a{display:inline-flex;align-items:center;box-sizing:border-box;height:var(--space-32);padding:0 var(--space-12);
+  border-radius:var(--radius-16);background:var(--m-grey-20);color:var(--m-ink);text-decoration:none;white-space:nowrap;
+  font-family:var(--font-primary);font-size:var(--text-14);font-weight:var(--fw-semibold);line-height:1}
+@media (hover:hover){ .m-stages a:hover{background:var(--m-ink);color:var(--m-paper)} }
+.m-stage{scroll-margin-top:var(--space-16)}
+.m-stage + .m-stage{margin-top:var(--space-32)}
+.m-stage-title{margin:0 0 var(--space-12);font-family:var(--font-primary);font-size:var(--text-18, 18px);font-weight:var(--fw-semibold);
+  line-height:var(--lh-tight);color:var(--m-ink)}
+@media (min-width:1024px){
+  .m-stage{scroll-margin-top:calc(var(--r-bar-h) + var(--space-24))}
+  .m-stage + .m-stage{margin-top:var(--space-48)}
+  .m-stage-title{font-size:var(--text-20, 20px);margin-bottom:var(--space-16)}
+}
+
+/* ── BUY ── the product a page offers (on paper: a QR code). The photo from the
+   library (no plate behind it), the name and the kind, the button to its page. */
+.m-buy{display:flex;align-items:center;gap:var(--space-12);box-sizing:border-box;
+  padding:var(--space-8) var(--space-12) var(--space-8) var(--space-8);border-radius:var(--radius-16);
+  background:var(--m-grey-20);font-family:var(--font-primary);color:var(--m-ink)}
+.m-buy-art{flex:none;display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+  width:var(--space-64);height:var(--space-64);padding:var(--space-4)}
+.m-buy-art img{max-width:100%;max-height:100%;display:block;object-fit:contain}
+.m-buy-text{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--space-2)}
+.m-buy-name{font-size:var(--text-16);font-weight:var(--fw-semibold);line-height:var(--lh-tight)}
+.m-buy-kind{font-size:var(--text-14);font-weight:var(--fw-medium);line-height:var(--lh-tight);opacity:.56}
+/* ── THE BUTTON ── ui-kit's `.btn` (ui-kit/kit/kit.css → BUTTONS): a pill, 48 high,
+   --text-13 / 600, the kit's transitions and pressed state. Restated here, as the
+   passport page does (ui-kit/passport/passport.css), because this page does not
+   load kit.css — that sheet is the dark tools' rail. Two things are the manual's
+   own: the ground is the page's ink (the kit's --black-700 is a dark page's
+   ground), and it is as wide as its words, not as its container.
+   ⚠ If the kit's button changes, this is the third place. */
+.m-buy .btn,.m-pop .btn{
+  flex:none;display:flex;align-items:center;justify-content:center;gap:var(--space-8);box-sizing:border-box;
+  width:auto;height:var(--number-48);padding:0 var(--space-24);border-radius:9999px;border:none;
+  background:var(--m-ink);color:var(--m-paper);
+  font-size:var(--text-13);font-weight:600;font-family:var(--font-primary);line-height:1;white-space:nowrap;
+  text-decoration:none;cursor:pointer;
+  transition:background .15s, color .15s, transform .08s;
+}
+.m-buy .btn:hover,.m-pop .btn:hover{background:var(--black-700)}
+.m-buy .btn:active,.m-pop .btn:active{transform:scale(.98)}
+.m-buy .btn:focus-visible,.m-pop .btn:focus-visible{outline:2px solid var(--m-ink);outline-offset:2px}
+@media (min-width:768px){
+  .m-buy{gap:var(--space-16);padding:var(--space-12) var(--space-16) var(--space-12) var(--space-12)}
+  .m-buy-art{width:var(--space-80, 80px);height:var(--space-80, 80px)}
+}
+
+/* ═══════════════ INDICATORS (2026-10-07) ═══════════════
+   The legend of the machine's four lights. `.m-light` is one light: `data-c`
+   its colour (blue · red · ink), `data-m` what it does — on (solid),
+   flashing (a dot in a dashed ring), breathing (a faint dot in a ring). On
+   screen flashing and breathing move, unless motion is reduced.
+   A phone lists a light's states under its name; from 768 they are columns. */
+.m-ind{font-family:var(--font-primary);font-weight:var(--fw-medium);color:var(--m-ink);font-size:var(--text-16);line-height:var(--lh-body)}
+.m-ind-row{display:grid;grid-template-columns:minmax(0, 1fr);gap:var(--space-8);padding:var(--space-12) 0;border-top:var(--hairline) solid var(--black-150)}
+.m-ind-row.is-key{border-top:var(--space-2) solid var(--m-ink);border-bottom:var(--space-2) solid var(--m-ink)}
+.m-ind-row.is-key + .m-ind-row{border-top:0}
+.m-ind-row.is-key .m-ind-name{display:none}
+.m-ind-row.is-key .m-ind-states{display:flex;flex-wrap:wrap;gap:var(--space-8) var(--space-24)}
+.m-ind-name{margin:0;font-size:inherit;line-height:inherit;font-weight:var(--fw-semibold)}
+.m-ind-states{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0, 1fr);gap:var(--space-8)}
+.m-ind-states li{display:flex;align-items:center;gap:var(--space-8);min-width:0}
+.m-ind-lights{display:inline-flex;gap:var(--space-4);flex:none}
+.m-light{--c:var(--m-ink);flex:none;box-sizing:border-box;width:var(--space-12);height:var(--space-12);border-radius:50%;background:var(--c)}
+.m-light[data-c="blue"]{--c:#1C87FF}
+.m-light[data-c="red"]{--c:#E8212B}
+.m-light[data-m="flashing"], .m-light[data-m="breathing"]{
+  width:calc(var(--space-12) + var(--space-2));height:calc(var(--space-12) + var(--space-2));
+  background:radial-gradient(circle closest-side, var(--c) 0 46%, transparent 52%);
+  border:calc(var(--hairline) * 1.5) dashed var(--c)}
+.m-light[data-m="breathing"]{border-style:solid;background:radial-gradient(circle closest-side, color-mix(in srgb, var(--c) 45%, transparent) 0 46%, transparent 52%)}
+@media (prefers-reduced-motion:no-preference){
+  .m-light[data-m="flashing"]{animation:m-light-flash 1s steps(1, end) infinite}
+  .m-light[data-m="breathing"]{animation:m-light-breathe 3s ease-in-out infinite}
+}
+@keyframes m-light-flash{ 0%{opacity:1} 50%{opacity:.25} }
+@keyframes m-light-breathe{ 0%,100%{opacity:1} 50%{opacity:.35} }
+@media (min-width:768px){
+  .m-ind-row{grid-template-columns:minmax(0, 3fr) minmax(0, 9fr);gap:var(--gg, var(--space-8));align-items:start}
+  .m-ind-row.is-key .m-ind-name{display:block}
+  .m-ind-states, .m-ind-row.is-key .m-ind-states{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:var(--space-8) var(--gg, var(--space-8))}
+  .m-ind-row.is-alarm .m-ind-states{grid-template-columns:minmax(0, 1fr)}
+}
+
+/* ═══════════════ REVEAL (2026-10-07) ═══════════════
+   Content comes in as it is scrolled to: a short rise and a fade. The shell
+   puts `has-reveal` on <html> (screen only, never with reduced motion, never in
+   a specimen or a capture) and `is-in` on a block when it enters the viewport;
+   blocks that arrive together follow each other by `--reveal-step`. Without
+   the script nothing is hidden. A card's picture is loaded lazily and fades in
+   over the grey ground once it has arrived (`is-loaded`). */
+:root{--reveal-rise:var(--space-16);--reveal-dur:.5s;--reveal-step:60ms;--reveal-ease:cubic-bezier(.2, .7, .2, 1)}
+.has-reveal .m-reveal{opacity:0;transform:translateY(var(--reveal-rise));
+  transition:opacity var(--reveal-dur) var(--reveal-ease) var(--reveal-delay, 0ms),
+             transform var(--reveal-dur) var(--reveal-ease) var(--reveal-delay, 0ms);
+  will-change:opacity, transform}
+.has-reveal .m-reveal.is-in{opacity:1;transform:none;will-change:auto}
+.has-reveal .m-card-art{opacity:0;transition:opacity .4s ease}
+.has-reveal .m-card-art.is-loaded{opacity:1}
+@media (prefers-reduced-motion: reduce){
+  .has-reveal .m-reveal{opacity:1;transform:none;transition:none}
+  .has-reveal .m-card-art{opacity:1;transition:none}
+}

@@ -38,6 +38,10 @@ l-type-connector-3-8 · l-type-connector-1-4 · inlet-3-way-ball-valve ·
 drain-saddle · lock-clips · pe-tubing-3-8-blue · pe-tubing-3-8-red ·
 pe-tubing-1-4-grey
 
+Имена файлов — исторические; **в тексте картриджи называются иначе** (зафиксировано
+2026-10-07): `pcb-filter` → I «2-in-1 Sediment + Carbon Filter», `ro-filter` → II «RO Membrane»,
+`mineralizer-filter` → III «Mineralizator». Имена в тексте — см. `docs/localization/glossary.md`.
+
 Старый сводный кадр `cartridges` (RO + PCB вместе) ещё стоит в разделах
 Installation и First Start — новой пары одним кадром пока нет.
 

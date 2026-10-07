@@ -11,8 +11,9 @@
 <link rel="stylesheet" href="assets/ui-kit/tokens.css?v=kit8">
 <!-- Компоненты инструкции: номер — из кита, заголовки и кадр — свои (см. a1-manual-kit.html). -->
 <link rel="stylesheet" href="assets/ui-kit/number.css?v=kit8">
+<link rel="stylesheet" href="assets/ui-kit/hotspot.css?v=kit8">
 <link rel="stylesheet" href="assets/ui-kit/topbar.css?v=kit8">
-<link rel="stylesheet" href="assets/manual-kit.css?v=11">
+<link rel="stylesheet" href="assets/manual-kit.css?v=26">
 <style>
 /* ─────────────────────────────────────────────────────────────────────────────
    A1 — THE DOCUMENT.
@@ -396,28 +397,33 @@ html:not([data-media="screen"]) .side-inner:not(.is-on){display:none}
    обе страницы по обрезу. Растягивается ровно в трим: холст макета 1664 × 1180
    отличается от A3 на 0,3 %, и это разница, которую лучше отдать масштабу, чем
    полоске бумаги у края. Выше неё — только номера страниц и сетка. */
-.spread-art{
+.spread-art,
+.page-art{
   position:absolute;inset:0;width:100%;height:100%;
   object-fit:fill;z-index:3;pointer-events:none;display:block;
 }
-html.no-art .spread-art,
-html.no-content .spread-art{visibility:hidden}
+/* A picture per page (2026-10-06): one spread = L + R, each exported from Figma
+   as its own page, 832 × 1180. It lies in its panel, to the trim, the same way. */
+html.no-art .spread-art, html.no-art .page-art,
+html.no-content .spread-art, html.no-content .page-art{visibility:hidden}
 
 /* ── НОМЕР СТРАНИЦЫ ── `?pn=1`
-   В нижнем внешнем углу: чётные — слева, нечётные — справа, как у любой книги,
-   — чтобы номер было видно, не раскрывая буклет до корешка. Стоит в нижнем поле
-   по его середине и по краю наборной полосы, а не по обрезу: поле — это рамка
-   страницы, и номер принадлежит ей. На обложке и задней сторонке номера нет. */
+   Во внешнем углу: чётные — слева, нечётные — справа, как у любой книги.
+   На обложке и задней сторонке номера нет. */
+/* 2026-10-07: the folio moved to the TOP outer corner, over the page title — the
+   place the Figma pages keep for it («/ 14», 1379:13711): 17 u from the top,
+   46 u from the left edge on even pages, 48 u from the right on odd ones;
+   Cy Grotesk Key Medium 16 u / 1.12, black. */
 .page-no{
   position:absolute;z-index:4;display:none;
-  bottom:calc(var(--safe) / 2);transform:translateY(50%);
-  font-family:var(--font-cover);font-weight:500;font-size:9pt;line-height:1;
-  color:var(--ink);
+  top:calc(17 * var(--u));
+  font-family:var(--font-primary);font-weight:500;font-size:calc(16 * var(--u));line-height:1.12;
+  color:#000;white-space:nowrap;
   font-feature-settings:"tnum" 1, "lnum" 1;
 }
 html.show-pn .page-no{display:block}
-.panel-l .page-no{left:var(--safe)}
-.panel-r .page-no{right:var(--safe)}
+.panel-l .page-no{left:calc(46 * var(--u))}
+.panel-r .page-no{right:calc(48 * var(--u))}
 
 /* ═══════════════ THE RIBBON — screen version ═══════════════
    The same manual for a phone and a desktop (`?media=screen`): the same
@@ -468,19 +474,46 @@ html.is-embedded[data-media="screen"] body{background:var(--paper)}
    mark on the right; both stay out while the hero is on screen (it shows the
    same two) and come in once the first screen is scrolled past. */
 @media (min-width:1024px){
-  .r-bar .r-product-img{position:absolute;left:var(--gm);top:50%;transform:translateY(-50%)}
+  /* 2026-10-07: the photo moved to the right, in front of the A1 mark; the left
+     margin is the Akvantis mark's (32) */
   .r-bar .r-product-img, .r-bar .r-product-mark{opacity:0;transition:opacity var(--r-dur) var(--r-ease)}
   body.past-hero .r-bar .r-product-img, body.past-hero .r-bar .r-product-mark{opacity:1}
+}
+/* 2026-10-07: THE ROW OF SECTIONS SITS IN THE CONTENT'S CONTAINER. On the desktop
+   the bar is as wide as the screen, but its links start and end where the
+   sections below do — the same `--g-off` columns in from each margin (the
+   formula is the ribbon's own padding). The photo and the A1 mark stay at the
+   margins, outside it. Centred while the row fits, scrolls inside the
+   container when it does not (ui-kit/topbar.css, `safe center`). */
+@media (min-width:1024px){
+  [data-media="screen"] .r-bar .topbar-nav{
+    --bar-col:calc((100% - 2 * var(--gm) - (var(--gc) - 1) * var(--gg)) / var(--gc));
+    position:absolute;top:0;bottom:0;margin:0;padding:0;scroll-padding:0;
+    left:calc(var(--gm) + var(--g-off) * (var(--bar-col) + var(--gg)));
+    right:calc(var(--gm) + var(--g-off) * (var(--bar-col) + var(--gg)))}
+  [data-media="screen"] .r-bar .r-product{margin-left:auto}
 }
 /* ── ROWS RUN EDGE TO EDGE (2026-10-01) ── from 768 the sideways rows of In the
    box and Tools use the whole viewport: the container is as wide as the screen,
    and its side padding puts the first card back on the content's left edge. */
-@media (min-width:768px){
+/* 2026-10-07: tablet only. On the desktop the row stays inside the container,
+   like every other section — one width for the whole manual. */
+@media (min-width:768px) and (max-width:1023px){
   html[data-media="screen"] .ribbon .r-scroll:has(> .m-rows){width:100vw;margin-left:calc(50% - 50vw)}
   html[data-media="screen"] .ribbon .r-scroll > .m-rows{--bleed:calc((100vw - 100cqw) / 2);
     margin:0;padding:0 var(--bleed) var(--space-4);scroll-padding:0 var(--bleed)}
   html[data-media="screen"] .ribbon .r-scroll:has(> .m-rows)::after{right:0}
 }
+/* 2026-10-07: A SIDEWAYS ROW NEVER SCROLLS UP AND DOWN. `overflow-x:auto` makes
+   the other axis scrollable too, and a row whose cards stick out by a few
+   pixels (the reveal moves them 16 px) became a small vertical scroller: the
+   wheel or the finger moved the row instead of the page, and the page stood
+   still. The vertical axis is clipped, so a vertical gesture over a row always
+   goes to the page; sideways it scrolls as before. (An earlier attempt set
+   `touch-action:pan-x` here — that blocked the page scroll on a phone; gone.) */
+html[data-media="screen"] .ribbon .m-rows,
+html[data-media="screen"] .ribbon .r-row,
+html[data-media="screen"] .ribbon .m-specs{overflow-y:hidden;overscroll-behavior-y:auto;touch-action:pan-x pan-y}
 /* no head block any more (2026-10-02): nothing above the first section */
 .ribbon > .r-flow{margin-top:0}
 @media (max-width:1023px){ html[data-media="screen"] body .ribbon{padding-top:0} }
@@ -503,6 +536,22 @@ html.is-embedded[data-media="screen"] body{background:var(--paper)}
 }
 /* the Akvantis mark: out of the bar, to the end of the page — grey, centred */
 [data-media="screen"] .r-bar .topbar-mark, [data-media="screen"] .r-bar .topbar-mark-in{display:none}
+/* 2026-10-07: on the desktop the Akvantis mark is back at the left margin, 32 */
+@media (min-width:1024px){ [data-media="screen"] .r-bar .topbar-mark{display:block} }
+/* ── LANGUAGE (2026-10-07) ── En · De · Ua at the foot of the page, over the
+   Akvantis mark. The words are in assets/manual-texts.js; `?lang=de` opens a language,
+   the choice is kept in the reader's browser (`akv-region`, as the passport). */
+.r-lang{display:none}
+/* 2026-10-07: hidden everywhere. The language comes from the address (`?lang=`)
+   or the earlier choice; the switch shows only when asked for with `?langs=1`. */
+html.show-lang[data-media="screen"] .r-lang{display:flex;justify-content:center;gap:var(--space-4);margin-top:var(--space-48)}
+.r-lang + .r-foot{padding-top:var(--space-24)}
+.r-lang button{appearance:none;border:0;margin:0;background:none;cursor:pointer;
+  font-family:var(--font-primary);font-size:var(--text-14);font-weight:var(--fw-semibold);line-height:1;
+  color:var(--ink-3);min-width:var(--space-40);height:var(--space-32);padding:0 var(--space-8);border-radius:var(--radius-16)}
+.r-lang button:hover{color:var(--ink)}
+.r-lang button[aria-pressed="true"]{color:var(--white);background:var(--black)}
+.r-lang button:focus-visible{outline:var(--space-2) solid var(--ink);outline-offset:var(--space-2)}
 .r-foot{display:flex;justify-content:center;padding:var(--space-48) 0 var(--space-16);color:var(--ink-3)}
 .r-foot svg{width:var(--space-32);height:var(--space-32);display:block}
 /* the same block as the passport's hero (passport.css): picture 232, brand
@@ -632,9 +681,10 @@ html{--acc-gap:var(--space-24)}
 .r-product{display:none}
 @media (min-width:1024px){
   .r-product{display:flex;align-items:center;gap:var(--space-12);flex:0 0 auto;margin-right:var(--gm);height:100%}
-  .r-product-img{height:calc(var(--r-bar-h) - var(--space-16));width:auto;display:block}
-  .r-product-mark{display:block;height:var(--space-24);color:var(--ink)}
-  .r-product-mark svg{height:100%;width:auto;display:block}
+  .r-product-img{height:var(--space-32);width:auto;display:block}   /* 2026-10-07: 32 */
+  /* 2026-10-07: the A1 mark first (40 wide), the photo after it */
+  .r-product-mark{display:block;order:-1;width:var(--space-40);color:var(--ink)}
+  .r-product-mark svg{width:100%;height:auto;display:block}
 }
 .r-bar .topbar-mark{color:var(--ink);width:var(--space-32);height:var(--space-32);align-self:center;margin-left:var(--gm)}
 .r-bar .topbar-mark svg{height:100%}
@@ -665,9 +715,13 @@ html{--acc-gap:var(--space-24)}
 .r-bar .topbar-nav a{color:var(--ink-3);flex-direction:column;justify-content:center;gap:var(--space-4);
   font-size:var(--text-16);padding:0 var(--space-12)}
 @media (min-width:768px){ .r-bar .topbar-nav a{padding:0 var(--space-12)} }
-.topbar-num{display:flex;align-items:center;justify-content:center;width:var(--space-16);height:var(--space-16);
-  border-radius:50%;background:var(--black);color:var(--white);font-size:var(--text-10);font-weight:var(--fw-semibold);line-height:1;
-  font-variant-numeric:tabular-nums;transition:transform var(--r-dur) var(--r-ease)}
+/* 2026-10-07: the badge IS the kit's number (`.num`, ui-kit/kit/number.css) at
+   16 — it was a look-alike with its own type size, and 10, 11, 12 did not fit.
+   Only the size, the screen's ink and the motion are set here. */
+/* 2026-10-07: 18, not 16 — at 16 the figure (10.7 px) was too small to read; the
+   active one is still ~29 (× 1.6, was 16 × 1.8) */
+.num.topbar-num{--num-size:18px;--num-ink:var(--black);--num-paper:var(--white);
+  font-weight:var(--fw-semibold);transition:transform var(--r-dur) var(--r-ease)}
 /* active: badge and digit grow 80 %, from the bottom edge so the label below
    does not move and the badge grows up into the bar's free space */
 .r-bar .topbar-num{transform-origin:50% 100%}
@@ -837,8 +891,9 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
 
 <div class="r-guides" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
-<script src="assets/manual-data.js?v=5"></script>
-<script src="assets/manual-render.js?v=13"></script>
+<script src="assets/manual-data.js?v=16"></script>
+<script src="assets/manual-texts.js?v=7"></script>
+<script src="assets/manual-render.js?v=25"></script>
 <script>
 (function(){
   'use strict';
@@ -861,12 +916,131 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
   var TURN = q.get('turn') === '1';
   if (q.get('bleed') === '1') el.classList.add('bleed');
 
+  /* ── LANGUAGE (2026-10-07) ──
+     English is the original (manual.json). The other languages are rows in
+     assets/manual-texts.js. Which one: `?lang=de|uk` in the address, else the
+     reader's earlier choice, else English — never the browser's language: a
+     scanned carton must land on a predictable page (docs/localization).
+     Inside a frame (constructor, kit, a pop-up) only the address decides. */
+  if (q.get('langs') === '1' || q.get('specimen') === 'lang') el.classList.add('show-lang');
+  var TEXTS = window.MANUAL_TEXTS || { languages:[{ code:'en', short:'En', name:'English' }], ui:{}, texts:{} };
+  var LANGS = TEXTS.languages.map(function(l){ return l.code; });
+  var LANG = (function(){
+    var l = (q.get('lang') || '').toLowerCase();
+    if (l === 'ua') l = 'uk';
+    if (LANGS.indexOf(l) >= 0) return l;
+    if (!embedded) try { l = localStorage.getItem('akv-region'); } catch (err) { l = ''; }
+    return LANGS.indexOf(l) >= 0 ? l : 'en';
+  }());
+  var DICT = {};
+  function dictFor(lang){
+    var d = {};
+    if (lang === 'en') return null;
+    for (var g in TEXTS.texts) TEXTS.texts[g].forEach(function(r){ if (r[lang]) d[r.en] = r[lang]; });
+    return d;
+  }
+  function T(key){ var r = (TEXTS.ui || {})[key] || {}; return r[LANG] || r.en || key; }
+  function setLang(l){
+    if (l === LANG || LANGS.indexOf(l) < 0 || !RAW) return;
+    LANG = l;
+    try { localStorage.setItem('akv-region', l); } catch (err) {}
+    /* what the reader had open stays open, and the page stays where it was */
+    var open = {}, y = window.scrollY;
+    document.querySelectorAll('.ribbon .m-sec.is-acc').forEach(function(sec){ open[sec.id] = sec.classList.contains('is-open'); });
+    apply(RAW, BLOBS);
+    document.querySelectorAll('.ribbon .m-sec.is-acc').forEach(function(sec){
+      if (!(sec.id in open)) return;
+      sec.classList.toggle('is-open', open[sec.id]);
+      var d = sec.querySelector('details.acc'); if (d) d.open = open[sec.id];
+    });
+    window.scrollTo(0, y);
+  }
+  /* ── HOTSPOTS (2026-10-07) ── a "+" on a picture opens a pop-up with the
+     part's picture and name (assets/manual-kit.css, HOTSPOT · POP-UP). One
+     <dialog> for the page, filled on the press; the browser's own modal gives
+     the scrim, Esc and the focus trap. */
+  var pop = null;
+  document.addEventListener('click', function(e){
+    var hot = e.target.closest && e.target.closest('.m-hot');
+    if (!hot) return;
+    if (!pop){
+      pop = document.createElement('dialog');
+      pop.className = 'm-pop';
+      pop.tabIndex = -1;
+      pop.innerHTML = '<button type="button" class="m-pop-x"></button><div class="m-pop-art"><img alt=""></div>' +
+                      '<div class="m-pop-foot"><div class="m-pop-text"><h3 class="m-pop-name"></h3><p class="m-pop-desc"></p></div>' +
+                      '<a class="btn m-pop-btn" target="_blank" rel="noopener" hidden></a></div>';
+      document.body.appendChild(pop);
+      pop.querySelector('.m-pop-x').addEventListener('click', function(){ pop.close(); });
+      pop.addEventListener('click', function(ev){ if (ev.target === pop) pop.close(); });   /* the scrim */
+    }
+    pop.querySelector('.m-pop-x').setAttribute('aria-label', T('pop.close'));
+    pop.querySelector('img').src = hot.dataset.art || '';
+    pop.querySelector('.m-pop-name').textContent = hot.dataset.name || '';
+    pop.querySelector('.m-pop-desc').textContent = hot.dataset.desc || '';
+    var buy = pop.querySelector('.m-pop-btn');
+    buy.hidden = !hot.dataset.url;
+    if (hot.dataset.url){ buy.href = hot.dataset.url; buy.textContent = hot.dataset.btn || ''; } else buy.removeAttribute('href');
+    pop.setAttribute('aria-label', hot.dataset.name || '');
+    if (pop.showModal) pop.showModal(); else pop.setAttribute('open', '');
+    pop.focus();   /* not the close button: no focus ring on a pop-up opened by a tap */
+  });
+
+  /* ── REVEAL (2026-10-07) ── blocks rise and fade in as they are scrolled to
+     (assets/manual-kit.css, REVEAL). Screen only; off with reduced motion, in a
+     specimen and in a capture. Blocks entering together are staggered. */
+  var revealIO = null;
+  function reveal(){
+    if (revealIO){ revealIO.disconnect(); revealIO = null; }
+    var ok = el.dataset.media === 'screen' && !el.classList.contains('is-specimen') && !el.classList.contains('capture') && 'IntersectionObserver' in window &&
+             !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    el.classList.toggle('has-reveal', ok);
+    if (!ok) return;
+    var nodes = document.querySelectorAll('.ribbon .m-card, .ribbon .m-item, .ribbon .m-buy, .ribbon .m-stages, .ribbon .m-stage-title, ' +
+                                          '.ribbon .m-faults-wrap, .ribbon .m-ind, .ribbon .m-spec');
+    revealIO = new IntersectionObserver(function(entries){
+      var k = 0;
+      entries.forEach(function(en){
+        if (!en.isIntersecting) return;
+        en.target.style.setProperty('--reveal-delay', 'calc(var(--reveal-step) * ' + Math.min(k++, 6) + ')');
+        en.target.classList.add('is-in');
+        revealIO.unobserve(en.target);
+      });
+    }, { rootMargin:'0px 0px -6% 0px', threshold:0 });
+    [].forEach.call(nodes, function(n){ n.classList.add('m-reveal'); revealIO.observe(n); });
+    /* pictures: in over the grey ground once loaded */
+    [].forEach.call(document.querySelectorAll('.ribbon .m-card-art'), function(i){
+      function on(){ i.classList.add('is-loaded'); }
+      if (i.complete) on(); else { i.addEventListener('load', on); i.addEventListener('error', on); }
+    });
+  }
+
+  /* the switch and the page's own words — after every render */
+  function langUi(){
+    el.lang = LANG;
+    document.title = T('doc.title');
+    var ribbon = document.querySelector('.ribbon'); if (!ribbon) return;
+    ribbon.querySelectorAll('.r-bar, .topbar-nav').forEach(function(n){ n.setAttribute('aria-label', T('nav.sections')); });
+    var top = ribbon.querySelector('.topbar-mark'); if (top) top.setAttribute('aria-label', T('nav.top'));
+    var flow = ribbon.querySelector('.r-flow'); if (!flow || LANGS.length < 2) return;
+    var box = document.createElement('div');
+    box.className = 'r-lang'; box.setAttribute('role', 'group'); box.setAttribute('aria-label', T('lang.label'));
+    TEXTS.languages.forEach(function(l){
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = l.short; b.lang = l.code; b.title = l.name;
+      b.setAttribute('aria-pressed', l.code === LANG ? 'true' : 'false');
+      b.addEventListener('click', function(){ setLang(l.code); });
+      box.appendChild(b);
+    });
+    flow.parentNode.insertBefore(box, flow.nextSibling);
+  }
+
   /* ── THE DATA ──
      Inside the constructor the data is the one being edited, and it arrives
      by message — unsaved changes included, uploaded pictures as blob URLs
      (`blobs`: path → URL). Opened on its own, the document reads manual.json.
      The constructor is asked first; if nobody answers, the file is read. */
-  var DATA = null, BLOBS = {};
+  var DATA = null, RAW = null, BLOBS = {};
   function resolve(p){ return BLOBS[p] || p; }
 
   addEventListener('message', function(e){
@@ -997,7 +1171,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
      that stays put at the far side, the newest target's half at the near
      side, and the leaves in between. A turn the other way while pages are
      moving lets them land first (instantly) and starts from there. */
-  var turns = [], turnFwd = null, underNear = null, DUR = 900;
+  var turns = [], turnFwd = null, underNear = null, DUR = 900, turnSeq = 0;
   var EASE = 'cubic-bezier(.45,.05,.25,1)';
   function turnTo(a, b){
     var fwd = ordOf(b) > ordOf(a);
@@ -1026,6 +1200,14 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
        paints blank for a frame or two. The leaf waits for its pictures (at most
        a quarter second) and only then starts to move. */
     var imgs = [].slice.call((freshLayer ? layer : leaf).querySelectorAll('img')).concat(underNear ? [].slice.call(underNear.querySelectorAll('img')) : []);
+    /* Riffling (2026-10-07): leaves share one layer, and a leaf that has
+       landed used to stay on top of the ones landing after it — the old page
+       stood there until the last turn finished. Stacking now follows the
+       paper: on the side the leaves leave, the earlier one is on top; past
+       the half-turn, on the side they land, the later one is. */
+    if (turns.length === 0) turnSeq = 0;
+    var seq = ++turnSeq;
+    leaf.style.zIndex = 1000 - seq;
     var t = { anims:[] };
     turns.push(t);
     var started = false;
@@ -1045,6 +1227,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
       var half2 = [{ opacity:0 }, { opacity:0, offset:.5 }, { opacity:1, offset:.5 }, { opacity:1 }];
       if (faces.length === 2){ t.anims.push(faces[0].animate(half, { duration:DUR, easing:EASE, fill:'forwards' }), faces[1].animate(half2, { duration:DUR, easing:EASE, fill:'forwards' })); }
       else if (faces.length === 1){ var back = faces[0].style.transform.indexOf('180') >= 0; t.anims.push(faces[0].animate(back ? half2 : half, { duration:DUR, easing:EASE, fill:'forwards' })); }
+      t.anims.push(leaf.animate([{ zIndex:1000 - seq }, { zIndex:1000 - seq, offset:.5 }, { zIndex:1000 + seq, offset:.5 }, { zIndex:1000 + seq }], { duration:DUR, easing:EASE, fill:'forwards' }));
       t.anims[0].onfinish = function(){
         turns.splice(turns.indexOf(t), 1);
         if (!turns.length){ underNear = null; rest(cur); }
@@ -1080,7 +1263,8 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
   /* ── AFTER EVERY RENDER ── */
   var first = true;
   function apply(data, blobs){
-    DATA = data; BLOBS = blobs || {};
+    RAW = data; BLOBS = blobs || {};
+    DATA = window.ManualRender.localize(RAW, dictFor(LANG));
     window.ManualRender.render(document, DATA, { resolve:resolve });
     SPREADS = Math.max(1, (DATA.spreads || []).length);
     sheet.dataset.spreads = SPREADS;
@@ -1095,13 +1279,15 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
       first = false;
     } else if (TURN && cur !== null) rest(cur);
     else go({ side:sheet.dataset.side || 'inner', spread:spread }, false);
+    langUi();
     bar.refresh();
     rows();
+    reveal();
     requestAnimationFrame(function(){
       var over = window.ManualRender.overflow(document);
       if (embedded) try { window.parent.postMessage({ type:'a1-overflow', pages:over }, '*'); } catch (err) {}
     });
-    if (el.classList.contains('capture')) capture();
+    if (el.classList.contains('capture')){ prune(); capture(); }
     /* decode the pages' pictures up front, so the first turn has them ready */
     if (TURN) sheet.querySelectorAll('img').forEach(function(i){ if (i.decode) i.decode().catch(function(){}); });
   }
@@ -1116,7 +1302,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
       sd.querySelectorAll('.panel').forEach(function(panel){
         var no = document.createElement('span');
         no.className = 'page-no'; no.setAttribute('aria-hidden', 'true');
-        no.textContent = panel.dataset.page;
+        no.textContent = '/ ' + ('0' + panel.dataset.page).slice(-2);
         panel.appendChild(no);
       });
     });
@@ -1217,7 +1403,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
       row.parentNode.insertBefore(wrap, row);
       wrap.appendChild(row);
       var btn = document.createElement('button');
-      btn.type = 'button'; btn.className = 'r-next'; btn.setAttribute('aria-label', 'Scroll right');
+      btn.type = 'button'; btn.className = 'r-next'; btn.setAttribute('aria-label', T('scroll.right'));
       btn.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg>';
       wrap.appendChild(btn);
       function upd(){
@@ -1304,6 +1490,18 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
      embedded in, by message. Redrawn after every render, so an edit in the
      constructor reaches the 3D sheet too. Waits for fonts and pictures: a
      snapshot taken before them is a sheet without its content. */
+/* 2026-10-07: a capture frame photographs ONE side and never turns. Everything
+     else is taken out of it before the photograph: the other spreads and the
+     screen ribbon. With a picture per page, nine frames each holding all
+     eighteen pages (and html2canvas cloning them) ran the browser out of
+     memory, and the booklet came out white. */
+  function prune(){
+    var on = sheet.dataset.side === 'front' ? null : sheet.querySelector('.side-inner.is-on');
+    sheet.querySelectorAll('.side-inner').forEach(function(sd){ if (sd !== on) sd.remove(); });
+    if (on){ sheet.querySelectorAll('.side-front img').forEach(function(i){ i.remove(); }); }
+    var ribbon = document.querySelector('.ribbon');
+    if (ribbon) ribbon.querySelectorAll('.r-flow, .r-foot, .r-lang').forEach(function(n){ n.remove(); });
+  }
   var capT = 0, capN = 0;
   function key(){ return sheet.dataset.side === 'front' ? 'front' : 'inner-' + spread; }
   function lib(){
@@ -1316,7 +1514,10 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     });
   }
   function ready(){
-    var imgs = [].slice.call(document.images).map(function(im){
+    /* 2026-10-07: only the sheet's own pictures. The screen ribbon's cards are
+       `loading="lazy"` and, hidden, never load — waiting for every image of the
+       document meant waiting for ever, and the 3D booklet stayed blank. */
+    var imgs = [].slice.call(sheet.querySelectorAll('img')).map(function(im){
       return im.complete ? Promise.resolve() : new Promise(function(r){ im.addEventListener('load', r); im.addEventListener('error', r); });
     });
     return Promise.all(imgs.concat([document.fonts ? document.fonts.ready : Promise.resolve()]));
