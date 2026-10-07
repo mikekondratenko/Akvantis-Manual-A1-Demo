@@ -348,6 +348,16 @@
 .m-cap-i-in{fill:var(--cap-paper)}
 @media (min-width:768px){
   .m-pages{gap:var(--space-24)}
+  /* 2026-10-07: TWO CORNERS IN ONE. The art has its own rounded corner drawn in
+     (16 u), and from 768 a page is shown larger than 1:1 — on a desktop ×1.24 —
+     so the art's corner was ~20 px under a 16 px frame: two arcs of different
+     radii, a black wedge in every corner. Here all cards of a page share one
+     scale, so the frame takes the art's own radius (16 u in the page's scale):
+     one arc, and still one radius for every card on the screen. On a phone the
+     cards differ in scale, and the frame stays 16 px (the art's corner is then
+     the smaller one and hides under it). */
+  .m-page{container-type:inline-size}
+  .m-page > .m-card{--m-card-r:calc(16 * 100cqw / var(--pw))}
   .m-page{display:block;position:relative;aspect-ratio:var(--pw) / var(--ph)}
   .m-page > .m-card{
     position:absolute;aspect-ratio:auto;
