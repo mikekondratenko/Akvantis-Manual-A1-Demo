@@ -315,8 +315,9 @@
    every width. The picture's own rule lies under ours (see `--bleed`). */
 .m-card{--m-card-rule:var(--space-2);--m-card-r:var(--radius-16);overflow:hidden;border-radius:var(--m-card-r)}
 .m-card-art{
-  /* 2026-10-07: the art is moved out by exactly as much as its own 2 u rule is
-     thicker than ours (2 px), so the two rules share an inner edge. Whatever
+  /* The pictures carry no rule of their own any more (clean exports, 2026-10-07), but
+     they are still the whole card frame of the page, 2 u of which lay under the rule.
+     The art is moved out by exactly as much as that 2 u is thicker than our rule (2 px). Whatever
      is drawn inside the card — the small inset tiles, 4 u from the rule in
      Figma — keeps that distance. (It was 4 u flat, which ate the gap: the
      tiles touched the frame.) */
@@ -357,7 +358,9 @@
      cards differ in scale, and the frame stays 16 px (the art's corner is then
      the smaller one and hides under it). */
   .m-page{container-type:inline-size}
-  .m-page > .m-card{--m-card-r:calc(16 * 100cqw / var(--pw))}
+  /* 2026-10-07 (later): the card pictures are now CLEAN — exported from Figma with no
+     rule and square corners — so the frame is ours alone and keeps one radius, 16 px,
+     at every width (it used to follow the art's baked arc here). */
   .m-page{display:block;position:relative;aspect-ratio:var(--pw) / var(--ph)}
   .m-page > .m-card{
     position:absolute;aspect-ratio:auto;
