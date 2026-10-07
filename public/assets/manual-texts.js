@@ -20,6 +20,9 @@
    III Mineralizator — names fixed 2026-10-07;
    German formal "Sie"; Ukrainian imperative, 2nd person plural). Words printed
    on the machine itself (Flush, Power, Filter) are not translated.
+   The two filters keep their ORIGINAL NAMES (2026-10-07): «Фільтр 2-in-1 Sediment +
+   Carbon», «Фільтр RO Membrane»; in German the English name as it is. Everything
+   else — fittings included — is translated.
    STATUS: de, uk — machine draft 2026-10-07, needs native review.
    ───────────────────────────────────────────────────────────────────────────── */
 window.MANUAL_TEXTS = {
@@ -66,9 +69,9 @@ window.MANUAL_TEXTS = {
       { "en": "Main", "de": "Hauptteile", "uk": "Основне" },
       { "en": "A1 Unit", "de": "A1 Gerät", "uk": "Блок A1" },
       { "en": "Filtration module", "de": "Filtermodul", "uk": "Модуль фільтрації" },
-      { "en": "2-in-1 Sediment + Carbon Filter", "de": "2-in-1-Sediment- und Aktivkohlefilter", "uk": "Фільтр 2-в-1: осад + вугілля" },
+      { "en": "2-in-1 Sediment + Carbon Filter", "de": "2-in-1 Sediment + Carbon Filter", "uk": "Фільтр 2-in-1 Sediment + Carbon" },
       { "en": "Cartridge I", "de": "Kartusche I", "uk": "Картридж I" },
-      { "en": "RO Membrane", "de": "RO-Membran", "uk": "Мембрана RO" },
+      { "en": "RO Membrane", "de": "RO Membrane", "uk": "Фільтр RO Membrane" },
       { "en": "Cartridge II", "de": "Kartusche II", "uk": "Картридж II" },
       { "en": "Power Adapter", "de": "Netzteil", "uk": "Блок живлення" },
       { "en": "230 V~ to module", "de": "230 V~ zum Modul", "uk": "230 В~ до модуля" },
