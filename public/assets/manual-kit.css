@@ -410,7 +410,14 @@
 .m-pop-art{display:flex;align-items:center;justify-content:center;box-sizing:border-box;aspect-ratio:4 / 3;padding:var(--space-24);
   /* 2026-10-07: no plate — the pictures are cut-outs and stand on the pop-up's own white */
   }
-.m-pop-art img{max-width:100%;max-height:100%;display:block;object-fit:contain}
+/* 2026-10-08: the picture is laid OVER the art box, not inside its flow. In the square
+   phone pop-up the box gets its height from flex, and Safari does not resolve a percent
+   max-height against that — the picture came out 0 px high (iPhone: empty pop-ups).
+   Absolutely placed, it needs no percent of an indefinite height. */
+.m-pop-art{position:relative}
+.m-pop-art img{position:absolute;left:var(--space-24);top:var(--space-24);
+  width:calc(100% - 2 * var(--space-24));height:calc(100% - 2 * var(--space-24));
+  max-width:none;max-height:none;display:block;object-fit:contain}
 .m-pop-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-16);padding:var(--space-16) var(--space-8) var(--space-8)}
 .m-pop-text{flex:1 1 auto;min-width:0}
 /* the button of a part sold apart (K1, K3): the kit's .btn, bottom right */
