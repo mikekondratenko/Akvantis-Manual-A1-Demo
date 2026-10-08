@@ -34,6 +34,7 @@ ui-kit/kit/           →  <project>/public/assets/ui-kit/
 ├── tokens.css   CSS custom properties — colour, type, numbers, space, radius
 ├── panel.css    the plate title and the collapsible plate; requires tokens.css
 ├── number.css   the step number in a circle (Figma «Number»); requires tokens.css
+├── hotspot.css  the "+" in a black disc on a picture — a button that opens more; requires tokens.css
 ├── kit.css      components; requires tokens.css and panel.css, in that order
 └── kit.js       the two controls that are built rather than written (window.Kit)
 

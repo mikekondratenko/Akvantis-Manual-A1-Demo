@@ -410,14 +410,10 @@
 .m-pop-art{display:flex;align-items:center;justify-content:center;box-sizing:border-box;aspect-ratio:4 / 3;padding:var(--space-24);
   /* 2026-10-07: no plate — the pictures are cut-outs and stand on the pop-up's own white */
   }
-/* 2026-10-08: the picture is laid OVER the art box, not inside its flow. In the square
-   phone pop-up the box gets its height from flex, and Safari does not resolve a percent
-   max-height against that — the picture came out 0 px high (iPhone: empty pop-ups).
-   Absolutely placed, it needs no percent of an indefinite height. */
-.m-pop-art{position:relative}
-.m-pop-art img{position:absolute;left:var(--space-24);top:var(--space-24);
-  width:calc(100% - 2 * var(--space-24));height:calc(100% - 2 * var(--space-24));
-  max-width:none;max-height:none;display:block;object-fit:contain}
+/* 2026-10-08: the picture sits in the flow of the art box, which has a definite
+   height (an aspect ratio of a definite width) — the one arrangement every
+   browser sizes alike. Pinned or flex-grown, it came out 0 high in Safari. */
+.m-pop-art img{max-width:100%;max-height:100%;width:auto;height:auto;display:block;object-fit:contain}
 .m-pop-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-16);padding:var(--space-16) var(--space-8) var(--space-8)}
 .m-pop-text{flex:1 1 auto;min-width:0}
 /* the button of a part sold apart (K1, K3): the kit's .btn, bottom right */
@@ -425,7 +421,7 @@
 .m-pop-name{margin:0;font-size:var(--text-20, 20px);font-weight:var(--fw-semibold);line-height:var(--lh-tight)}
 .m-pop-desc{margin:var(--space-4) 0 0;font-size:var(--text-14);font-weight:var(--fw-medium);line-height:var(--lh-tight);opacity:.56}
 .m-pop-desc:empty{display:none}
-.m-pop-x{position:absolute;right:var(--space-12);top:var(--space-12);box-sizing:border-box;width:var(--space-40);height:var(--space-40);padding:0;
+.m-pop-x{position:absolute;z-index:2;right:var(--space-12);top:var(--space-12);   /* z: above the pinned picture, or the picture took the tap (2026-10-08) */box-sizing:border-box;width:var(--space-40);height:var(--space-40);padding:0;
   border:0;border-radius:50%;background:var(--m-grey-20);color:var(--m-ink);cursor:pointer;transition:background .15s, color .15s, transform .08s}
 .m-pop-x::before,.m-pop-x::after{content:'';position:absolute;left:50%;top:50%;width:var(--space-16);height:var(--space-2);
   margin:calc(var(--space-2) / -2) 0 0 calc(var(--space-16) / -2);background:currentColor;border-radius:1px;transform:rotate(45deg)}
@@ -433,14 +429,15 @@
 .m-pop-x:active{transform:scale(.94)}
 .m-pop-x:focus-visible{outline:var(--space-2) solid var(--m-ink);outline-offset:var(--space-2)}
 @media (hover:hover){ .m-pop-x:hover{background:var(--m-ink);color:var(--m-paper)} }
-/* 2026-10-07: ON A PHONE EVERY POP-UP IS THE SAME SQUARE. They used to be as
-   tall as their text (one line of description or three), so the window
-   changed size from one + to the next. Now the window is 1:1; the text block
-   takes what it needs and the picture takes the rest. */
+/* 2026-10-08: NO 1:1 RULE ON THE WINDOW. The square pop-up was done by an
+   aspect-ratio on the <dialog> and a flex-grown picture box — Safari on iPhone
+   gave that box no height at all, and the pop-ups came up with no picture. Now
+   the sizes are plain: on a phone the picture box is a square of the window's
+   width, and the text block is held to two lines, so the pop-ups come out the
+   same size with no indefinite height anywhere. */
 @media (max-width:767px){
-  .m-pop[open]{display:flex;flex-direction:column;aspect-ratio:1 / 1;max-height:none}
-  .m-pop-art{flex:1 1 0;min-height:0;aspect-ratio:auto}
-  .m-pop-foot{flex:none}
+  .m-pop-art{aspect-ratio:1 / 1}
+  .m-pop-text{min-height:calc(var(--text-20, 20px) * var(--lh-tight, 1.15) + var(--space-4) + var(--text-14) * var(--lh-tight, 1.15))}
 }
 
 /* ── STAGES ── a section in several parts (Installation: Faucet K1 … Mineralizator).

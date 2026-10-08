@@ -766,29 +766,49 @@ a.lang-mark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2p
 html.regions-lock { overflow: hidden; }
 
 /* ══════════════ THE GUIDE SHEET (2026-09-28) ══════════════
-   The manual, from the bottom, 90% of the viewport, over the same scrim and in the same
-   frost as the location sheet. On a desktop it stays a bottom sheet, capped to a reading
-   width and centred — the guide is a document, and a document wants a column. */
+   The manual, from the bottom, over the same scrim as the location sheet.
+   2026-10-07: TALLER. On a phone and a tablet it is 95 % of the viewport (it was
+   90 %: the gap above is halved). On a desktop (≥ 1024) it is no longer a column
+   capped to a reading width: it fills the window, 24 px from every edge — the
+   manual's desktop layout needs the width, and the 24 px above it is the grabber. */
 .guide { position: fixed; inset: 0; z-index: 41; visibility: hidden; transition: visibility 0s linear .32s; }
 .guide.is-open { visibility: visible; transition-delay: 0s; }
 .guide.is-open .regions-scrim { opacity: 1; }
+/* 2026-10-07: NO PLATE AROUND THE GUIDE. The sheet was a frosted panel with the
+   guide inset 16 px inside it — a frame around a page that has its own edge. Now
+   the guide itself is the sheet: 6 px from each side of the viewport, the grabber
+   above it on the dark, and everything behind under a black 80 % overlay at every
+   width (it was 50 % on a phone). */
 .guide-sheet {
-  --tile: var(--on-frost); --tile-hover: var(--on-frost-hover);
   position: absolute; left: 0; right: 0; bottom: 0; margin: 0 auto;
-  height: 90vh; height: 90dvh; max-width: calc(var(--number-240) * 4);
+  height: 95vh; height: 95dvh;
   display: flex; flex-direction: column;
-  padding: var(--space-16) var(--space-16) 0;
-  background: var(--frost-900);
-  backdrop-filter: blur(24px) saturate(120%); -webkit-backdrop-filter: blur(24px) saturate(120%);
-  box-shadow: inset 0 0 0 1px var(--white-07), 0 calc(var(--space-16) * -1) var(--space-48) var(--scrim-50);
-  border-radius: var(--radius-24) var(--radius-24) 0 0;
+  padding: 0 6px 0;
+  background: none;
   transform: translateY(100%);
   transition: transform .32s cubic-bezier(.2, 0, 0, 1);
 }
+.guide .regions-scrim { background: var(--scrim-80); }
 .guide.is-open .guide-sheet { transform: none; }
-.guide-head { max-width: none; width: 100%; flex: none; }
+.guide-grab { flex: none; display: flex; align-items: center; justify-content: center;
+  height: var(--space-24); margin: 0 -6px; cursor: grab; touch-action: none; }
+.guide-grab i { width: 36px; height: 5px; border-radius: 3px; background: var(--white-32); transition: background .2s; }
+.guide-grab:hover i, .guide-grab:focus-visible i { background: var(--ink); }
+.guide-grab:focus-visible { outline: none; }
 .guide-frame { flex: 1; width: 100%; border: 0; border-radius: var(--radius-16) var(--radius-16) 0 0; background: var(--page); }
-@media (min-width: 768px) { .guide .regions-scrim { background: var(--scrim-80); } }
+/* The cross is the desktop's close; below 1024 the grabber is. */
+.guide-x { display: none; }
+@media (min-width: 1024px) {
+  /* 2026-10-07 (later): NO GRABBER ON A DESKTOP — nobody drags a window down with a
+     mouse. The standard cross instead (the location sheet's own `.regions-x`), in the
+     right gutter beside the guide, so it covers nothing of the manual. 24 px above and
+     below; 72 px at the sides = 16 + the 40 px cross + 16. */
+  .guide-sheet { bottom: var(--space-24); height: calc(100vh - 2 * var(--space-24)); height: calc(100dvh - 2 * var(--space-24));
+    padding: 0 calc(var(--space-16) * 2 + var(--number-40)); transform: translateY(calc(100% + var(--space-24))); }
+  .guide-grab { display: none; }
+  .guide-x { display: flex; position: absolute; top: 0; right: var(--space-16); }
+  .guide-frame { border-radius: var(--radius-16); }
+}
 @media (prefers-reduced-motion: reduce) { .guide-sheet { transition: none; } }
 
 /* ── THE LANGUAGE ──

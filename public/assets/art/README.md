@@ -35,23 +35,21 @@ system-unit · pcb-filter · ro-filter · mineralizer-filter · power-adapter ·
 straight-connector-3-8 · thread-connector-3-8-x-3-4 ·
 reducing-bushing-1-2m-to-3-8f · thread-adapter-3-8m-to-1-2f ·
 l-type-connector-3-8 · l-type-connector-1-4 · inlet-3-way-ball-valve ·
-drain-saddle · lock-clips · pe-tubing-3-8-blue · pe-tubing-3-8-red ·
+drain-saddle · pe-tubing-3-8-blue · pe-tubing-3-8-red ·
 pe-tubing-1-4-grey
 
 Имена файлов — исторические; **в тексте картриджи называются иначе** (зафиксировано
 2026-10-07): `pcb-filter` → I «2-in-1 Sediment + Carbon Filter», `ro-filter` → II «RO Membrane»,
 `mineralizer-filter` → III «Mineralizator». Имена в тексте — см. `docs/localization/glossary.md`.
 
-Старый сводный кадр `cartridges` (RO + PCB вместе) ещё стоит в разделах
-Installation и First Start — новой пары одним кадром пока нет.
 
 ### `tools/` — «Tools»
 
-В вёрстке: drill-driver · **bits** (оба сверла одним кадром) · wrench ·
-screwdriver (вертикальная)
+В вёрстке: drill-driver · bit-6 · bit-12 · wrench · screwdriver (вертикальная) ·
+pipe-key
 
-Про запас: bit-12 · bit-6 · screwdriver-angled ·
-wrench-screwdriver (ключ и отвёртка вместе) · pipe-key
+Кадры, которых вёрстка не читала (bits, screwdriver-angled, wrench-screwdriver,
+lock-clips, сводный cartridges), убраны 2026-10-08 — есть в истории git.
 
 ### `safety/` — «Safety & warranty», 7 пиктограмм
 supply · inlet-pressure · working-pressure · feed-water · ambient · warranty · qr
