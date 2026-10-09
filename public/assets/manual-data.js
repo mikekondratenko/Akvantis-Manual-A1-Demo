@@ -486,7 +486,7 @@ window.MANUAL_DATA = {
                   "name": "Faucet K1",
                   "desc": "Drinking Water Faucet",
                   "button": "Buy K1",
-                  "url": "https://akvantis.de"
+                  "url": "https://qrco.de/bh3Fv9"
                 },
                 {
                   "x": 36,
@@ -566,7 +566,14 @@ window.MANUAL_DATA = {
               "w": 362,
               "h": 218,
               "n": 5,
-              "caption": "Hand-tighten, no tools"
+              "caption": "Hand-tighten, no tools",
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 88.95,
+                  "y": 18.35
+                }
+              ]
             }
           ]
         },
@@ -592,7 +599,7 @@ window.MANUAL_DATA = {
                   "name": "Faucet K1",
                   "desc": "Drinking Water Faucet",
                   "button": "Buy K1",
-                  "url": "https://akvantis.de"
+                  "url": "https://qrco.de/bh3Fv9"
                 },
                 {
                   "x": 40.5,
@@ -652,7 +659,7 @@ window.MANUAL_DATA = {
             "name": "Faucet K1",
             "kind": "Drinking Water Faucet",
             "button": "Buy K1",
-            "url": "https://akvantis.de"
+            "url": "https://qrco.de/bh3Fv9"
           }
         }
       ],
@@ -690,7 +697,14 @@ window.MANUAL_DATA = {
               "w": 362,
               "h": 506,
               "n": 2,
-              "caption": "Connect blue tube"
+              "caption": "Connect blue tube",
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 61.88,
+                  "y": 51.19
+                }
+              ]
             },
             {
               "art": "assets/art/cards/p06-3.webp",
@@ -734,7 +748,7 @@ window.MANUAL_DATA = {
                   "name": "Faucet K3",
                   "desc": "Drinking Water Faucet",
                   "button": "Buy K3",
-                  "url": "https://akvantis.de"
+                  "url": "https://qrco.de/TapK3"
                 },
                 {
                   "x": 41,
@@ -794,7 +808,7 @@ window.MANUAL_DATA = {
             "name": "Faucet K3",
             "kind": "Drinking Water Faucet",
             "button": "Buy K3",
-            "url": "https://akvantis.de"
+            "url": "https://qrco.de/TapK3"
           }
         }
       ],
@@ -867,7 +881,14 @@ window.MANUAL_DATA = {
               "y": 693,
               "w": 486,
               "h": 333,
-              "n": 6
+              "n": 6,
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 91.77,
+                  "y": 12.01
+                }
+              ]
             }
           ]
         }
@@ -922,7 +943,19 @@ window.MANUAL_DATA = {
               "x": 0,
               "y": 693,
               "w": 736,
-              "h": 333
+              "h": 333,
+              "marks": [
+                {
+                  "type": "error",
+                  "x": 55.98,
+                  "y": 11.41
+                },
+                {
+                  "type": "ok",
+                  "x": 5.84,
+                  "y": 11.71
+                }
+              ]
             }
           ]
         }
@@ -969,7 +1002,14 @@ window.MANUAL_DATA = {
               "y": 346,
               "w": 362,
               "h": 391,
-              "n": 3
+              "n": 3,
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 88.95,
+                  "y": 10.23
+                }
+              ]
             },
             {
               "art": "assets/art/cards/p10-4.webp",
@@ -986,7 +1026,14 @@ window.MANUAL_DATA = {
               "y": 750,
               "w": 362,
               "h": 276,
-              "n": 5
+              "n": 5,
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 88.95,
+                  "y": 14.49
+                }
+              ]
             }
           ]
         },
@@ -1022,7 +1069,14 @@ window.MANUAL_DATA = {
               "h": 680,
               "n": 8,
               "caption": "20 mm inside the fitting",
-              "info": true
+              "info": true,
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 94.57,
+                  "y": 5.88
+                }
+              ]
             }
           ]
         }
@@ -1060,7 +1114,14 @@ window.MANUAL_DATA = {
               "y": 0,
               "w": 362,
               "h": 449,
-              "n": 2
+              "n": 2,
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 88.95,
+                  "y": 8.91
+                }
+              ]
             },
             {
               "art": "assets/art/cards/p12-3.webp",
@@ -1096,7 +1157,14 @@ window.MANUAL_DATA = {
               "w": 736,
               "h": 1026,
               "n": 5,
-              "caption": "Mineralizator installed"
+              "caption": "Mineralizator installed",
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 94.57,
+                  "y": 3.9
+                }
+              ]
             }
           ]
         }
@@ -1126,7 +1194,19 @@ window.MANUAL_DATA = {
               "w": 736,
               "h": 506,
               "n": 1,
-              "caption": "Check both filters are locked in"
+              "caption": "Check both filters are locked in",
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 17.12,
+                  "y": 70.36
+                },
+                {
+                  "type": "ok",
+                  "x": 17.12,
+                  "y": 29.64
+                }
+              ]
             },
             {
               "art": "assets/art/cards/p14-2.webp",
@@ -1135,7 +1215,19 @@ window.MANUAL_DATA = {
               "w": 362,
               "h": 507,
               "n": 2,
-              "caption": "Check tubes and clips"
+              "caption": "Check tubes and clips",
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 32.6,
+                  "y": 54.64
+                },
+                {
+                  "type": "ok",
+                  "x": 70.17,
+                  "y": 52.47
+                }
+              ]
             },
             {
               "art": "assets/art/cards/p14-3.webp",
@@ -1144,7 +1236,14 @@ window.MANUAL_DATA = {
               "w": 362,
               "h": 507,
               "n": 3,
-              "caption": "Check drain tube"
+              "caption": "Check drain tube",
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 66.85,
+                  "y": 51.28
+                }
+              ]
             }
           ]
         },
@@ -1162,7 +1261,14 @@ window.MANUAL_DATA = {
               "w": 299,
               "h": 276,
               "n": 4,
-              "caption": "Open inlet valve"
+              "caption": "Open inlet valve",
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 86.62,
+                  "y": 14.49
+                }
+              ]
             },
             {
               "art": "assets/art/cards/p15-2.webp",
@@ -1189,7 +1295,14 @@ window.MANUAL_DATA = {
               "w": 736,
               "h": 507,
               "n": 7,
-              "caption": "Ready to drink"
+              "caption": "Ready to drink",
+              "marks": [
+                {
+                  "type": "ok",
+                  "x": 94.57,
+                  "y": 7.89
+                }
+              ]
             }
           ]
         }

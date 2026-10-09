@@ -205,6 +205,16 @@
                         /* a part that is sold apart (the faucets): the pop-up gets a button to its page */
                         (hs.url ? ' data-url="' + esc(hs.url) + '" data-btn="' + esc(hs.button || 'Buy') + '"' : '') + '></button>';
                }).join('') +
+               /* `marks` (2026-10-08): the green check / red cross over a part of the
+                  picture — HTML, not drawn into the picture, so it is the same size on
+                  every card whatever the card's scale. `x y`: its centre, % of the card. */
+               (c.marks || []).map(function(m){
+                 var t = m.type === 'error' ? 'error' : 'ok', x = +m.x || 0, y = +m.y || 0;
+                 /* in the top-right corner of the mock-up = the card's verdict: pinned to
+                    the corner like the step number, not to a point of the picture */
+                 if (x >= 85 && y <= 20) return '<span class="m-mark" data-mark="' + t + '" data-corner aria-hidden="true"></span>';
+                 return '<span class="m-mark" data-mark="' + t + '" style="left:' + x + '%;top:' + y + '%" aria-hidden="true"></span>';
+               }).join('') +
                (c.caption ? '<figcaption class="m-cap"' + (c.mode ? ' data-mode="' + esc(c.mode) + '"' : '') + '>' +
                  (c.info ? CAP_INFO : '') + '<span>' + esc(c.caption) + '</span></figcaption>' : '') +
                '</figure>';
