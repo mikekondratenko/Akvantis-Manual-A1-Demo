@@ -1,17 +1,24 @@
 # Akvantis — A1 Manual Guide Demo
 
-The Manual constructor with the controls taken out, for showing a client. Static, no build
-step: `public/` is the site.
+The A1 manual shown to the client: the printed booklet in 2D / 3D and the guide on a
+desktop, a tablet and a phone. Static, no build step: `public/` is the site.
+
+**The content is not edited here.** The manual's one source is `../A1-Manual-Page/src/`;
+`node ../A1-Manual-Page/tools/build.mjs` writes this demo's data, texts, renderer and
+pictures every time it builds the guide (2026-10-17 — the Manual constructor is gone).
 
 ```
 public/
-  index.html            the page — the booklet in 2D / 3D and the three screen views; no rail, no guides
-  a1-manual.html        ⚠ copy of ../Manual/public/a1-manual.html — edit there, copy here
-  manual.json           ⚠ copy of the constructor's data (…/Manual/public/manual.json)
-  assets/
-    manual-data.js      ⚠ the same data as a script — what index.html feeds the booklet
-    manual-kit.css  manual-render.js  manual-texts.js  sheet3d.js  art/  brand/  …   ⚠ copies from ../Manual/public/assets
-    ui-kit/ fonts/      synced from ../ui-kit — do not edit here
+  index.html            the page — the booklet in 2D / 3D and the three screen views
+  a1-manual.html        the booklet document (the demo's own; turns its pages, draws the screen views)
+  manual.json           ┐
+  assets/manual-data.js │ WRITTEN by ../A1-Manual-Page/tools/build.mjs from its src/ —
+  assets/manual-texts.js│ do not edit here
+  assets/manual-render.js
+  assets/art/ photos/   ┘
+  assets/screen/        the booklet's page pictures, page-01 … page-20 (Figma page exports, WebP q85)
+  assets/manual-kit.css sheet3d.js   the booklet's own styles and 3D
+  assets/ui-kit/ fonts/ synced from ../ui-kit — do not edit here
 ```
 
 ## What it shows
@@ -20,7 +27,7 @@ The printed A1 booklet, opening on the closed cover — and, since 2026-10-07, t
 screen version too.
 
 - **2D / 3D** — two bare icons above the booklet (a flat square, an isometric cube). Both are
-  the WebGL booklet of the constructor (`assets/sheet3d.js`, three.js r128 from cdnjs): 2D is
+  the WebGL booklet (`assets/sheet3d.js`, three.js r128 from cdnjs): 2D is
   that booklet strictly face-on, 3D is the same booklet at an angle, turned by dragging.
   Its pages are the page pictures of `manual-data.js` (`imageL` / `imageR`), two to a
   texture — no capture frames. Without WebGL, three.js or a page picture (and from `file://`)
@@ -35,28 +42,16 @@ screen version too.
 Run locally with `./serve.sh` (http://localhost:8091/) — the page asks for `/a1-manual`
 without the extension, as Cloudflare serves it.
 
-Not here, on purpose: the sidebar and the constructor, the grid guides.
+Not here, on purpose: the grid guides.
 
 ## Updating
 
-The content is made in `../Manual` (the constructor, `a1-manual-prototype.html`) and saved
-there. To bring it here, copy `manual.json`, `assets/manual-data.js`, `a1-manual.html`,
-`assets/manual-render.js`, `assets/manual-kit.css` and any new pictures under `assets/art`
-and `assets/uploads` from `../Manual/public`.
-
-Here `manual.json` / `manual-data.js` point at light copies instead of the print PNGs: the
-pages are `assets/screen/page-NN.webp` (one file per page, `imageL` + `imageR` of a spread —
-page 2 … page 19 for the 9 spreads; covers page-01 and page-20). After a new export, convert each
-`../Manual/public/assets/art/pages/page-NN.webp` to `assets/screen/page-NN.webp` under the same
-number; the data does not change. Page numbers are off unless the booklet is asked for with
-`?pn=1`, and the page art is exported without the folio.
-
-The phone / tablet / desktop version (`?media=screen`) is built from cards, not page images:
-`assets/art/cards/pNN-k.webp` (same files and paths as in `../Manual/public`), with numbers and
-captions set in HTML. See "Screen version from cards" in `../Manual/README.md`.
-
-Languages: `assets/manual-texts.js` (en · de · uk) is a copy of the one in `../Manual/public/assets`
-— edit it there and copy it here. `?media=screen&lang=de` opens German, `&lang=uk` Ukrainian.
+- **Text, cards, captions, translations** — change `../A1-Manual-Page/src/` and run
+  `node ../A1-Manual-Page/tools/build.mjs`; this folder follows.
+- **The booklet's pages** — export the page frames from Figma (Akvantis-A1 → A1 Manual →
+  section «A1-Manual · Screen assets», `page-01 … page-20`, PNG 2x), convert to WebP (q85)
+  and put them in `assets/screen/` under the same names. page-01 is the front cover,
+  page-20 the back cover.
 
 ## Deploy
 

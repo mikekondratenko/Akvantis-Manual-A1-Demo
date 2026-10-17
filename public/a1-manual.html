@@ -13,7 +13,6 @@
 <link rel="stylesheet" href="assets/ui-kit/number.css?v=kit10">
 <link rel="stylesheet" href="assets/ui-kit/hotspot.css?v=kit10">
 <link rel="stylesheet" href="assets/ui-kit/header.css?v=kit10">
-<link rel="stylesheet" href="assets/manual-field.css?v=35">
 <link rel="stylesheet" href="assets/manual-kit.css?v=35">
 <style>
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -59,11 +58,9 @@
    ЧИСТЫЙ ЛИСТ, 2026-09-23. Внутренняя сторона пуста — вёрстка пересобирается по
    новой сетке. Наружная нарисована с макета (Figma, «A1 Manual — outer»).
 
-   ВНИМАНИЕ: прежняя редакция этого файла — шапка, семь секций и их компоненты —
-   в истории НЕ сохранена. `Manual/` — отдельный репозиторий, и `a1-manual.html`
-   в нём ни разу не коммитился (во внешнем репозитории Akvantis папка `Manual/`
-   в .gitignore, поэтому его коммиты к этому файлу отношения не имеют). Первое,
-   что стоит сделать с этим файлом, — закоммитить его.
+   2026-10-17: the Manual project (constructor and printed sheet) is gone. This
+   copy lives on in the demo; its data, texts, renderer and pictures are written by
+   ../A1-Manual-Page/tools/build.mjs from that project's src/.
 
    TOKENS ONLY, AND DELIBERATELY NOT kit.css. kit.css is instrument chrome for a
    rail-and-stage tool and opens `html, body { height: 100dvh; overflow: hidden }`,
@@ -902,9 +899,9 @@ html.is-specimen[data-media="screen"] .r-bar.header{position:relative;transform:
 
 <div class="r-guides" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
-<script src="assets/manual-data.js?v=20"></script>
-<script src="assets/manual-texts.js?v=10"></script>
-<script src="assets/manual-render.js?v=27"></script>
+<script src="assets/manual-data.js?v=8a1a4aa2"></script>
+<script src="assets/manual-texts.js?v=f9784de3"></script>
+<script src="assets/manual-render.js?v=f90c5b80"></script>
 <script>
 (function(){
   'use strict';
