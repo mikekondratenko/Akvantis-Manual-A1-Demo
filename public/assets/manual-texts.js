@@ -230,6 +230,9 @@ window.MANUAL_TEXTS = {
       { "en": "Leak detected — close inlet valve, restart", "de": "Leck erkannt — Zulaufventil schließen, neu starten", "uk": "Виявлено протікання — закрийте вхідний клапан, перезапустіть" }
     ],
     "safety": [
+      { "en": "Order filters", "de": "Filter bestellen", "uk": "Замовити фільтри" },
+      { "en": "Do not dispose of with household waste.", "de": "Nicht über den Hausmüll entsorgen.", "uk": "Не викидайте разом із побутовими відходами." },
+      { "en": "Take the unit to a collection point for electrical and electronic equipment (WEEE).", "de": "Bringen Sie das Gerät zu einer Sammelstelle für Elektro- und Elektronik-Altgeräte (WEEE).", "uk": "Здайте пристрій до пункту збору електричного та електронного обладнання (WEEE)." },
       { "en": "Filter replacement", "de": "Kartuschenwechsel", "uk": "Заміна картриджів" },
       { "en": "Replace every 6 months", "de": "Alle 6 Monate wechseln", "uk": "Замінюйте кожні 6 місяців" },
       { "en": "Replace every 12 months", "de": "Alle 12 Monate wechseln", "uk": "Замінюйте кожні 12 місяців" },

@@ -24,7 +24,7 @@
      sections  the content, in reading order: a title or a group frame, the
                print page it sits on (0 — screen only), its width on the page
                in columns of 12, and its blocks.
-     blocks    step · image · items · specs · text · table,
+     blocks    step · image · items · specs · text · table · filters (2026-10-17),
                page — one printed page of picture cards for the screen: each
                card is its art (the frame from Figma without number and
                caption), its place on the page in mock-up units, and the
@@ -250,6 +250,32 @@
         return '<div class="m-ind-row' + (r.alarm ? ' is-alarm' : '') + '"><h3 class="m-ind-name">' + esc(r.name || '') + '</h3>' + states(r.states) + '</div>';
       }).join('');
       return h('div', { 'class':'m-ind', 'data-block':b.id }, key + rows);
+    },
+    /* Filters & specs (2026-10-17) — page 19 of the printed booklet as one framed
+       panel: the three cartridges (picture, numeral, name, when to replace) and
+       where to order them, the specifications, the compliance marks with the
+       disposal notice, and the unit's size and weight. Styles: manual-blocks.css. */
+    filters: function(b, ctx){
+      var carts = (b.cartridges || []).map(function(c){
+        return '<figure class="m-cart"><span class="m-cart-art">' + img(c.art, ctx.resolve) + '</span>' +
+               '<figcaption class="m-cart-text"><span class="m-cart-n" aria-hidden="true">' + esc(c.n || '') + '</span>' +
+               '<strong class="m-cart-name">' + esc(c.name || '') + '</strong>' +
+               (c.sub ? '<span class="m-cart-sub">' + esc(c.sub) + '</span>' : '') + '</figcaption></figure>';
+      }).join('');
+      var o = b.order || {};
+      var order = o.url ? '<a class="btn m-filters-order" href="' + esc(o.url) + '" target="_blank" rel="noopener">' + esc(o.label || 'Order filters') + '</a>' : '';
+      var specs = (b.specs || []).map(function(i){
+        return '<div class="m-fspec"><span class="m-fspec-icon">' + img(i.icon, ctx.resolve) + '</span>' +
+               '<span class="m-fspec-value">' + esc(i.value || '') + '</span><span class="m-fspec-what">' + esc(i.what || '') + '</span></div>';
+      }).join('');
+      var n = b.notice || {};
+      var marks = (b.marks || []).map(function(m){ return '<span class="m-filters-mark">' + img(m.icon, ctx.resolve) + '</span>'; }).join('');
+      return h('div', { 'class':'m-filters', 'data-block':b.id },
+        '<div class="m-filters-carts">' + carts + order + '</div>' +
+        (specs ? '<div class="m-filters-specs">' + specs + '</div>' : '') +
+        (marks || n.title ? '<div class="m-filters-notice">' + (marks ? '<span class="m-filters-marks">' + marks + '</span>' : '') +
+          '<p class="m-filters-notice-text"><strong>' + esc(n.title || '') + '</strong>' + (n.text ? '<span>' + esc(n.text) + '</span>' : '') + '</p></div>' : '') +
+        (b.note ? '<p class="m-filters-note">' + esc(b.note) + '</p>' : ''));
     }
   };
   var CAP_INFO = '<svg class="m-cap-i" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="currentColor"/>' +

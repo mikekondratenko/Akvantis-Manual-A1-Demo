@@ -1,0 +1,119 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   MANUAL BLOCKS — components shared by the guide (A1-Manual-Page) and the demo
+   (A1-Manual-Guide-Demo), newer than either page's own stylesheet and loaded
+   after it. Source: A1-Manual-Page/src/assets/; copied to both by tools/build.mjs.
+   Only kit tokens (ui-kit/kit/tokens.css) — no literal sizes but the hairline.
+
+     SPACING   one gap between cards, pages and blocks — `--m-gap`
+     PAGE      a printed page of cards, laid out with that gap
+     INDICATORS the four lights, set as on the printed page 19
+     FILTERS   Filters & specs, page 19 as one framed panel
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ══════════════ SPACING (2026-10-17) ══════════════
+   One gap for everything that stands side by side or one under another in a
+   section: between cards on a page, between pages, between a page and the block
+   under it. 12 on a phone, 16 from 768. */
+:root{--m-gap:var(--space-12)}
+@media (min-width:768px){ :root{--m-gap:var(--space-16)} }
+.ribbon .m-sec-body, .ribbon .m-pages, .ribbon .m-page{gap:var(--m-gap)}
+
+/* ══════════════ PAGE ══════════════
+   From 768 the cards stand as on the printed page — but the page's own 12 u
+   gutter, scaled up with the picture, made the gaps between cards larger than the
+   gaps between pages, and different on every screen. Here every coordinate is
+   mapped so that the gutter becomes exactly `--m-gap` at any width: a layout of
+   pw × ph u with 12 u gutters onto W px with --m-gap gutters. Cards keep their
+   columns and rows; only the air between them is fixed. */
+@media (min-width:768px){
+  .m-page > .m-card{
+    --g0:12;
+    --pw-px:100cqw;                                           /* the page's width (its container) */
+    --ph-px:calc(100cqw * var(--ph) / var(--pw));             /* its height, from its proportion */
+    --sx:calc((var(--pw-px) + var(--m-gap)) / (var(--pw) + var(--g0)));
+    --sy:calc((var(--ph-px) + var(--m-gap)) / (var(--ph) + var(--g0)));
+    left:calc(var(--x) * var(--sx));
+    top:calc(var(--y) * var(--sy));
+    width:calc((var(--w) + var(--g0)) * var(--sx) - var(--m-gap));
+    height:calc((var(--h) + var(--g0)) * var(--sy) - var(--m-gap));
+  }
+}
+
+/* ══════════════ INDICATORS ══════════════
+   As printed: the name in the first column, each state a light and its word;
+   the key between two ink rules, soft rules between lights; an alarm lists its
+   lights over its sentence. Lights 24, text 16 — the printed page's proportion. */
+.ribbon .m-ind{--m-light:var(--space-24);font-size:var(--text-16);line-height:var(--lh-body, 1.4);font-weight:var(--fw-medium, 500)}
+.ribbon .m-ind-row{padding:var(--space-16) 0;gap:var(--space-12);border-top:var(--hairline, 1px) solid var(--black-150)}
+.ribbon .m-ind-row.is-key{border-top:var(--space-2) solid var(--m-ink);border-bottom:var(--space-2) solid var(--m-ink)}
+.ribbon .m-ind-name{font-weight:var(--fw-medium, 500)}
+.ribbon .m-ind-states li{gap:var(--space-12)}
+.ribbon .m-ind-lights{gap:var(--space-8)}
+.ribbon .m-light{width:var(--m-light);height:var(--m-light)}
+.ribbon .m-light[data-m="flashing"], .ribbon .m-light[data-m="breathing"]{width:var(--m-light);height:var(--m-light);border-width:var(--space-2)}
+.ribbon .m-light[data-m="flashing"]{background:radial-gradient(circle closest-side, var(--c) 0 48%, transparent 54%)}
+.ribbon .m-light[data-m="breathing"]{background:radial-gradient(circle closest-side, color-mix(in srgb, var(--c) 45%, transparent) 0 48%, transparent 54%)}
+/* an alarm: its lights over its sentence, a soft rule between the two alarms */
+.ribbon .m-ind-row.is-alarm .m-ind-states li{flex-direction:column;align-items:flex-start;gap:var(--space-8)}
+.ribbon .m-ind-row.is-alarm .m-ind-states li + li{border-top:var(--hairline, 1px) solid var(--black-150);padding-top:var(--space-16)}
+.ribbon .m-ind-row.is-alarm .m-ind-states{gap:var(--space-16)}
+@media (min-width:768px){
+  .ribbon .m-ind-row{padding:var(--space-24) 0;align-items:center}
+  .ribbon .m-ind-row.is-key{padding:var(--space-16) 0}
+  .ribbon .m-ind-row.is-alarm{align-items:start}
+}
+
+/* ══════════════ FILTERS & SPECS ══════════════
+   Page 19's panel. The frame is the cards' frame — the same rule and corner —
+   so the section reads as one more card of the manual. */
+.m-filters{--m-card-rule:1.5px;position:relative;display:flex;flex-direction:column;
+  padding:0 var(--space-16);border-radius:var(--radius-16);box-shadow:inset 0 0 0 var(--m-card-rule) var(--m-ink);
+  font-family:var(--font-primary);font-weight:var(--fw-medium, 500);color:var(--m-ink)}
+@media (min-width:768px){ .m-filters{--m-card-rule:2px;padding:0 var(--space-32)} }
+@media (min-width:1600px){ .m-filters{--m-card-rule:2.5px} }
+.m-filters > *{padding:var(--space-24) 0}
+.m-filters > * + *{border-top:var(--hairline, 1px) solid var(--black-150)}
+@media (min-width:768px){ .m-filters > *{padding:var(--space-32) 0} }
+
+/* the cartridges: picture, the big numeral, the name, when to replace it */
+.m-filters-carts{display:grid;grid-template-columns:minmax(0, 1fr);gap:var(--space-16)}
+.m-cart{display:flex;align-items:flex-start;gap:var(--space-16);margin:0}
+.m-cart-art{flex:none;width:var(--space-40);height:var(--space-112);overflow:hidden}
+/* the box pictures are squares with the cartridge in the middle: cropped to it */
+.m-cart-art img{width:100%;height:100%;object-fit:cover;display:block}
+.m-cart-text{display:flex;flex-direction:column;min-width:0}
+.m-cart-n{font-size:var(--text-32);line-height:1;font-weight:var(--fw-semibold, 600);letter-spacing:-.02em;margin-bottom:var(--space-8)}
+.m-cart-name{font-size:var(--text-16);line-height:var(--lh-tight, 1.2);font-weight:var(--fw-semibold, 600)}
+.m-cart-sub{margin-top:var(--space-4);font-size:var(--text-14);line-height:var(--lh-snug, 1.3);color:var(--black-250)}
+.m-filters-order{justify-self:start;align-self:center}
+@media (min-width:768px){
+  .m-filters-carts{grid-template-columns:repeat(3, minmax(0, 1fr));gap:var(--space-24)}
+  .m-cart-art{width:var(--space-56);height:var(--space-160)}
+  .m-cart-n{font-size:var(--text-48);margin-bottom:var(--space-16)}
+  .m-filters-carts:has(> .m-filters-order){grid-template-columns:repeat(3, minmax(0, 1fr)) auto}
+}
+
+/* the specifications: six figures in a row (three on a phone and a tablet) */
+.m-filters-specs{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:var(--space-24) var(--space-8)}
+@media (min-width:1024px){ .m-filters-specs{grid-template-columns:repeat(6, minmax(0, 1fr))} }
+.m-fspec{display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--space-4)}
+.m-fspec-icon{width:var(--space-40);height:var(--space-40);margin-bottom:var(--space-8)}
+.m-fspec-icon img{width:100%;height:100%;display:block}
+.m-fspec-value{font-size:var(--text-16);line-height:var(--lh-tight, 1.2);font-feature-settings:"lnum" 1, "pnum" 1}
+.m-fspec-what{font-size:var(--text-14);line-height:var(--lh-snug, 1.3);color:var(--black-250)}
+
+/* the compliance marks and the disposal notice */
+.m-filters-notice{display:flex;flex-direction:column;gap:var(--space-16)}
+.m-filters-marks{display:flex;gap:var(--space-24)}
+.m-filters-mark{width:var(--space-48);height:var(--space-48);color:var(--m-ink)}
+.m-filters-mark img{width:100%;height:100%;display:block}
+.m-filters-notice-text{margin:0;display:flex;flex-direction:column;gap:var(--space-4)}
+.m-filters-notice-text strong{font-size:var(--text-16);line-height:var(--lh-tight, 1.2);font-weight:var(--fw-semibold, 600)}
+.m-filters-notice-text span{font-size:var(--text-14);line-height:var(--lh-snug, 1.3);color:var(--black-250)}
+@media (min-width:768px){
+  .m-filters-notice{flex-direction:row;align-items:center;gap:var(--space-32)}
+  .m-filters-marks{flex:none;padding-right:var(--space-32);border-right:var(--hairline, 1px) solid var(--black-150)}
+}
+
+/* the unit's size and weight */
+.m-filters-note{margin:0;font-size:var(--text-14);line-height:var(--lh-snug, 1.3);color:var(--black-250);text-align:center}

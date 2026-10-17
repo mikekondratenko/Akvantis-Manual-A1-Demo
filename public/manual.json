@@ -1609,39 +1609,32 @@
       "blocks": [
         {
           "id": "b30",
-          "type": "items",
-          "label": "Filter replacement",
-          "items": [
+          "type": "filters",
+          "cartridges": [
             {
+              "n": "I",
               "art": "assets/art/box/pcb-filter.webp",
               "name": "2-in-1 Sediment + Carbon Filter",
-              "count": "",
-              "desc": "Cartridge I",
-              "label": "2-in-1 Sediment + Carbon Filter",
               "sub": "Replace every 6 months"
             },
             {
+              "n": "II",
               "art": "assets/art/box/ro-filter.webp",
               "name": "RO Membrane",
-              "count": "",
-              "desc": "Cartridge II",
-              "label": "RO Membrane",
               "sub": "Replace every 24 months"
             },
             {
+              "n": "III",
               "art": "assets/art/box/mineralizer-filter.webp",
               "name": "Mineralizator",
-              "count": "",
-              "desc": "Cartridge III",
-              "label": "Mineralizator",
               "sub": "Replace every 12 months"
             }
-          ]
-        },
-        {
-          "id": "b31",
-          "type": "specs",
-          "items": [
+          ],
+          "order": {
+            "label": "Order filters",
+            "url": ""
+          },
+          "specs": [
             {
               "icon": "assets/art/safety/supply.svg",
               "value": "230 V~ 50 Hz",
@@ -1672,17 +1665,20 @@
               "value": "5 years",
               "what": "warranty"
             }
-          ]
-        },
-        {
-          "id": "b32",
-          "type": "text",
-          "text": "Unit 126 × 364 × 339 mm (W × D × H), 6.78 kg · Feed water: municipal tap or pretreated well water."
-        },
-        {
-          "id": "b33",
-          "type": "text",
-          "text": "Do not dispose of with household waste. Take the unit to a collection point for electrical and electronic equipment (WEEE)."
+          ],
+          "marks": [
+            {
+              "icon": "assets/art/safety/ce.svg"
+            },
+            {
+              "icon": "assets/art/safety/weee.svg"
+            }
+          ],
+          "notice": {
+            "title": "Do not dispose of with household waste.",
+            "text": "Take the unit to a collection point for electrical and electronic equipment (WEEE)."
+          },
+          "note": "Unit 126 × 364 × 339 mm (W × D × H), 6.78 kg · Feed water: municipal tap or pretreated well water."
         }
       ]
     }
