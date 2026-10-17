@@ -47,7 +47,7 @@
         --bar-top: var(--space-12); }
 @media (min-width: 768px) { :root { --bar-h: 72px; --bar-top: var(--space-16); } }
 
-.topbar {
+.header {
   position: fixed; top: var(--bar-top); left: 50%;
   transform: translateX(-50%); z-index: 20;
   /* Full width less the page's own inset on a phone, the named width once there is room
@@ -57,14 +57,14 @@
   display: flex; align-items: stretch; gap: var(--space-16);
   height: var(--bar-h);
   padding: 0 calc((var(--bar-h) - var(--bar-mark)) / 2);
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
   overflow: hidden;
   background: var(--frost-900);
   backdrop-filter: blur(24px) saturate(120%);
   -webkit-backdrop-filter: blur(24px) saturate(120%);
-  box-shadow: inset 0 0 0 1px var(--white-07);
-  transition: transform .26s cubic-bezier(.2, 0, 0, 1),
-              border-radius .2s cubic-bezier(.2, 0, 0, 1);
+  box-shadow: var(--frost-edge);
+  transition: transform var(--duration-slow) var(--ease-emphasized),
+              border-radius var(--duration-base) var(--ease-emphasized);
 }
 
 /* ── The row is tightened to fit the bar, not the bar widened to fit the row ──
@@ -82,7 +82,7 @@
    From 768, the same breakpoint that starts centring the row: below it the bar is narrower
    than 888 anyway and the row is meant to be swiped. */
 @media (min-width: 768px) {
-  .topbar-nav a { padding: 0 var(--space-4); }
+  .header-nav a { padding: 0 var(--space-4); }
 }
 
 /* ── Away on the way down, back on the way up ──
@@ -91,44 +91,44 @@
    height plus the 16 it floats at, so it clears the viewport rather than hovering with a
    sliver showing. The transform carries the centring with it, which is why the offset is
    written as a two-axis translate and not as a `translateY`. */
-body.bar-away .topbar { transform: translate(-50%, calc(-100% - var(--bar-top))); }
-@media (prefers-reduced-motion: reduce) { .topbar { transition: none; } }
+body.bar-away .header { transform: translate(-50%, calc(-100% - var(--bar-top))); }
+@media (prefers-reduced-motion: reduce) { .header { transition: none; } }
 
 /* Stretched to the bar's full height and holding an `svg` at 100% of it. The drawing does
    not become 40 × 72 as that implies: with no `preserveAspectRatio` override a square
    viewBox fits itself into the box and centres, so the width is what sets the size and the
    height is what centres it. Written this way rather than as a centred 40 × 40 because a
    shrink-to-fit box gives a percentage height nothing to resolve against. */
-.topbar-mark { width: var(--bar-mark); color: var(--white); flex-shrink: 0;
+.header-mark { width: var(--bar-mark); color: var(--white); flex-shrink: 0;
                display: flex; align-items: center; }
-.topbar-mark svg { height: 100%; width: 100%; display: block; }
+.header-mark svg { height: 100%; width: 100%; display: block; }
 
 /* Scrolls sideways rather than wrapping — a second line would double the bar's height for
    a row that is only long on a phone. `overscroll-behavior-inline: contain` stops a swipe
    that runs out of links from turning into a back-gesture, which is the one way a
    horizontal row inside a fixed bar can lose a reader. */
-.topbar-nav { position: relative; display: flex; align-items: stretch;
+.header-nav { position: relative; display: flex; align-items: stretch;
               gap: var(--space-4); flex: 1 1 auto; margin-left: var(--space-8);
               overflow-x: auto; overflow-y: hidden;
               overscroll-behavior-inline: contain;
               -webkit-overflow-scrolling: touch;
               scrollbar-width: none; }
-.topbar-nav::-webkit-scrollbar { display: none; }
+.header-nav::-webkit-scrollbar { display: none; }
 
 /* ── Centred once the row fits, ranged left while it does not ──
    Only from 768 up. On a phone the row is longer than the screen by design and centring
    an overflowing flex row moves its first item out of scroll range, which loses the item
    rather than centring it. `safe` says exactly that: centre when it fits, fall back to the
    start when it does not. */
-@media (min-width: 768px) { .topbar-nav { justify-content: safe center; } }
+@media (min-width: 768px) { .header-nav { justify-content: safe center; } }
 
-.topbar-nav a { position: relative; flex-shrink: 0; display: flex; align-items: center;
+.header-nav a { position: relative; flex-shrink: 0; display: flex; align-items: center;
                 padding: 0 var(--space-12);
-                font-size: var(--text-12); font-weight: 600; color: var(--black-250);
+                font-size: var(--text-12); font-weight: var(--weight-semibold); color: var(--black-250);
                 text-decoration: none; white-space: nowrap;
-                transition: color .15s; }
-.topbar-nav a:hover { color: var(--white); }
-.topbar-nav a.is-here { color: var(--white); }
+                transition: color var(--duration-fast); }
+.header-nav a:hover { color: var(--white); }
+.header-nav a.is-here { color: var(--white); }
 
 /* ── One rule that travels, not one per link ──
    The position marker is a rule on the bar's bottom edge, not a plate behind the word: a
@@ -140,14 +140,14 @@ body.bar-away .topbar { transform: translate(-50%, calc(-100% - var(--bar-top)))
    pseudo-element belongs to its element, so moving the class from one link to the next
    destroys one marker and creates another, and neither can animate. The consumer sets
    `width`, `transform` and `.is-on`. */
-.topbar-ink { position: absolute; left: 0; bottom: 0; height: 5px; width: 0;
+.header-ink { position: absolute; left: 0; bottom: 0; height: 5px; width: 0;
               background: var(--accent); opacity: 0; pointer-events: none;
               transform: translateX(0);
-              transition: transform .2s cubic-bezier(.2, 0, 0, 1),
-                          width     .2s cubic-bezier(.2, 0, 0, 1),
-                          opacity   .15s linear; }
-.topbar-ink.is-on { opacity: 1; }
-@media (prefers-reduced-motion: reduce) { .topbar-ink { transition: opacity .18s linear; } }
+              transition: transform var(--duration-base) var(--ease-emphasized),
+                          width     var(--duration-base) var(--ease-emphasized),
+                          opacity   var(--duration-fast) linear; }
+.header-ink.is-on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .header-ink { transition: opacity var(--duration-base) linear; } }
 
 /* ── The right-hand slot ──
    One control and its label, and one is the limit: the bar is a line, not a toolbar, and
@@ -156,16 +156,16 @@ body.bar-away .topbar { transform: translate(-50%, calc(-100% - var(--bar-top)))
    The label is 12/600 like the links it sits beside rather than the 13 the sidebar uses —
    a bar is a denser line than a panel and one size fits all of it. It lights when the
    switch is on, so the pair reads as one control from across the room. */
-.topbar-aside { display: flex; align-items: center; gap: var(--space-8);
+.header-aside { display: flex; align-items: center; gap: var(--space-8);
                 flex: 0 0 auto; align-self: center; padding-left: var(--space-8); }
-.topbar-aside-label { font-size: var(--text-12); font-weight: 600; color: var(--black-350);
-                      white-space: nowrap; transition: color .15s; }
-.topbar-aside:has(.toggle-switch[aria-checked="true"]) .topbar-aside-label { color: var(--white); }
+.header-aside-label { font-size: var(--text-12); font-weight: var(--weight-semibold); color: var(--ink-faint);
+                      white-space: nowrap; transition: color var(--duration-fast); }
+.header-aside:has(.toggle-switch[aria-checked="true"]) .header-aside-label { color: var(--white); }
 
 /* On frosted glass the switch's default off state needs its own ground — `--black-700` is
    a solid grey and reads as a hole punched in the pane. */
-.topbar .toggle-switch { background: var(--white-12); }
-.topbar .toggle-switch[aria-checked="true"] { background: var(--accent); }
+.header .toggle-switch { background: var(--white-12); }
+.header .toggle-switch[aria-checked="true"] { background: var(--accent); }
 
 /* ── ON A PHONE ──
    The pill floats closer to the top edge and takes the full width less a 12 gutter, under
@@ -173,7 +173,7 @@ body.bar-away .topbar { transform: translate(-50%, calc(-100% - var(--bar-top)))
    full-width by way of `max-width`; what this adds is the safe-area, which is the part a
    `max-width` cannot know about. */
 @media (max-width: 767px) {
-  .topbar {
+  .header {
     top: max(var(--bar-top), env(safe-area-inset-top));
     max-width: calc(100% - var(--space-24)
                     - env(safe-area-inset-left) - env(safe-area-inset-right));

@@ -21,13 +21,13 @@
 .swatch-btn {
   width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent;
   cursor: pointer; padding: 0; position: relative; flex-shrink: 0;
-  transition: opacity .12s, border-color .12s, padding .12s;
+  transition: opacity var(--duration-fast), border-color var(--duration-fast), padding var(--duration-fast);
 }
 /* Hover dims the disc; it does not grow it and it does not tint it. Growing moves the
    swatch out from under the cursor and nudges the row; tinting changes the one thing the
    control exists to show. */
 .swatch-btn:hover { opacity: .78; }
-.swatch-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--white-32); }
+.swatch-btn:focus-visible { outline: none; box-shadow: var(--focus-halo); }
 /* Selected: the fill pulls in, the ring takes the edge — so a row of swatches does not
    grow when one of them is chosen. Done with background-clip rather than a second
    element, so the colour can keep arriving as an inline background on the button.
@@ -132,5 +132,5 @@
   cursor: pointer;
 }
 
-.pair-name { font-size: var(--text-13); font-weight: 600; color: var(--white); }
-.pantone-note { font-size: var(--text-10); color: var(--black-350); line-height: 1.5; min-height: 14px; }
+.pair-name { font-size: var(--text-13); font-weight: var(--weight-semibold); color: var(--white); }
+.pantone-note { font-size: var(--text-10); color: var(--ink-faint); line-height: var(--leading-relaxed); min-height: 14px; }

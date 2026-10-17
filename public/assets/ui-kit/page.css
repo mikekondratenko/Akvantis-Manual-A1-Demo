@@ -1,0 +1,148 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Page — the ground every reading page stands on (2026-10-10)
+
+   A page that scrolls — the passport, the landing — cannot load kit.css, which pins html
+   and body to the viewport for an instrument. What such a page needs is here: the reset and
+   the body, `.sr-only`, the section label, the plate, the specification row, and the
+   collapsible plate restated for a page with no rail inset. Moved out of passport.css,
+   value for value; the notes are the passport's own and still true.
+
+   Requires tokens.css and panel.css (this file corrects panel.css for a page, so it loads
+   after it).
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* A page is dark: form controls, scrollbars and the canvas follow. */
+:root { color-scheme: dark; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-primary);
+  font-size: var(--text-14);
+  line-height: var(--leading-relaxed);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Off-screen but spoken. `kit.css` has this and the page cannot load it — see the file
+   header — so the four lines live here too. `clip-path` with a 1px box rather than
+   `display: none`, which removes an element from the accessibility tree along with the
+   layout, and rather than a negative text-indent, which a right-to-left language reverses
+   into the visible area. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* ── SECTION LABEL ──
+   `.group-label` is the kit's own class for exactly this — 10 / 700 caps, the
+   smaller tighter thing inside the larger one. Its declarations live in kit.css,
+   which this page does not load, so the two lines are lifted here verbatim rather
+   than approximated. If the kit's changes, this is the second place to edit; it is
+   marked so it can be found. */
+.group-label {
+  font-size: var(--text-10); font-weight: var(--weight-bold); letter-spacing: var(--tracking-widest);
+  text-transform: uppercase; color: var(--ink-faint);
+  margin: var(--space-24) 0 var(--space-8);
+}
+
+/* ── PLATES ──
+   Every object in the list below the hero — a link row, a collapsible section, a table
+   of specifications, the picture's stand-in — is `.sidebar-tile`: `--black-900` at
+   `--radius-16`, no border. The kit's own tile, unchanged, because a plate on a page
+   this tool exports and a plate in the rail of the tool that exported it are the same
+   object.
+
+   `--number-64` is the floor, which is comfortably over the 44 both platforms ask for
+   and matches the collapsible plate's strip in `panel.css`. */
+.plate {
+  border-radius: var(--radius-16);
+  background: var(--tile);
+}
+.plate + .plate { margin-top: var(--space-12); }
+
+/* ══════════════ THE COLLAPSIBLE SECTION ══════════════
+   Not defined here. `panel.css` owns `button.panel-title`, `.panel-chevron` and
+   `.panel-fold`, and this page loads that file — so the plate a reader opens on a
+   carton page is the plate in the Box Maker's rail: same strip, same sign, same
+   0fr → 1fr fold on the same .24s curve.
+
+   ⚠ Three corrections of 2026-09-04, and two of them were mine to begin with:
+
+   1. It was `<details>`, chosen so the terms would open with JavaScript off. Defensible
+      on its own and not what was asked for: `<details>` cannot animate its height, so
+      the section snapped open while every other plate in the building eased. Fidelity
+      was the requirement; the no-JS case is answered below instead, by opening every
+      fold when there is no script to close it.
+   2. It drew a hairline over the body when open. The kit's plate has none — the strip
+      and the body are one surface — and a rule there says the two are separate things.
+   3. The strip carried the row's note beside its title. A collapsible plate's strip is
+      a title and a sign.
+
+   What is left here is only what a document adds: prose ink, and a body that reads as
+   paragraphs rather than as a column of fields. */
+.panel-body {
+  padding: 0 var(--space-16) var(--space-16);
+  font-size: var(--text-12); line-height: var(--leading-loose); color: var(--ink-muted);
+  /* `panel.css` gives the body `gap: var(--space-16)` for a rail full of controls.
+     Paragraphs want less, and the gap is the only spacing here — no margins on the
+     paragraphs, or the two systems add up and the terms read loose. */
+  gap: var(--space-8);
+}
+/* Bold in a block of terms is not a shout, it is a pointer: `five full years` and the
+   serial number are the two facts a person will come back to look up, and 500 white
+   against 400 muted is enough to find them at a glance without the paragraph developing a
+   texture. `<strong>` and `<b>` together — the renderer writes the first, and pages
+   exported before it did carry the second. */
+.panel-body b, .panel-body strong { color: var(--ink); font-weight: var(--weight-medium); }
+/* Inside a fold the bottom inset is a margin on the last item, not padding on the body.
+   The body is the fold's clipping child, and overflow clips content but never padding: at
+   0fr a closed plate kept 16px of body under its title — taller than the strip that lights
+   on hover (found in the preview, 2026-10-10). A margin inside the clip folds away with it. */
+.panel-fold > .panel-body { padding-bottom: 0; }
+.panel-fold > .panel-body > :last-child { margin-bottom: var(--space-16); }
+/* Italic stays the body's own ink. It marks a turn of phrase — `the statutory right
+   applies` — and a phrase that is both lighter and slanted disappears. */
+.panel-body em { font-style: italic; }
+
+/* ⚠ THE STRIP'S GEOMETRY IS THE PAGE'S, AND THIS IS THE BUG IN THE SCREENSHOT ──
+   `panel.css` draws the strip with `width: calc(100% + var(--space-32))` and a negative
+   16 margin. That is correct in a rail: `.sidebar-panel` holds a 16px inset, and the
+   negative margin takes the button's box out to the tile's edges so the whole strip is
+   the target while its text stays where the inset put it.
+
+   A plate on this page has no inset — the row's own padding is its inset — so the same
+   rule pushed the strip 16 past the plate on both sides: the warranty row came out
+   wider than the rows above and below it, and its title started 16 to the left of
+   theirs. So the geometry is restated here to match `a.card` exactly, value for value.
+   Everything else about the control — the type, the sign, the fold, the curve, the
+   corners — is still the kit's and is not repeated.
+
+   The strip's ink is the page's too: `panel.css` sets `--black-100`, which is right on
+   a dark rail and invisible on paper. */
+button.panel-title {
+  width: 100%; margin: 0;
+  min-height: var(--number-64);
+  padding: var(--space-12) var(--space-16);
+  color: var(--ink);
+}
+button.panel-title:hover { color: var(--ink); }
+button.panel-title[aria-expanded="false"]:hover { background: var(--tile-hover); }
+button.panel-title:focus-visible { outline: var(--focus-ring); outline-offset: -2px; box-shadow: none; }
+.panel-chevron { color: var(--ink-faint); }
+
+/* ── SPECIFICATIONS ──
+   Field left, answer right, a hairline between rows. The answer column is tabular
+   so a column of numbers lines up on its digits rather than on its glyph widths. */
+.spec {
+  display: flex; justify-content: space-between; gap: var(--space-16);
+  padding: var(--space-12) var(--space-16);
+  font-size: var(--text-12);
+}
+.spec + .spec { border-top: 1px solid var(--rule); }
+.spec span:first-child { color: var(--ink-muted); }
+.spec span:last-child  { color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }

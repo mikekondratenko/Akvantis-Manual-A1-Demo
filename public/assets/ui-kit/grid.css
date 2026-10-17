@@ -1,0 +1,59 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Grid — the layout grid, one source (2026-10-10)
+
+   The grid was a table in docs/DESIGN.md and nothing else: the
+   manual carried its own copy as --gc / --gg / --gm, the Box Demo a `.grid-layout`, the
+   landing none at all. This file is the grid; docs/DESIGN.md's grid table and the
+   preview's Grid section are generated from it by `node ui-kit/build-docs.mjs`.
+
+   Each breakpoint sets three properties on :root, so anything can read them:
+     --grid-cols     columns
+     --grid-gutter   the gap between columns
+     --grid-margin   the inset at either edge
+   `--grid-name` and `--grid-bp` are labels for the docs and the preview, not for layout.
+
+   Edit a value here, run build-docs, commit both. Mobile first: the base block is 360.
+
+   Requires tokens.css.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --grid-bp: 360; --grid-name: "Mobile";
+  --grid-cols: 6;  --grid-gutter: var(--space-8); --grid-margin: var(--space-12);
+}
+@media (min-width: 768px) {
+  :root { --grid-bp: 768; --grid-name: "Tablet";
+          --grid-cols: 8;  --grid-gutter: var(--space-8); --grid-margin: var(--space-16); }
+}
+@media (min-width: 1024px) {
+  :root { --grid-bp: 1024; --grid-name: "Laptop";
+          --grid-cols: 12; --grid-gutter: var(--space-8); --grid-margin: var(--space-24); }
+}
+@media (min-width: 1440px) {
+  :root { --grid-bp: 1440; --grid-name: "Desktop";
+          --grid-cols: 12; --grid-gutter: var(--space-8); --grid-margin: var(--space-32); }
+}
+@media (min-width: 1920px) {
+  :root { --grid-bp: 1920; --grid-name: "Wide";
+          --grid-cols: 20; --grid-gutter: var(--space-8); --grid-margin: var(--space-24); }
+}
+
+/* The container. Children place themselves with `grid-column: span n`. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+  padding-inline: var(--grid-margin);
+}
+
+/* ── OVERLAY (2026-10-12) ── the grid drawn over a page, from the same three properties, so it
+   is the grid rather than a picture of it. Put there by kit/grid-overlay.js with its button —
+   a frosted round `.btn` in the bottom-right corner (button.css). Moved out of the preview,
+   where it was `.pv-gridov` / `.pv-fab`, the day a page wanted it too. */
+.grid-overlay { position: fixed; inset: 0; z-index: 90; pointer-events: none; display: none;
+  grid-template-columns: repeat(var(--grid-cols), 1fr); gap: var(--grid-gutter); padding: 0 var(--grid-margin); }
+.grid-overlay.is-on { display: grid; }
+.grid-overlay i { background: var(--accent); opacity: .12; }
+.grid-overlay i:nth-child(n + 21) { display: none; }
+.btn.grid-fab { position: fixed; right: var(--space-24); bottom: max(var(--space-24), env(safe-area-inset-bottom)); z-index: 91; }
+.btn.grid-fab { width: var(--number-48); }   /* .btn.: button.css loads after this file and sets position: relative */

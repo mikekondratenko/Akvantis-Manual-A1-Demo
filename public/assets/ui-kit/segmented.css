@@ -1,0 +1,50 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Segmented tabs — N equal segments on a padded track, the choice carried by a white
+   thumb. Built by `Kit.segmented()` in kit.js (the thumb's geometry is derived from the
+   option count, so it is not written by hand).
+
+   Moved out of kit.css on 2026-10-12, the same move panel.css, header.css and swatch.css
+   made before it: a reading page (the commercial proposal) wants the control and cannot
+   link kit.css, which pins html/body to the viewport. kit.css @imports this file, so every
+   tool gets it exactly as before. Requires tokens.css.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ══════════════ SEGMENTED CONTROL (generic, N segments) ══════════════ */
+.segmented {
+  position: relative; display: flex; height: 48px; padding: 4px;
+  border: 1px solid transparent; border-radius: var(--radius-8); background: var(--black-700);
+  transition: border-color var(--duration-fast);
+}
+/* No border change on track hover — the per-segment highlight carries it. */
+.segmented-thumb {
+  position: absolute; top: 4px; left: 4px; bottom: 4px;
+  background: var(--white); border-radius: 6px;
+  transition: transform var(--duration-base) var(--ease-standard);
+  z-index: 1;
+}
+.segment-btn {
+  position: relative; z-index: 2; flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  border: none; background: transparent; border-radius: 6px;
+  color: var(--black-200); cursor: pointer; font-size: var(--text-13); font-weight: var(--weight-semibold);
+  font-family: var(--font-primary);
+  transition: color var(--duration-fast), background var(--duration-fast); padding: 0 6px; text-align: center;
+}
+/* On the thumb, which is white: the label has to invert with it or the selected segment is
+   the only one you cannot read. */
+.segment-btn.is-active { color: var(--black-1000); }
+/* Many options — Kit.segmented(…, { scroll: true }). Segments take their label's width and
+   the track scrolls sideways with no visible bar; the thumb is sized by script. */
+.segmented.is-scroll { overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+.segmented.is-scroll::-webkit-scrollbar { display: none; }
+.segmented.is-scroll .segment-btn { flex: none; padding: 0 var(--space-16); white-space: nowrap; }
+.segmented.is-scroll .segmented-thumb { transition: transform var(--duration-base) var(--ease-standard), width var(--duration-base) var(--ease-standard); }
+/* No hover state on an inactive segment, by design. The fill that used to appear under
+   the cursor competed with the thumb — two lit panels at once, one of which was not the
+   selection. The thumb is the only thing that ever fills a segment. */
+.segment-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: inherit; }
+.segment-icon svg { display: block; }
+
+/* An option that cannot be chosen — dimmed and left in place, so the track keeps its width. */
+.segment-btn:disabled { opacity: .35; cursor: default; }
+.segment-btn:disabled:hover { color: var(--black-200); }

@@ -52,14 +52,25 @@
      N equal segments on a padded track, selection carried by a white thumb. The
      thumb's width is `(100% - 8px) / N` because the track has 4px of padding on
      each side; its travel is a plain N × 100% translate of that width. */
-  Kit.segmented = function (container, options, activeIndex, onChange) {
-    container.className = 'segmented';
+  /* opts.scroll — many options: each segment is as wide as its label, the track scrolls
+     sideways, and the thumb is measured from the active button instead of being 1/n of
+     the track. The chosen segment is scrolled into view. Without it, nothing changes. */
+  Kit.segmented = function (container, options, activeIndex, onChange, opts) {
+    var scroll = !!(opts && opts.scroll);
+    container.className = 'segmented' + (scroll ? ' is-scroll' : '');
     container.innerHTML = '';
 
     var thumb = document.createElement('div');
     thumb.className = 'segmented-thumb';
-    thumb.style.width = 'calc((100% - 8px) / ' + options.length + ')';
+    if (!scroll) thumb.style.width = 'calc((100% - 8px) / ' + options.length + ')';
     container.appendChild(thumb);
+
+    var place = function (i) {
+      if (!scroll) { thumb.style.transform = 'translateX(' + (i * 100) + '%)'; return; }
+      var b = btns[i]; if (!b) return;
+      thumb.style.width = b.offsetWidth + 'px';
+      thumb.style.transform = 'translateX(' + (b.offsetLeft - 4) + 'px)';
+    };
 
     var btns = options.map(function (opt, i) {
       var btn = document.createElement('button');
@@ -77,14 +88,22 @@
       btn.appendChild(labelSpan);
       btn.addEventListener('click', function () {
         btns.forEach(function (b, j) { b.classList.toggle('is-active', j === i); });
-        thumb.style.transform = 'translateX(' + (i * 100) + '%)';
+        place(i);
+        if (scroll && btn.scrollIntoView) btn.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
         if (onChange) onChange(opt.value, i);
       });
       container.appendChild(btn);
       return btn;
     });
 
-    thumb.style.transform = 'translateX(' + (activeIndex * 100) + '%)';
+    place(activeIndex);
+    /* Measured geometry goes stale if the face loads late or the track is shown later. */
+    if (scroll) {
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { place(activeIndex); });
+      if (window.ResizeObserver) new ResizeObserver(function () {
+        var a = btns.findIndex(function (b) { return b.classList.contains('is-active'); }); place(a < 0 ? 0 : a);
+      }).observe(container);
+    }
     return btns;
   };
 

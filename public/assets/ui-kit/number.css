@@ -45,15 +45,15 @@
   width:var(--num-size);height:var(--num-size);
   border-radius:999px;overflow:hidden;
   background:var(--num-ink);color:var(--num-paper);
-  font-family:var(--font-primary);font-weight:500;
-  font-size:calc(var(--num-size) * 2 / 3);line-height:1;
+  font-family:var(--font-primary);font-weight:var(--weight-medium);
+  font-size:calc(var(--num-size) * 2 / 3);line-height:var(--leading-none);
   font-feature-settings:"lnum" 1, "pnum" 1;
   text-align:center;white-space:nowrap;
-  letter-spacing:-.02em;
+  letter-spacing:var(--tracking-tight);
 }
 /* a two-digit number (10, 16) stays inside the disc instead of widening it */
-.num[data-digits="2"]{font-size:calc(var(--num-size) * 13 / 24);letter-spacing:-.05em}
-.num[data-fill="simple"][data-digits="2"]{font-size:calc(var(--num-size) * 5 / 6);letter-spacing:-.02em}
+.num[data-digits="2"]{font-size:calc(var(--num-size) * 13 / 24);letter-spacing:var(--tracking-tighter)}
+.num[data-fill="simple"][data-digits="2"]{font-size:calc(var(--num-size) * 5 / 6);letter-spacing:var(--tracking-tight)}
 .num[data-fill="off"]{
   background:none;color:var(--num-ink);
   border:calc(var(--num-size) / 24) solid var(--num-ink);

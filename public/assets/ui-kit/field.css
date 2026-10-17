@@ -1,0 +1,133 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Field — the input family, one source for the tools and the pages (2026-10-10)
+
+   A label, a control, a line under it. The controls are an outline with nothing inside:
+   --field-edge at rest, -hover under the cursor, -focus with the caret in it. The edge is
+   --black-300 because it is the darkest step that clears WCAG 1.4.11's 3:1 on every ground a
+   field sits on — 5.2 on --page, 4.5 on --tile, 4.0 on --black-700.
+
+   Was two places: kit.css drew `.dark-input` for the tools, and the landing carried a lifted
+   copy because it cannot load kit.css (html/body pinned to the viewport). Both read this file
+   now. kit.css keeps what is the rail's own — `.field-group`, `.field-row`, the stepper and
+   the droplist, which are built from the tokens below — and loads after this file.
+
+     .field                 a label and a control stacked, with a hint or a message under it
+     .field-label           11, the muted ink, 8 above the control
+     .dark-input            the text field; `textarea.dark-input` grows, `[type=number]` is tabular
+     .select                the same box with a chevron
+     .field-value-input     a short number, right-aligned, beside its label (.field-row)
+     .field-hint            a line under the control, faint
+     .field-error           the same line when something is wrong, with an icon if given
+     .is-error / .is-success, or aria-invalid="true" on the control — the edge carries the state
+     .notice                what a form says after it is sent — a plate in the status surface:
+                            .notice (info) · .notice.is-success · .notice.is-error
+
+   Requires tokens.css.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.field { display: grid; gap: var(--space-8); }
+.field > .field-label { margin-bottom: 0; }
+
+.field-label {
+  display: block; margin-bottom: var(--space-8);
+  font-size: var(--text-11); font-weight: var(--weight-regular); color: var(--ink-muted);
+}
+
+.dark-input,
+.select,
+.field-value-input {
+  height: var(--field-h);
+  background-color: transparent;
+  border: 1px solid var(--field-edge); border-radius: var(--field-radius);
+  color: var(--ink); font-family: var(--font-primary);
+  font-size: var(--text-13); font-weight: var(--weight-medium);
+  transition: border-color var(--duration-fast), background-color var(--duration-fast);
+}
+.dark-input:hover, .select:hover, .field-value-input:hover { border-color: var(--field-edge-hover); }
+/* Focus is the edge turning white, not an outline: the box is already a line. */
+.dark-input:focus, .select:focus, .field-value-input:focus { outline: none; border-color: var(--field-edge-focus); }
+
+.dark-input { width: 100%; padding: 0 var(--field-pad); }
+.dark-input::placeholder { color: var(--ink-faint); }
+textarea.dark-input {
+  height: auto; min-height: var(--field-h); padding: var(--space-12) var(--field-pad);
+  resize: vertical; line-height: var(--leading-normal);
+}
+/* Numeric — tabular figures so a value does not jitter as it is stepped. */
+.dark-input[type="number"] { font-weight: var(--weight-semibold); font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+.dark-input[type="number"]::-webkit-outer-spin-button,
+.dark-input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* ── SELECT ──
+   The chevron is a background image, which is why nothing here sets the `background`
+   shorthand — it would wipe the chevron. */
+.select {
+  width: 100%; padding: 0 var(--space-40) 0 var(--field-pad);
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23989B9A' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right var(--field-pad) center;
+}
+.select:disabled { color: var(--ink-faint); cursor: not-allowed; }
+.select option { background: var(--black-700); color: var(--white); }
+
+/* A number on its own, right-aligned, for a label/value row where the label is the
+   question and the field is just the answer. */
+.field-value-input {
+  width: var(--number-72); padding: 0 var(--field-pad);
+  font-size: var(--text-14); font-weight: var(--weight-semibold);
+  text-align: right; font-variant-numeric: tabular-nums;
+}
+
+/* ── REQUIRED (2026-10-12) ── a field whose control carries `required` gets an asterisk after
+   its label, drawn here so no page types it. The red is the danger ink at rest — the one
+   convention every form reader already knows; it is a mark, not an error state. The
+   asterisk is decoration (`speak: never`): the control's own `required` is what a screen
+   reader announces. Fields without it need no «(optional)». */
+.field:has(:is(input, textarea, select)[required]) > .field-label::after {
+  content: ' *'; color: var(--danger); speak: never;
+}
+
+/* ── THE LINE UNDER ── */
+.field-hint, .field-error {
+  display: flex; align-items: center; gap: var(--space-8);
+  font-size: var(--text-11); line-height: var(--leading-normal);
+}
+.field-hint { color: var(--ink-faint); }
+.field-error { color: var(--danger); font-weight: var(--weight-medium); }
+.field-error svg, .field-hint svg { flex-shrink: 0; }
+/* Not stacked by .field's gap — a message sits 8 under the control, like the label above it. */
+:not(.field) > .field-hint, :not(.field) > .field-error { margin-top: var(--space-8); }
+
+/* ── STATES ──
+   The edge carries the state and the field stays a field — empty, so it still reads as a
+   place to type rather than a warning that happens to accept text. Error keeps its red
+   under the cursor and with the caret in it, instead of falling back to white and losing
+   what it was saying. `aria-invalid` is the same state, for a form that sets it. */
+.dark-input.is-error, .select.is-error, .field-value-input.is-error, .stepper.is-error,
+.dark-input[aria-invalid="true"], .select[aria-invalid="true"] { border-color: var(--danger-edge); }
+.dark-input.is-error:hover, .select.is-error:hover, .field-value-input.is-error:hover, .stepper.is-error:hover,
+.dark-input[aria-invalid="true"]:hover, .select[aria-invalid="true"]:hover { border-color: var(--danger); }
+.dark-input.is-error:focus, .select.is-error:focus, .field-value-input.is-error:focus, .stepper.is-error:focus-within,
+.dark-input[aria-invalid="true"]:focus, .select[aria-invalid="true"]:focus { outline: none; border-color: var(--danger-edge); }
+.field-label.is-error { color: var(--danger); }
+
+.dark-input.is-success, .select.is-success, .field-value-input.is-success { border-color: var(--success); }
+.field-hint.is-success { color: var(--success); }
+
+/* ── NOTICE (2026-10-11) ──
+   The answer a form gives after sending: a plate on the status surface, its icon in the
+   status ink, the words in the page's ink — the colour says which kind, the text does the
+   telling. role="status" (or "alert" for an error) on the element; `hidden` until there is
+   something to say. */
+.notice {
+  display: flex; align-items: flex-start; gap: var(--space-12);
+  padding: var(--space-12) var(--space-16); border-radius: var(--radius-12);
+  background: var(--info-surface); color: var(--ink);
+  font-size: var(--text-14); line-height: var(--leading-normal);
+}
+.notice[hidden] { display: none; }
+.notice > svg { flex: none; width: var(--number-16); height: var(--number-16); margin-top: var(--space-2); color: var(--info); }
+.notice.is-success { background: var(--success-surface); }
+.notice.is-success > svg { color: var(--success); }
+.notice.is-error { background: var(--danger-surface); }
+.notice.is-error > svg { color: var(--danger); }

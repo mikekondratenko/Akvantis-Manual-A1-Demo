@@ -1,0 +1,73 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Foot — the last lines of a page: social marks and the legal line (2026-10-10)
+
+   Moved out of passport.css so the landing can use it alone. Requires tokens.css.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── FOOT ── */
+.foot {
+  /* ⚠ The hairline above the foot came off on 2026-09-04. The page is a stack of plates
+     on a plain ground, and the last plate's own edge is already where the list ends — a
+     rule under it draws a second ending for the same place. What separates the foot now
+     is the 32 above it, which is the largest gap on the page and says the same thing
+     without a line. */
+  margin-top: var(--space-32);
+  padding-top: var(--space-16);
+  /* ── WHITE, TURNED DOWN — NOT A GREY ──
+     `--ink-faint` is a step on the neutral ramp: an opaque colour mixed
+     against black. It was right while the page had one ground. It is wrong now that the
+     ground can be water — a fixed grey over a moving blue reads as a smudge on the glass,
+     because it is not related to what is behind it at all.
+
+     `--white-32` is the same white the page is set in, at a third of its strength, so the
+     foot is the page's own ink dimmed rather than a different colour that happens to look
+     dim on black. Over the flat ground it lands within a shade of where the grey was; over
+     the water it takes the water's colour with it, which is what a quiet line of type on
+     glass is supposed to do. */
+  font-size: var(--text-10); color: var(--ink-quiet); line-height: var(--leading-relaxed);
+  text-align: center;
+}
+.foot p { margin: 0; }
+.foot p + p { margin-top: var(--space-4); }
+.foot-mark { display: block; width: var(--number-72); margin: 0 auto var(--space-12); color: var(--ink-quiet); }
+.foot-mark svg { display: block; width: 100%; height: auto; }
+
+/* The marks are the company's own, taken off akvantis.com — not redrawn as
+   outlines to match the chevrons. A social glyph is a trademark and a version of
+   it in our line weight is a version of somebody else's mark. Centred as a row,
+   at 40 square, spaced so the targets do not touch. */
+.social {
+  display: flex; justify-content: center; gap: var(--space-8);
+  margin-bottom: var(--space-16);
+}
+.social a {
+  display: flex; align-items: center; justify-content: center;
+  width: var(--number-40); height: var(--number-40);
+  border-radius: var(--radius-8);
+  /* Full white, where the copyright line beside them is white at a third.
+     They are not the same kind of thing and should not be the same weight: the marks are
+     four destinations somebody might actually want, and at `--ink-faint` they read as
+     disabled — a row of greyed-out buttons at the bottom of the page. The line under them
+     is a legal notice nobody came here for.
+
+     ⚠ Which means the ROW is now the brightest thing in the foot, and that is deliberate.
+     If it ever starts pulling attention off the guide button, the answer is fewer icons,
+     not dimmer ones. */
+  color: var(--ink);
+}
+/* ⚠ No hover. They are four marks in a foot, not four controls: lighting one under the
+   cursor promises a state change on the least important object on the page, and a row of
+   plates flickering as the pointer crosses it is noise. The focus ring stays — that is
+   how somebody on a keyboard knows where they are. */
+.social a:focus-visible { outline: var(--focus-ring); outline-offset: 0; }
+.social svg { display: block; width: var(--number-24); height: var(--number-24); }
+/* The YouTube glyph is two-tone: the body is the ink and the play triangle is a hole in
+   it. Cut with the page colour so it stays a hole rather than becoming a grey shape.
+
+   ⚠ Over the water this is a lie the eye does not notice and should not be made to: the
+   triangle is filled with `--page` while what is actually behind the icon is a moving
+   blue. At 10px of glyph, against a body that is now full white, the difference is below
+   the threshold where anybody could see it — and the alternative, punching a real hole
+   with `mix-blend-mode`, would knock through to the water and make the play symbol
+   shimmer. A still wrong colour beats a correct one that moves. */
+.social .knockout { fill: var(--page); }

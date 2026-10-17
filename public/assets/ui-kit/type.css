@@ -1,0 +1,86 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Type roles — what a line of text is for, one class each (2026-10-10)
+
+   tokens.css holds the scale (--text-*) and the metrics (--weight-*, --leading-*,
+   --tracking-*). A role is the four chosen together, so a heading is one decision and not
+   four that have to be remembered in step. The role names the job, not the tag: a section
+   title that has to read as large as the page title is `<h2 class="t-h1">`.
+
+     .t-display   56 → 72 → 96 / 1 / 600 / -.02em   a landing's object — a name, a price as a picture
+     .t-h1        40 → 48 → 56 / 1 / 600            a page or a screen's title
+     .t-h2        24 → 32      / 1.1 / 600          a section's title, a price
+     .t-h3        24 / 1.25 / 600            a group inside a section
+     .t-title     16 / 1.25 / 600            a card's name, a row's name, a question
+     .t-lead      16 / 1.5  / muted          the sentence under a title
+     .t-body      16 / 1.5                   running text on a page
+     .t-small     14 / 1.5                   running text in a plate, a row's second line
+     .t-caption   12 / 1.4  / faint          a note under something
+     .t-label     10 / 700  / caps / .08em   the small heading over a group
+     .link        a text link: a 40 % hairline at rest; under the cursor a full-ink 1px line
+                  draws across it left to right, and runs off to the right on the way out.
+                  It takes the ink of the text it sits in; data-state="hover" pins the drawn
+                  state for the preview
+
+   ── THE TOP THREE STEP DOWN ON A SMALL SCREEN (2026-10-11) ──
+   Sizes are mobile first and change at the grid's own breakpoints, 768 and 1024, so a title
+   changes size where the columns do. Every step is on the type scale — no clamp(), no vw:
+   a size that slides with the window is a size nobody chose. h3 and down hold at every width.
+
+   Tools set their chrome at 10–14 inside their own components and do not need these; the
+   roles are for pages that read. Every value is a token, so the docs table in DESIGN.md
+   and the preview's Type section are generated from this file.
+
+   Requires tokens.css.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* The role sizes, mobile first. */
+:root {
+  --type-display: var(--text-56);
+  --type-h1:      var(--text-40);
+  --type-h2:      var(--text-24);
+}
+@media (min-width: 768px)  { :root { --type-display: var(--text-72); --type-h1: var(--text-48); --type-h2: var(--text-32); } }
+@media (min-width: 1024px) { :root { --type-display: var(--text-96); --type-h1: var(--text-56); } }
+
+.t-display { font-size: var(--type-display); line-height: var(--leading-none);    font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); }
+.t-h1      { font-size: var(--type-h1); line-height: var(--leading-none);    font-weight: var(--weight-semibold); }
+.t-h2      { font-size: var(--type-h2); line-height: var(--leading-tight);   font-weight: var(--weight-semibold); }
+.t-h3      { font-size: var(--text-24); line-height: var(--leading-snug);    font-weight: var(--weight-semibold); }
+.t-title   { font-size: var(--text-16); line-height: var(--leading-snug);    font-weight: var(--weight-semibold); }
+.t-lead    { font-size: var(--text-16); line-height: var(--leading-relaxed); color: var(--ink-muted); }
+.t-body    { font-size: var(--text-16); line-height: var(--leading-relaxed); }
+.t-small   { font-size: var(--text-14); line-height: var(--leading-relaxed); }
+.t-caption { font-size: var(--text-12); line-height: var(--leading-normal);  color: var(--ink-faint); }
+.t-label   { font-size: var(--text-10); line-height: var(--leading-snug);    font-weight: var(--weight-bold);
+             letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--ink-faint); }
+
+/* ── LINE BREAKS (2026-10-12) ──
+   No word left alone on the last line. A title is balanced — its lines come out near equal;
+   running text is `pretty` — the browser looks a few lines ahead and avoids an orphan. Both
+   are hints: a browser without them breaks lines as before, nothing else changes. */
+.t-display, .t-h1, .t-h2, .t-h3, .t-title { text-wrap: balance; }
+.t-lead, .t-body, .t-small, .t-caption { text-wrap: pretty; }
+
+/* ── LINK (2026-10-11) ──
+   Two lines drawn as backgrounds, so they follow the text across a line break: the hairline
+   at rest (the ink at 40 %), and the full line over it, 0 wide until the cursor arrives. It
+   grows from the left; on the way out it is anchored right, so it runs off that way instead
+   of rewinding — a trim path, not a wipe back. Only the size is animated; the anchor jumps. */
+.link {
+  color: inherit; text-decoration: none;
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    /* The hairline is drawn inside a whole-pixel strip rather than as a half-pixel strip of
+       its own: a background tile under one device pixel tall, on the fractional bottom edge
+       of a line of text, is dropped by the rasteriser — the hairline came and went from line
+       to line on a 2× screen. */
+    linear-gradient(to top, color-mix(in srgb, currentColor 40%, transparent) var(--link-line), transparent var(--link-line));
+  background-repeat: no-repeat;
+  background-position: 100% 100%, 0 100%;
+  background-size: 0% var(--link-line-hover), 100% 1px;
+  transition: background-size var(--duration-slow) var(--ease-emphasized);
+}
+.link:hover, .link:focus-visible, .link[data-state="hover"] {
+  background-position: 0 100%, 0 100%;
+  background-size: 100% var(--link-line-hover), 100% 1px;
+}

@@ -34,7 +34,7 @@
   border:0;border-radius:999px;
   background:var(--hot-ink);color:var(--hot-paper);
   cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:transform .08s;
+  transition:transform var(--duration-instant);
 }
 .hotspot::before,.hotspot::after{
   content:'';position:absolute;left:50%;top:50%;

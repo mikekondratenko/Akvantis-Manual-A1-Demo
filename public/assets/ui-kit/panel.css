@@ -36,7 +36,7 @@
    stopped being loud has to be legible. The collapsible variant lifts to white on
    hover. */
 .panel-title {
-  font-size: var(--text-14); font-weight: 600; letter-spacing: 0;
+  font-size: var(--text-14); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-normal);
   color: var(--black-100);
 }
 
@@ -71,13 +71,13 @@ button.panel-title {
   border-radius: var(--radius-16);
   background: none; border: 0; cursor: pointer;
   font-family: inherit; text-align: left;
-  transition: color .12s, background .12s;
+  transition: color var(--duration-fast), background var(--duration-fast);
 }
 button.panel-title:hover { color: var(--white); }
 button.panel-title[aria-expanded="false"]:hover { background: var(--white-04); }
 button.panel-title:focus-visible {
   outline: none; color: var(--white);
-  box-shadow: 0 0 0 2px var(--white-32);
+  box-shadow: var(--focus-halo);
 }
 /* Open, the plate continues below the strip, so the bottom corners belong to the
    body. */
@@ -107,7 +107,7 @@ button.panel-title[aria-expanded="true"] { border-radius: var(--radius-16) var(-
 .panel-chevron {
   flex: none; color: var(--black-250);
   transform: rotate(-90deg);
-  transition: transform .2s cubic-bezier(.4, 0, .2, 1);
+  transition: transform var(--duration-base) var(--ease-standard);
 }
 [aria-expanded="true"] .panel-chevron { transform: rotate(0deg); }
 
@@ -137,7 +137,7 @@ button.panel-title[aria-expanded="true"] { border-radius: var(--radius-16) var(-
 .sidebar-panel:has(> .panel-fold) { gap: 0; }
 .panel-fold {
   display: grid; grid-template-rows: 0fr;
-  transition: grid-template-rows .24s cubic-bezier(.4, 0, .2, 1);
+  transition: grid-template-rows var(--duration-slow) var(--ease-standard);
 }
 .panel-fold[data-open="true"] { grid-template-rows: 1fr; }
 .panel-fold > * { overflow: hidden; min-height: 0; }

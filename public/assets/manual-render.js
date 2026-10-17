@@ -425,13 +425,13 @@
     main.querySelectorAll(':scope > :not(.r-bar)').forEach(function(e){ e.remove(); });
     /* The Akvantis mark closes the page (2026-10-01): grey, centred, after the
        last section — it left the bar. The drawing is the bar's own. */
-    var markSvg = bar && bar.querySelector('.topbar-mark svg');
+    var markSvg = bar && bar.querySelector('.header-mark svg');
     /* 2026-10-07: no mark at the foot — the page ends with its last section, on a
        phone, a tablet and a desktop alike. */
     var foot = '';
     main.insertAdjacentHTML('beforeend', head + '<div class="r-flow">' + body + '</div>' + foot);
     if (bar){
-      var nav = bar.querySelector('.topbar-nav');
+      var nav = bar.querySelector('.header-nav');
       nav.querySelectorAll('a').forEach(function(a){ a.remove(); });
       var n = 0, seen = {};
       (data.sections || []).forEach(function(s){
@@ -445,7 +445,7 @@
         }
         var a = doc.createElement('a');
         a.href = '#' + s.id;
-        a.innerHTML = num(++n, 'topbar-num') + '<span class="topbar-label">' +
+        a.innerHTML = num(++n, 'header-num') + '<span class="header-label">' +
                       esc(String(s.navTitle || s.title).replace(/\n/g, ' ')) + '</span>';
         nav.appendChild(a);
       });

@@ -4,7 +4,9 @@ Cloned from the **Shokobox Card Generator** (`card-generator.michaelkondratenko.
 which is the reference implementation of the kit. The donor repository is read-only
 for this project — nothing here writes back to it.
 
-Specimen page: **`A1/public/ui-kit.html`**. In use: **`A1/public/box.html`** and
+Specimen: **`ui-kit/preview/index.html`** — the one page for the whole kit: tokens, roles, page
+components and every tool component, rendered by the kit's own files (2026-10-10: the tools'
+specimen that lived at `A1/public/ui-kit.html` was merged into it). In use: **`A1/public/box.html`** and
 **`Stick-Maker/public/index.html`**.
 
 ## Where this is edited
@@ -31,12 +33,34 @@ the whole rail in a fallback. `sync-kit` lays down both.
 
 ```
 ui-kit/kit/           →  <project>/public/assets/ui-kit/
-├── tokens.css   CSS custom properties — colour, type, numbers, space, radius
+├── tokens.css   CSS custom properties — colour, status, type metrics, numbers, space, radius,
+│                motion, elevation, focus, field; ends with the one :focus-visible ring and
+│                the reduced-motion rule
+├── type.css     the type roles: .t-display .t-h1 .t-h2 .t-h3 .t-title .t-lead .t-body .t-small
+│                .t-caption .t-label — for pages that read
+├── field.css    the input family — .field .field-label .dark-input .select .field-value-input
+│                .field-hint .field-error, .is-error / .is-success; tools load it before kit.css
+├── page.css     the ground of a page that scrolls: reset, body, .plate .spec .group-label, the
+│                panel on a page; after panel.css
+├── locale.css   the location picker and the region sheet
+├── foot.css     the page's foot: social marks and the legal line
+├── header.css   the bar: .header — the tools' top bar and a page's head; requires tokens.css
+├── swatch.css   the colour swatch and the finish row (.swatch-btn, .color-block); requires tokens.css
 ├── panel.css    the plate title and the collapsible plate; requires tokens.css
 ├── number.css   the step number in a circle (Figma «Number»); requires tokens.css
 ├── hotspot.css  the "+" in a black disc on a picture — a button that opens more; requires tokens.css
-├── kit.css      components; requires tokens.css and panel.css, in that order
-└── kit.js       the two controls that are built rather than written (window.Kit)
+├── button.css   the one button, tools and pages alike — colour from the --btn role; requires tokens.css
+├── segmented.css the segmented tabs (Kit.segmented) — kit.css @imports it; a page links it alone
+├── section.css  the screens of a landing: .sec-hero .sec-benefits .sec-split .sec-cta .sec-faq;
+│                specimen preview/sections.html; requires tokens, grid, type, button (+ page);
+│                every section is listed in docs/DESIGN.md → Sections
+├── accordion.js the collapsible plate's behaviour — aria-expanded, data-open, inert; no kit.js
+├── slider.js    the controls of .sec-slides / .sec-gallery / .sec-reviews — arrows, or dots and
+│                pause with data-autoplay; requires button.css, no kit.js
+├── grid-overlay.js  the grid's columns over a page and a round button to show them — previews only
+├── grid.css     the layout grid: --grid-cols / --grid-gutter / --grid-margin per breakpoint, and .grid
+├── kit.css      components; requires tokens.css, panel.css, button.css and field.css, in that order
+└── kit.js       the builders: controls that are made rather than written (window.Kit)
 
 ui-kit/fonts/            →  <project>/public/assets/fonts/
 └── CyGrotesk-Key*         the licensed face tokens.css reaches for
@@ -45,6 +69,8 @@ ui-kit/fonts/            →  <project>/public/assets/fonts/
 ```html
 <link rel="stylesheet" href="assets/ui-kit/tokens.css">
 <link rel="stylesheet" href="assets/ui-kit/panel.css">
+<link rel="stylesheet" href="assets/ui-kit/button.css">
+<link rel="stylesheet" href="assets/ui-kit/field.css">
 <link rel="stylesheet" href="assets/ui-kit/kit.css">
 <script src="assets/ui-kit/kit.js"></script>
 ```
@@ -57,7 +83,7 @@ Maker had redeclared the sign locally as a chevron, and `kit.css` held a reduced
 rule for `.panel-chevron` — a class it never defined. One file, four surfaces, no copies.
 The sign is the chevron; `.panel-sign`, the plus that became a minus, is gone.
 
-Sora comes from Google Fonts; the kit assumes it is loaded.
+The face is Cy Grotesk Key, self-hosted and declared in `tokens.css` — nothing to load from a CDN.
 
 ## The scale
 
@@ -85,6 +111,27 @@ rather than a gap.
 
 `--rail` and `--rail-collapsed` stay off the scale deliberately — 300 is the rail's own
 measurement, and rounding it to 288 to tidy the list would change what the number is for.
+
+## Roles and the button — 2026-10-10
+
+`tokens.css` now carries the **roles** a page reaches for — `--page --ink --ink-muted
+--ink-faint --ink-quiet --rule --tile --tile-hover --btn --btn-hover --btn-ink` — moved
+out of `passport.css` with their values unchanged, plus `--radius-pill`.
+
+**`button.css` is the one button.** It replaced two `.btn`s that disagreed: grey in
+`kit.css`, accent in `passport.css`. The shape is written once and the colour is the
+`--btn` role:
+
+| | `--btn` resolves to | why |
+|---|---|---|
+| a page (`tokens.css` default) | the accent | on a page the button *is* the action |
+| a tool (`kit.css` re-points `:root`) | `--black-700` | in an instrument the accent is a state |
+
+Variants re-point the role on the element and never paint a background of their own:
+`.is-on`, `.btn-accent`, `.btn-neutral`, `.btn-white`, `.btn-ghost`, `.btn-danger`. That is
+what lets `.is-frosted` swap a button's fill (`--btn: var(--frost-700)`) without outranking
+hover or `.is-on`. Verified 2026-10-10 against 18 pages, computed styles and hover: identical
+except the inset, 20 → 24 (`--space-24`; 20 is off the scale), invisible on full-width buttons.
 
 ## Heading levels
 
@@ -139,12 +186,12 @@ on cannot move anything by a pixel.
 **CSS-only** — `.sidebar-tile`, `.sidebar-panel`, `.panel-title`, `.group-label`,
 `.group-note`, `.sidebar-divider`, `.toggle-row` + `.toggle-switch`, `.dark-input`,
 `.select`, `.file-in`, `.swatch-input`, `.swatch-btn`, `.slider` + `.value-row` +
-`.ends`, `.btn` / `.btn-ghost` / `.print-btn`, `.toast`, `.stage`, `.stage-hint`,
-`.view-tab`, `.camera-tab`, `.bottom-bar`, `.topbar` + `.topbar-mark` + `.topbar-nav` +
-`.topbar-ink` + `.topbar-aside`, `.preview-caption`, `.section-disabled`,
+`.ends`, `.print-btn`, `.toast`, `.stage`, `.stage-hint`,
+`.view-tab`, `.camera-tab`, `.bottom-bar`, `.header` + `.header-mark` + `.header-nav` +
+`.header-ink` + `.header-aside`, `.preview-caption`, `.section-disabled`,
 `.popup` + `.popup-overlay`.
 
-**`.topbar` is a shell, and the row inside it is the consumer's.** Brand mark left,
+**`.header` is a shell, and the row inside it is the consumer's.** Brand mark left,
 section links centre, one control right, floating as a frosted pill over a fixed page. It
 came out of `product-matrix`, where it was written first — that page now carries only what
 is genuinely local to it: the family lockups that go inside a link, the greyed state for a
@@ -157,12 +204,12 @@ fitting, the link padding comes down rather than the pill going out: from 768 it
 either side, which holds sixteen sections inside 888 with about 100 px to spare. Past that
 the row scrolls, which is the phone behaviour and was always the intent there.
 
-**The ink is positioned by script, and the kit only dresses it.** `.topbar-ink` is one
+**The ink is positioned by script, and the kit only dresses it.** `.header-ink` is one
 element on the bar's bottom edge that travels; the consumer sets `width`, `transform` and
 `.is-on`. An `::after` on the active link cannot animate — a pseudo-element belongs to its
 element, so moving the class destroys one marker and creates another.
 
-**`.topbar-aside` holds one control.** The bar is a line, not a toolbar, and the second
+**`.header-aside` holds one control.** The bar is a line, not a toolbar, and the second
 thing put in that slot is the thing that starts the row scrolling on a laptop. Its label
 lights when a `.toggle-switch` inside it is on, so the pair reads as one control.
 

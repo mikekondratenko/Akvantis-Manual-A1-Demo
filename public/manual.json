@@ -165,7 +165,7 @@
         "h": 127
       }
     ],
-    "imageL": "assets/screen/page-18.webp",
+    "imageL": "assets/screen/page-20.webp",
     "imageR": "assets/screen/page-01.webp"
   },
   "spreads": [
@@ -216,6 +216,12 @@
       "mode": "image",
       "imageL": "assets/screen/page-16.webp",
       "imageR": "assets/screen/page-17.webp"
+    },
+    {
+      "id": "sp9",
+      "mode": "image",
+      "imageL": "assets/screen/page-18.webp",
+      "imageR": "assets/screen/page-19.webp"
     }
   ],
   "sections": [
@@ -547,7 +553,7 @@
               "w": 362,
               "h": 564,
               "n": 3,
-              "caption": "Overview"
+              "caption": "Fit faucet"
             },
             {
               "art": "assets/art/cards/p04-4.webp",
@@ -1260,7 +1266,7 @@
               "w": 299,
               "h": 276,
               "n": 4,
-              "caption": "Open inlet valve",
+              "caption": "Open valve, check for leaks",
               "marks": [
                 {
                   "type": "ok",
@@ -1271,21 +1277,21 @@
             },
             {
               "art": "assets/art/cards/p15-2.webp",
-              "x": 312,
-              "y": 0,
-              "w": 424,
-              "h": 506,
-              "n": 5,
-              "caption": "Open faucet"
-            },
-            {
-              "art": "assets/art/cards/p15-3.webp",
               "x": 0,
               "y": 288,
               "w": 299,
               "h": 218,
-              "n": 6,
+              "n": 5,
               "caption": "Plug in"
+            },
+            {
+              "art": "assets/art/cards/p15-3.webp",
+              "x": 312,
+              "y": 0,
+              "w": 424,
+              "h": 506,
+              "n": 6,
+              "caption": "Open faucet"
             },
             {
               "art": "assets/art/cards/p15-4.webp",
@@ -1326,7 +1332,7 @@
               "x": 0,
               "y": 0,
               "w": 362,
-              "h": 276,
+              "h": 506,
               "n": 1,
               "caption": "Close inlet valve"
             },
@@ -1335,43 +1341,52 @@
               "x": 374,
               "y": 0,
               "w": 362,
-              "h": 391,
+              "h": 506,
               "n": 2,
               "caption": "Open faucet until water stops"
             },
             {
               "art": "assets/art/cards/p16-3.webp",
               "x": 0,
-              "y": 288,
-              "w": 362,
-              "h": 276,
+              "y": 519,
+              "w": 736,
+              "h": 507,
               "n": 3,
               "caption": "Release old filter"
-            },
+            }
+          ]
+        },
+        {
+          "id": "pg17",
+          "type": "page",
+          "page": 17,
+          "w": 736,
+          "h": 1026,
+          "cards": [
             {
-              "art": "assets/art/cards/p16-4.webp",
-              "x": 374,
-              "y": 404,
-              "w": 362,
-              "h": 391,
+              "art": "assets/art/cards/p17-1.webp",
+              "x": 0,
+              "y": 0,
+              "w": 736,
+              "h": 506,
               "n": 4,
               "caption": "Insert new filter until click"
             },
             {
-              "art": "assets/art/cards/p16-5.webp",
+              "art": "assets/art/cards/p17-2.webp",
               "x": 0,
-              "y": 577,
+              "y": 519,
               "w": 362,
-              "h": 449,
+              "h": 507,
               "n": 5,
               "caption": "Open valve & faucet"
             },
             {
-              "art": "assets/art/cards/p16-6.webp",
+              "art": "assets/art/cards/p17-3.webp",
               "x": 374,
-              "y": 808,
+              "y": 519,
               "w": 362,
-              "h": 218,
+              "h": 507,
               "n": 6,
               "caption": "Hold 3 s to reset"
             }
@@ -1587,11 +1602,42 @@
     },
     {
       "id": "safety",
-      "title": "Safety & warranty",
+      "title": "Filters & specs",
       "style": "group",
       "page": 5,
       "span": 12,
       "blocks": [
+        {
+          "id": "b30",
+          "type": "items",
+          "label": "Filter replacement",
+          "items": [
+            {
+              "art": "assets/art/box/pcb-filter.webp",
+              "name": "2-in-1 Sediment + Carbon Filter",
+              "count": "",
+              "desc": "Cartridge I",
+              "label": "2-in-1 Sediment + Carbon Filter",
+              "sub": "Replace every 6 months"
+            },
+            {
+              "art": "assets/art/box/ro-filter.webp",
+              "name": "RO Membrane",
+              "count": "",
+              "desc": "Cartridge II",
+              "label": "RO Membrane",
+              "sub": "Replace every 24 months"
+            },
+            {
+              "art": "assets/art/box/mineralizer-filter.webp",
+              "name": "Mineralizator",
+              "count": "",
+              "desc": "Cartridge III",
+              "label": "Mineralizator",
+              "sub": "Replace every 12 months"
+            }
+          ]
+        },
         {
           "id": "b31",
           "type": "specs",
@@ -1627,6 +1673,16 @@
               "what": "warranty"
             }
           ]
+        },
+        {
+          "id": "b32",
+          "type": "text",
+          "text": "Unit 126 × 364 × 339 mm (W × D × H), 6.78 kg · Feed water: municipal tap or pretreated well water."
+        },
+        {
+          "id": "b33",
+          "type": "text",
+          "text": "Do not dispose of with household waste. Take the unit to a collection point for electrical and electronic equipment (WEEE)."
         }
       ]
     }

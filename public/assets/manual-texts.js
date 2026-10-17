@@ -42,6 +42,7 @@ window.MANUAL_TEXTS = {
   },
   "texts": {
     "sections": [
+      { "en": "Filters & specs", "de": "Kartuschen & Technische Daten", "uk": "Картриджі та характеристики" },
       { "en": "In the box", "de": "Lieferumfang", "uk": "Комплектація" },
       { "en": "Tools required", "de": "Benötigtes Werkzeug", "uk": "Потрібні інструменти" },
       { "en": "Tools", "de": "Werkzeug", "uk": "Інструменти" },
@@ -115,6 +116,7 @@ window.MANUAL_TEXTS = {
       { "en": "Screwdriver", "de": "Schraubendreher", "uk": "Викрутка" }
     ],
     "faucet-k1": [
+      { "en": "Fit faucet", "de": "Wasserhahn einsetzen", "uk": "Встановіть кран" },
       { "en": "Drill hole", "de": "Loch bohren", "uk": "Просвердліть отвір" },
       { "en": "Insert K1 faucet", "de": "Wasserhahn K1 einsetzen", "uk": "Вставте кран K1" },
       { "en": "Tighten nut", "de": "Mutter anziehen", "uk": "Затягніть гайку" },
@@ -156,6 +158,7 @@ window.MANUAL_TEXTS = {
       { "en": "Mineralizator installed", "de": "Mineralisator montiert", "uk": "Мінералізатор встановлено" }
     ],
     "first-start": [
+      { "en": "Open valve, check for leaks", "de": "Ventil öffnen, auf Dichtheit prüfen", "uk": "Відкрийте клапан, перевірте на протікання" },
       { "en": "Check both filters are locked in", "de": "Beide Kartuschen eingerastet?", "uk": "Перевірте фіксацію обох картриджів" },
       { "en": "Check tubes and clips", "de": "Schläuche und Clips prüfen", "uk": "Перевірте трубки та кліпси" },
       { "en": "Check drain tube", "de": "Abflussschlauch prüfen", "uk": "Перевірте дренажну трубку" },
@@ -227,6 +230,12 @@ window.MANUAL_TEXTS = {
       { "en": "Leak detected — close inlet valve, restart", "de": "Leck erkannt — Zulaufventil schließen, neu starten", "uk": "Виявлено протікання — закрийте вхідний клапан, перезапустіть" }
     ],
     "safety": [
+      { "en": "Filter replacement", "de": "Kartuschenwechsel", "uk": "Заміна картриджів" },
+      { "en": "Replace every 6 months", "de": "Alle 6 Monate wechseln", "uk": "Замінюйте кожні 6 місяців" },
+      { "en": "Replace every 12 months", "de": "Alle 12 Monate wechseln", "uk": "Замінюйте кожні 12 місяців" },
+      { "en": "Replace every 24 months", "de": "Alle 24 Monate wechseln", "uk": "Замінюйте кожні 24 місяці" },
+      { "en": "Unit 126 × 364 × 339 mm (W × D × H), 6.78 kg · Feed water: municipal tap or pretreated well water.", "de": "Gerät 126 × 364 × 339 mm (B × T × H), 6,78 kg · Zulaufwasser: Leitungswasser oder vorbehandeltes Brunnenwasser.", "uk": "Пристрій 126 × 364 × 339 мм (Ш × Г × В), 6,78 кг · Вхідна вода: водопровідна або попередньо очищена колодязна." },
+      { "en": "Do not dispose of with household waste. Take the unit to a collection point for electrical and electronic equipment (WEEE).", "de": "Nicht über den Hausmüll entsorgen. Bringen Sie das Gerät zu einer Sammelstelle für Elektro- und Elektronik-Altgeräte (WEEE).", "uk": "Не викидайте разом із побутовими відходами. Здайте пристрій до пункту збору електричного та електронного обладнання (WEEE)." },
       { "en": "230 V~ 50 Hz", "de": "230 V~ 50 Hz", "uk": "230 В~ 50 Гц" },
       { "en": "supply", "de": "Stromversorgung", "uk": "живлення" },
       { "en": "1–4 bar", "de": "1–4 bar", "uk": "1–4 бар" },

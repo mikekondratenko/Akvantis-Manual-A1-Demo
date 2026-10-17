@@ -1,0 +1,105 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Button — one component for the tools and the pages (2026-10-10)
+
+   Until today there were two `.btn`s: `kit.css` drew it grey for the instruments,
+   `passport.css` drew it blue for the reading pages, with 20px of inset in one and 24 in
+   the other, and a comment in the second saying "if the kit's button changes, this is the
+   second place". Which button a page got depended on which stylesheet it happened to link.
+
+   Now the shape is written once, here, and the colour is a role. `.btn` paints
+   `--btn` / `--btn-hover` / `--btn-ink`; `tokens.css` maps those to the accent, and a
+   shell that wants another resting button re-points them — `kit.css` does, to the grey,
+   because in an instrument the accent is a state. Variants re-point the same three
+   properties on the element instead of painting a background of their own, so a context
+   (frost, a plate) can change a role without fighting a variant on specificity.
+
+   Requires tokens.css. Links: tokens.css → (panel.css) → button.css → kit.css or passport.css.
+   Every rule is the union of the two it replaces — same height, radius, type and motion.
+   The inset is 24 (`--space-24`): 20 is not on the scale and the passport had already
+   corrected it. A full-width button does not move; a hugging one is 8px wider.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.btn {
+  position: relative;
+  display: flex; align-items: center; justify-content: center; gap: var(--space-8);
+  width: 100%; height: var(--number-48); padding: 0 var(--space-24);
+  border-radius: var(--radius-pill); border: none;
+  background: var(--btn); color: var(--btn-ink);
+  font-size: var(--text-13); font-weight: var(--weight-semibold); font-family: var(--font-primary);
+  text-decoration: none; cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast), transform var(--duration-instant);
+}
+/* `display: flex` outranks the browser's own rule for `hidden`, so a hidden button would
+   stay on screen. Every component in the kit that sets display has to say this. */
+.btn[hidden] { display: none; }
+/* An icon sits before or after the label in source order — no class for left or right. The gap
+   above spaces it; flex: none keeps a long label from squeezing it. */
+.btn > svg { flex: none; }
+.btn:hover  { background: var(--btn-hover); }
+.btn:active { transform: scale(.98); }
+/* Focus: the one ring, from tokens.css. */
+
+/* Dims at .35 like every other control in the kit; `:hover` is said again because it is a
+   separate rule and would otherwise keep lighting a button that cannot be pressed. */
+.btn:disabled { opacity: .35; cursor: default; }
+.btn:disabled:hover { background: var(--btn); }
+
+/* ── SENDING (2026-10-11) ──
+   `.is-loading` (and aria-busy="true" for a screen reader): a ring turns before the label, the
+   button stops taking clicks and keeps its colour — it is busy, not unavailable. The script
+   swaps the label ("Send request" → "Sending"). 800ms a turn is a loop, not a transition, so
+   it is not a duration token; with less motion the ring turns at a third of the speed. */
+.btn.is-loading { pointer-events: none; }
+.btn.is-loading::before {
+  content: ''; flex: none; width: var(--number-16); height: var(--number-16); border-radius: 50%;
+  border: 2px solid currentColor; border-right-color: transparent;
+  animation: btn-spin 800ms linear infinite;
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .btn.is-loading::before { animation-duration: 2400ms; } }
+
+/* ── STATE AND VARIANTS — each re-points the role, none paints ── */
+
+/* On — the accent as a state, the tools' rule. It does not lighten under the cursor. */
+.btn.is-on   { --btn: var(--accent); --btn-hover: var(--accent); --btn-ink: var(--accent-ink); }
+
+/* Asked for by name, whatever the shell's default is. */
+.btn-accent  { --btn: var(--accent);    --btn-hover: var(--accent-deep); --btn-ink: var(--accent-ink); }
+.btn-neutral { --btn: var(--black-700); --btn-hover: var(--black-600);   --btn-ink: var(--white); }
+
+/* The second filled button on a page: white, so it reads as a button without competing
+   with the accent on hue. The ink flips with the ground. */
+.btn-white   { --btn: var(--white); --btn-hover: var(--black-100); --btn-ink: var(--black-1000); box-shadow: none; }
+
+/* Frost — a button floating over a page or a scene: the frosted plate the header wears,
+   from the --frost-* tokens. `.is-on` still turns it to the accent. */
+.btn-frost {
+  --btn: var(--frost-900); --btn-hover: var(--frost-700); --btn-ink: var(--white);
+  backdrop-filter: var(--frost-blur); -webkit-backdrop-filter: var(--frost-blur);
+  box-shadow: var(--frost-edge);
+}
+.btn-frost:hover { box-shadow: inset 0 0 0 1px var(--white-14); }
+
+/* Round — an icon and nothing else, 48 across. Give it an aria-label. */
+.btn-round { width: var(--number-48); padding: 0; flex: none; }
+
+/* A quieter control — the ring, no fill until the cursor arrives. Its ink is the page's,
+   not the button role's: on a page `--btn-ink` is the dark ink that sits on the accent, and a
+   ghost has no accent under its label (found by the preview, 2026-10-10). */
+.btn-ghost   { --btn: transparent; --btn-hover: var(--black-700); --btn-ink: var(--ink); box-shadow: inset 0 0 0 1px var(--black-700); }
+
+/* ══════════════ DESTRUCTIVE ══════════════
+   The one place red is allowed — "Red — destructive only" in tokens.css. An error is
+   something that has already gone wrong; this is something that is about to. Quiet at
+   rest (outlined, red ink), loud under the cursor (filled), so it is never the brightest
+   object in a rail of buttons that do not delete. The edge is an inset shadow rather than
+   a border: a border would make it 50 tall in a column of 48s.
+   Pair it with a confirmation for anything that cannot be undone. */
+.btn-danger {
+  --btn: transparent; --btn-hover: var(--red-1000); --btn-ink: var(--red-800);
+  box-shadow: inset 0 0 0 1px var(--red-800);
+}
+.btn-danger:hover  { --btn-ink: var(--white); box-shadow: inset 0 0 0 1px var(--red-1000); }
+.btn-danger:active { background: var(--red-800); box-shadow: inset 0 0 0 1px var(--red-800); }
+.btn-danger:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--red-800), var(--focus-halo); }
+.btn-danger:disabled:hover { background: transparent; color: var(--red-800); box-shadow: inset 0 0 0 1px var(--red-800); }

@@ -1,0 +1,356 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Section — the screens a landing page is built from (2026-10-12)
+
+   Lifted out of A1-Landing-Page/landing.css, where they were `lp-*` and where pass 4 of the
+   kit audit (docs/ui-kit-audit-2026-10-10-pass4.md, item 7) said they belonged in the kit.
+   A section only PLACES the kit's objects — type roles, `.btn`, `.plate` — on grid.css's
+   columns. No colour of its own: the sheet is `--page`, the ground between sheets
+   `--black-900`, a picture slot `--tile`.
+
+     .sec-stack        the column of sheets: 2 apart and 2 from the window's edge, on a ground
+                       one step lighter than the page. No dividers — the 2px is the division
+     .sec              one sheet: grid.css's columns, corners 24 → 48 from 1024, 64 → 96 inset
+       .is-screen        at least the height of the viewport
+     .sec-head         label · title · caption, the title block of any section
+     .sec-actions      a row of buttons (and a price) under it
+     .sec-banner       the picture of a hero or a CTA — an object over the text by default,
+                       a photograph behind it on `.is-cover`
+     .sec-ph           a picture slot until the picture exists
+
+     .sec-hero         banner, label, display title, caption, button — centred, first screen
+       .is-cover         the banner fills the sheet, the text sits on it over a scrim
+     .sec-cta          the same anatomy one size down: title, caption, button over a banner
+     .sec-benefits     blocks of picture + title + line, centred, no title — 1 → 2 → 4 a row
+       .is-3             three a row (two on a phone), at the reading measure — a box's benefits
+       .benefit · .benefit-icon (empty = placeholder)
+     .sec-cards        a title and 2 or 3 cards — `.is-2` / `.is-3`; `.is-square` makes each card 1:1
+       .sec-cards-grid · .card (on .plate) · .card-pic
+     .sec-bento        tiles of different sizes on a 12-column grid, Apple-style
+       .sec-bento-grid · .tile (+ .is-half .is-wide .is-full .is-tall) · .tile-pic
+     .sec-infographic  big figures stacked beside a close-up (Bluewater's Cleone page);
+                       `.is-flip` puts the picture right
+       .sec-info-grid · .sec-info-pic · .sec-info-stats · .stat · .stat-value
+     .sec-statement    a kicker and one huge line, centred — «Best battery life.» (apple.com)
+     .sec-bar          a title on the left and a link on the right, over a slider
+     .sec-kicker       the small line over a title — muted, semibold, never in caps
+     .sec-slides       the highlights: wide slides one at a time, a caption on each, dots that
+                       fill as they play and a pause button (kit/slider.js, data-autoplay)
+     .sec-gallery      cards about half a screen wide, words under each, arrows (kit/slider.js)
+     .sec-reviews      reviews three a row, cards without a plate (`.is-plates` for tiles), a quote mark
+                       behind the words, an avatar and a name under a hairline, arrows
+       .slider · .slider-track · .slide · .slider-ctrl (built by the script)
+     .sec-price        a price as the object of a line: large figure, the rest small and muted
+     .sec-split        picture on one half of the grid, text on the other
+       .is-flip          the other way round; chequer a page by alternating it
+       .sec-split-text · .sec-split-pic
+     .sec-faq          a centred title and the kit's accordion at a reading measure, a plus for
+                       the sign; the plate hidden at rest by default, `.is-plates` to show it
+       .sec-faq-list
+
+   Mobile first; changes at the grid's own breakpoints, 768 and 1024. Halves are whole
+   columns: 6 of 12, 10 of 20. Seen rendered: ui-kit/preview/sections.html.
+
+   Requires tokens.css, grid.css, type.css, button.css; a page also loads page.css.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --sec-pad: var(--space-64);
+  --sec-radius: var(--radius-24);
+  --sec-gap: var(--space-32);
+  --sec-head: 1 / -1;          /* the title block's span */
+  --sec-half: 6;               /* a split's side, in columns (from 1024) */
+  --sec-narrow: 1 / -1;        /* a reading measure, centred — FAQ, a form */
+  --sec-card-radius: var(--radius-32);   /* cards, tiles, slides, pictures: 32 → 48 from 768 */
+  --type-statement: var(--text-48);
+}
+@media (min-width: 768px)  { :root { --sec-head: 1 / span 6; --sec-card-radius: var(--radius-48); --type-statement: var(--text-72); } }
+@media (min-width: 1024px) { :root { --sec-pad: var(--space-96); --sec-radius: var(--radius-48);
+                                     --sec-gap: var(--space-48); --sec-head: 1 / span 8;
+                                     --sec-narrow: 3 / 11; --type-statement: var(--text-96); } }
+@media (min-width: 1440px) { :root { --sec-head: 1 / span 7; --sec-narrow: 4 / 10; --type-statement: var(--text-128); } }
+@media (min-width: 1920px) { :root { --sec-head: 1 / span 10; --sec-half: 10; --sec-narrow: 7 / 15; } }
+
+/* ── THE STACK AND THE SHEET ── */
+.sec-stack { display: grid; gap: var(--space-2); padding: var(--space-2); background: var(--black-900); }
+
+.sec {
+  position: relative; overflow: hidden;
+  display: grid; align-content: center;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--grid-gutter); row-gap: var(--sec-gap);
+  padding: var(--sec-pad) var(--grid-margin);
+  background: var(--page); color: var(--ink);
+  border-radius: var(--sec-radius);
+  scroll-margin-top: var(--space-2);
+}
+.sec[hidden] { display: none; }
+.sec > * { grid-column: 1 / -1; min-width: 0; }
+.sec.is-screen { min-height: 100vh; min-height: 100svh; }
+
+/* ── PARTS ── */
+.sec-head { grid-column: var(--sec-head); display: grid; gap: var(--space-16); justify-items: start; }
+.sec-head > .t-lead { max-width: calc(var(--number-288) * 2); }
+.sec-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-16) var(--space-24); }
+.sec-actions .btn { width: auto; }
+/* A price said loud: the figure at h1, what follows it («/ month») small and muted. */
+.sec-price { font-size: var(--type-h1); line-height: var(--leading-none); font-weight: var(--weight-semibold); }
+.sec-price small { font-size: var(--text-16); font-weight: var(--weight-regular); color: var(--ink-muted); margin-left: var(--space-4); }
+
+.sec-banner { display: block; max-width: 100%; }
+img.sec-banner { object-fit: contain; }
+
+.sec-ph {
+  display: grid; place-items: center; padding: var(--space-16); text-align: center;
+  border-radius: var(--sec-card-radius); color: var(--ink-faint); font-size: var(--text-12);
+  background: repeating-linear-gradient(135deg, var(--tile) 0 var(--space-12), var(--black-800) var(--space-12) var(--space-24));
+}
+
+/* ── HERO ──
+   The first screen: the object, then the words, centred. The top inset clears a fixed
+   header.css bar where the page has one (--bar-max and --bar-top are header.css's; with no
+   bar they fall back to 0). */
+.sec-hero {
+  min-height: 100vh; min-height: 100svh;
+  justify-items: center; text-align: center; row-gap: var(--space-24);
+  padding-top: calc(var(--bar-max, 0px) + var(--bar-top, 0px) + var(--space-24));
+}
+.sec-hero > .sec-head, .sec-cta > .sec-head { grid-column: 1 / -1; justify-items: center; }
+.sec-hero .sec-actions, .sec-cta .sec-actions { justify-content: center; }
+/* Centred lines are balanced, caption included: two near-equal lines, never a word alone. */
+.sec-hero .sec-head > *, .sec-cta .sec-head > * { text-wrap: balance; }
+.sec-hero > img.sec-banner { width: auto; height: min(52svh, calc(var(--number-288) * 2)); aspect-ratio: 1; }
+
+/* ── CTA ── the hero's anatomy, a sheet tall rather than a screen. */
+.sec-cta { justify-items: center; text-align: center; row-gap: var(--space-24); min-height: calc(var(--number-288) * 2); }
+
+/* ── COVER ── on a hero `.is-cover`, and on a CTA always when it has a banner: the banner
+   fills the sheet and the words stand on it. The scrim is the page's black from the bottom,
+   so the text keeps its contrast whatever the photograph does. */
+.sec-hero.is-cover > .sec-banner, .sec-cta > .sec-banner {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; border-radius: 0;
+  /* Placed on a grid line, an absolute child takes the grid AREA as its box (inside the
+     margins); auto placement gives it the sheet's padding box, edge to edge. */
+  grid-column: auto; grid-row: auto;
+}
+.sec-hero.is-cover > :where(:not(.sec-banner)), .sec-cta > :where(:not(.sec-banner)) { position: relative; z-index: 1; }
+.sec-hero.is-cover::after, .sec-cta:has(> .sec-banner)::after {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(to top, var(--scrim-80), var(--scrim-32) 60%, transparent);
+}
+.sec-hero.is-cover { align-content: end; }
+.sec-hero.is-cover > .sec-banner.sec-ph, .sec-cta > .sec-banner.sec-ph { place-items: start center; padding-top: var(--space-24); }
+
+/* ── BENEFITS ── blocks of picture + title + line, centred, no section title over them. One a
+   row on a phone, two on a tablet, four from 1024 — four is the design; a fifth starts a row.
+   `.benefit-icon` is a 64 slot: empty, it draws the placeholder; an <svg> or <img> inside
+   replaces it when the icon set exists. */
+.sec-grid { display: grid; gap: var(--space-48) var(--grid-gutter); list-style: none; margin: 0; padding: 0; }
+@media (min-width: 768px)  { .sec-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .sec-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+/* `.is-3`: three a row, like the benefits printed on a box — two on a phone, three from 768. */
+.sec-benefits.is-3 .sec-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-40) var(--space-8); }
+@media (min-width: 768px) { .sec-benefits.is-3 .sec-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-64) var(--grid-gutter); } }
+.sec-benefits.is-3 > .sec-grid { grid-column: var(--sec-narrow); }
+.benefit { display: grid; gap: var(--space-8); align-content: start; justify-items: center; text-align: center;
+  padding-inline: var(--space-16); }
+.benefit-icon {
+  display: grid; place-items: center; width: var(--number-64); height: var(--number-64);
+  margin-bottom: var(--space-16); border-radius: var(--radius-16); color: var(--accent);
+  background: repeating-linear-gradient(135deg, var(--tile) 0 var(--space-8), var(--black-800) var(--space-8) var(--space-16));
+}
+.benefit-icon:has(> *) { background: var(--tile); }
+.benefit-icon > svg { width: var(--number-32); height: var(--number-32); fill: none; stroke: currentColor;
+  stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.benefit-icon > img { width: 100%; height: 100%; object-fit: contain; }
+.benefit > .t-small { color: var(--ink-muted); max-width: var(--number-288); }
+
+/* ── SPLIT ── picture and text on two halves of the grid. On a phone and a tablet they stack,
+   picture first; from 1024 they share a row, and `.is-flip` puts the picture on the left. */
+.sec-split { align-items: center; }
+.sec-split-text { display: grid; justify-items: start; gap: var(--space-16); max-width: calc(var(--number-288) * 2); }
+.sec-split-text .sec-actions { margin-top: var(--space-16); }
+.sec-split-pic { display: grid; place-items: center; order: -1; }
+.sec-split-pic > img { width: 100%; max-height: min(72svh, calc(var(--number-288) * 2)); aspect-ratio: 1; object-fit: contain; }
+.sec-split-pic > .sec-ph { width: 100%; aspect-ratio: 1; max-height: 72svh; }
+@media (min-width: 1024px) {
+  .sec-split > .sec-split-text { grid-column: 1 / span var(--sec-half); grid-row: 1; }
+  .sec-split > .sec-split-pic  { grid-column: span var(--sec-half) / -1; grid-row: 1; order: 0; }
+  .sec-split.is-flip > .sec-split-text { grid-column: span var(--sec-half) / -1; }
+  .sec-split.is-flip > .sec-split-pic  { grid-column: 1 / span var(--sec-half); }
+}
+
+/* ── CARDS ── a title and two or three cards: picture, title, line, an action. One a row on a
+   phone; `.is-2` two from 768; `.is-3` two from 768 and three from 1024. A card is the kit's
+   `.plate`; its picture is an <img> or a `.sec-ph`, 4:3, inset in the plate. */
+.sec-cards-grid { display: grid; gap: var(--grid-gutter); list-style: none; margin: 0; padding: 0; }
+@media (min-width: 768px)  { .sec-cards.is-2 .sec-cards-grid, .sec-cards.is-3 .sec-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .sec-cards.is-3 .sec-cards-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.sec-cards-grid > .plate + .plate { margin-top: 0; }
+.card { display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-8) var(--space-8) var(--space-24);
+  border-radius: var(--sec-card-radius); }
+.card-pic { width: 100%; aspect-ratio: 4 / 3; border-radius: calc(var(--sec-card-radius) - var(--space-8)); object-fit: contain; }
+img.card-pic { background: var(--black-800); }
+.card > :not(.card-pic) { margin-inline: var(--space-16); }
+.card > .card-pic + * { margin-top: var(--space-12); }
+.card > .t-small { color: var(--ink-muted); }
+.card > .sec-actions { margin-top: auto; padding-top: var(--space-12); }
+
+/* Square cards: from 768 the card is 1:1 and the picture takes what the words leave; on a
+   phone the card is as tall as it needs and the picture is square. */
+.sec-cards.is-square .card-pic { aspect-ratio: 1; }
+@media (min-width: 768px) {
+  .sec-cards.is-square .card { aspect-ratio: 1; }
+  .sec-cards.is-square .card-pic { aspect-ratio: auto; flex: 1 1 0; min-height: 0; }
+}
+
+/* ── BENTO ── tiles of different sizes, Apple's way of showing one thing from several sides.
+   Its own 12 columns from 1024 (whatever grid.css has at that width), rows at least 288:
+     .tile          4 of 12      .is-half 6      .is-wide 8      .is-full 12      .is-tall 2 rows
+   On a tablet two columns (wide, full and half span both), on a phone one. A tile is words on
+   top and a picture filling the rest — `.tile-pic`, an <img> or a `.sec-ph` until the render
+   exists. `grid-auto-flow: dense` lets a small tile fill the hole a tall one leaves. */
+.sec-bento-grid { display: grid; gap: var(--grid-gutter); grid-auto-flow: dense; list-style: none; margin: 0; padding: 0; }
+@media (min-width: 768px)  { .sec-bento-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+                             .tile.is-wide, .tile.is-full { grid-column: span 2; } }
+@media (min-width: 1024px) { .sec-bento-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: minmax(var(--number-288), auto); }
+                             .tile { grid-column: span 4; } .tile.is-half { grid-column: span 6; }
+                             .tile.is-wide { grid-column: span 8; } .tile.is-full { grid-column: span 12; }
+                             .tile.is-tall { grid-row: span 2; } }
+.tile { display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; min-height: var(--number-288);
+  padding: var(--space-24); border-radius: var(--sec-card-radius); background: var(--tile); overflow: hidden; }
+@media (min-width: 1024px) { .tile { padding: var(--space-32); } }
+.tile > .t-small { color: var(--ink-muted); max-width: calc(var(--number-288) * 1.5); }
+.tile-pic { flex: 1 1 0; width: 100%; height: 0; min-height: var(--number-160); margin-top: var(--space-16); }
+/* `flex-basis: 0` and `height: 0`: the picture takes what the words leave and never sets the
+   row's height — a 1200-square photograph would otherwise make every row as tall as itself. */
+img.tile-pic { object-fit: contain; }
+
+/* ── INFOGRAPHIC ── figures said as large as the hero's name, beside a close-up — the way
+   Bluewater sells its membrane (bluewatergroup.com, Cleone: 0.0001 µm · 30% · 98%). From 1024
+   the picture takes one half and the figures stack on the other, hairlines between them;
+   below, the figures follow the picture. Each `.stat` is a `.stat-value` (display size, its
+   unit small and muted) and one line under it. Three figures is the design; four still read.
+   `.is-flip` puts the picture on the right. */
+.sec-info-grid { display: grid; gap: var(--sec-gap) var(--grid-gutter); align-items: center; }
+.sec-info-pic { width: 100%; aspect-ratio: 1; max-height: 72svh; border-radius: var(--sec-card-radius); object-fit: cover; }
+div.sec-info-pic { display: grid; place-items: center; }
+.sec-info-stats { display: grid; list-style: none; margin: 0; padding: 0; }
+.stat { display: grid; gap: var(--space-8); padding-block: var(--space-24); border-top: 1px solid var(--rule); }
+.stat:last-child { border-bottom: 1px solid var(--rule); }
+.stat-value { font-size: var(--type-display); line-height: var(--leading-none); font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight); white-space: nowrap; }
+.stat-value small { font-size: var(--type-h2); font-weight: var(--weight-regular); letter-spacing: 0; color: var(--ink-muted); margin-left: var(--space-8); }
+.stat > .t-small, .stat > .t-lead { color: var(--ink-muted); }
+@media (min-width: 1024px) {
+  .sec-info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-48); }
+  .sec-infographic.is-flip .sec-info-pic { order: 1; }
+}
+
+/* ── FAQ ── the kit's accordion (panel.css + accordion.js), centred title, at a reading measure.
+   By default no plates: questions are rows on hairlines, larger, with a plus that turns into a
+   cross when the answer opens (`.sec-faq-sign`, in place of the chevron). `.is-plates` keeps
+   the collapsible plates as the kit draws them. */
+.sec-faq > * { grid-column: var(--sec-narrow); }
+.sec-faq > .sec-head { justify-items: center; text-align: center; }
+.sec-faq-list { display: grid; gap: var(--space-12); }
+.sec-faq-list > .plate + .plate { margin-top: 0; }
+/* No plates: the kit's accordion exactly — strip, inset, type, hover — with the plate hidden
+   at rest. The cursor still lights it (the kit's closed-hover), and an open question stands on
+   it, so the question and its answer read as one object. */
+.sec-faq:not(.is-plates) .sec-faq-list > .plate { background: none; transition: background var(--duration-fast); }
+.sec-faq:not(.is-plates) .sec-faq-list > .plate:has(> button.panel-title[aria-expanded="true"]) { background: var(--tile); }
+.sec-faq-sign { flex: none; width: var(--number-16); height: var(--number-16); color: var(--ink-faint);
+  transition: transform var(--duration-base) var(--ease-emphasized), color var(--duration-fast); }
+button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg); color: var(--ink); }
+
+/* ── KICKER ── the small line over a title. Never caps: muted, semibold, a size up from body. */
+.sec-kicker { font-size: var(--text-16); font-weight: var(--weight-semibold); color: var(--ink-muted); }
+@media (min-width: 1024px) { .sec-kicker { font-size: var(--text-24); } }
+
+/* ── STATEMENT ── one thought, as large as the type goes: 48 → 72 → 96 → 128. */
+.sec-statement { justify-items: center; text-align: center; row-gap: var(--space-16); padding-block: calc(var(--sec-pad) * 1.5); }
+.sec-statement > .sec-statement-line { font-size: var(--type-statement); line-height: var(--leading-none); font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight); text-wrap: balance; max-width: 16ch; }
+.sec-statement > .sec-statement-line .is-muted { display: block; color: var(--ink-muted); }   /* each thought its own line */
+
+/* ── BAR ── over a slider: the title left, one link right, on the title's baseline. */
+.sec-bar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-16) var(--space-24); }
+.sec-bar > .link { color: var(--accent); font-size: var(--text-16); white-space: nowrap; }
+
+/* ══════════════ SLIDERS ══════════════
+   One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the
+   sheet's content by the grid margin either side, so the next slide shows in the margin and
+   says «there is more». The script (kit/slider.js) adds the controls and moves the track; with
+   no script the track still scrolls by finger or trackpad. */
+.slider { position: relative; margin-inline: calc(-1 * var(--grid-margin)); }
+.slider-track {
+  position: relative; display: grid; grid-auto-flow: column; gap: var(--grid-gutter);
+  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
+  padding-inline: var(--grid-margin); scroll-padding-inline: var(--grid-margin);
+  list-style: none; margin: 0; scrollbar-width: none;
+}
+.slider-track::-webkit-scrollbar { display: none; }
+.slide { scroll-snap-align: start; min-width: 0; }
+@media (prefers-reduced-motion: no-preference) { .slider-track { scroll-behavior: smooth; } }
+
+/* The controls row: dots + pause (highlights), arrows (gallery, reviews). */
+.slider-ctrl { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-8);
+  padding: var(--space-24) var(--grid-margin) 0; }
+.slider-ctrl .btn { width: var(--number-48); }
+.slider-ctrl .btn:disabled { opacity: .35; }
+
+/* ── HIGHLIGHTS ── one slide a view, the full content width, 4:5 on a phone and 16:9 from
+   1024; the caption sits on the picture at the top, the controls float at the bottom. */
+.sec-slides .slider-track { grid-auto-columns: calc(100% - var(--grid-margin) * 2); }
+.sec-slides .slide { position: relative; overflow: hidden; aspect-ratio: 4 / 5; border-radius: var(--sec-card-radius); background: var(--tile); }
+@media (min-width: 768px)  { .sec-slides .slide { aspect-ratio: 4 / 3; } }
+@media (min-width: 1024px) { .sec-slides .slide { aspect-ratio: 16 / 9; max-height: 80svh; } }
+.slide-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
+img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
+.slide-cap { position: absolute; top: 0; left: 0; right: 0; z-index: 1; padding: var(--space-32) var(--space-24) var(--space-96);
+  text-align: center; text-wrap: balance; font-size: var(--text-24); line-height: var(--leading-snug); font-weight: var(--weight-semibold);
+  background: linear-gradient(to bottom, var(--scrim-50), transparent); }
+@media (min-width: 1024px) { .slide-cap { font-size: var(--text-32); padding-inline: 20%; } }
+.sec-slides .slider-ctrl { position: absolute; left: 50%; bottom: var(--space-24); transform: translateX(-50%); padding: 0; justify-content: center; }
+.slider-dots { display: flex; align-items: center; gap: var(--space-12); height: var(--number-48); padding: 0 var(--space-24);
+  border-radius: var(--radius-pill); background: var(--frost-900); box-shadow: var(--frost-edge);
+  -webkit-backdrop-filter: var(--frost-blur); backdrop-filter: var(--frost-blur); }
+.slider-dot { position: relative; overflow: hidden; width: var(--number-8); height: var(--number-8); padding: 0; border: 0;
+  border-radius: var(--radius-pill); background: var(--white-32); cursor: pointer;
+  transition: width var(--duration-slow) var(--ease-emphasized), background var(--duration-fast); }
+.slider-dot:hover { background: var(--ink-muted); }
+.slider-dot.is-on { width: var(--number-40); }
+/* The active dot fills over the slide's time; paused, it holds. */
+.slider-dot.is-on::after { content: ''; position: absolute; inset: 0; background: var(--ink); transform-origin: left;
+  animation: slider-fill var(--slide-ms, 5000ms) linear forwards; }
+.slider.is-paused .slider-dot.is-on::after, .slider:not(.is-playing) .slider-dot.is-on::after { animation: none; transform: none; }
+@keyframes slider-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* ── GALLERY ── cards about half the content wide from 1024 (the third peeks), most of the
+   width on a phone; the picture on top, words under it: a bold lead-in, the rest muted. */
+.sec-gallery .slider-track { grid-auto-columns: 86%; }
+@media (min-width: 768px)  { .sec-gallery .slider-track { grid-auto-columns: 62%; } }
+@media (min-width: 1024px) { .sec-gallery .slider-track { grid-auto-columns: calc((100% - var(--grid-margin) * 2 - var(--grid-gutter)) * .46); } }
+.sec-gallery .slide { display: grid; gap: var(--space-24); align-content: start; }
+.sec-gallery .slide-pic { width: 100%; aspect-ratio: 3 / 2; border-radius: var(--sec-card-radius); background: var(--tile); object-fit: contain; }
+.sec-gallery .slide-text { padding-inline: var(--space-24); max-width: 44ch; color: var(--ink-muted); font-size: var(--text-16); line-height: var(--leading-relaxed); }
+.sec-gallery .slide-text b { color: var(--ink); font-weight: var(--weight-semibold); }
+
+/* ── REVIEWS ── three cards a row from 1024, the fourth peeking; a quote mark behind the
+   words, a hairline, the avatar and the name at the foot. */
+.sec-reviews .slider-track { grid-auto-columns: 86%; }
+@media (min-width: 768px)  { .sec-reviews .slider-track { grid-auto-columns: 46%; } }
+@media (min-width: 1024px) { .sec-reviews .slider-track { grid-auto-columns: calc((100% - var(--grid-margin) * 2 - var(--grid-gutter) * 2) / 3.15); } }
+.review { position: relative; display: flex; flex-direction: column; gap: var(--space-24); padding: var(--space-32); border-radius: var(--sec-card-radius); }
+/* `.is-plates` puts each review on a tile, as the gallery cards are. */
+.sec-reviews.is-plates .review { background: var(--tile); }
+.review::before { content: '\201C'; position: absolute; top: var(--space-8); left: var(--space-24); z-index: 0;
+  font-size: var(--text-160); line-height: 1; font-weight: var(--weight-semibold); color: var(--white-10); pointer-events: none; }
+.review-text { position: relative; z-index: 1; flex: 1; font-size: var(--text-16); line-height: var(--leading-relaxed); text-wrap: pretty; }
+.review-who { display: flex; align-items: center; gap: var(--space-12); padding-top: var(--space-24); border-top: 1px solid var(--rule); }
+.review-avatar { display: grid; place-items: center; flex: none; width: var(--number-48); height: var(--number-48); border-radius: 50%;
+  overflow: hidden; background: var(--avatar, var(--black-700)); color: var(--avatar-ink, var(--ink-muted)); font-size: var(--text-14); font-weight: var(--weight-semibold); }
+/* An avatar without a photograph: initials on a tint — set --avatar / --avatar-ink on the element. */
+.review-avatar img, .review-avatar svg { width: 100%; height: 100%; object-fit: cover; display: block; }
+.review-name { display: grid; gap: var(--space-2); }
+.review-name small { font-size: var(--text-12); color: var(--ink-muted); }

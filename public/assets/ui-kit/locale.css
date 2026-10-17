@@ -1,0 +1,123 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Locale — the location picker and the region sheet (2026-10-10)
+
+   Globe · region · language in the bar, and the sheet it opens: from the top on a phone,
+   a centred popup from 768. Opens on `.is-open` (script) or `:target` (no script); closes
+   on the ×, the scrim, Esc. Moved out of passport.css so the landing can use it alone.
+
+   Requires tokens.css. `--bar-w` (the bar's width) sets the sheet's measure on a phone.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── THE GLOBE, BEFORE THERE IS ANYWHERE TO GO ──
+   ⚠ A `<span>`, and everything about it says so: no pointer, no hover plate, no focus
+   ring. On a page that ships one language there is nothing to choose, and a corner that
+   lights up under the cursor and then does nothing is worse than a corner that does not
+   move. It is the sign of the language corner, set at the switcher's size and in the
+   faint ink so it sits under the wordmark rather than beside it.
+
+   ⚠ THE `akvantis.com` LINK STOOD HERE AND IS GONE (2026-09-19). The site is reached
+   from the `More info at akvantis.com` row in the list, where it can say where it goes
+   in words. Do not put a second destination back in this bar. */
+.lang-mark {
+  display: flex; align-items: center; justify-content: center;
+  gap: var(--space-4); min-height: var(--number-32); flex: none;
+  /* Full ink, not faint: faint read as disabled (2026-09-28). */
+  color: var(--ink);
+}
+.lang-mark svg, .lang summary > svg:first-child { width: calc(var(--number-16) + var(--space-4)); height: calc(var(--number-16) + var(--space-4)); }
+.lang-mark svg { display: block; }
+a.lang-mark { width: var(--number-40); height: var(--number-40); border-radius: 50%;
+  transition: background var(--duration-fast); -webkit-tap-highlight-color: transparent; }
+/* ── LOCATION PICKER · trigger (kit component, see ui-kit/kit/README.md) ──
+   Globe · Region · Language · chevron. The region in ink, the language muted, as the
+   rows in the sheet say them. A pill so the hover plate has a shape. */
+a.lang-mark.locale { width: auto; gap: var(--space-8); padding: 0 var(--space-8) 0 var(--space-12);
+  margin-right: calc(var(--space-8) * -1); border-radius: var(--radius-pill); text-decoration: none; }
+.locale-txt { font-size: var(--text-14); line-height: var(--leading-none); white-space: nowrap; }
+.locale-txt b { font-weight: var(--weight-semibold); color: var(--ink); }
+.locale-sub { color: var(--ink-muted); }
+/* One form at every width (2026-09-28): `Germany • De`. The long form stays in the
+   markup unused, so switching back is one rule. */
+.locale-long { display: none; }
+a.lang-mark:hover { background: var(--tile); }
+
+/* ══════════════ THE REGION SHEET (2026-09-28) ══════════════
+   Pressing the globe drops a sheet from the top, the full width of the viewport, over a
+   dimmed page. Shokobox's pattern: a title and a round close, then one row per region —
+   an icon, the region in its own language, the language under it. Globe for Global, a
+   pin for a country, no flags. The current region carries a check.
+
+   Opens on `.is-open` (script) or `:target` (no script). Closes on the ×, on the
+   scrim, on Esc. */
+.regions { position: fixed; inset: 0; z-index: 40; visibility: hidden;
+  transition: visibility 0s linear var(--duration-slow); }
+.regions.is-open, .regions:target { visibility: visible; transition-delay: 0s; }
+.regions-scrim { position: absolute; inset: 0; background: var(--scrim-50);
+  opacity: 0; transition: opacity var(--duration-slow) var(--ease-standard); }
+.regions.is-open .regions-scrim, .regions:target .regions-scrim { opacity: 1; }
+.regions-sheet {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding: calc(var(--space-16) + env(safe-area-inset-top)) var(--space-16) var(--space-24);
+  /* Frost, like the kit's bar: the page shows through, blurred (2026-09-28). Rows and
+     the close button inside it follow the frost rule — white at low alpha, not grey. */
+  --tile: var(--on-frost);
+  --tile-hover: var(--on-frost-hover);
+  background: var(--frost-900);
+  backdrop-filter: blur(24px) saturate(120%);
+  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  box-shadow: var(--frost-edge), var(--shadow-lg);
+  border-radius: 0 0 var(--radius-24) var(--radius-24);
+  transform: translateY(-100%);
+  transition: transform var(--duration-slow) var(--ease-emphasized);
+}
+.regions.is-open .regions-sheet, .regions:target .regions-sheet { transform: none; }
+/* ── FROM 768: A POPUP, NOT A SHEET (2026-09-28) ──
+   On a desktop a sheet the width of the screen is a banner. There it is a centred card,
+   Shokobox's shape: 480 wide, radius 24 all round, fading in and rising 8. */
+@media (min-width: 768px) {
+  .regions-scrim { background: var(--scrim-80); }
+  .regions-sheet {
+    top: 50%; left: 50%; right: auto;
+    width: min(calc(var(--number-240) * 2), calc(100% - var(--space-48)));
+    padding: var(--space-32);
+    border-radius: var(--radius-24);
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + var(--space-8)));
+    transition: transform var(--duration-slow) var(--ease-emphasized), opacity var(--duration-base) var(--ease-standard);
+  }
+  .regions.is-open .regions-sheet, .regions:target .regions-sheet {
+    opacity: 1; transform: translate(-50%, -50%);
+  }
+  .regions-head { max-width: none; margin-bottom: var(--space-24); }
+  .regions-list { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) { .regions-sheet, .regions-scrim { transition: none; } }
+.regions-head { display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-16); max-width: var(--bar-w); margin: 0 auto var(--space-16);
+  min-height: var(--number-40); }
+.regions-head h2 { margin: 0; font-size: var(--text-24); font-weight: var(--weight-semibold); color: var(--ink); }
+.regions-x { display: flex; align-items: center; justify-content: center; flex: none;
+  width: var(--number-40); height: var(--number-40); border-radius: 50%;
+  background: var(--tile); color: var(--ink); }
+.regions-x:hover { background: var(--tile-hover); }
+.regions-list { display: flex; flex-direction: column; gap: var(--space-8);
+  max-width: var(--bar-w); margin: 0 auto; }
+.region { display: flex; align-items: center; gap: var(--space-16);
+  min-height: var(--number-72); padding: 0 var(--space-16);
+  border-radius: var(--radius-16); background: var(--tile);
+  color: var(--ink); text-decoration: none; transition: background var(--duration-fast); }
+.region:hover { background: var(--tile-hover); }
+.region-ico { display: flex; flex: none; color: var(--ink); }
+.region-ico svg { width: calc(var(--number-16) + var(--space-4)); height: calc(var(--number-16) + var(--space-4)); display: block; }
+.region-txt { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.region-txt b { font-size: var(--text-16); font-weight: var(--weight-semibold); }
+.region-txt span { font-size: var(--text-14); color: var(--ink-muted); }
+.region-on { display: flex; flex: none; color: currentColor; }
+.region:not([aria-current="true"]) .region-on { visibility: hidden; }
+/* The chosen row, in the accent — the same blue and the same ink as the page's button,
+   so "this is the one" reads the way "press this" already does. */
+.region[aria-current="true"] { background: var(--btn); color: var(--btn-ink); }
+.region[aria-current="true"]:hover { background: var(--btn-hover); }
+.region[aria-current="true"] .region-ico { color: currentColor; }
+.region[aria-current="true"] .region-txt span { color: currentColor; opacity: .72; }
+html.regions-lock { overflow: hidden; }

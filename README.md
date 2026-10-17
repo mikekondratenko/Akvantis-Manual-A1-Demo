@@ -46,7 +46,7 @@ and `assets/uploads` from `../Manual/public`.
 
 Here `manual.json` / `manual-data.js` point at light copies instead of the print PNGs: the
 pages are `assets/screen/page-NN.webp` (one file per page, `imageL` + `imageR` of a spread —
-page 2 … page 17 for the 8 spreads). After a new export, convert each
+page 2 … page 19 for the 9 spreads; covers page-01 and page-20). After a new export, convert each
 `../Manual/public/assets/art/pages/page-NN.webp` to `assets/screen/page-NN.webp` under the same
 number; the data does not change. Page numbers are off unless the booklet is asked for with
 `?pn=1`, and the page art is exported without the folio.

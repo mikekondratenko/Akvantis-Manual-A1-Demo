@@ -8,11 +8,12 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="favicon.png?v=1">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
-<link rel="stylesheet" href="assets/ui-kit/tokens.css?v=kit8">
+<link rel="stylesheet" href="assets/ui-kit/tokens.css?v=kit10">
 <!-- Компоненты инструкции: номер — из кита, заголовки и кадр — свои (см. a1-manual-kit.html). -->
-<link rel="stylesheet" href="assets/ui-kit/number.css?v=kit8">
-<link rel="stylesheet" href="assets/ui-kit/hotspot.css?v=kit8">
-<link rel="stylesheet" href="assets/ui-kit/topbar.css?v=kit8">
+<link rel="stylesheet" href="assets/ui-kit/number.css?v=kit10">
+<link rel="stylesheet" href="assets/ui-kit/hotspot.css?v=kit10">
+<link rel="stylesheet" href="assets/ui-kit/header.css?v=kit10">
+<link rel="stylesheet" href="assets/manual-field.css?v=35">
 <link rel="stylesheet" href="assets/manual-kit.css?v=35">
 <style>
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -484,9 +485,9 @@ html.is-embedded[data-media="screen"] body{background:var(--paper)}
    sections below do — the same `--g-off` columns in from each margin (the
    formula is the ribbon's own padding). The photo and the A1 mark stay at the
    margins, outside it. Centred while the row fits, scrolls inside the
-   container when it does not (ui-kit/topbar.css, `safe center`). */
+   container when it does not (ui-kit/header.css, `safe center`). */
 @media (min-width:1024px){
-  [data-media="screen"] .r-bar .topbar-nav{
+  [data-media="screen"] .r-bar .header-nav{
     --bar-col:calc((100% - 2 * var(--gm) - (var(--gc) - 1) * var(--gg)) / var(--gc));
     position:absolute;top:0;bottom:0;margin:0;padding:0;scroll-padding:0;
     left:calc(var(--gm) + var(--g-off) * (var(--bar-col) + var(--gg)));
@@ -535,9 +536,9 @@ html[data-media="screen"] .ribbon .m-specs{overflow-y:hidden;overscroll-behavior
   html[data-media="screen"] .ribbon .m-specs{grid-template-columns:repeat(3, minmax(0, 1fr))}
 }
 /* the Akvantis mark: out of the bar, to the end of the page — grey, centred */
-[data-media="screen"] .r-bar .topbar-mark, [data-media="screen"] .r-bar .topbar-mark-in{display:none}
+[data-media="screen"] .r-bar .header-mark, [data-media="screen"] .r-bar .header-mark-in{display:none}
 /* 2026-10-07: on the desktop the Akvantis mark is back at the left margin, 32 */
-@media (min-width:1024px){ [data-media="screen"] .r-bar .topbar-mark{display:block} }
+@media (min-width:1024px){ [data-media="screen"] .r-bar .header-mark{display:block} }
 /* ── LANGUAGE (2026-10-07) ── En · De · Ua at the foot of the page, over the
    Akvantis mark. The words are in assets/manual-texts.js; `?lang=de` opens a language,
    the choice is kept in the reader's browser (`akv-region`, as the passport). */
@@ -653,7 +654,7 @@ html{--acc-gap:var(--space-24)}
 }
 
 /* ── THE BAR — section stepper, pinned to the bottom ──
-   The kit's top bar (topbar.css), used as it is: frosted pill, mark, a row of
+   The kit's top bar (header.css), used as it is: frosted pill, mark, a row of
    section links that scrolls sideways on a phone, the ink rule under the
    section being read, the count on the right. The only local rule is where it
    is anchored: at the bottom, where a thumb is. Links are built from the
@@ -662,19 +663,19 @@ html{--acc-gap:var(--space-24)}
 [data-media="screen"] .r-bar{display:flex}
 /* 2026-09-29: белая панель во всю ширину вьюпорта, прижата к низу — без
    скругления и без отступа; frost — белый. Нижний inset уходит внутрь панели. */
-[data-media="screen"] .r-bar.topbar{top:0;bottom:auto;left:0;transform:none;
+[data-media="screen"] .r-bar.header{top:0;bottom:auto;left:0;transform:none;
   width:100%;max-width:none;border-radius:0;
   height:calc(var(--r-bar-h) + env(safe-area-inset-top));
   padding-top:env(safe-area-inset-top);
   background:var(--r-frost-paper);
   box-shadow:inset 0 calc(var(--hairline) * -1) 0 var(--rule-soft)}
-[data-media="screen"] body.bar-away .r-bar.topbar{transform:translateY(-100%)}
+[data-media="screen"] body.bar-away .r-bar.header{transform:translateY(-100%)}
 [data-media="screen"] .ribbon{padding-top:calc(var(--r-bar-h) + env(safe-area-inset-top) + var(--space-24));padding-bottom:var(--space-64)}
 /* 2026-09-29: в панели нет знака и счётчика — только секции */
 /* The Akvantis mark: fixed at the left margin of the bar from 768; on a phone
    it is the first thing IN the scrolling row, so it leaves with the row as the
    reader moves through the sections. */
-.r-bar .topbar-aside{display:none}
+.r-bar .header-aside{display:none}
 /* desktop: the product on the right of the bar — the A1 photo (ui-kit/photos,
    trimmed, white-grey) and the A1 mark (ui-kit/devices/devices.js), on the
    right margin, the same height as the Akvantis mark on the left */
@@ -686,49 +687,49 @@ html{--acc-gap:var(--space-24)}
   .r-product-mark{display:block;order:-1;width:var(--space-40);color:var(--ink)}
   .r-product-mark svg{width:100%;height:auto;display:block}
 }
-.r-bar .topbar-mark{color:var(--ink);width:var(--space-32);height:var(--space-32);align-self:center;margin-left:var(--gm)}
-.r-bar .topbar-mark svg{height:100%}
-.topbar-mark-in{display:none}
+.r-bar .header-mark{color:var(--ink);width:var(--space-32);height:var(--space-32);align-self:center;margin-left:var(--gm)}
+.r-bar .header-mark svg{height:100%}
+.header-mark-in{display:none}
 /* No side padding on the bar itself: the row scrolls under the whole width of
    the viewport and only its content is inset by the margin, so nothing is cut
    off 12 px short of the edge. */
-[data-media="screen"] .r-bar.topbar{padding-left:0;padding-right:0}
-.r-bar .topbar-nav{margin-left:0;padding:0 var(--gm);scroll-padding:0 var(--gm)}
+[data-media="screen"] .r-bar.header{padding-left:0;padding-right:0}
+.r-bar .header-nav{margin-left:0;padding:0 var(--gm);scroll-padding:0 var(--gm)}
 /* ON A PHONE the bar goes to the bottom, where the thumb is, and carries no
    mark. From 768 it is the top bar with the mark at the left margin. */
 /* 2026-10-01: the tablet too — the bar is at the bottom below 1024 */
 @media (max-width:1023px){
-  [data-media="screen"] .r-bar.topbar{top:auto;bottom:0;
+  [data-media="screen"] .r-bar.header{top:auto;bottom:0;
     height:calc(var(--r-bar-h) + env(safe-area-inset-bottom));padding-top:0;padding-bottom:env(safe-area-inset-bottom);
     box-shadow:inset 0 var(--hairline) 0 var(--rule-soft)}
-  [data-media="screen"] body.bar-away .r-bar.topbar{transform:translateY(100%)}
+  [data-media="screen"] body.bar-away .r-bar.header{transform:translateY(100%)}
   [data-media="screen"] .ribbon{padding-top:var(--space-24);padding-bottom:calc(var(--r-bar-h) + env(safe-area-inset-bottom) + var(--space-24))}
   .r-flow > .m-sec{scroll-margin-top:var(--space-8)}
-  .r-bar .topbar-mark-in{display:none}
+  .r-bar .header-mark-in{display:none}
 }
 @media (max-width:767px){
-  .r-bar .topbar-mark{display:none}
-  .topbar-mark-in{display:flex;align-items:center;flex:0 0 auto;width:var(--space-32);height:100%;
+  .r-bar .header-mark{display:none}
+  .header-mark-in{display:flex;align-items:center;flex:0 0 auto;width:var(--space-32);height:100%;
     color:var(--ink);margin-right:var(--space-12)}
-  .topbar-mark-in svg{width:100%;height:auto;display:block}
+  .header-mark-in svg{width:100%;height:auto;display:block}
 }
-.r-bar .topbar-nav a{color:var(--ink-3);flex-direction:column;justify-content:center;gap:var(--space-4);
+.r-bar .header-nav a{color:var(--ink-3);flex-direction:column;justify-content:center;gap:var(--space-4);
   font-size:var(--text-16);padding:0 var(--space-12)}
-@media (min-width:768px){ .r-bar .topbar-nav a{padding:0 var(--space-12)} }
+@media (min-width:768px){ .r-bar .header-nav a{padding:0 var(--space-12)} }
 /* 2026-10-07: the badge IS the kit's number (`.num`, ui-kit/kit/number.css) at
    16 — it was a look-alike with its own type size, and 10, 11, 12 did not fit.
    Only the size, the screen's ink and the motion are set here. */
 /* 2026-10-07: 18, not 16 — at 16 the figure (10.7 px) was too small to read; the
    active one is still ~29 (× 1.6, was 16 × 1.8) */
-.num.topbar-num{--num-size:18px;--num-ink:var(--black);--num-paper:var(--white);
+.num.header-num{--num-size:18px;--num-ink:var(--black);--num-paper:var(--white);
   font-weight:var(--fw-semibold);transition:transform var(--r-dur) var(--r-ease)}
 /* active: badge and digit grow 80 %, from the bottom edge so the label below
    does not move and the badge grows up into the bar's free space */
-.r-bar .topbar-num{transform-origin:50% 100%}
-.r-bar .topbar-nav a.is-here .topbar-num{transform:scale(var(--r-num-active))}
-.r-bar .topbar-label{font-size:var(--text-16);font-weight:var(--fw-semibold);line-height:var(--lh-tight)}
-@media (prefers-reduced-motion: reduce){ .topbar-num{transition:none} }
-.r-bar .topbar-nav a:hover,.r-bar .topbar-nav a.is-here{color:var(--ink)}
+.r-bar .header-num{transform-origin:50% 100%}
+.r-bar .header-nav a.is-here .header-num{transform:scale(var(--r-num-active))}
+.r-bar .header-label{font-size:var(--text-16);font-weight:var(--fw-semibold);line-height:var(--lh-tight)}
+@media (prefers-reduced-motion: reduce){ .header-num{transition:none} }
+.r-bar .header-nav a:hover,.r-bar .header-nav a.is-here{color:var(--ink)}
 /* the kit's 888 is the matrix's row; eight section names need a little more */
 .r-count{font-size:var(--text-12);font-weight:var(--fw-semibold);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
 
@@ -862,6 +863,16 @@ html.capture .flip{transform:none!important;transition:none;transform-style:flat
 html.capture .side{backface-visibility:visible;transform:none}
 html.capture .sheet[data-side="inner"] .side-front{display:none}
 html.capture .sheet[data-side="front"] .side-inner{display:none}
+
+/* ── SPECIMEN (the UI kit's frames) ── one component, nothing around it */
+html.is-specimen body{min-height:0}
+html.is-specimen:not(.show-grid) .r-guides{display:none}
+html.is-specimen .ribbon > :not(.spec-path):not(.spec-on),
+html.is-specimen .spec-path > :not(.spec-path):not(.spec-on):not(summary){display:none!important}
+html.is-specimen.is-spec-block .spec-path > summary{display:none!important}
+html.is-specimen[data-media="screen"] .ribbon{padding-top:var(--space-24);padding-bottom:var(--space-24)}
+html.is-specimen.is-spec-bar[data-media="screen"] .ribbon{padding:0}
+html.is-specimen[data-media="screen"] .r-bar.header{position:relative;transform:none;top:auto;bottom:auto}
 </style>
 </head>
 <body>
@@ -881,18 +892,18 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
 
 <!-- THE RIBBON — screen version (?media=screen). Built from the same data. -->
 <main class="ribbon" id="r-top" aria-label="Akvantis A1 — installation guide">
-  <header class="topbar r-bar" aria-label="Sections">
-    <a class="topbar-mark" href="#r-top" aria-label="Top"><svg viewBox="0 0 48.05 48.37" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24.0209 0.146484C10.777 0.146484 0 10.9305 0 24.1831C0 37.4356 10.777 48.2196 24.0209 48.2196C37.2649 48.2196 48.0418 37.4356 48.0418 24.1831C48.0418 10.9305 37.2694 0.146484 24.0209 0.146484ZM24.0209 45.1933C12.4445 45.1933 3.02432 35.7671 3.02432 24.1831C3.02432 12.5991 12.4445 3.17277 24.0209 3.17277C35.5974 3.17277 45.0175 12.5991 45.0175 24.1831C45.0175 35.7671 35.5974 45.1933 24.0209 45.1933Z"/><path d="M18.6985 21.7971C20.7543 21.5777 22.7324 21.8199 25.0258 22.6337C29.1968 24.1285 33.3587 23.6119 36.6891 21.6508L35.1632 15.8679C32.9658 16.8965 30.7957 17.3262 28.5572 17.2531C26.1405 17.1754 24.6375 16.3799 22.6411 15.8725C21.2385 15.5159 19.8223 15.4199 18.3102 15.5434C15.7655 15.7537 13.463 16.5811 11.3524 18.1034L12.8828 23.8817C14.7788 22.6977 16.4874 22.0302 18.7031 21.7925L18.6985 21.7971Z"/><path d="M28.5617 26.2453C26.145 26.1676 24.6419 25.3721 22.6455 24.8647C21.243 24.5081 19.8268 24.4121 18.3146 24.5356C15.77 24.7459 13.4675 25.5733 11.3569 27.0956L12.8873 32.8738C14.7832 31.6898 16.4918 31.0224 18.7075 30.7847C20.7633 30.5653 22.7415 30.8076 25.0348 31.6213C29.2058 33.1161 33.3677 32.5996 36.6981 30.6384L35.1722 24.8556C32.9748 25.8841 30.8048 26.3139 28.5662 26.2407L28.5617 26.2453Z"/></svg></a>
-    <nav class="topbar-nav" aria-label="Sections"><span class="topbar-mark-in" aria-hidden="true"><svg viewBox="0 0 48.05 48.37" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24.0209 0.146484C10.777 0.146484 0 10.9305 0 24.1831C0 37.4356 10.777 48.2196 24.0209 48.2196C37.2649 48.2196 48.0418 37.4356 48.0418 24.1831C48.0418 10.9305 37.2694 0.146484 24.0209 0.146484ZM24.0209 45.1933C12.4445 45.1933 3.02432 35.7671 3.02432 24.1831C3.02432 12.5991 12.4445 3.17277 24.0209 3.17277C35.5974 3.17277 45.0175 12.5991 45.0175 24.1831C45.0175 35.7671 35.5974 45.1933 24.0209 45.1933Z"/><path d="M18.6985 21.7971C20.7543 21.5777 22.7324 21.8199 25.0258 22.6337C29.1968 24.1285 33.3587 23.6119 36.6891 21.6508L35.1632 15.8679C32.9658 16.8965 30.7957 17.3262 28.5572 17.2531C26.1405 17.1754 24.6375 16.3799 22.6411 15.8725C21.2385 15.5159 19.8223 15.4199 18.3102 15.5434C15.7655 15.7537 13.463 16.5811 11.3524 18.1034L12.8828 23.8817C14.7788 22.6977 16.4874 22.0302 18.7031 21.7925L18.6985 21.7971Z"/><path d="M28.5617 26.2453C26.145 26.1676 24.6419 25.3721 22.6455 24.8647C21.243 24.5081 19.8268 24.4121 18.3146 24.5356C15.77 24.7459 13.4675 25.5733 11.3569 27.0956L12.8873 32.8738C14.7832 31.6898 16.4918 31.0224 18.7075 30.7847C20.7633 30.5653 22.7415 30.8076 25.0348 31.6213C29.2058 33.1161 33.3677 32.5996 36.6981 30.6384L35.1722 24.8556C32.9748 25.8841 30.8048 26.3139 28.5662 26.2407L28.5617 26.2453Z"/></svg></span><span class="topbar-ink"></span></nav>
-    <div class="topbar-aside"><span class="r-count" aria-live="polite"></span></div>
+  <header class="header r-bar" aria-label="Sections">
+    <a class="header-mark" href="#r-top" aria-label="Top"><svg viewBox="0 0 48.05 48.37" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24.0209 0.146484C10.777 0.146484 0 10.9305 0 24.1831C0 37.4356 10.777 48.2196 24.0209 48.2196C37.2649 48.2196 48.0418 37.4356 48.0418 24.1831C48.0418 10.9305 37.2694 0.146484 24.0209 0.146484ZM24.0209 45.1933C12.4445 45.1933 3.02432 35.7671 3.02432 24.1831C3.02432 12.5991 12.4445 3.17277 24.0209 3.17277C35.5974 3.17277 45.0175 12.5991 45.0175 24.1831C45.0175 35.7671 35.5974 45.1933 24.0209 45.1933Z"/><path d="M18.6985 21.7971C20.7543 21.5777 22.7324 21.8199 25.0258 22.6337C29.1968 24.1285 33.3587 23.6119 36.6891 21.6508L35.1632 15.8679C32.9658 16.8965 30.7957 17.3262 28.5572 17.2531C26.1405 17.1754 24.6375 16.3799 22.6411 15.8725C21.2385 15.5159 19.8223 15.4199 18.3102 15.5434C15.7655 15.7537 13.463 16.5811 11.3524 18.1034L12.8828 23.8817C14.7788 22.6977 16.4874 22.0302 18.7031 21.7925L18.6985 21.7971Z"/><path d="M28.5617 26.2453C26.145 26.1676 24.6419 25.3721 22.6455 24.8647C21.243 24.5081 19.8268 24.4121 18.3146 24.5356C15.77 24.7459 13.4675 25.5733 11.3569 27.0956L12.8873 32.8738C14.7832 31.6898 16.4918 31.0224 18.7075 30.7847C20.7633 30.5653 22.7415 30.8076 25.0348 31.6213C29.2058 33.1161 33.3677 32.5996 36.6981 30.6384L35.1722 24.8556C32.9748 25.8841 30.8048 26.3139 28.5662 26.2407L28.5617 26.2453Z"/></svg></a>
+    <nav class="header-nav" aria-label="Sections"><span class="header-mark-in" aria-hidden="true"><svg viewBox="0 0 48.05 48.37" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24.0209 0.146484C10.777 0.146484 0 10.9305 0 24.1831C0 37.4356 10.777 48.2196 24.0209 48.2196C37.2649 48.2196 48.0418 37.4356 48.0418 24.1831C48.0418 10.9305 37.2694 0.146484 24.0209 0.146484ZM24.0209 45.1933C12.4445 45.1933 3.02432 35.7671 3.02432 24.1831C3.02432 12.5991 12.4445 3.17277 24.0209 3.17277C35.5974 3.17277 45.0175 12.5991 45.0175 24.1831C45.0175 35.7671 35.5974 45.1933 24.0209 45.1933Z"/><path d="M18.6985 21.7971C20.7543 21.5777 22.7324 21.8199 25.0258 22.6337C29.1968 24.1285 33.3587 23.6119 36.6891 21.6508L35.1632 15.8679C32.9658 16.8965 30.7957 17.3262 28.5572 17.2531C26.1405 17.1754 24.6375 16.3799 22.6411 15.8725C21.2385 15.5159 19.8223 15.4199 18.3102 15.5434C15.7655 15.7537 13.463 16.5811 11.3524 18.1034L12.8828 23.8817C14.7788 22.6977 16.4874 22.0302 18.7031 21.7925L18.6985 21.7971Z"/><path d="M28.5617 26.2453C26.145 26.1676 24.6419 25.3721 22.6455 24.8647C21.243 24.5081 19.8268 24.4121 18.3146 24.5356C15.77 24.7459 13.4675 25.5733 11.3569 27.0956L12.8873 32.8738C14.7832 31.6898 16.4918 31.0224 18.7075 30.7847C20.7633 30.5653 22.7415 30.8076 25.0348 31.6213C29.2058 33.1161 33.3677 32.5996 36.6981 30.6384L35.1722 24.8556C32.9748 25.8841 30.8048 26.3139 28.5662 26.2407L28.5617 26.2453Z"/></svg></span><span class="header-ink"></span></nav>
+    <div class="header-aside"><span class="r-count" aria-live="polite"></span></div>
     <div class="r-product" aria-label="Akvantis A1"><img class="r-product-img" src="assets/photos/trimmed/a1-wg.webp" alt="" width="72" height="192"><span class="r-product-mark"><svg viewBox="0 0 60 32" fill="currentColor" aria-hidden="true"><g clip-path="url(#dv-a1)"><path d="M58.3899 31.9991H53.6672C53.2877 31.9991 52.9802 31.6853 52.9802 31.2978V11.0141C52.9802 10.6222 52.666 10.3075 52.2821 10.3136C51.0791 10.3321 49.8667 10.3356 48.6439 10.3233C47.4169 10.311 46.2001 10.304 44.9928 10.3022C44.6142 10.3022 44.3076 9.98838 44.3076 9.60088V6.09052C44.3076 5.7223 44.5867 5.41633 44.9473 5.3909L46.7978 5.26027C48.4293 5.14367 49.6743 4.95342 50.533 4.69041C51.3917 4.4274 52.1216 3.9531 52.7226 3.26575C53.2636 2.64767 53.7926 1.70433 54.3103 0.434849C54.4177 0.171836 54.6675 0 54.9458 0H58.3899C58.7694 0 59.0768 0.313863 59.0768 0.70137V31.2986C59.0768 31.6861 58.7694 32 58.3899 32V31.9991Z"/><path d="M29.7047 0.376889C29.585 0.144889 29.3507 0 29.0967 0H16.4405C16.1856 0 15.9523 0.144889 15.8326 0.376889L0.0814639 30.9547C-0.162239 31.4284 0.170161 32 0.689429 32H6.05175C6.3075 32 6.5426 31.8533 6.66143 31.6196L11.272 22.5538C11.5269 22.0533 12.2184 22.0444 12.4845 22.5387L13.9355 25.2338C14.0569 25.4596 14.2877 25.5991 14.5374 25.5991H30.9499C31.2005 25.5991 31.4304 25.4587 31.5518 25.2338L33.0287 22.4907C33.2948 21.9964 33.9863 22.0044 34.2412 22.5058L38.8767 31.6196C38.9955 31.8533 39.2306 32 39.4864 32H44.8487C45.3679 32 45.7012 31.4284 45.4566 30.9547L29.7047 0.376889ZM13.101 18.9582L22.0879 1.288C22.2067 1.05422 22.4418 0.907556 22.6976 0.907556H22.8388C23.0946 0.907556 23.3297 1.05422 23.4485 1.288L32.4353 18.9582C32.6765 19.432 32.3432 20 31.8257 20H13.7107C13.1923 20 12.8599 19.432 13.101 18.9582Z"/></g><defs><clipPath id="dv-a1"><rect width="59.0769" height="32" fill="white"/></clipPath></defs></svg></span></div>
   </header>
 </main>
 
 <div class="r-guides" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
-<script src="assets/manual-data.js?v=19"></script>
-<script src="assets/manual-texts.js?v=9"></script>
+<script src="assets/manual-data.js?v=20"></script>
+<script src="assets/manual-texts.js?v=10"></script>
 <script src="assets/manual-render.js?v=27"></script>
 <script>
 (function(){
@@ -915,6 +926,12 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
   if (q.get('pn') === '1') el.classList.add('show-pn');
   var TURN = q.get('turn') === '1';
   if (q.get('bleed') === '1') el.classList.add('bleed');
+  /* ── SPECIMEN ── `?specimen=bar | head | sec:<id> | block:<id>` — the UI kit
+     (a1-manual-kit.html) shows one screen component at a time in a frame: the
+     real markup, the real CSS, nothing else on the page. It reports its height
+     to the kit so the frame fits. */
+  var SPEC = q.get('specimen');
+  if (SPEC){ el.dataset.media = 'screen'; el.classList.add('is-specimen'); }
 
   /* ── LANGUAGE (2026-10-07) ──
      English is the original (manual.json). The other languages are rows in
@@ -1020,8 +1037,8 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     el.lang = LANG;
     document.title = T('doc.title');
     var ribbon = document.querySelector('.ribbon'); if (!ribbon) return;
-    ribbon.querySelectorAll('.r-bar, .topbar-nav').forEach(function(n){ n.setAttribute('aria-label', T('nav.sections')); });
-    var top = ribbon.querySelector('.topbar-mark'); if (top) top.setAttribute('aria-label', T('nav.top'));
+    ribbon.querySelectorAll('.r-bar, .header-nav').forEach(function(n){ n.setAttribute('aria-label', T('nav.sections')); });
+    var top = ribbon.querySelector('.header-mark'); if (top) top.setAttribute('aria-label', T('nav.top'));
     var flow = ribbon.querySelector('.r-flow'); if (!flow || LANGS.length < 2) return;
     var box = document.createElement('div');
     box.className = 'r-lang'; box.setAttribute('role', 'group'); box.setAttribute('aria-label', T('lang.label'));
@@ -1045,7 +1062,10 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
 
   addEventListener('message', function(e){
     var d = e.data;
+    /* the constructor's grid switch, without a reload (the scroll stays) */
+    if (d && d.type === 'a1-flags'){ if ('grid' in d) el.classList.toggle('show-grid', !!d.grid); return; }
     if (!d || d.type !== 'a1-data' || !d.data) return;
+    if (d.grid === true && el.dataset.media === 'screen') el.classList.add('show-grid');
     apply(d.data, d.blobs);
   });
   function fromFile(){
@@ -1265,7 +1285,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
   function apply(data, blobs){
     RAW = data; BLOBS = blobs || {};
     DATA = window.ManualRender.localize(RAW, dictFor(LANG));
-    window.ManualRender.render(document, DATA, { resolve:resolve });
+    window.ManualRender.render(document, DATA, { resolve:resolve, tableView:q.get('tview') || '' });
     SPREADS = Math.max(1, (DATA.spreads || []).length);
     sheet.dataset.spreads = SPREADS;
     pages();
@@ -1283,6 +1303,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     bar.refresh();
     rows();
     reveal();
+    if (SPEC) specimen();
     requestAnimationFrame(function(){
       var over = window.ManualRender.overflow(document);
       if (embedded) try { window.parent.postMessage({ type:'a1-overflow', pages:over }, '*'); } catch (err) {}
@@ -1290,6 +1311,35 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
     if (el.classList.contains('capture')){ prune(); capture(); }
     /* decode the pages' pictures up front, so the first turn has them ready */
     if (TURN) sheet.querySelectorAll('img').forEach(function(i){ if (i.decode) i.decode().catch(function(){}); });
+  }
+
+  function specimen(){
+    var ribbon = document.querySelector('.ribbon'), t = null;
+    document.querySelectorAll('.spec-path, .spec-on').forEach(function(n){ n.classList.remove('spec-path', 'spec-on'); });
+    if (SPEC === 'bar'){ t = ribbon.querySelector('.r-bar'); el.classList.add('is-spec-bar'); }
+    else if (SPEC === 'head') t = ribbon.querySelector('.r-head');
+    else if (SPEC === 'lang') t = ribbon.querySelector('.r-lang');
+    else if (SPEC.indexOf('sec:') === 0) t = document.getElementById(SPEC.slice(4));
+    else if (SPEC.indexOf('block:') === 0){
+      t = ribbon.querySelector('[data-block="' + SPEC.slice(6) + '"]');
+      if (t && t.closest('.r-scroll')) t = t.closest('.r-scroll');
+      el.classList.add('is-spec-block');
+    }
+    if (!t) return;
+    t.classList.add('spec-on');
+    t.querySelectorAll('details.acc').forEach(function(d){ d.open = true; d.parentNode.classList.add('is-open'); });
+    for (var n = t.parentNode; n && n !== ribbon; n = n.parentNode){
+      n.classList.add('spec-path');
+      if (n.tagName === 'DETAILS'){ n.open = true; n.parentNode.classList.add('is-open'); }
+    }
+    var link = ribbon.querySelector('.header-nav a'); if (link && SPEC === 'bar') link.classList.add('is-here');
+    function post(){
+      try { window.parent.postMessage({ type:'a1-specimen', key:SPEC, h:Math.ceil(ribbon.getBoundingClientRect().height) }, '*'); } catch (err) {}
+    }
+    post();
+    if (window.ResizeObserver) new ResizeObserver(post).observe(ribbon);
+    document.addEventListener('toggle', function(){ setTimeout(post, 350); }, true);
+    addEventListener('load', post);
   }
 
   /* Page numbers from the spread's place in the booklet, not from markup:
@@ -1334,7 +1384,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
      the section. Only in the ribbon — the sheet has no bar. */
   var bar = (function(){
     var root = document.querySelector('.r-bar');
-    var nav = root.querySelector('.topbar-nav'), ink = root.querySelector('.topbar-ink');
+    var nav = root.querySelector('.header-nav'), ink = root.querySelector('.header-ink');
     var count = root.querySelector('.r-count');
     var links = [], secs = [], cur = -1;
     function mark(i){
@@ -1351,7 +1401,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
       nav.scrollTo({ left:Math.max(0, a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2), behavior:'smooth' });
     }
     function spy(){
-      if (el.dataset.media !== 'screen' || !secs.length) return;
+      if (el.dataset.media !== 'screen' || !secs.length || el.classList.contains('is-specimen')) return;
       var line = innerHeight / 3, i = 0;
       secs.forEach(function(sec, j){ if (sec && sec.getBoundingClientRect().top <= line) i = j; });
       if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) i = secs.length - 1;
@@ -1371,7 +1421,7 @@ html.capture .sheet[data-side="front"] .side-inner{display:none}
       });
       cur = -1; spy(); hero();
     }
-    root.querySelector('.topbar-mark').addEventListener('click', function(e){
+    root.querySelector('.header-mark').addEventListener('click', function(e){
       e.preventDefault(); scrollTo({ top:0, behavior:'smooth' });
     });
     /* past the hero: the bar may show the product (see the CSS) */
