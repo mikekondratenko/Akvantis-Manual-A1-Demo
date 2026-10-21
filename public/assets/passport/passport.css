@@ -872,10 +872,9 @@ body.is-frosted .plate .card {
 .finish { align-items: center; margin-top: var(--space-12); }
 /* Not a control here: it states a fact rather than offering a choice. The kit's hover
    dim would promise a press that does nothing. */
-.finish .swatch-btn {
-  cursor: default; border-color: var(--rule);
-  box-shadow: inset 0 0 0 1px var(--rule);
-}
+/* The edge is the kit's hairline (2026-10-21) — it sits on the disc; a box-shadow here would sit
+   on the 36 box, 2 px off it. */
+.finish .swatch-btn { cursor: default; }
 .finish .swatch-btn:hover { opacity: 1; }
 .finish .pair-name { color: var(--ink); }
 
@@ -1223,3 +1222,34 @@ div.card { cursor: default; }
    broken rather than as a page that is not finished. The button is full ink, and it
    becomes a link the moment the guide has one. */
 
+
+/* ── THE LANGUAGE WAS PICKED FOR YOU (2026-10-21) ──
+   id.akvantis.com sends a reader in Germany to `de`, in Ukraine to `ua` (the site's worker,
+   by the country Cloudflare reports), and the page says so once: a compact note at the top
+   in the page's own language, with Change (opens the location sheet) and a close. The kit's
+   `.alert` (status.css) in the neutral tone, on an opaque plate of its own — the alert's 10 %
+   surface is meant to sit on a page, and this one floats over it. Under the location sheet
+   (40), over the bar (20). Shown by the page's script when the address carries `?geo=`;
+   without script it stays hidden. */
+.geo-note {
+  position: fixed; z-index: 30; left: var(--space-12); right: var(--space-12); margin: 0 auto;
+  top: max(var(--space-12), env(safe-area-inset-top));
+  max-width: calc(var(--number-288) * 2 - var(--space-32));
+  border-radius: var(--radius-pill); background: var(--black-800); box-shadow: var(--shadow-md);
+  transition: opacity var(--duration-base) var(--ease-standard), translate var(--duration-base) var(--ease-standard);
+}
+.geo-note[hidden] { display: none; }
+.geo-note.is-away { opacity: 0; translate: 0 calc(var(--space-8) * -1); pointer-events: none; }
+.geo-note .alert { width: 100%; flex-wrap: nowrap; }
+.geo-note .alert-msg { flex: 1 1 auto; white-space: normal; font-size: var(--text-14); }
+.geo-x {
+  flex: none; display: flex; align-items: center; justify-content: center;
+  width: calc(var(--number-32) + var(--space-4)); height: calc(var(--number-32) + var(--space-4)); border-radius: 50%;
+  color: var(--ink-muted); transition: color var(--duration-fast), background-color var(--duration-fast);
+}
+.geo-x:hover { color: var(--ink); background: var(--white-10); }
+@media (max-width: 520px) {
+  .geo-note { border-radius: var(--radius-24); }
+  .geo-note .alert { flex-wrap: nowrap; border-radius: var(--radius-24); }
+  .geo-note .alert:has(.alert-action) .alert-action.btn { width: auto; }
+}

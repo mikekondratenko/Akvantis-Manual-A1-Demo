@@ -15,11 +15,12 @@
      .t-body      16 / 1.5                   running text on a page
      .t-small     14 / 1.5                   running text in a plate, a row's second line
      .t-caption   12 / 1.4  / faint          a note under something
+     .t-note      14 / 1.5  / faint          what something is: a caption, a tile's name, a column head
      .t-label     10 / 700  / caps / .08em   the small heading over a group
-     .link        a text link: a 40 % hairline at rest; under the cursor a full-ink 1px line
-                  draws across it left to right, and runs off to the right on the way out.
-                  It takes the ink of the text it sits in; data-state="hover" pins the drawn
-                  state for the preview
+     .link        a text link: a 1px line at 32 % of its ink at rest, 2px under the text; under
+                  the cursor a full-ink line draws over it left to right and back when it leaves;
+                  on a touch screen the line is always there. data-state="hover" pins the
+                  drawn state for the preview
 
    ── THE TOP THREE STEP DOWN ON A SMALL SCREEN (2026-10-11) ──
    Sizes are mobile first and change at the grid's own breakpoints, 768 and 1024, so a title
@@ -51,6 +52,10 @@
 .t-body    { font-size: var(--text-16); line-height: var(--leading-relaxed); }
 .t-small   { font-size: var(--text-14); line-height: var(--leading-relaxed); }
 .t-caption { font-size: var(--text-12); line-height: var(--leading-normal);  color: var(--ink-faint); }
+/* A quiet line that says what something is — the caption over a specimen, a name under a tile,
+   a column's head (2026-10-21). 14 / 1.5 in --ink-faint, sentence case: caps at 10 read as a
+   code, not a sentence. */
+.t-note    { font-size: var(--text-14); line-height: var(--leading-relaxed); font-weight: var(--weight-regular); color: var(--ink-faint); }
 .t-label   { font-size: var(--text-10); line-height: var(--leading-snug);    font-weight: var(--weight-bold);
              letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--ink-faint); }
 
@@ -61,26 +66,41 @@
 .t-display, .t-h1, .t-h2, .t-h3, .t-title { text-wrap: balance; }
 .t-lead, .t-body, .t-small, .t-caption { text-wrap: pretty; }
 
-/* ── LINK (2026-10-11) ──
-   Two lines drawn as backgrounds, so they follow the text across a line break: the hairline
-   at rest (the ink at 40 %), and the full line over it, 0 wide until the cursor arrives. It
-   grows from the left; on the way out it is anchored right, so it runs off that way instead
-   of rewinding — a trim path, not a wipe back. Only the size is animated; the anchor jumps. */
+/* ── LINK (2026-10-11, reworked 2026-10-20, 2026-10-21) ──
+   AT REST a thin line in the link's own ink at 32 % (`--link-rest`) — white with opacity on the
+   dark theme, the ink with opacity on the light one, because it is mixed from currentColor
+   and the ink turns over with the theme. A link on a page is now visible as a link before
+   anyone points at it (2026-10-21: it used to have no line at all).
+   UNDER THE CURSOR or with keyboard focus a full-ink line draws across the resting one from
+   the left; when the cursor leaves it draws back the same way, right to left. Anchored left
+   in both directions, so only the width animates.
+   Two background layers, not text-decoration, so the top one can be drawn and both follow
+   the text over a line break. Kept to a whole pixel: a tile thinner than one device pixel on
+   the fractional bottom edge of a line of text is dropped by the rasteriser.
+   THE GAP: `padding-bottom: --link-offset` pushes the line 2px further under the letters. On
+   an inline box vertical padding moves the background and not the layout, so the line height
+   of the paragraph is untouched; `box-decoration-break: clone` gives every line of a wrapped
+   link the same gap rather than only the last.
+   ON A TOUCH SCREEN THE FULL LINE IS ALWAYS THERE (hover: none): there is no cursor to reveal
+   it, and a link that looks like plain text until it is tapped is a link nobody taps. */
 .link {
   color: inherit; text-decoration: none;
+  padding-bottom: var(--link-offset);
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
   background-image:
     linear-gradient(currentColor, currentColor),
-    /* The hairline is drawn inside a whole-pixel strip rather than as a half-pixel strip of
-       its own: a background tile under one device pixel tall, on the fractional bottom edge
-       of a line of text, is dropped by the rasteriser — the hairline came and went from line
-       to line on a 2× screen. */
-    linear-gradient(to top, color-mix(in srgb, currentColor 40%, transparent) var(--link-line), transparent var(--link-line));
+    linear-gradient(color-mix(in srgb, currentColor var(--link-rest), transparent),
+                    color-mix(in srgb, currentColor var(--link-rest), transparent));
   background-repeat: no-repeat;
-  background-position: 100% 100%, 0 100%;
-  background-size: 0% var(--link-line-hover), 100% 1px;
+  background-position: 0 100%, 0 100%;
+  background-size: 0% var(--link-line), 100% var(--link-line);
   transition: background-size var(--duration-slow) var(--ease-emphasized);
 }
-.link:hover, .link:focus-visible, .link[data-state="hover"] {
-  background-position: 0 100%, 0 100%;
-  background-size: 100% var(--link-line-hover), 100% 1px;
-}
+.link:hover, .link:focus-visible, .link[data-state="hover"] { background-size: 100% var(--link-line), 100% var(--link-line); }
+@media (hover: none) { .link { background-size: 100% var(--link-line), 100% var(--link-line); } }
+
+/* ── ONE FACE (2026-10-21) ──
+   Cy Grotesk everywhere, code included: the kit ships no monospace (the old --font-mono named
+   Spline Sans Mono, which no page loaded, so every code fell back to the machine's own). A
+   token name or a hex in running text is the face at Medium, not a second typeface. */
+code, kbd, samp, pre { font-family: inherit; font-size: inherit; }

@@ -4,7 +4,7 @@
    Lifted out of A1-Landing-Page/landing.css, where they were `lp-*` and where pass 4 of the
    kit audit (docs/ui-kit-audit-2026-10-10-pass4.md, item 7) said they belonged in the kit.
    A section only PLACES the kit's objects — type roles, `.btn`, `.plate` — on grid.css's
-   columns. No colour of its own: the sheet is `--page`, the ground between sheets
+   columns. No color of its own: the sheet is `--page`, the ground between sheets
    `--black-900`, a picture slot `--tile`.
 
      .sec-stack        the column of sheets: 2 apart and 2 from the window's edge, on a ground
@@ -71,7 +71,7 @@
 @media (min-width: 1920px) { :root { --sec-head: 1 / span 10; --sec-half: 10; --sec-narrow: 7 / 15; } }
 
 /* ── THE STACK AND THE SHEET ── */
-.sec-stack { display: grid; gap: var(--space-2); padding: var(--space-2); background: var(--black-900); }
+.sec-stack { display: grid; gap: var(--space-2); padding: var(--space-2); background: var(--page-sunk); }   /* = --black-900 in the dark theme; a grey under the sheets on paper */
 
 .sec {
   position: relative; overflow: hidden;
@@ -155,7 +155,7 @@ img.sec-banner { object-fit: contain; }
   padding-inline: var(--space-16); }
 .benefit-icon {
   display: grid; place-items: center; width: var(--number-64); height: var(--number-64);
-  margin-bottom: var(--space-16); border-radius: var(--radius-16); color: var(--accent);
+  margin-bottom: var(--space-16); border-radius: var(--radius-16); color: var(--accent-text);
   background: repeating-linear-gradient(135deg, var(--tile) 0 var(--space-8), var(--black-800) var(--space-8) var(--space-16));
 }
 .benefit-icon:has(> *) { background: var(--tile); }
@@ -275,7 +275,7 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 
 /* ── BAR ── over a slider: the title left, one link right, on the title's baseline. */
 .sec-bar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-16) var(--space-24); }
-.sec-bar > .link { color: var(--accent); font-size: var(--text-16); white-space: nowrap; }
+.sec-bar > .link { color: var(--accent-text); font-size: var(--text-16); white-space: nowrap; }
 
 /* ══════════════ SLIDERS ══════════════
    One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the

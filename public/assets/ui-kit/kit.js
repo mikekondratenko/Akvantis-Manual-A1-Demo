@@ -59,17 +59,21 @@
     var scroll = !!(opts && opts.scroll);
     container.className = 'segmented' + (scroll ? ' is-scroll' : '');
     container.innerHTML = '';
+    /* Scroll mode: the segments and the thumb live on an inner rail that scrolls and is
+       masked at its ends (segmented.css), so the track keeps its own fill and padding. */
+    var host = container;
+    if (scroll) { host = document.createElement('div'); host.className = 'segmented-rail'; container.appendChild(host); }
 
     var thumb = document.createElement('div');
     thumb.className = 'segmented-thumb';
     if (!scroll) thumb.style.width = 'calc((100% - 8px) / ' + options.length + ')';
-    container.appendChild(thumb);
+    host.appendChild(thumb);
 
     var place = function (i) {
       if (!scroll) { thumb.style.transform = 'translateX(' + (i * 100) + '%)'; return; }
       var b = btns[i]; if (!b) return;
       thumb.style.width = b.offsetWidth + 'px';
-      thumb.style.transform = 'translateX(' + (b.offsetLeft - 4) + 'px)';
+      thumb.style.transform = 'translateX(' + b.offsetLeft + 'px)';
     };
 
     var btns = options.map(function (opt, i) {
@@ -92,25 +96,32 @@
         if (scroll && btn.scrollIntoView) btn.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
         if (onChange) onChange(opt.value, i);
       });
-      container.appendChild(btn);
+      host.appendChild(btn);
       return btn;
     });
 
     place(activeIndex);
+    /* Scroll mode: open the mask at the end that has segments hidden behind it. */
+    var fades = function () {
+      var max = host.scrollWidth - host.clientWidth;
+      container.classList.toggle('is-fade-start', host.scrollLeft > 1);
+      container.classList.toggle('is-fade-end', host.scrollLeft < max - 1);
+    };
+    if (scroll) { host.addEventListener('scroll', fades, { passive: true }); fades(); }
     /* Measured geometry goes stale if the face loads late or the track is shown later. */
     if (scroll) {
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { place(activeIndex); });
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { place(activeIndex); fades(); });
       if (window.ResizeObserver) new ResizeObserver(function () {
-        var a = btns.findIndex(function (b) { return b.classList.contains('is-active'); }); place(a < 0 ? 0 : a);
-      }).observe(container);
+        var a = btns.findIndex(function (b) { return b.classList.contains('is-active'); }); place(a < 0 ? 0 : a); fades();
+      }).observe(host);
     }
     return btns;
   };
 
   /* ══════════════ ICON TOGGLE ══════════════
      Same mechanism and the same curve as the segmented tabs — the two controls
-     must not animate differently — but full-bleed: the thumb runs to the group's
-     own edges rather than sitting inset on a track.
+     must not animate differently — and, since 2026-10-21 (Figma `Tab Bar`), the same
+     inset thumb: the track has 4px of padding, so the thumb is `(100% - 8px) / N`.
 
      Why this reuses the DOM instead of rebuilding it: selecting a panel usually
      re-runs whatever rendered the section, and a freshly-inserted element has no
@@ -136,7 +147,7 @@
 
     var thumb = document.createElement('div');
     thumb.className = 'iconseg-thumb';
-    thumb.style.width = 'calc(100% / ' + options.length + ')';
+    thumb.style.width = 'calc((100% - 8px) / ' + options.length + ')';
     container.appendChild(thumb);
 
     btns = [];
@@ -253,9 +264,7 @@
         (opts.labelledBy ? ' aria-labelledby="' + opts.labelledBy + ' ' + uid + 'b"' : '') + '>' +
         '<span class="dd-mark" data-current></span>' +
         '<span class="dd-gen" data-gen hidden></span>' +
-        '<svg class="dd-chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" ' +
-          'stroke="currentColor" stroke-width="1.6" stroke-linecap="round" ' +
-          'stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5L8 10.5L12 6.5"/></svg>' +
+        icon('chevron-down', { size: 14, cls: 'dd-chevron' }) +
       '</button>' +
       '<div class="dd-menu" role="listbox" tabindex="-1">' +
         groups.map(function (g) {
@@ -921,91 +930,38 @@
   };
 
   /* ══════════════ ICONS ══════════════
-     A small shared set, so two tools never draw the same idea two ways. Feather
-     geometry, 1.8 stroke, currentColor — they inherit the control's own colour and
-     therefore its states. */
-  Kit.icons = {
-    /* ── THE FOUR FORMATTING GLYPHS ──
-       Set as `<text>`, not drawn as paths, and that is the right call for exactly these
-       four: `H1`, `H2`, `B` and `I` are *letters* in every editor anybody has used, and a
-       letter drawn as a path is a letter that stops matching the interface's own face the
-       day the face changes. `font-family: inherit` hands them the kit's type, so the
-       toolbar is set in the same voice as everything around it.
+     Since 2026-10-21 the kit's icons are one set — Lucide plus a few of Akvantis' own, built into
+     icons.js by ui-kit/build-icons.mjs (grid 24, 1.5 px stroke at every size, round, currentColor).
+     The audit that day found a plus drawn six ways; this file used to hold one of them.
 
-       It is also why there is no icon here for "paragraph" or "normal": the way back to
-       body text is pressing the heading button again, and a toolbar of four is one a
-       person reads rather than scans. */
-    h1: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><text x="8" y="12" text-anchor="middle" font-family="inherit" font-size="11" font-weight="700" letter-spacing="-0.4">H1</text></svg>',
-    h2: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><text x="8" y="12" text-anchor="middle" font-family="inherit" font-size="11" font-weight="700" letter-spacing="-0.4">H2</text></svg>',
-    bold: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><text x="8" y="12.5" text-anchor="middle" font-family="inherit" font-size="13" font-weight="800">B</text></svg>',
-    italic: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><text x="8" y="12.5" text-anchor="middle" font-family="inherit" font-size="13" font-weight="500" font-style="italic">I</text></svg>',
+       Kit.icon('chevron-down', { size: 16 })   → the <svg>
+       <i data-icon="chevron-down"></i>          → swapped for it by icons.js, on load and later
 
-    /* One plus and one minus for the whole kit — the stepper's ends, the collapsible
-       plate's sign, any icon button that adds something. Drawn on a 16 box at 1.6, the
-       weight every other glyph here uses, so they sit at the same optical density as
-       their neighbours instead of one control's plus looking heavier than another's. */
-    plus:  '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M8 3v10"/><path d="M3 8h10"/></svg>',
-    minus: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 8h10"/></svg>',
-    box: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 7.5v9L12 21l9-4.5v-9L12 3Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg>',
-    cube: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 7.5v9L12 21l9-4.5v-9L12 3Z"/><path d="M3 7.5 12 12l9-4.5"/></svg>',
-    flat: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="1.6"/><path d="M7 6v12M12 6v12M17 6v12"/></svg>',
-    /* Tray with an arrow coming down into it — the one icon everybody already reads as
-       "put a file here", which is the point of putting it on a drop zone. */
-    drop: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v10"/><path d="M8.5 9.5 12 13l3.5-3.5"/><path d="M3 15v3.5A2.5 2.5 0 0 0 5.5 21h13a2.5 2.5 0 0 0 2.5-2.5V15"/></svg>',
-    download: '<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3v9"/><path d="M6.5 8.5 10 12l3.5-3.5"/><path d="M3 14v2.5h14V14"/></svg>',
-    print: '<svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M5 8V3H15V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14H3.5C2.67157 14 2 13.3284 2 12.5V9.5C2 8.67157 2.67157 8 3.5 8H16.5C17.3284 8 18 8.67157 18 9.5V12.5C18 13.3284 17.3284 14 16.5 14H15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="5" y="11" width="10" height="6" stroke="currentColor" stroke-width="1.6"/></svg>',
-    back: '<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 6 10l6 6"/></svg>',
-    /* A trapezoid for perspective — edges converging toward a vanishing point — against
-       a plain rectangle for orthographic, where they stay parallel. The two icons say
-       the difference between the projections rather than naming them. */
-    perspective: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5h10l4 14H3L7 5z"/></svg>',
-    orthographic: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1.5"/></svg>',
-    /* A solid triangle, optically centred rather than geometrically: a triangle centred on
-       its bounding box reads as sitting left of centre inside a circle, because its mass is
-       all on the left edge. The 0.6 nudge right is the correction, and it is the whole
-       reason this is drawn here once instead of in each tool. */
-    play: '<svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" aria-hidden="true"><path d="M6.2 3.6v10.8a.7.7 0 0 0 1.07.6l8.5-5.4a.7.7 0 0 0 0-1.2l-8.5-5.4a.7.7 0 0 0-1.07.6Z"/></svg>',
+     When icons.js has not run yet, Kit.icon returns the <i data-icon> placeholder, which icons.js
+     swaps the moment it starts — so the order the two files load in does not matter.
 
-    /* ── TWO WAYS TO LAY A LIST OUT ──
-       Three lines against four squares, and that is the whole drawing. The pair only has
-       to say which of two arrangements you are choosing, so they *are* the arrangement —
-       nothing representational, no frame around them, no rounded corners standing in for
-       a card. A row is a line and a tile is a square; anything added past that is a
-       detail the eye has to resolve before it gets the answer it already had.
-
-       20 on a 24 box, the size the icon toggle's glyphs are drawn at. */
-    rows:  '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>',
-    tiles: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg>',
-    endPanels: '<svg width="28" height="20" viewBox="0 0 28 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4" width="24" height="12" rx="1.5"/><rect x="4.5" y="8" width="4" height="4" rx="2"/><rect x="19.5" y="8" width="4" height="4" rx="2"/></svg>',
-    longPanels: '<svg width="28" height="20" viewBox="0 0 28 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4" width="24" height="12" rx="1.5"/><rect x="10" y="8" width="8" height="4" rx="2"/></svg>'
+     Kit.icons keeps its old keys for the tools that read them; each now resolves to the set. */
+  function icon(name, opts) {
+    opts = opts || {};
+    if (root.KitIcons) return root.KitIcons.svg(name, opts);
+    return '<i data-icon="' + name + '"' + (opts.size ? ' data-size="' + opts.size + '"' : '') +
+      (opts.fill ? ' data-fill' : '') + (opts.cls ? ' class="' + opts.cls + '"' : '') + '></i>';
+  }
+  Kit.icon = icon;
+  var LEGACY_ICONS = {
+    h1: ['heading-1', 16], h2: ['heading-2', 16], bold: ['bold', 16], italic: ['italic', 16],
+    plus: ['plus', 16], minus: ['minus', 16],
+    box: ['box', 20], cube: ['cube', 20], flat: ['dieline', 20],
+    drop: ['upload', 18], download: ['download', 16], print: ['printer', 16], back: ['chevron-left', 16],
+    perspective: ['perspective', 20], orthographic: ['orthographic', 20],
+    play: ['play', 18, true], rows: ['rows-3', 20], tiles: ['layout-grid', 20],
+    endPanels: ['end-panels', 24], longPanels: ['long-panels', 24]
   };
-
-  /* ══════════════ BRAND MARKS ══════════════
-     Markup rather than files, for the reason the icons are: a <use> into a same-document
-     sprite needs no fetch, inherits `currentColor`, and survives being opened over
-     file://, which is how half of these pages get looked at. `viewBox` and no width or
-     height, so the CSS decides the size — `.brand-wave` pins one, `.plate-empty` scales
-     one, and the mark itself has no opinion. */
-  Kit.marks = {
-    wave: '<svg class="wave-mark" viewBox="0 0 176 176" fill="none" ' +
-      'xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
-      '<path d="M88 0C39.4812 0 0 39.4812 0 88C0 136.519 39.4812 176 88 176C136.519 176 ' +
-      '176 136.519 176 88C176 39.4812 136.536 0 88 0ZM164.921 88C164.921 130.41 130.41 ' +
-      '164.921 88 164.921C45.59 164.921 11.0795 130.41 11.0795 88C11.0795 45.59 45.59 ' +
-      '11.0795 88 11.0795C130.41 11.0795 164.921 45.59 164.921 88Z" fill="currentColor"/>' +
-      '<path d="M128.821 57.5738L134.411 78.7453C122.227 85.9085 106.963 87.8165 91.683 ' +
-      '82.3437C83.2813 79.3646 76.0345 78.4776 68.5031 79.2809C60.3859 80.1512 54.1265 ' +
-      '82.578 47.1809 86.9295L41.5742 65.7746C49.3064 60.2014 57.7416 57.1721 67.0638 ' +
-      '56.4023C72.6202 55.9504 77.7918 56.3018 82.9299 57.6073C90.2437 59.465 95.75 ' +
-      '62.3771 104.604 62.6617C112.804 62.9295 120.754 61.3562 128.804 57.5905" ' +
-      'fill="currentColor"/>' +
-      '<path d="M128.837 90.4761L134.427 111.648C122.243 118.811 106.979 120.719 91.6986 ' +
-      '115.246C83.297 112.267 76.0501 111.38 68.5187 112.183C60.4016 113.054 54.1421 ' +
-      '115.48 47.1965 119.832L41.5898 98.677C49.3221 93.1038 57.7572 90.0745 67.0794 ' +
-      '89.3046C72.6359 88.8527 77.8074 89.2042 82.9455 90.5096C90.2593 92.3674 95.7656 ' +
-      '95.2795 104.619 95.564C112.82 95.8318 120.77 94.2586 128.82 90.4929" ' +
-      'fill="currentColor"/></svg>'
-  };
+  Kit.icons = {};
+  Object.keys(LEGACY_ICONS).forEach(function (k) {
+    var d = LEGACY_ICONS[k];
+    Object.defineProperty(Kit.icons, k, { enumerable: true, get: function () { return icon(d[0], { size: d[1], fill: d[2] }); } });
+  });
 
   /* ══════════════ HOTKEYS ══════════════
      Kit.hotkey('c', fn) — one key, one handler, bound once on the document.
@@ -1140,15 +1096,11 @@
       pop.innerHTML =
         '<div class="cal-head">' +
           '<button type="button" class="cal-nav" data-cal-step="-1" aria-label="Previous month">' +
-            '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" ' +
-              'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
-              '<path d="M10 3.5L6 8l4 4.5"/></svg>' +
+            icon('chevron-left', { size: 16 }) +
           '</button>' +
           '<div class="cal-title">' + CAL_MONTH[view.getMonth()] + ' ' + view.getFullYear() + '</div>' +
           '<button type="button" class="cal-nav" data-cal-step="1" aria-label="Next month">' +
-            '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" ' +
-              'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
-              '<path d="M6 3.5L10 8l-4 4.5"/></svg>' +
+            icon('chevron-right', { size: 16 }) +
           '</button>' +
         '</div>' +
         '<div class="cal-grid">' +
@@ -1230,6 +1182,335 @@
       }
     };
   };
+
+  /* ══════════════ PROGRESS ══════════════
+     Kit.progress(host, opts) — the Figma `Progress Bar` (700:5724): a level on a 144 plate,
+     the reading in the middle, − and + at the ends. The look is progress.css.
+
+       opts.value / min / max / step   numbers, default 0 / 0 / 100 / 1
+       opts.unit                       '%' by default; '' for none
+       opts.label                      the line under the number ('Salt level')
+       opts.accent                     the cyan → blue fill instead of the neutral one
+       opts.readonly                   a reading only: no ends, no drag, no keys
+       opts.format(v)                  how the number is printed (default: as is)
+       opts.onChange(v)                after every change the person makes
+
+     Set three ways, and all three are the same `set()`: the ends (one step on press, then
+     the stepper's 1000 ms pause and a step every 70 ms while held), a press or drag on the
+     plate (the level goes where the finger is), and the keys — ← ↓ / → ↑ a step,
+     PageDown / PageUp ten, Home / End the ends. The plate is the `role="slider"`, so a screen
+     reader hears one control with one value rather than two buttons and a number.
+     Returns { el, get(), set(v) }. */
+  Kit.progress = function (host, opts) {
+    opts = opts || {};
+    var min = opts.min != null ? +opts.min : 0, max = opts.max != null ? +opts.max : 100;
+    var step = opts.step != null ? +opts.step : 1;
+    var dec = (String(step).split('.')[1] || '').length;
+    var fmt = opts.format || function (v) { return v.toFixed(dec); };
+    var value = min;
+
+    host.className = 'progress' + (opts.accent ? ' is-accent' : '') + (opts.readonly ? ' is-readonly' : '');
+    host.innerHTML =
+      '<div class="progress-fill"></div>' +
+      '<button type="button" class="progress-step" data-step="-1" tabindex="-1" aria-hidden="true">' +
+      icon('minus', { size: 24 }) + '</button>' +
+      '<div class="progress-read"><div class="progress-value"><span class="progress-num"></span>' +
+      (opts.unit === '' ? '' : '<span class="progress-unit"></span>') + '</div>' +
+      (opts.label ? '<div class="progress-label"></div>' : '') + '</div>' +
+      '<button type="button" class="progress-step" data-step="1" tabindex="-1" aria-hidden="true">' +
+      icon('plus', { size: 24 }) + '</button>';
+    var num = host.querySelector('.progress-num'), unit = host.querySelector('.progress-unit');
+    var label = host.querySelector('.progress-label');
+    var less = host.querySelector('[data-step="-1"]'), more = host.querySelector('[data-step="1"]');
+    if (unit) unit.textContent = opts.unit != null ? opts.unit : '%';
+    if (label) label.textContent = opts.label;
+
+    host.setAttribute('role', opts.readonly ? 'meter' : 'slider');
+    host.setAttribute('aria-valuemin', min); host.setAttribute('aria-valuemax', max);
+    if (opts.label) host.setAttribute('aria-label', opts.label);
+    if (!opts.readonly) host.tabIndex = 0;
+
+    function snap(v) {
+      v = Math.round((v - min) / step) * step + min;
+      return +Math.min(max, Math.max(min, v)).toFixed(dec);
+    }
+    function set(v, fromUser) {
+      v = snap(+v); var changed = v !== value; value = v;
+      host.style.setProperty('--progress', max === min ? 0 : (v - min) / (max - min));
+      num.textContent = fmt(v);
+      host.setAttribute('aria-valuenow', v);
+      host.setAttribute('aria-valuetext', fmt(v) + (unit ? unit.textContent : ''));
+      less.disabled = v <= min; more.disabled = v >= max;
+      cover();
+      if (fromUser && changed && opts.onChange) opts.onChange(v);
+    }
+    /* What the fill is under. On the accent ramp the words and glyphs are white (Figma) — but
+       only where the ramp is actually behind them: a reading at 30 % sits on the pale track,
+       where white would vanish. Each of the three (−, the reading, +) turns white only when
+       the fill covers it whole. */
+    var read = host.querySelector('.progress-read');
+    function cover() {
+      var W = host.clientWidth; if (!W) return;
+      var t = max === min ? 0 : (value - min) / (max - min), edge = t * W;
+      [less, read, more].forEach(function (el) {
+        var right = el === read ? (W + read.offsetWidth) / 2 : el.offsetLeft + el.offsetWidth;
+        el.classList.toggle('is-on-fill', edge >= right);
+      });
+    }
+    if (window.ResizeObserver) new ResizeObserver(cover).observe(host);
+    set(opts.value != null ? opts.value : min);
+    if (opts.readonly) return { el: host, get: function () { return value; }, set: function (v) { set(v); } };
+
+    /* The ends — hold to repeat, the stepper's timing. */
+    var hold = null, rep = null;
+    function stop() { clearTimeout(hold); clearInterval(rep); hold = rep = null; }
+    [less, more].forEach(function (b) {
+      var dir = +b.dataset.step;
+      b.addEventListener('pointerdown', function (e) {
+        e.preventDefault(); e.stopPropagation(); if (b.disabled) return;
+        set(value + dir * step, true);
+        hold = setTimeout(function () { rep = setInterval(function () {
+          if (b.disabled) return stop(); set(value + dir * step, true); }, 70); }, 1000);
+      });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) { b.addEventListener(t, stop); });
+    });
+    window.addEventListener('blur', stop);
+
+    /* The plate — the level goes where the finger is. */
+    function fromX(e) {
+      var r = host.getBoundingClientRect();
+      set(min + Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * (max - min), true);
+    }
+    host.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('.progress-step')) return;
+      host.setPointerCapture(e.pointerId); host.classList.add('is-dragging'); host.focus(); fromX(e);
+      var move = function (ev) { fromX(ev); };
+      var up = function () {
+        host.classList.remove('is-dragging');
+        host.removeEventListener('pointermove', move); host.removeEventListener('pointerup', up); host.removeEventListener('pointercancel', up);
+      };
+      host.addEventListener('pointermove', move); host.addEventListener('pointerup', up); host.addEventListener('pointercancel', up);
+    });
+
+    host.addEventListener('keydown', function (e) {
+      var k = e.key, big = step * 10;
+      if (k === 'ArrowRight' || k === 'ArrowUp') set(value + step, true);
+      else if (k === 'ArrowLeft' || k === 'ArrowDown') set(value - step, true);
+      else if (k === 'PageUp') set(value + big, true);
+      else if (k === 'PageDown') set(value - big, true);
+      else if (k === 'Home') set(min, true);
+      else if (k === 'End') set(max, true);
+      else return;
+      e.preventDefault();
+    });
+
+    return { el: host, get: function () { return value; }, set: function (v) { set(v); } };
+  };
+
+  /* ══════════════ COLOUR PICKER ══════════════
+     Kit.colorPicker(input) — the kit's own popover for an `<input type="color">`: the color
+     mesh (hue by angle, saturation by radius), a brightness bar, the hex, the eyedropper.
+     The look is in swatch.css (`.cpick`).
+
+     It DRIVES the input rather than replacing it: the input keeps the value, and every change
+     is written there with the `input` event the native panel would have fired, `change` on
+     close. So a consumer that listens to the input needs to know nothing about this.
+
+     Nobody has to call it. A click (or Enter / Space) on any `input.swatch-input[type=color]`
+     anywhere in the document is caught below, the native panel is kept shut, and this one
+     opens — the swatch rails of the tools and the Builder get it without an edit.
+     Returns { open, close }. One popover for the page, re-pointed at whichever input opened. */
+  function cpHexToRgb(h) {
+    var m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(h || '').trim());
+    if (!m) return null;
+    var x = m[1].length === 3 ? m[1].replace(/./g, '$&$&') : m[1];
+    return [parseInt(x.slice(0, 2), 16), parseInt(x.slice(2, 4), 16), parseInt(x.slice(4, 6), 16)];
+  }
+  function cpRgbToHex(r) {
+    return '#' + r.map(function (v) { return ('0' + Math.round(v).toString(16)).slice(-2); }).join('').toUpperCase();
+  }
+  function cpHsvToRgb(h, s, v) {
+    var f = function (n) { var k = (n + h / 60) % 6; return v - v * s * Math.max(0, Math.min(k, 4 - k, 1)); };
+    return [f(5) * 255, f(3) * 255, f(1) * 255];
+  }
+  function cpRgbToHsv(r) {
+    var R = r[0] / 255, G = r[1] / 255, B = r[2] / 255;
+    var max = Math.max(R, G, B), min = Math.min(R, G, B), d = max - min, h = 0;
+    if (d) {
+      if (max === R) h = ((G - B) / d) % 6; else if (max === G) h = (B - R) / d + 2; else h = (R - G) / d + 4;
+      h *= 60; if (h < 0) h += 360;
+    }
+    return [h, max ? d / max : 0, max];
+  }
+
+  var cp = null;   // the one popover, built on first use
+
+  function cpBuild() {
+    var pop = document.createElement('div');
+    pop.className = 'cpick'; pop.hidden = true;
+    pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'Choose a color');
+    pop.innerHTML =
+      '<div class="cpick-wheel"><canvas></canvas><div class="cpick-dim"></div>' +
+      '<button type="button" class="cpick-handle" role="slider" aria-label="Hue and saturation"></button></div>' +
+      '<input class="cpick-range" type="range" min="0" max="100" step="1" aria-label="Brightness">' +
+      '<div class="cpick-row"><span class="cpick-chip" aria-hidden="true"></span>' +
+      '<input class="cpick-hex" type="text" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Hex">' +
+      '<button type="button" class="cpick-tool" aria-label="Pick from the screen" title="Pick from the screen" hidden>' +
+      icon('pipette', { size: 18 }) + '</button></div>';
+    document.body.appendChild(pop);
+
+    var wheel = pop.querySelector('.cpick-wheel'), canvas = pop.querySelector('canvas');
+    var dim = pop.querySelector('.cpick-dim'), handle = pop.querySelector('.cpick-handle');
+    var range = pop.querySelector('.cpick-range'), chip = pop.querySelector('.cpick-chip');
+    var hex = pop.querySelector('.cpick-hex'), tool = pop.querySelector('.cpick-tool');
+    var st = { h: 0, s: 0, v: 1, input: null, anchor: null, drawn: 0 };
+
+    /* True HSV at V = 1, hue clockwise from three o'clock DOWNWARD in hue (red → magenta →
+       blue), which is the mesh on the `.swatch-custom` disc: `conic-gradient(from 90deg, red,
+       magenta, blue, cyan, green, yellow)`. Drawn once per pixel size. */
+    function paintWheel() {
+      var px = Math.round(wheel.clientWidth * (window.devicePixelRatio || 1));
+      if (!px || st.drawn === px) return;
+      st.drawn = px; canvas.width = canvas.height = px;
+      var ctx = canvas.getContext('2d'), img = ctx.createImageData(px, px), d = img.data, c = px / 2;
+      for (var y = 0; y < px; y++) for (var x = 0; x < px; x++) {
+        var dx = x + .5 - c, dy = y + .5 - c, r = Math.sqrt(dx * dx + dy * dy) / c;
+        var i = (y * px + x) * 4;
+        if (r > 1) { d[i + 3] = 0; continue; }
+        var a = Math.atan2(dy, dx) * 180 / Math.PI;
+        var rgb = cpHsvToRgb((360 - a) % 360, r, 1);
+        d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2];
+        d[i + 3] = r > 1 - 1.5 / c ? 255 * (1 - r) * c / 1.5 : 255;   // a soft edge, one pixel
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+
+    function render(skipHex) {
+      var rgb = cpHsvToRgb(st.h, st.s, st.v), hx = cpRgbToHex(rgb);
+      var R = wheel.clientWidth / 2, a = -st.h * Math.PI / 180;
+      handle.style.left = (R + Math.cos(a) * st.s * R) + 'px';
+      handle.style.top  = (R + Math.sin(a) * st.s * R) + 'px';
+      handle.style.background = hx;
+      handle.setAttribute('aria-valuetext', 'hue ' + Math.round(st.h) + '°, saturation ' + Math.round(st.s * 100) + '%');
+      dim.style.opacity = String(1 - st.v);
+      range.value = String(Math.round(st.v * 100));
+      pop.style.setProperty('--cpick-full', cpRgbToHex(cpHsvToRgb(st.h, st.s, 1)));
+      chip.style.background = hx;
+      if (!skipHex) hex.value = hx;
+      return hx;
+    }
+
+    function commit(skipHex) {
+      var hx = render(skipHex);
+      if (st.input && st.input.value.toUpperCase() !== hx) {
+        st.input.value = hx.toLowerCase();
+        st.input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+
+    function fromPoint(e) {
+      var b = wheel.getBoundingClientRect(), R = b.width / 2;
+      var dx = e.clientX - b.left - R, dy = e.clientY - b.top - R;
+      st.s = Math.min(1, Math.sqrt(dx * dx + dy * dy) / R);
+      st.h = (360 - Math.atan2(dy, dx) * 180 / Math.PI) % 360;
+      if (st.v === 0) st.v = 1;   // picking a color off a black wheel should show the color
+      commit();
+    }
+    wheel.addEventListener('pointerdown', function (e) {
+      e.preventDefault(); wheel.setPointerCapture(e.pointerId); handle.focus(); fromPoint(e);
+      var move = function (ev) { fromPoint(ev); };
+      var up = function () { wheel.removeEventListener('pointermove', move); wheel.removeEventListener('pointerup', up); wheel.removeEventListener('pointercancel', up); };
+      wheel.addEventListener('pointermove', move); wheel.addEventListener('pointerup', up); wheel.addEventListener('pointercancel', up);
+    });
+    /* Keyboard: ← → turn the hue, ↑ ↓ move toward the edge or the centre; Shift for big steps. */
+    handle.addEventListener('keydown', function (e) {
+      var k = e.shiftKey ? 10 : 2;
+      if (e.key === 'ArrowRight') st.h = (st.h - k + 360) % 360;
+      else if (e.key === 'ArrowLeft') st.h = (st.h + k) % 360;
+      else if (e.key === 'ArrowUp') st.s = Math.min(1, st.s + k / 100);
+      else if (e.key === 'ArrowDown') st.s = Math.max(0, st.s - k / 100);
+      else return;
+      e.preventDefault(); commit();
+    });
+    range.addEventListener('input', function () { st.v = +range.value / 100; commit(); });
+    hex.addEventListener('input', function () {
+      var rgb = cpHexToRgb(hex.value); if (!rgb) return;
+      var hsv = cpRgbToHsv(rgb); st.h = hsv[0]; st.s = hsv[1]; st.v = hsv[2]; commit(true);
+    });
+    hex.addEventListener('blur', function () { render(); });
+    hex.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); close(true); } });
+    if ('EyeDropper' in window) {
+      tool.hidden = false;
+      tool.addEventListener('click', function () {
+        new window.EyeDropper().open().then(function (res) {
+          var hsv = cpRgbToHsv(cpHexToRgb(res.sRGBHex)); st.h = hsv[0]; st.s = hsv[1]; st.v = hsv[2]; commit();
+        }, function () {});
+      });
+    }
+
+    function place() {
+      var a = (st.anchor || st.input).getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
+      var gap = 8, vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight;
+      var top = a.bottom + gap; if (top + h > vh - gap && a.top - gap - h >= gap) top = a.top - gap - h;
+      var left = Math.max(gap, Math.min(a.left, vw - w - gap));
+      pop.style.top = Math.max(gap, top) + 'px'; pop.style.left = left + 'px';
+    }
+
+    function open(input) {
+      if (st.input && st.input !== input) close();
+      st.input = input; st.anchor = input.closest('.swatch-btn') || input;
+      var hsv = cpRgbToHsv(cpHexToRgb(input.value) || [255, 255, 255]);
+      st.h = hsv[0]; st.s = hsv[1]; st.v = hsv[2];
+      pop.hidden = false; paintWheel(); render(); place();
+      handle.focus();
+    }
+    function close(refocus) {
+      if (pop.hidden) return;
+      pop.hidden = true;
+      var input = st.input; st.input = null;
+      if (input) {
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        if (refocus) input.focus();
+      }
+    }
+    function away(e) {
+      if (pop.hidden) return;
+      if (pop.contains(e.target) || (st.anchor && st.anchor.contains(e.target))) return;
+      close();
+    }
+    document.addEventListener('pointerdown', away, true);
+    pop.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); close(true); } });
+    window.addEventListener('resize', function () { if (!pop.hidden) { st.drawn = 0; paintWheel(); render(); place(); } });
+    window.addEventListener('scroll', function () { if (!pop.hidden) place(); }, true);
+
+    return { open: open, close: close, isOpen: function () { return !pop.hidden; }, input: function () { return st.input; } };
+  }
+
+  Kit.colorPicker = function (input) {
+    if (!cp) cp = cpBuild();
+    return { open: function () { cp.open(input); }, close: function () { cp.close(); } };
+  };
+
+  /* The catch: any `input.swatch-input[type=color]` opens the kit's picker, not the native one.
+     Capture phase, so it runs before anything on the input itself; a second click on the same
+     input closes it, the way the native panel toggles. */
+  function cpTarget(e) {
+    var t = e.target;
+    return t && t.matches && t.matches('input.swatch-input[type="color"]') && !t.disabled ? t : null;
+  }
+  document.addEventListener('click', function (e) {
+    var input = cpTarget(e); if (!input) return;
+    e.preventDefault();
+    if (!cp) cp = cpBuild();
+    if (cp.isOpen() && cp.input() === input) cp.close(); else cp.open(input);
+  }, true);
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var input = cpTarget(e); if (!input) return;
+    e.preventDefault();
+    if (!cp) cp = cpBuild();
+    cp.open(input);
+  }, true);
 
   root.Kit = Kit;
 })(window);

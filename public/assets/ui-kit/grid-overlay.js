@@ -16,7 +16,7 @@
     var o = document.createElement('div'); o.className = 'grid-overlay'; o.setAttribute('aria-hidden', 'true');
     for (var i = 0; i < 20; i++) o.appendChild(document.createElement('i'));
     var b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-frost btn-round grid-fab';
-    b.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M6 2v12M10 2v12"/></svg>';
+    b.innerHTML = '<i data-icon="columns-3" data-size="16"></i>';   /* the kit's icon (icons.js) */
     document.body.append(o, b);
     var fill = function () {
       var n = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--grid-cols'), 10) || 12;

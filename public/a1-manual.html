@@ -8,11 +8,11 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="favicon.png?v=1">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
-<link rel="stylesheet" href="assets/ui-kit/tokens.css?v=kit10">
+<link rel="stylesheet" href="assets/ui-kit/tokens.css?v=kit14">
 <!-- Компоненты инструкции: номер — из кита, заголовки и кадр — свои (см. a1-manual-kit.html). -->
-<link rel="stylesheet" href="assets/ui-kit/number.css?v=kit10">
-<link rel="stylesheet" href="assets/ui-kit/hotspot.css?v=kit10">
-<link rel="stylesheet" href="assets/ui-kit/header.css?v=kit10">
+<link rel="stylesheet" href="assets/ui-kit/number.css?v=kit14">
+<link rel="stylesheet" href="assets/ui-kit/hotspot.css?v=kit14">
+<link rel="stylesheet" href="assets/ui-kit/header.css?v=kit14">
 <link rel="stylesheet" href="assets/manual-kit.css?v=35">
 <style>
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -101,7 +101,7 @@
      цвет — то, чем монтажник отличает одну линию от другой в тёмной тумбе. */
   --tube-blue  : #1257C8;
   --tube-black : var(--black);
-  --tube-red   : var(--red-1000);
+  --tube-red   : #FA2041;
 
   /* Обложка. Из дизайн-библиотеки, а не из кита: бирюза — её акцент, серо-синий
      — её же линия. Записаны здесь, потому что на листе они больше нигде. */
@@ -313,9 +313,9 @@ html:not(.show-grid) .grid-overlay{display:none}
 /* The document draws the guides; the tool only asks for them. Фальц один и
    принадлежит листу, а не стороне: бумага складывается целиком, и на обороте
    тот же сгиб. По умолчанию погашен — это лекало, а не краска. */
-.fold{position:absolute;border:0 dashed var(--red-1000);opacity:.4;pointer-events:none;z-index:6}
+.fold{position:absolute;border:0 dashed #FA2041;opacity:.4;pointer-events:none;z-index:6}
 .fold-v{left:var(--fold-x);top:0;bottom:0;border-left-width:1px}
-.fold-v::after{content:"фальц";position:absolute;top:2mm;left:2mm;font-size:6pt;color:var(--red-1000)}
+.fold-v::after{content:"фальц";position:absolute;top:2mm;left:2mm;font-size:6pt;color:#FA2041}
 html:not(.show-fold) .fold{display:none}
 
 /* ── ЛИСТ БЕЗ ГРАФИКИ ──
@@ -368,7 +368,7 @@ html.no-content .page-grid>*:not(.grid-overlay){visibility:hidden}
 }
 .side-inner[data-mode="image"] .page-flow{display:none}
 /* In the constructor, a page whose content runs past its bottom margin says so. */
-html.is-embedded:not(.capture) .page-flow.is-over{outline:calc(3 * var(--u)) dashed var(--red-1000);outline-offset:calc(4 * var(--u))}
+html.is-embedded:not(.capture) .page-flow.is-over{outline:calc(3 * var(--u)) dashed #FA2041;outline-offset:calc(4 * var(--u))}
 .page-flow > .m-sec{grid-column:span var(--span, 12);min-width:0}
 .page-flow .m-sec > .m-title{margin-bottom:calc(24 * var(--u))}
 .page-flow .m-sec-body{display:flex;flex-direction:column;gap:calc(13 * var(--u))}
@@ -872,7 +872,7 @@ html.is-specimen.is-spec-bar[data-media="screen"] .ribbon{padding:0}
 html.is-specimen[data-media="screen"] .r-bar.header{position:relative;transform:none;top:auto;bottom:auto}
 </style>
 <!-- shared with the guide, written by ../A1-Manual-Page/tools/build.mjs; after the page's own styles -->
-<link rel="stylesheet" href="assets/manual-blocks.css?v=6039f0bd">
+<link rel="stylesheet" href="assets/manual-blocks.css?v=9ea19464">
 </head>
 <body>
 <div class="stage">
@@ -1453,7 +1453,7 @@ html.is-specimen[data-media="screen"] .r-bar.header{position:relative;transform:
       wrap.appendChild(row);
       var btn = document.createElement('button');
       btn.type = 'button'; btn.className = 'r-next'; btn.setAttribute('aria-label', T('scroll.right'));
-      btn.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg>';
+      btn.innerHTML = '<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-icon="chevron-right"><path vector-effect="non-scaling-stroke" d="m9 18 6-6-6-6"/></svg>';
       wrap.appendChild(btn);
       function upd(){
         var more = row.scrollWidth - row.clientWidth - row.scrollLeft > 4;

@@ -14,15 +14,15 @@
   margin-top: var(--space-32);
   padding-top: var(--space-16);
   /* ── WHITE, TURNED DOWN — NOT A GREY ──
-     `--ink-faint` is a step on the neutral ramp: an opaque colour mixed
+     `--ink-faint` is a step on the neutral ramp: an opaque color mixed
      against black. It was right while the page had one ground. It is wrong now that the
      ground can be water — a fixed grey over a moving blue reads as a smudge on the glass,
      because it is not related to what is behind it at all.
 
      `--white-32` is the same white the page is set in, at a third of its strength, so the
-     foot is the page's own ink dimmed rather than a different colour that happens to look
+     foot is the page's own ink dimmed rather than a different color that happens to look
      dim on black. Over the flat ground it lands within a shade of where the grey was; over
-     the water it takes the water's colour with it, which is what a quiet line of type on
+     the water it takes the water's color with it, which is what a quiet line of type on
      glass is supposed to do. */
   font-size: var(--text-10); color: var(--ink-quiet); line-height: var(--leading-relaxed);
   text-align: center;
@@ -62,12 +62,12 @@
 .social a:focus-visible { outline: var(--focus-ring); outline-offset: 0; }
 .social svg { display: block; width: var(--number-24); height: var(--number-24); }
 /* The YouTube glyph is two-tone: the body is the ink and the play triangle is a hole in
-   it. Cut with the page colour so it stays a hole rather than becoming a grey shape.
+   it. Cut with the page color so it stays a hole rather than becoming a grey shape.
 
    ⚠ Over the water this is a lie the eye does not notice and should not be made to: the
    triangle is filled with `--page` while what is actually behind the icon is a moving
    blue. At 10px of glyph, against a body that is now full white, the difference is below
    the threshold where anybody could see it — and the alternative, punching a real hole
    with `mix-blend-mode`, would knock through to the water and make the play symbol
-   shimmer. A still wrong colour beats a correct one that moves. */
+   shimmer. A still wrong color beats a correct one that moves. */
 .social .knockout { fill: var(--page); }

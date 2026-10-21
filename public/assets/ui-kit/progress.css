@@ -1,0 +1,93 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Progress — a level you read and set: a big number over a plate that fills to it,
+   with − and + at the ends. Requires tokens.css. Built by `Kit.progress()` in kit.js.
+
+   ── SOURCE OF TRUTH: FIGMA — Akvantis Design Library, V2 → `Progress Bar` (700:5724) ──
+   Added 2026-10-21. 360 × 144 in the mock-up, corners 48 (`radius/4xl`); the track is
+   `background/surface`, the fill `background/surface-raised` — or, `.is-accent`, a ramp from
+   `#34BCDB` to `#3B82F6` (--cyan-400 → --blue-500). The fill's own trailing corners are 8
+   (`radius/md`): the edge of a level, not the end of a pill. Value 48 Medium, unit 16, label
+   12, all `text/primary`; − and + 24, 32 in from the ends.
+
+   Its own file for the reason segmented.css and number.css are: a page cannot load kit.css,
+   and a reading page (the passport, the guide) is where a salt level is shown. kit.css
+   @imports it, so every tool has it too.
+
+   The level is one custom property, `--progress` (0 … 1), set by script; everything that
+   depends on it is drawn from it, so a reader without kit.js still gets a correct bar from
+   `style="--progress:.51"` in the markup.
+
+   Roles, so the light theme re-points two values instead of restating the control:
+     --progress-track   the plate
+     --progress-fill    the level (a color or a gradient)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.progress {
+  --progress: 0;
+  --progress-track: var(--black-900);
+  --progress-fill : var(--black-700);
+  position: relative; display: flex; align-items: center; justify-content: space-between;
+  width: 100%; height: var(--number-144); padding: 0 var(--space-12);
+  border-radius: var(--radius-48); overflow: hidden;
+  background: var(--progress-track); color: var(--ink);
+  font-family: var(--font-primary);
+  /* A drag across the plate sets the level; a vertical swipe on a phone still scrolls. */
+  touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  cursor: pointer;
+}
+.progress.is-accent { --progress-fill: linear-gradient(90deg, var(--cyan-400), var(--blue-500)); }
+/* On the ramp, white — in both themes (Figma's text/primary on the accent). Only what the ramp
+   covers: kit.js marks −, the reading and + with .is-on-fill when the fill is wholly under them. */
+.progress.is-accent .is-on-fill { color: #FFFFFF; }
+.progress.is-accent .progress-step.is-on-fill:hover { background: rgba(255, 255, 255, .16); }
+.progress:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
+
+/* The level. The plate's overflow + radius rounds its leading end; its trailing corners are
+   its own 8 — and at 100 % the plate clips those too, so a full bar is a clean pill. */
+.progress-fill {
+  position: absolute; top: 0; bottom: 0; left: 0;
+  width: calc(var(--progress) * 100%);
+  background: var(--progress-fill);
+  border-radius: 0 var(--radius-8) var(--radius-8) 0;
+  transition: width var(--duration-base) var(--ease-standard);
+  pointer-events: none;
+}
+/* Under a finger the bar follows the finger, not a curve chasing it. */
+.progress.is-dragging .progress-fill { transition: none; }
+
+/* − and +: a 64 hit area, the 24 glyph 32 in from the end, as drawn. */
+.progress-step {
+  position: relative; z-index: 1; flex: none;
+  width: var(--number-64); height: var(--number-64); padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 50%; background: transparent; color: inherit;
+  cursor: pointer; transition: background var(--duration-fast), opacity var(--duration-fast);
+}
+.progress-step:hover { background: var(--white-08); }
+.progress-step:disabled { opacity: .35; cursor: default; background: transparent; }
+.progress-step svg { display: block; }
+.progress.is-readonly { cursor: default; }
+.progress.is-readonly .progress-step { visibility: hidden; }
+
+/* The reading, centred on the plate rather than between the buttons, so it does not shift
+   when one of them hides. */
+.progress-read {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1;
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-2);
+  pointer-events: none; white-space: nowrap;
+}
+.progress-value {
+  display: flex; align-items: flex-start; gap: var(--space-4);
+  font-size: var(--text-48); font-weight: var(--weight-medium); line-height: var(--leading-snug);
+  font-variant-numeric: tabular-nums;
+}
+/* The unit sits up by the figure's shoulder, as in the mock-up (19 down a 60 line). */
+.progress-unit { font-size: var(--text-16); line-height: var(--leading-relaxed); margin-top: calc(var(--text-48) * .4); }
+.progress-label { font-size: var(--text-12); font-weight: var(--weight-medium); line-height: var(--leading-relaxed); }
+
+/* Light theme: the same plate one step into the paper, the level two. The accent ramp keeps
+   its colors; the reading takes the ink, which is what the role already does. */
+[data-theme="light"] .progress { --progress-track: var(--black-800); --progress-fill: var(--black-500); }
+[data-theme="light"] .progress.is-accent { --progress-fill: linear-gradient(90deg, var(--cyan-400), var(--blue-500)); }
+
+@media (prefers-reduced-motion: reduce) { .progress-fill { transition: none; } }

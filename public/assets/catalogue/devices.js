@@ -164,12 +164,27 @@ window.COLOURS = [
        variants stopped fitting the palette: before this, chrome was being printed as `Gray`
        and steel as `White`, which is a wrong word on a label rather than an approximate one. */
     /* A1's second finish is one thing sold under one name — white housing, grey dials and
-       base — so it is one entry and not two. The disc carries the body colour, which is what
-       somebody matching a swatch to a box is looking at. */
-    { id: 'whitegrey',   label: 'White & Grey', hex: '#E4E7E9' },
+       base — so it is one entry and not two. Since 2026-10-21 the disc shows both: `hex` the
+       white body, `hex2` the grey, left half and right half (swatch.css `.swatch-split`).
+       Draw any finish with `swatchStyle(c)` below, never `background:` + c.hex by hand, or a
+       two-colour finish silently shows only its first colour. */
+    { id: 'whitegrey',   label: 'White & Grey', hex: '#F7F7F7', hex2: '#8A8F94' },
     { id: 'chrome',      label: 'Chrome',      hex: '#C9CED2' },
     { id: 'steel',       label: 'Brushed Steel', hex: '#9BA1A5' }
   ];
+
+  /* The inline style that paints a finish on a disc — one colour, or two as halves (2026-10-21).
+     Longhands only: `background-color` and `background-image`, so `.swatch-btn`'s clip and
+     origin survive (the shorthand would reset them). The two halves are the kit's
+     `.swatch-split` written inline, so a disc that is not a `.swatch-btn` — a label's, a
+     page's — gets the same picture. */
+  window.swatchStyle = function (c) {
+    if (!c) return '';
+    return c.hex2
+      ? '--swatch-a:' + c.hex + ';--swatch-b:' + c.hex2 + ';background-color:' + c.hex +
+        ';background-image:linear-gradient(90deg,' + c.hex + ' 50%,' + c.hex2 + ' 50%)'
+      : 'background:' + c.hex;
+  };
 
 
 /* ⚠ MOVED HERE FROM THE STICK MAKER — 2026-09-04.

@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   Tools UI Kit — the colour swatch.
+   Tools UI Kit — the color swatch.
 
-   A finish as an object: a disc filled with the colour, and the name of the colour
+   A finish as an object: a disc filled with the color, and the name of the color
    under the row. It is a control in a rail — the Stick Maker picks a finish with it,
    the Passport builder picks the finish a page shows — and a statement on a page,
    where the same disc says which machine the reader is holding.
@@ -17,113 +17,112 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 .color-block { display: flex; flex-direction: column; gap: var(--space-8); }
-.pair-row { display: flex; gap: var(--space-8); flex-wrap: wrap; }
+/* 4, not 8: each button carries 2px of room for its ring on every side, so 4 between boxes
+   is 8 between discs — a 40 pitch for the 32 disc. */
+.pair-row { display: flex; gap: var(--space-4); flex-wrap: wrap; }
+
+/* ── SOURCE OF TRUTH: FIGMA — Akvantis Design Library, V2 → `Color/Swatch` (700:6224) ──
+   Synced 2026-10-21. Selected: a 2px `brand/default` (= --accent) ring sits OUTSIDE the
+   disc with a 3px gap, and the fill pulls in. Figma draws the disc at 40; the kit's
+   default is 32 (decided 2026-10-21 — a rail and a card want the smaller one), so the
+   chosen fill is 26. Ring and gap are fixed; `--swatch-size` sets the disc for any row
+   that wants another size (`--swatch-size: 40px` is Figma's).
+
+   ── THE RING IS INSIDE THE BOX, AND THAT IS THE POINT ──
+   Figma's stroke is outside the disc, so its real bounds are disc + 4. Drawn as an outer
+   box-shadow it would be 36 on screen and 32 to layout — and every `.panel-fold` clips its
+   content (`overflow: hidden`, the thing that makes the fold animate), so a chosen swatch
+   on a plate's first or last row lost 2px of ring on that side. So the button IS the disc + 4 (36):
+   2px of padding around the disc at rest, an inset ring on that edge when chosen. Same
+   picture as Figma, and nothing for a container to cut. */
 .swatch-btn {
-  width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent;
-  cursor: pointer; padding: 0; position: relative; flex-shrink: 0;
-  transition: opacity var(--duration-fast), border-color var(--duration-fast), padding var(--duration-fast);
+  width: calc(var(--swatch-size, 32px) + 4px); height: calc(var(--swatch-size, 32px) + 4px);
+  border-radius: 50%; border: 0; padding: 2px;
+  /* !important because the fill arrives as an inline `background` — a shorthand that
+     resets every longhand it does not name, background-clip included, and outranks this
+     file. Without it the color would paint under the 2px of room as well. */
+  background-clip: content-box !important;
+  background-origin: content-box;
+  cursor: pointer; position: relative; flex-shrink: 0;
+  transition: opacity var(--duration-fast), box-shadow var(--duration-fast), padding var(--duration-fast);
 }
 /* Hover dims the disc; it does not grow it and it does not tint it. Growing moves the
    swatch out from under the cursor and nudges the row; tinting changes the one thing the
    control exists to show. */
 .swatch-btn:hover { opacity: .78; }
 .swatch-btn:focus-visible { outline: none; box-shadow: var(--focus-halo); }
-/* Selected: the fill pulls in, the ring takes the edge — so a row of swatches does not
-   grow when one of them is chosen. Done with background-clip rather than a second
-   element, so the colour can keep arriving as an inline background on the button.
-   !important because that inline `background` is a shorthand: it resets every longhand
-   it does not name, background-clip included, and outranks this file. */
+/* Selected: 2px ring on the box's edge, 3px gap, the fill pulls in to 26 — the row does
+   not move when one is chosen. */
 .swatch-btn.is-active {
-  border-color: var(--white);
-  background-clip: content-box !important;
-  padding: 3px;
+  padding: 5px;
+  box-shadow: inset 0 0 0 2px var(--accent);
 }
+.swatch-btn.is-active:focus-visible { box-shadow: inset 0 0 0 2px var(--accent), var(--focus-halo); }
+
+/* ── THE HAIRLINE ON THE DISC (2026-10-21) ──
+   A white disc on paper and a black disc on the dark page have no edge at all — the color
+   is the only thing the control shows and it vanishes into its ground. So every disc carries
+   a 1px inner line at 12 % of the ink: `--white-12` is white on the dark theme and the ink
+   on the light one (tokens.css turns it over), so it reads on both and is invisible on a
+   mid color. It is drawn on the DISC, not on the 36 box — a pseudo-element inset by the
+   same padding the fill is clipped to (2 at rest, 5 chosen) — so it hugs the fill rather than
+   floating 2px outside it. On top of the fill and of the color input; clicks pass through. */
+.swatch-btn::after {
+  content: ''; position: absolute; inset: 2px; border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--white-12);
+  pointer-events: none; transition: inset var(--duration-fast);
+}
+.swatch-btn.is-active::after { inset: 5px; }
+
+/* ── TWO COLOURS IN ONE DISC ── Figma's `sand-white`, `graphite-sand` … : left half, right
+   half. The two colors are data, so they arrive as custom properties rather than a class
+   per pair:  <button class="swatch-btn swatch-split" style="--swatch-a:#C4B49E; --swatch-b:#FAFAFA"> */
+.swatch-split {
+  background-image: linear-gradient(90deg, var(--swatch-a) 50%, var(--swatch-b) 50%);
+}
+
+/* ── A TEXTURE, NOT A COLOUR ── Figma's `color custom swatch` (700:6295): a picture cropped
+   to the disc — a print, a material, a pattern. The picture is data, so it arrives inline:
+     <button class="swatch-btn swatch-texture" style="background-image:url(…)">
+   ⚠ `background-image`, the longhand — not `background`, which would reset the size
+   and position set here and the origin `.swatch-btn` sets. And not a custom property (`--swatch-img: url(…)`): a
+   relative `url()` inside a variable resolves against the stylesheet that reads it, so
+   `url(a.jpg)` written on a page would be looked for in `assets/ui-kit/`. */
+.swatch-texture {
+  background-size: cover;
+  background-position: center;
+  background-color: var(--black-150);
+}
+
 /* ── THE ONE THAT IS NOT A FINISH ──
-   A swatch whose colour is not on a list: the disc carries a real `<input type="color">`
+   A swatch whose color is not on a list: the disc carries a real `<input type="color">`
    stretched over it at zero opacity. The browser's picker, not one built here — it has
    the eyedropper, it is reachable from the keyboard on every platform, and it is the one
-   the person already knows. Three things a wheel drawn in a rail would each have to earn.
+   the person already knows.
 
-   Zero opacity rather than `hidden`, and this is the part that is easy to get wrong: a
-   hidden input cannot be clicked, and proxying a click to it opens the picker wherever
-   the browser feels like rather than under the swatch the person aimed at. So the input
-   *is* the hit area, and the disc behind it is only the fill.
+   Zero opacity rather than `hidden`: a hidden input cannot be clicked, and proxying a
+   click to it opens the picker wherever the browser feels like rather than under the
+   swatch the person aimed at. So the input *is* the hit area, and the disc behind it is
+   only the fill. */
+.swatch-custom { overflow: hidden; display: block; }
 
-   Used for the ripple background's water. It has no place in a product finish row —
-   a finish is a thing that exists, not a colour somebody liked. */
-.swatch-custom { position: relative; overflow: hidden; display: block; padding: 0; }
-.swatch-custom.is-active { padding: 3px; }
+/* ── THE COLOUR MESH IT WEARS WHILE NOTHING IS CHOSEN ── (2026-10-21, from the reference)
+   A color picker's disc: every hue round the edge, washing out to white at the centre —
+   hue by angle, saturation by radius. Red at three o'clock, yellow, green, cyan at nine,
+   blue, magenta, back to red: `conic-gradient` measures from twelve, so `from 90deg`
+   puts red on the right and the sweep runs clockwise from there.
+   Replaces the 2026-09-13 sweep of the kit's own palette: the disc now reads as "pick
+   any color", which is what it is for.
 
-/* ── THE WHEEL IT WEARS WHILE NOTHING IS CHOSEN ──
-   The disc has to say "any other colour", and the drawing everybody reads that way is a
-   wheel. It belongs here rather than in the rail that uses it: it was an inline
-   `style.background` written from JavaScript, which meant the one visual element in the
-   row that is not data was drawn as if it were, and no other consumer of this file could
-   have it without copying the string.
-
-   ── WHY A CONIC GRADIENT AND NOT A LINEAR ONE ──
-   A linear ramp across a circle is a striped disc: the bands run edge to edge, the two
-   ends do not meet, and at 32px it reads as a smear. A wheel closes where it started,
-   which is what `conic-gradient` is for.
-
-   ── ⚠ IT WAS A HUE WHEEL AND IT IS NOT ANY MORE ──
-   Eight full-saturation hues at 45° bearings — red, orange, chartreuse, green, cyan,
-   blue, violet, magenta. Correct as a colour wheel and wrong as a component: it was the
-   only object in this kit wearing colours the kit does not own, so a 32px disc of clip
-   art sat in a rail where every other pixel is one of six greys and one blue. Changed
-   2026-09-13 to sweep THE KIT'S OWN PALETTE.
-
-   What it gives up is the claim "every hue is available", which was never true of the
-   drawing anyway — eight stops out of a continuum. What it keeps is the only thing the
-   disc has to say, which is "not one of the ones listed beside me": still a wheel, still
-   the one control in the row that is not a flat fill, and now made of this product.
-
-   ── THE SWEEP ──
-   Light at the top, the accent down the right, the deep green-teal at the bottom, the
-   neutral ramp back up the left. Four poles, evenly spaced, so no quadrant is a smear.
-
-   ⚠ `from 0deg`, not the `from -90deg` this carried while it was a hue wheel. That
-   quarter-turn was there to put red at twelve o'clock and it does not — `conic-gradient`
-   already measures from twelve, so `-90deg` put the first stop at NINE o'clock and the
-   old comment describing it was simply wrong for as long as it stood. Here the first stop
-   is white and it belongs at the top, which is what `0deg` does.
-   The bearing that matters is the one nobody asks for: `--blue-1000` into `--green-1000`
-   crosses a turquoise, which is the note the palette has no token for and the only place
-   in the kit it appears.
-
-   Written as `var()` and not as hexes, so the disc follows the palette rather than
-   holding a photograph of it.
-
-   No `!important`, and no guard. The rail writes an inline `background` the moment a
-   colour IS chosen, and inline already beats a stylesheet — so the wheel is what the disc
-   wears until there is a colour to wear instead, and clearing that inline value brings it
-   back. That is the whole state machine, in two places that cannot disagree. */
+   Two layers: the white wash on top, the hue wheel under it. `background-image` and not
+   `background`, so the content-box origin on `.swatch-btn` survives and the mesh is sized
+   to the disc rather than to the box around it. No `!important`: the rail
+   writes an inline `background` the moment a color IS chosen, which resets the image and
+   covers the mesh; clearing it brings the mesh back. */
 .swatch-custom {
-  /* ⚠ THE WHEEL HAS TO FILL THE DISC, AND BY DEFAULT IT DOES NOT.
-     `.swatch-btn` carries a 2px transparent border so the selected ring can appear
-     without the disc changing size. A gradient is sized to the background POSITIONING
-     area, which is the padding box — 28 of the 32 — and then painted out into the border
-     box, so the wheel was drawn small and its edge colours smeared across the ring: a
-     pale band at nine o'clock, a dark one opposite, and the circle visibly not full.
-     `border-box` makes the positioning area the whole disc, which is what it looks like
-     and therefore what it should be.
-     ── AND IT IS `background-image`, NOT `background` ──
-     The shorthand INCLUDES `background-origin`, so written as `background:` it would
-     reset the line above it back to the padding box and undo the fix. The longhand leaves
-     the origin alone. Nothing else changes: an inline `background:` from the caller is
-     still a shorthand and still resets `background-image`, so a chosen colour covers the
-     wheel exactly as before. */
-  background-origin: border-box;
-  background-image: conic-gradient(from 0deg,
-    var(--white)        0deg,
-    var(--blue-200)    45deg,
-    var(--blue)        90deg,
-    var(--blue-1000)  135deg,
-    var(--green-1000) 180deg,
-    var(--black)      225deg,
-    var(--black-500)  270deg,
-    var(--black-150)  315deg,
-    var(--white)      360deg);
+  background-image:
+    radial-gradient(closest-side, rgba(255, 255, 255, .95), rgba(255, 255, 255, .35) 55%, rgba(255, 255, 255, 0)),
+    conic-gradient(from 90deg, #FF0000, #FF00FF, #0000FF, #00FFFF, #00FF00, #FFFF00, #FF0000);
 }
 .swatch-input {
   position: absolute; inset: 0;
@@ -134,3 +133,100 @@
 
 .pair-name { font-size: var(--text-13); font-weight: var(--weight-semibold); color: var(--white); }
 .pantone-note { font-size: var(--text-10); color: var(--ink-faint); line-height: var(--leading-relaxed); min-height: 14px; }
+
+/* ══════════════ THE COLOUR PICKER — `Kit.colorPicker` (2026-10-21) ══════════════
+   The browser's own picker was a different object on every platform — a macOS panel, a
+   Chrome bubble, a GTK dialog — and none of them was this kit. This is the kit's: the same
+   color mesh the disc wears (hue by angle, saturation by radius — red at three o'clock,
+   white at the centre), a brightness bar under it, the hex in a field, and the eyedropper
+   where the browser has one.
+
+   It does not replace the `<input type="color">` — it drives it. kit.js catches the click
+   (and Enter / Space) on any `input.swatch-input[type=color]`, keeps the native panel shut
+   and opens this one instead; every change is written to the input's `value` with the
+   `input` event it would have fired, and `change` on close. So every consumer that listens
+   to that input works unchanged, and a page without kit.js still gets the native picker.
+
+   Surface: the calendar's and the popup's — `--black-800` plate, a 1px `--black-600` edge,
+   `--shadow-md`, corners 16. All of them are roles the light theme turns over. */
+.cpick {
+  position: fixed; z-index: 95; width: 248px;
+  display: flex; flex-direction: column; gap: var(--space-12);
+  padding: var(--space-16);
+  background: var(--black-800); border: 1px solid var(--black-600);
+  border-radius: var(--radius-16); box-shadow: var(--shadow-md);
+  font-family: var(--font-primary); color: var(--ink);
+}
+.cpick[hidden] { display: none; }
+
+/* The mesh. Drawn on a canvas in true HSV (a CSS gradient pair only approximates it), at
+   full brightness; the dim layer over it is black at 1 − V, which is exactly what lowering V
+   does to every pixel — so the wheel shows the colors the bar below would give. */
+.cpick-wheel { position: relative; width: 100%; aspect-ratio: 1; touch-action: none; cursor: crosshair; }
+.cpick-wheel canvas { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; }
+.cpick-dim { position: absolute; inset: 0; border-radius: 50%; background: #000; pointer-events: none; }
+.cpick-wheel::after {   /* the hairline the swatch discs carry, for a white or black wheel edge */
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--white-12); pointer-events: none;
+}
+.cpick-handle {
+  position: absolute; width: 20px; height: 20px; margin: -10px 0 0 -10px; padding: 0;
+  border-radius: 50%; border: 2px solid #FFFFFF; cursor: grab;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .32), var(--shadow-sm);
+}
+.cpick-handle:focus-visible { outline: none; box-shadow: 0 0 0 1px rgba(0, 0, 0, .32), var(--focus-halo); }
+
+/* Brightness. The kit's range, drawn here because a page cannot load kit.css: a 7px rounded
+   track, a 24px white thumb — the track a ramp from black to the color at full brightness. */
+.cpick-range {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 24px; margin: 0;
+  background: transparent; cursor: pointer;
+}
+.cpick-range::-webkit-slider-runnable-track {
+  height: 8px; border-radius: 4px;
+  background: linear-gradient(to right, #000, var(--cpick-full, #FFF));
+  box-shadow: inset 0 0 0 1px var(--white-12);
+}
+.cpick-range::-moz-range-track {
+  height: 8px; border-radius: 4px;
+  background: linear-gradient(to right, #000, var(--cpick-full, #FFF));
+  box-shadow: inset 0 0 0 1px var(--white-12);
+}
+.cpick-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 24px; height: 24px; margin-top: -8px; border-radius: 50%;
+  background: #FFFFFF; border: 0; box-shadow: var(--shadow-sm), 0 0 0 1px rgba(0, 0, 0, .16);
+}
+.cpick-range::-moz-range-thumb {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #FFFFFF; border: 0; box-shadow: var(--shadow-sm), 0 0 0 1px rgba(0, 0, 0, .16);
+}
+.cpick-range:focus-visible { outline: none; }
+.cpick-range:focus-visible::-webkit-slider-thumb { box-shadow: var(--shadow-sm), var(--focus-halo); }
+.cpick-range:focus-visible::-moz-range-thumb { box-shadow: var(--shadow-sm), var(--focus-halo); }
+
+/* The row under it: the color as it is now, the hex, the eyedropper. 40 tall, the field's
+   look (field.css) restated so the picker stands on swatch.css alone. */
+.cpick-row { display: flex; align-items: center; gap: var(--space-8); }
+.cpick-chip {
+  width: 40px; height: 40px; flex: none; border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--white-12);
+}
+.cpick-hex {
+  flex: 1; min-width: 0; height: 40px; padding: 0 var(--space-12);
+  background: transparent; color: var(--ink);
+  border: 1px solid var(--field-edge); border-radius: var(--field-radius);
+  font-family: var(--font-primary); font-size: var(--control-text); font-weight: var(--weight-medium);
+  text-transform: uppercase; font-variant-numeric: tabular-nums;
+  transition: border-color var(--duration-fast);
+}
+.cpick-hex:hover { border-color: var(--field-edge-hover); }
+.cpick-hex:focus { outline: none; border-color: var(--field-edge-focus); }
+.cpick-tool {
+  width: 40px; height: 40px; flex: none; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 50%; background: var(--white-10); color: var(--ink);
+  cursor: pointer; transition: background var(--duration-fast);
+}
+.cpick-tool:hover { background: var(--white-20); }
+.cpick-tool:focus-visible { outline: none; box-shadow: var(--focus-halo); }
+.cpick-tool[hidden] { display: none; }

@@ -1,6 +1,6 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   Segmented tabs — N equal segments on a padded track, the choice carried by a white
-   thumb. Built by `Kit.segmented()` in kit.js (the thumb's geometry is derived from the
+   Segmented tabs — N equal segments on a translucent track, the choice carried by a lighter
+   plate (Figma Tab Bar). Built by `Kit.segmented()` in kit.js (the thumb's geometry is derived from the
    option count, so it is not written by hand).
 
    Moved out of kit.css on 2026-10-12, the same move panel.css, header.css and swatch.css
@@ -9,35 +9,71 @@
    tool gets it exactly as before. Requires tokens.css.
    ───────────────────────────────────────────────────────────────────────────── */
 
-/* ══════════════ SEGMENTED CONTROL (generic, N segments) ══════════════ */
+/* ══════════════ SEGMENTED CONTROL (generic, N segments) ══════════════
+   ── SOURCE OF TRUTH: FIGMA — Akvantis Design Library, V2 → `Tab Bar` (700:6211) ──
+   Synced 2026-10-21. A translucent track (`white/a10`), 4 in, radius 16, 48 tall; the chosen
+   tab a lighter translucent plate (`white/a20`), 40 tall, radius 16; labels Medium in
+   `text/primary` on the choice and `text/secondary` off it — at the buttons' size,
+   `--control-text` (Figma draws 16; the kit keeps one size for everything you press). Replaces the white thumb with
+   inverted ink on a grey plate: the choice is now a step of light, not a negative.
+
+   The track and the thumb are roles, so the light theme and a frosted surface re-point
+   them instead of restating the control:
+     --seg-track   the track's fill (translucent — it takes whatever it sits on)
+     --seg-thumb   the chosen plate */
 .segmented {
-  position: relative; display: flex; height: 48px; padding: 4px;
-  border: 1px solid transparent; border-radius: var(--radius-8); background: var(--black-700);
-  transition: border-color var(--duration-fast);
+  --seg-track: var(--white-10);
+  --seg-thumb: var(--white-20);
+  position: relative; display: flex; height: 48px; padding: var(--space-4);
+  border: 0; border-radius: var(--radius-16);
+  background: var(--seg-track);
 }
-/* No border change on track hover — the per-segment highlight carries it. */
 .segmented-thumb {
-  position: absolute; top: 4px; left: 4px; bottom: 4px;
-  background: var(--white); border-radius: 6px;
+  position: absolute; top: var(--space-4); left: var(--space-4); bottom: var(--space-4);
+  background: var(--seg-thumb); border-radius: var(--radius-16);
   transition: transform var(--duration-base) var(--ease-standard);
   z-index: 1;
 }
 .segment-btn {
   position: relative; z-index: 2; flex: 1;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  border: none; background: transparent; border-radius: 6px;
-  color: var(--black-200); cursor: pointer; font-size: var(--text-13); font-weight: var(--weight-semibold);
-  font-family: var(--font-primary);
-  transition: color var(--duration-fast), background var(--duration-fast); padding: 0 6px; text-align: center;
+  display: flex; align-items: center; justify-content: center; gap: var(--space-8);
+  border: none; background: transparent; border-radius: var(--radius-16);
+  color: var(--ink-muted); cursor: pointer;
+  font-size: var(--control-text); font-weight: var(--weight-medium); font-family: var(--font-primary);
+  transition: color var(--duration-fast); padding: 0 var(--space-16); text-align: center;
 }
-/* On the thumb, which is white: the label has to invert with it or the selected segment is
-   the only one you cannot read. */
-.segment-btn.is-active { color: var(--black-1000); }
+/* Off the choice, the label lifts toward the ink under the cursor — the only hover there is.
+   The thumb stays the one thing that ever fills a segment (see below). */
+.segment-btn:not(.is-active):not(:disabled):hover { color: var(--ink); }
+.segment-btn.is-active { color: var(--ink); }
 /* Many options — Kit.segmented(…, { scroll: true }). Segments take their label's width and
-   the track scrolls sideways with no visible bar; the thumb is sized by script. */
-.segmented.is-scroll { overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
-.segmented.is-scroll::-webkit-scrollbar { display: none; }
-.segmented.is-scroll .segment-btn { flex: none; padding: 0 var(--space-16); white-space: nowrap; }
+   scroll sideways with no visible bar; the thumb is sized by script.
+
+   ── THE SCROLL LIVES ON AN INNER RAIL, AND THE EDGES FADE BY MASK (2026-10-21) ──
+   The fades used to be two sticky pseudo-elements painted in the track's color. Once the
+   track went translucent (the Figma sync) there is no "track's color" to paint: whatever
+   it sat on — the page, a plate, a frosted bar — showed a different grey, and the fade
+   drew a visible band over the first and last segment. So the fade is now a MASK, which
+   has no color at all: it makes the segments themselves transparent toward the edge, and
+   the track shows through on any ground, in either theme.
+   A mask on the track would fade the track too, so `Kit.segmented` puts the segments and the
+   thumb in `.segmented-rail` inside it: the track keeps its fill and padding, the rail
+   scrolls and is masked. kit.js sets .is-fade-start / .is-fade-end on the track from the
+   rail's scroll position; each opens a 64px ramp at its end — long enough that the segment
+   cut by the edge is seen fading out rather than missing, which is what says "there is more". */
+.segmented.is-scroll { overflow: hidden; }
+.segmented-rail {
+  --fade-start: 0px; --fade-end: 0px;
+  position: relative; display: flex; flex: 1; min-width: 0;
+  overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain;
+  -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,.08), #000 var(--fade-start), #000 calc(100% - var(--fade-end)), rgba(0,0,0,.08));
+          mask-image: linear-gradient(to right, rgba(0,0,0,.08), #000 var(--fade-start), #000 calc(100% - var(--fade-end)), rgba(0,0,0,.08));
+}
+.segmented-rail::-webkit-scrollbar { display: none; }
+.segmented.is-fade-start .segmented-rail { --fade-start: var(--number-64); }
+.segmented.is-fade-end   .segmented-rail { --fade-end: var(--number-64); }
+.segmented-rail .segmented-thumb { top: 0; bottom: 0; left: 0; }
+.segmented.is-scroll .segment-btn { flex: none; white-space: nowrap; }
 .segmented.is-scroll .segmented-thumb { transition: transform var(--duration-base) var(--ease-standard), width var(--duration-base) var(--ease-standard); }
 /* No hover state on an inactive segment, by design. The fill that used to appear under
    the cursor competed with the thumb — two lit panels at once, one of which was not the
@@ -47,4 +83,15 @@
 
 /* An option that cannot be chosen — dimmed and left in place, so the track keeps its width. */
 .segment-btn:disabled { opacity: .35; cursor: default; }
-.segment-btn:disabled:hover { color: var(--black-200); }
+.segment-btn:disabled:hover { color: var(--ink-muted); }
+
+/* Light theme (2026-10-21, with the Figma sync): the same control turned over. The track is
+   the ink at 6 % on paper (the dark theme's 10 % of white reads twice as heavy in ink); the
+   choice is a paper plate lifted off it with a small shadow — on a light ground "a step of
+   light" is a white plate, not a darker one — see tokens.css «NOT AN INVERT». Labels are
+   already roles (--ink / --ink-muted) and turn over with the theme. */
+[data-theme="light"] .segmented {
+  --seg-track: var(--white-06);
+  --seg-thumb: var(--page);
+}
+[data-theme="light"] .segmented-thumb { box-shadow: var(--shadow-sm); }

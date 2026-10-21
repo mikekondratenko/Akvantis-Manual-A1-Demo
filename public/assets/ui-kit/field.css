@@ -40,7 +40,7 @@
   background-color: transparent;
   border: 1px solid var(--field-edge); border-radius: var(--field-radius);
   color: var(--ink); font-family: var(--font-primary);
-  font-size: var(--text-13); font-weight: var(--weight-medium);
+  font-size: var(--control-text); font-weight: var(--weight-medium);
   transition: border-color var(--duration-fast), background-color var(--duration-fast);
 }
 .dark-input:hover, .select:hover, .field-value-input:hover { border-color: var(--field-edge-hover); }
@@ -64,7 +64,7 @@ textarea.dark-input {
 .select {
   width: 100%; padding: 0 var(--space-40) 0 var(--field-pad);
   -webkit-appearance: none; appearance: none; cursor: pointer;
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23989B9A' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23989B9A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath vector-effect='non-scaling-stroke' d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right var(--field-pad) center;
 }
 .select:disabled { color: var(--ink-faint); cursor: not-allowed; }
@@ -74,7 +74,7 @@ textarea.dark-input {
    question and the field is just the answer. */
 .field-value-input {
   width: var(--number-72); padding: 0 var(--field-pad);
-  font-size: var(--text-14); font-weight: var(--weight-semibold);
+  font-size: var(--control-text); font-weight: var(--weight-semibold);
   text-align: right; font-variant-numeric: tabular-nums;
 }
 
@@ -116,7 +116,7 @@ textarea.dark-input {
 
 /* ── NOTICE (2026-10-11) ──
    The answer a form gives after sending: a plate on the status surface, its icon in the
-   status ink, the words in the page's ink — the colour says which kind, the text does the
+   status ink, the words in the page's ink — the color says which kind, the text does the
    telling. role="status" (or "alert" for an error) on the element; `hidden` until there is
    something to say. */
 .notice {
@@ -131,3 +131,7 @@ textarea.dark-input {
 .notice.is-success > svg { color: var(--success); }
 .notice.is-error { background: var(--danger-surface); }
 .notice.is-error > svg { color: var(--danger); }
+
+/* Light theme (2026-10-20): the box is white on the grey page, so it reads as a place to
+   type rather than a hole in the paper. Edges: tokens.css (light). */
+[data-theme="light"] :is(.dark-input, .select, .field-value-input) { background-color: var(--page); }

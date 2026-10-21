@@ -17,6 +17,10 @@
 /* The segmented tabs live in segmented.css (2026-10-12) so a page that scrolls — which cannot
    take this file — can use them too. Imported here, so every tool keeps them unchanged. */
 @import url('segmented.css');
+/* The progress plate (2026-10-21) — progress.css, for the same reason. */
+@import url('progress.css');
+/* Status pills and alert banners (2026-10-21) — status.css, for the same reason. */
+@import url('status.css');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -26,9 +30,9 @@
    — `.btn.is-on`, the toggle, the slider thumb — and the resting button is neutral. Every
    page that links this file is an instrument, so the shell re-points the role once. */
 :root {
-  --btn       : var(--black-700);
-  --btn-hover : var(--black-600);
-  --btn-ink   : var(--white);
+  --btn       : var(--white-10);   /* the library's white alpha button (button.css) */
+  --btn-hover : var(--white-20);
+  --btn-ink   : var(--ink);
 }
 
 html, body { height: 100%; height: 100dvh; overflow: hidden; }
@@ -121,11 +125,12 @@ a { color: inherit; }
 .is-frosted .segmented,
 .is-frosted .iconseg,
 .is-frosted .toggle-switch { background-color: var(--frost-700); }
+.is-frosted .segmented { --seg-track: var(--frost-700); }
 .is-frosted .toggle-switch[aria-checked="true"] { background-color: var(--accent); }
 /* A button takes the frost through its role, not through `background-color`: a direct
    property here would outrank `.btn:hover` and `.btn.is-on` now that those live in a file
    loaded before this one. The accent and the white button keep their own fill. */
-.is-frosted .btn:not(.is-on, .btn-accent, .btn-white) { --btn: var(--frost-700); }
+.is-frosted .btn:not(.is-on, .btn-accent, .btn-white, .btn-primary, .btn-secondary) { --btn: var(--frost-700); }
 .is-frosted .sidebar-divider { background: var(--white-09); }
 /* Anything floating directly over the scene rather than inside a plate needs its own
    blur — there is no frosted surface beneath it to do the job. */
@@ -153,9 +158,10 @@ a { color: inherit; }
    this is a shape the kit has no component for. */
 .dd { position: relative; }
 .dd-btn {
-  width: 100%; height: 48px;
+  width: 100%; height: var(--control-h);
   display: flex; align-items: center; gap: var(--space-12);
   padding: 0 var(--space-12);
+  font-family: var(--font-primary); font-size: var(--control-text); font-weight: var(--weight-medium);
   background: transparent; color: var(--white);
   border: 1px solid var(--field-edge); border-radius: var(--field-radius);
   cursor: pointer; text-align: left;
@@ -184,7 +190,7 @@ a { color: inherit; }
    A tag and not a second mark: `A1` and `A1G2` are the same drawing, and the matrix is explicit
    that the generation is words on the carton and a code everywhere else. Grey because it is a
    qualifier on the mark rather than part of it — the same relationship a field name has to its
-   answer on the sheet, and the same colour that says so there. */
+   answer on the sheet, and the same color that says so there. */
 .dd-gen { margin-left: var(--space-8); font-size: var(--text-11); letter-spacing: var(--tracking-wide);
           color: var(--black-250); flex: 0 0 auto; }
 .dd-opt .dd-gen { margin-left: auto; }
@@ -266,7 +272,7 @@ a { color: inherit; }
    the field under it, which carries the ink. */
 .spec-row-head .dark-input[data-field="label"] { font-size: var(--text-12); color: var(--black-100); }
 
-/* No rule of its own beyond not shrinking. It was painted `--accent` once — the colour
+/* No rule of its own beyond not shrinking. It was painted `--accent` once — the color
    this kit gives to the thing you are meant to do, the chosen swatch, the switch that is
    on — and a control that deletes a row is not that. Bare, it is `.icon-btn`'s white
    glyph on a round translucent plate, which is what every other bare glyph here is. */
@@ -434,37 +440,40 @@ a { color: inherit; }
    does not change width when a choice becomes unavailable — and so the reason can live on the
    button's own title instead of somewhere the cursor is not. */
 .iconseg-btn:disabled { opacity: .35; cursor: default; }
-.iconseg-btn:disabled:hover { color: var(--black-200); }
+.iconseg-btn:disabled:hover { color: var(--ink-muted); }
 
 
-/* ══════════════ ICON TOGGLE (flat two/N-panel button group) ══════════════ */
+/* ══════════════ ICON TOGGLE (flat two/N-panel button group) ══════════════
+   Restyled 2026-10-21 to the Figma `Tab Bar` (700:6211) with the segmented tabs, so the two
+   controls read as one family: the same translucent track and inset plate, the same roles
+   (--seg-track / --seg-thumb from segmented.css's light rule are not inherited here, so the
+   icon toggle carries its own pair), Medium labels at the buttons' `--control-text`. It stays 64 tall — an icon over a label
+   needs the room — and the thumb is now inset by 4 rather than full-bleed. */
 .iconseg {
+  --seg-track: var(--white-10);
+  --seg-thumb: var(--white-20);
   position: relative;
-  display: flex; height: 64px; overflow: hidden;
-  border-radius: var(--radius-8);
-  background: var(--black-700); border: 1px solid transparent; transition: border-color var(--duration-fast);
+  display: flex; height: 64px; padding: var(--space-4); overflow: hidden;
+  border-radius: var(--radius-16);
+  background: var(--seg-track); border: 0;
 }
-/* Full-bleed, not inset: the selected panel runs to the group's own edges. The group's
-   radius plus overflow:hidden rounds whichever end the thumb is parked against and
-   leaves the inner end square — which is what makes it read as a panel of the group
-   rather than a pill floating in it. */
 .iconseg-thumb {
-  position: absolute; top: 0; left: 0; bottom: 0;
-  background: var(--black-500);
+  position: absolute; top: var(--space-4); left: var(--space-4); bottom: var(--space-4);
+  background: var(--seg-thumb); border-radius: var(--radius-16);
   transition: transform var(--duration-base) var(--ease-standard);
   z-index: 1;
 }
 .iconseg-btn {
   position: relative; z-index: 2; flex: 1 1 0%;
   display: flex; align-items: center; justify-content: center; gap: var(--space-8);
-  background: transparent; border: none; color: var(--black-200);
-  font-size: var(--text-13); font-weight: var(--weight-semibold); font-family: var(--font-primary);
+  background: transparent; border: none; border-radius: var(--radius-16); color: var(--ink-muted);
+  font-size: var(--control-text); font-weight: var(--weight-medium); font-family: var(--font-primary);
   padding: 0 var(--space-8); cursor: pointer; transition: color var(--duration-fast);
 }
 /* No fill on hover — the thumb is the only thing that ever fills a panel. The label
-   lightening is all the feedback the cursor gets. */
-.iconseg-btn:not([aria-pressed="true"]):hover { color: var(--black-100); }
-.iconseg-btn[aria-pressed="true"] { color: var(--white); }
+   lifting to the ink is all the feedback the cursor gets. */
+.iconseg-btn:not([aria-pressed="true"]):not(:disabled):hover { color: var(--ink); }
+.iconseg-btn[aria-pressed="true"] { color: var(--ink); }
 .iconseg-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .iconseg-icon svg { display: block; }
 .iconseg-divider { display: none; }
@@ -619,12 +628,12 @@ a { color: inherit; }
    the distinction is free, and dashed is still the better drawing for "let go here". */
 .file-in {
   display: flex; align-items: center; justify-content: center; gap: var(--space-8);
-  width: 100%; height: 48px; padding: 0 20px;
-  background: var(--black-700); border: 1px solid transparent; border-radius: var(--radius-pill);
-  color: var(--white); font-size: var(--text-13); font-weight: var(--weight-semibold); cursor: pointer;
+  width: 100%; height: var(--control-h); padding: 0 var(--space-24);
+  background: var(--white-10); border: 1px solid transparent; border-radius: var(--radius-xl);
+  color: var(--ink); font-size: var(--control-text); font-weight: var(--weight-medium); cursor: pointer;
   transition: border-color var(--duration-fast), background-color var(--duration-fast), color var(--duration-fast);
 }
-.file-in:hover { background-color: var(--black-600); }
+.file-in:hover { background-color: var(--white-20); }
 .file-in input { display: none; }
 .file-in svg { flex-shrink: 0; color: var(--black-250); transition: color var(--duration-fast); }
 .file-in:hover svg { color: var(--white); }
@@ -636,15 +645,15 @@ a { color: inherit; }
 .file-in.is-dropping svg { color: var(--accent); }
 
 /* ── PICKER SWATCH ──
-   A swatch that opens the system colour picker. It wears a spectrum rather than the
-   colour currently chosen, because that is the one thing the two presets beside it
-   cannot say: those are the colours on offer, this is "any other". Showing it filled
-   with the current colour would make three discs that all claim to be a choice, with
+   A swatch that opens the system color picker. It wears a spectrum rather than the
+   color currently chosen, because that is the one thing the two presets beside it
+   cannot say: those are the colors on offer, this is "any other". Showing it filled
+   with the current color would make three discs that all claim to be a choice, with
    nothing marking the one that leads somewhere else.
 
    The native input sits on top at zero opacity — clicking anywhere on the disc opens
    the picker, and the disc keeps the kit's shape instead of the browser's. */
-/* ⚠ `.swatch-pick` STOOD HERE AND IS GONE — it was the donor kit's name for the colour
+/* ⚠ `.swatch-pick` STOOD HERE AND IS GONE — it was the donor kit's name for the color
    picker disc, it had no users in this building, and `swatch.css` has the same component
    under the name everything actually uses, `.swatch-custom`. Two names for one disc in
    two files is how the two drift; and this one could not be used by the passport, which
@@ -654,7 +663,7 @@ a { color: inherit; }
 /* ── COLOUR SWATCH INPUT ──
    The native <input type="color"> wearing the kit's swatch. It takes the *selected*
    look of .swatch-btn — white ring on the edge, fill pulled in by 3px — rather than
-   the resting one, because a colour input always has a current value; there is no
+   the resting one, because a color input always has a current value; there is no
    unselected state for it to be in. The 3px comes from the wrapper's padding here
    instead of the button's, which is the only way to reach inside the native control. */
 .swatch-input {
@@ -682,7 +691,7 @@ a { color: inherit; }
    The donor's range selector, geometry and all: a 7px bar at radius 4 — already a full
    pill at that height — and a 24px round handle.
 
-   Colour is the dark reading of the library's two roles. Drawn there on white, track
+   Color is the dark reading of the library's two roles. Drawn there on white, track
    --black/100 and fill --black/1000; inverted here the fill and handle go --white and
    the empty part becomes a translucent white wash, so it sits at the edge of visible and
    picks up whatever surface it is laid on. The accent stays out of it — this control
@@ -748,14 +757,14 @@ a { color: inherit; }
 /* ── AND THE SAME IDEA AT GLYPH SIZE ──
    The ✕ that removes a row. It stays `.icon-btn`'s white glyph at rest, for the reason
    written at `.spec-remove`: a row of controls where the destructive one is the only
-   coloured thing is a row that points at deletion. The red arrives with the cursor, which
+   colored thing is a row that points at deletion. The red arrives with the cursor, which
    is the moment it is useful. */
 /* ⚠ `.icon-btn.icon-btn-danger`, not `.icon-btn-danger` alone. `.icon-btn:hover` sets a
    white plate at the same specificity and stands later in this file, so a single class
    loses to it on source order and the ✕ lit up red on a WHITE plate — half the change
    applying, which is worse than none of it. Two classes settle it without `!important`. */
-.icon-btn.icon-btn-danger:hover:not(:disabled) { background: rgba(250, 32, 65, .14); color: var(--red-800); }
-.icon-btn.icon-btn-danger:active:not(:disabled) { background: rgba(250, 32, 65, .22); }
+.icon-btn.icon-btn-danger:hover:not(:disabled) { background: var(--danger-surface); color: var(--danger); }
+.icon-btn.icon-btn-danger:active:not(:disabled) { background: var(--red-a20); }
 
 /* ══════════════ ROUND BUTTON ══════════════
    A circle with one glyph in it and no words — the control you put on a canvas rather
@@ -777,7 +786,7 @@ a { color: inherit; }
 
    ── THE HOVER IS THE ACCENT ──
    Same bargain `.print-btn` makes: neutral at rest, the accent kept for the moment
-   somebody reaches for it. Blue is the UI accent here and not a brand colour.
+   somebody reaches for it. Blue is the UI accent here and not a brand color.
 
    Transitions are `.btn`'s, to the millisecond, because they are the same gesture. */
 .round-btn {
@@ -792,7 +801,9 @@ a { color: inherit; }
 }
 .round-btn[hidden] { display: none; }
 .round-btn svg { display: block; }
-.round-btn:hover:not(:disabled) { background: var(--accent); color: var(--accent-ink); }
+/* On the cyan the glyph is white, in both themes (2026-10-21) — #FFFFFF, not --white, which turns
+   to ink on paper. */
+.round-btn:hover:not(:disabled) { background: var(--accent); color: #FFFFFF; }
 .round-btn:active:not(:disabled) { transform: scale(.98); }
 .round-btn:focus-visible { outline: none; box-shadow: var(--focus-halo); }
 /* Dimmed rather than removed, the same as every other switched-off control in the kit: a
@@ -807,13 +818,13 @@ a { color: inherit; }
 
 /* The one filled call to action per tool. White at rest so it is the brightest object
    on screen; the accent is reserved for its hover and active states (UI accent, not a
-   brand colour — same rule as the donor's Print button). */
+   brand color — same rule as the donor's Print button). */
 .print-btn {
   position: relative;
   display: flex; align-items: center; justify-content: center;
-  width: 100%; height: 48px; padding: 0 20px; border-radius: var(--radius-pill); border: none;
+  width: 100%; height: var(--control-h); padding: 0 var(--space-24); border-radius: var(--radius-xl); border: none;
   background: var(--white); color: var(--black-1000);
-  font-size: var(--text-14); font-weight: var(--weight-semibold); font-family: var(--font-primary);
+  font-size: var(--control-text); font-weight: var(--weight-medium); font-family: var(--font-primary);
   cursor: pointer; transition: background var(--duration-fast), transform var(--duration-instant);
 }
 /* Icon is pulled out of the flow and pinned left, so the label stays optically centred
@@ -856,7 +867,7 @@ a { color: inherit; }
 .toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
 /* For a light stage. */
 .toast-invert { background: var(--black-1000); color: var(--white); }
-/* Optional leading chip — a colour that was copied, shown rather than named. */
+/* Optional leading chip — a color that was copied, shown rather than named. */
 .toast-chip { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(17, 18, 17, .15); }
 .toast-invert .toast-chip { box-shadow: inset 0 0 0 1px var(--white-20); }
 
@@ -880,14 +891,14 @@ a { color: inherit; }
 .ui-checkbox:focus-visible { outline: none; border-color: var(--white); }
 .ui-checkbox:checked {
   background-color: var(--white);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'><path d='M3.2 8.4L6.4 11.6L12.8 4.8' stroke='%23111211' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'><path d='M20 6 9 17l-5-5' stroke='%23111211' stroke-width='1.5' vector-effect='non-scaling-stroke' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 /* A white border would be invisible on a white fill, so the surface darkens instead. */
 .ui-checkbox:checked:hover { background-color: var(--black-100); }
 /* Mixed state — a parent whose children are only partly selected. */
 .ui-checkbox:indeterminate {
   background-color: var(--white);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'><path d='M4 8H12' stroke='%23111211' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'><path d='M5 12h14' stroke='%23111211' stroke-width='1.5' vector-effect='non-scaling-stroke' fill='none' stroke-linecap='round'/></svg>");
 }
 .checkbox-row { display: flex; align-items: center; gap: var(--space-12); }
 .checkbox-row label { font-size: var(--text-13); font-weight: var(--weight-semibold); color: var(--white); cursor: pointer; }
@@ -928,7 +939,7 @@ a { color: inherit; }
    A glyph standing on its own, with no chrome until the cursor arrives. Hover draws a
    round plate behind it — white at a very low alpha, so it reads as the surface lifting
    rather than as a new object, and it works over any of the kit's greys without a
-   per-surface value. The glyph never changes colour: the plate already says "this one".
+   per-surface value. The glyph never changes color: the plate already says "this one".
 
    Two sizes on the same 2:1 plate-to-glyph ratio — 32/16 for dense panels, 40/20 (.icon-btn-md)
    for controls sitting alone in open space. Author the larger glyph on a 20px viewBox
@@ -1031,23 +1042,25 @@ a { color: inherit; }
    cursor in three places at once — and for screenshots, where a real :hover cannot be
    captured. Product code never sets these: the pseudo-classes above are the real
    behaviour, and these only mirror them. */
+/* The field states mirror the field's own roles (2026-10-21): a hard-coded --black-200 / --white
+   painted near-black edges on paper — heavier than anything a real field ever shows. */
 [data-state="hover"].dark-input,
 [data-state="hover"].select,
 [data-state="hover"].field-value-input,
-[data-state="hover"].stepper { border-color: var(--black-200); }
+[data-state="hover"].stepper { border-color: var(--field-edge-hover); }
 [data-state="hover"].ui-checkbox,
 [data-state="hover"].ui-radio { border-color: var(--black-500); }
 [data-state="focus"].dark-input,
 [data-state="focus"].select,
 [data-state="focus"].field-value-input,
-[data-state="focus"].stepper,
+[data-state="focus"].stepper { border-color: var(--field-edge-focus); }
 [data-state="focus"].ui-checkbox,
 [data-state="focus"].ui-radio { border-color: var(--white); }
 [data-state="hover"].btn { background: var(--btn-hover); }
 [data-state="hover"].btn-danger {
-  background: var(--red-1000); box-shadow: inset 0 0 0 1px var(--red-1000); color: var(--white);
+  background: var(--red-600); box-shadow: inset 0 0 0 1px var(--red-600); color: #FFFFFF;
 }
-[data-state="hover"].icon-btn.icon-btn-danger { background: rgba(250, 32, 65, .14); color: var(--red-800); }
+[data-state="hover"].icon-btn.icon-btn-danger { background: var(--danger-surface); color: var(--danger); }
 [data-state="active"].btn { transform: scale(.98); }
 [data-state="hover"].print-btn,
 [data-state="active"].print-btn { background: var(--accent-deep); }
@@ -1055,7 +1068,7 @@ a { color: inherit; }
 [data-state="hover"].icon-btn { background: var(--white-08); }
 [data-state="active"].icon-btn { background: var(--white-14); }
 [data-state="hover"].round-btn,
-[data-state="active"].round-btn { background: var(--accent); color: var(--accent-ink); }
+[data-state="active"].round-btn { background: var(--accent); color: #FFFFFF; }
 [data-state="active"].round-btn { transform: scale(.98); }
 [data-state="hover"].swatch-btn { opacity: .78; }
 [data-state="hover"].file-in { background-color: var(--black-600); }
@@ -1128,49 +1141,6 @@ a { color: inherit; }
   transition: color var(--duration-base) var(--ease-standard);
 }
 .brand-wave:hover { color: var(--white); }
-
-/* ── An empty plate ──
-   A product that has a code and no photograph yet. The first version of this was a dashed
-   box with a camera glyph in it, which is a status message drawn twice: the dashes say
-   *missing*, the camera says *image*, and together they read as a fault rather than as work
-   that has not happened yet.
-
-   So: no border, and the company's mark at the centre. The frame was carrying the meaning
-   and now the mark does — a plate with a quiet wave on it is recognisably an Akvantis plate
-   waiting for its render, and an unbordered one sits in a row of photographs without drawing
-   a rectangle around the one item that has nothing to show. It is the same behaviour as a
-   photograph that has not loaded: the layout does not change, only the contents.
-
-   Sized as a fraction of the plate rather than in pixels, because the plate appears at three
-   sizes — grid card, product view, sidebar tile — and a mark that keeps its share of the box
-   looks deliberate at all three where a fixed 40px looks lost in the largest.
-
-   The plate is a filled square, not an outline. An outline draws attention to its own edge
-   — the border is the loudest thing in the row and it is around the one item with nothing
-   in it — where a fill one step off the page reads as a surface waiting for something. It
-   is the same silhouette a loaded photograph occupies, so nothing moves when the render
-   arrives.
-
-   The fill is white at 1%, not a step of the grey scale. A translucent white takes its value
-   from whatever it is laid on, so the same plate is right on the page, on a panel and on a
-   card without a second token per ground — and 1% is barely a surface at all, which is the
-   point: the plate is there to hold the position, not to be looked at. 24 on the corners, one step above everything else in the kit, because a large
-   empty square with small corners reads as a field and not as a plate.
-
-   Two knobs: `--plate-bg` for the surface and `--plate-ink` for the mark. The defaults are
-   dark enough to stay behind the type on the card, which is the whole intent — a shape
-   rather than a smudge, and quieter than anything real beside it. */
-.plate-empty {
-  display: flex; align-items: center; justify-content: center;
-  aspect-ratio: 1; width: 100%; overflow: hidden;
-  background: var(--plate-bg, var(--white-01));
-  border-radius: var(--radius-24);
-}
-.plate-empty > svg,
-.wave-mark {
-  width: 22%; min-width: 32px; max-width: 96px; height: auto; flex: none;
-  color: var(--plate-ink, var(--black-700));
-}
 
 /* Camera / projection switch — the same control as the view tab, one notch wider
    because its labels are longer. It sits at the top of the stage here rather than at
@@ -1371,3 +1341,56 @@ a { color: inherit; }
 .cal-day.is-today { box-shadow: inset 0 0 0 1px var(--black-400); }  /* the ring is round with the cell */
 .cal-day.is-on,
 .cal-day.is-on:hover { background: var(--accent); color: var(--accent-ink); }
+
+/* ══════════════ LIGHT THEME — the controls that were white (2026-10-20) ══════════════
+   In the dark theme a chosen control is the brightest object: a white box, a white knob, a
+   white fill. Mirrored onto paper that became a black box with a black tick on it — the
+   invert tokens.css «NOT AN INVERT» describes. On paper a knob or a handle is a white object
+   lifted by a shadow.
+   A checkbox and a radio are NOT the accent (2026-10-20): ticking a box is a statement, not
+   a call to action, so it takes the page's own ink — the dark theme's white box with a black
+   mark, inverted on paper to a black box with a white mark. Focus is the ink's edge too. */
+[data-theme="light"] .ui-checkbox:checked,
+[data-theme="light"] .is-frosted .ui-checkbox:checked {
+  background-color: var(--ink);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'><path d='M20 6 9 17l-5-5' stroke='%23FFFFFF' stroke-width='1.5' vector-effect='non-scaling-stroke' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+[data-theme="light"] .ui-checkbox:indeterminate {
+  background-color: var(--ink);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'><path d='M5 12h14' stroke='%23FFFFFF' stroke-width='1.5' vector-effect='non-scaling-stroke' fill='none' stroke-linecap='round'/></svg>");
+}
+[data-theme="light"] .ui-radio:checked,
+[data-theme="light"] .is-frosted .ui-radio:checked {
+  background-color: var(--ink);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'><circle cx='8' cy='8' r='3.4' fill='%23FFFFFF'/></svg>");
+}
+[data-theme="light"] .ui-checkbox:checked:hover,
+[data-theme="light"] .ui-radio:checked:hover { background-color: color-mix(in srgb, var(--ink) 80%, var(--page)); }
+[data-theme="light"] .ui-checkbox:focus-visible,
+[data-theme="light"] .ui-radio:focus-visible { border-color: var(--ink); }
+[data-theme="light"] [data-state="checked-hover"]:is(.ui-checkbox, .ui-radio) { background-color: color-mix(in srgb, var(--ink) 80%, var(--page)); }
+
+/* The switch: a grey track the white knob shows against; the accent when on. */
+[data-theme="light"] .toggle-switch { background: var(--black-450); }
+[data-theme="light"] .toggle-switch[aria-checked="true"] { background: var(--accent); }
+[data-theme="light"] .toggle-knob,
+[data-theme="light"] .toggle-switch[aria-checked="true"] .toggle-knob { background: #FFFFFF; box-shadow: var(--shadow-sm); }
+
+/* The slider: the filled part in the accent, the handle a white disc. */
+[data-theme="light"] .range-fill { background: var(--accent); }
+[data-theme="light"] .range-input::-webkit-slider-thumb { background: #FFFFFF; box-shadow: var(--shadow-sm), inset 0 0 0 var(--hairline) var(--white-14); }
+[data-theme="light"] .range-input::-moz-range-thumb { background: #FFFFFF; box-shadow: var(--shadow-sm), inset 0 0 0 var(--hairline) var(--white-14); }
+
+/* The tool's one call to action is the accent on paper, as `.btn` is. A toast stays dark:
+   a dark note over a light page is the convention, not an invert. */
+[data-theme="light"] .print-btn { background: var(--accent); color: var(--accent-ink); }
+
+/* Unchosen on paper: a white box with a visible edge. The dark theme's --black-700 fill is a
+   near-white smudge on the grey page. */
+[data-theme="light"] :is(.ui-checkbox, .ui-radio):not(:checked):not(:indeterminate) {
+  background-color: var(--page); border-color: var(--black-350); }
+[data-theme="light"] :is(.ui-checkbox, .ui-radio):not(:checked):not(:indeterminate):hover { border-color: var(--black-250); }
+
+/* The icon toggle: as the segmented tabs, the chosen panel is a paper plate on a 6 % ink track. */
+[data-theme="light"] .iconseg { --seg-track: var(--white-06); --seg-thumb: var(--page); }
+[data-theme="light"] .iconseg-thumb { box-shadow: var(--shadow-sm); }

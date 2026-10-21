@@ -10,15 +10,16 @@
    Markup:  <div class="slider" [data-autoplay="5000"]><ul class="slider-track">
               <li class="slide">…</li> … </ul></div>
    Runs on every .slider once the page is parsed; `Slider.init(el)` for one added later.
-   Requires button.css. No kit.js.
+   Requires button.css and icons.js (the glyphs). No kit.js.
    ───────────────────────────────────────────────────────────────────────────── */
 (function () {
   'use strict';
+  /* The kit's icons (icons.js swaps each <i data-icon> for its <svg>); play and pause filled. */
   var ICON = {
-    prev: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg>',
-    next: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg>',
-    pause: '<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><rect x="3" y="2" width="3" height="10" rx="1"/><rect x="8" y="2" width="3" height="10" rx="1"/></svg>',
-    play: '<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z"/></svg>'
+    prev: '<i data-icon="chevron-left" data-size="16"></i>',
+    next: '<i data-icon="chevron-right" data-size="16"></i>',
+    pause: '<i data-icon="pause" data-size="14" data-fill></i>',
+    play: '<i data-icon="play" data-size="14" data-fill></i>'
   };
   var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 

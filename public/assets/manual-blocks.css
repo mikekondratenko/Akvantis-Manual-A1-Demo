@@ -43,10 +43,10 @@
    As printed: the name in the first column, each state a light and its word;
    the key between two ink rules, soft rules between lights; an alarm lists its
    lights over its sentence. Lights 24, text 16 — the printed page's proportion. */
-.ribbon .m-ind{--m-light:var(--space-24);font-size:var(--text-16);line-height:var(--lh-body, 1.4);font-weight:var(--fw-medium, 500)}
-.ribbon .m-ind-row{padding:var(--space-16) 0;gap:var(--space-12);border-top:var(--hairline, 1px) solid var(--black-150)}
+.ribbon .m-ind{--m-light:var(--space-24);font-size:var(--text-16);line-height:var(--leading-normal);font-weight:var(--weight-medium)}
+.ribbon .m-ind-row{padding:var(--space-16) 0;gap:var(--space-12);border-top:var(--hairline) solid var(--rule)}
 .ribbon .m-ind-row.is-key{border-top:var(--space-2) solid var(--m-ink);border-bottom:var(--space-2) solid var(--m-ink)}
-.ribbon .m-ind-name{font-weight:var(--fw-medium, 500)}
+.ribbon .m-ind-name{font-weight:var(--weight-medium)}
 .ribbon .m-ind-states li{gap:var(--space-12)}
 .ribbon .m-ind-lights{gap:var(--space-8)}
 .ribbon .m-light{width:var(--m-light);height:var(--m-light)}
@@ -55,7 +55,7 @@
 .ribbon .m-light[data-m="breathing"]{background:radial-gradient(circle closest-side, color-mix(in srgb, var(--c) 45%, transparent) 0 48%, transparent 54%)}
 /* an alarm: its lights over its sentence, a soft rule between the two alarms */
 .ribbon .m-ind-row.is-alarm .m-ind-states li{flex-direction:column;align-items:flex-start;gap:var(--space-8)}
-.ribbon .m-ind-row.is-alarm .m-ind-states li + li{border-top:var(--hairline, 1px) solid var(--black-150);padding-top:var(--space-16)}
+.ribbon .m-ind-row.is-alarm .m-ind-states li + li{border-top:var(--hairline) solid var(--rule);padding-top:var(--space-16)}
 .ribbon .m-ind-row.is-alarm .m-ind-states{gap:var(--space-16)}
 @media (min-width:768px){
   .ribbon .m-ind-row{padding:var(--space-24) 0;align-items:center}
@@ -68,11 +68,11 @@
    so the section reads as one more card of the manual. */
 .m-filters{--m-card-rule:1.5px;position:relative;display:flex;flex-direction:column;
   padding:0 var(--space-16);border-radius:var(--radius-16);box-shadow:inset 0 0 0 var(--m-card-rule) var(--m-ink);
-  font-family:var(--font-primary);font-weight:var(--fw-medium, 500);color:var(--m-ink)}
+  font-family:var(--font-primary);font-weight:var(--weight-medium);color:var(--m-ink)}
 @media (min-width:768px){ .m-filters{--m-card-rule:2px;padding:0 var(--space-32)} }
 @media (min-width:1600px){ .m-filters{--m-card-rule:2.5px} }
 .m-filters > *{padding:var(--space-24) 0}
-.m-filters > * + *{border-top:var(--hairline, 1px) solid var(--black-150)}
+.m-filters > * + *{border-top:var(--hairline) solid var(--rule)}
 @media (min-width:768px){ .m-filters > *{padding:var(--space-32) 0} }
 
 /* the cartridges: picture, the big numeral, the name, when to replace it */
@@ -82,9 +82,9 @@
 /* the box pictures are squares with the cartridge in the middle: cropped to it */
 .m-cart-art img{width:100%;height:100%;object-fit:cover;display:block}
 .m-cart-text{display:flex;flex-direction:column;min-width:0}
-.m-cart-n{font-size:var(--text-32);line-height:1;font-weight:var(--fw-semibold, 600);letter-spacing:-.02em;margin-bottom:var(--space-8)}
-.m-cart-name{font-size:var(--text-16);line-height:var(--lh-tight, 1.2);font-weight:var(--fw-semibold, 600)}
-.m-cart-sub{margin-top:var(--space-4);font-size:var(--text-14);line-height:var(--lh-snug, 1.3);color:var(--black-250)}
+.m-cart-n{font-size:var(--text-32);line-height:1;font-weight:var(--weight-semibold);letter-spacing:var(--tracking-tight);margin-bottom:var(--space-8)}
+.m-cart-name{font-size:var(--text-16);line-height:var(--leading-snug);font-weight:var(--weight-semibold)}
+.m-cart-sub{margin-top:var(--space-4);font-size:var(--text-14);line-height:var(--leading-snug);color:var(--ink-faint)}
 .m-filters-order{justify-self:start;align-self:center}
 @media (min-width:768px){
   .m-filters-carts{grid-template-columns:repeat(3, minmax(0, 1fr));gap:var(--space-24)}
@@ -99,8 +99,8 @@
 .m-fspec{display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--space-4)}
 .m-fspec-icon{width:var(--space-40);height:var(--space-40);margin-bottom:var(--space-8)}
 .m-fspec-icon img{width:100%;height:100%;display:block}
-.m-fspec-value{font-size:var(--text-16);line-height:var(--lh-tight, 1.2);font-feature-settings:"lnum" 1, "pnum" 1}
-.m-fspec-what{font-size:var(--text-14);line-height:var(--lh-snug, 1.3);color:var(--black-250)}
+.m-fspec-value{font-size:var(--text-16);line-height:var(--leading-snug);font-feature-settings:"lnum" 1, "pnum" 1}
+.m-fspec-what{font-size:var(--text-14);line-height:var(--leading-snug);color:var(--ink-faint)}
 
 /* the compliance marks and the disposal notice */
 .m-filters-notice{display:flex;flex-direction:column;gap:var(--space-16)}
@@ -108,12 +108,12 @@
 .m-filters-mark{width:var(--space-48);height:var(--space-48);color:var(--m-ink)}
 .m-filters-mark img{width:100%;height:100%;display:block}
 .m-filters-notice-text{margin:0;display:flex;flex-direction:column;gap:var(--space-4)}
-.m-filters-notice-text strong{font-size:var(--text-16);line-height:var(--lh-tight, 1.2);font-weight:var(--fw-semibold, 600)}
-.m-filters-notice-text span{font-size:var(--text-14);line-height:var(--lh-snug, 1.3);color:var(--black-250)}
+.m-filters-notice-text strong{font-size:var(--text-16);line-height:var(--leading-snug);font-weight:var(--weight-semibold)}
+.m-filters-notice-text span{font-size:var(--text-14);line-height:var(--leading-snug);color:var(--ink-faint)}
 @media (min-width:768px){
   .m-filters-notice{flex-direction:row;align-items:center;gap:var(--space-32)}
-  .m-filters-marks{flex:none;padding-right:var(--space-32);border-right:var(--hairline, 1px) solid var(--black-150)}
+  .m-filters-marks{flex:none;padding-right:var(--space-32);border-right:var(--hairline) solid var(--rule)}
 }
 
 /* the unit's size and weight */
-.m-filters-note{margin:0;font-size:var(--text-14);line-height:var(--lh-snug, 1.3);color:var(--black-250);text-align:center}
+.m-filters-note{margin:0;font-size:var(--text-14);line-height:var(--leading-snug);color:var(--ink-faint);text-align:center}

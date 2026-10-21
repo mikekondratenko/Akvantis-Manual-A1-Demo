@@ -60,7 +60,7 @@
    The hover plate is on the closed state only. Closed, the strip *is* the tile and
    the wash under the cursor says the whole object is the button. Open, the strip is
    the top edge of a panel already showing everything it has — lighting it offers to
-   reveal something that is not hidden. The colour lift answers the cursor in both
+   reveal something that is not hidden. The color lift answers the cursor in both
    states; only the plate is conditional. */
 button.panel-title {
   display: flex; align-items: center; justify-content: space-between;

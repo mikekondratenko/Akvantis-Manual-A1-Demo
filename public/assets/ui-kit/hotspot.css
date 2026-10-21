@@ -2,7 +2,7 @@
    HOTSPOT — a "+" in a black disc on a picture: «there is more about this
    part, press». Requires tokens.css. Added 2026-10-07 (A1 manual, overview
    pictures); a sibling of NUMBER (number.css): the same black disc, the same
-   print colours, a plus where the figure is.
+   print colors, a plus where the figure is.
 
    <button type="button" class="hotspot" aria-label="A1 Unit"></button>
 
@@ -21,7 +21,7 @@
    draws it 10 px to the right of the point it marks).
    Pressed: scale .94, as the kit's `.btn`.
 
-   Colours are the number's: override `--hot-ink` / `--hot-paper` on any ancestor.
+   Colors are the number's: override `--hot-ink` / `--hot-paper` on any ancestor.
    Placing it (position, left, top) is the page's job, not the kit's.
    ───────────────────────────────────────────────────────────────────────────── */
 .hotspot{

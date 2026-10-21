@@ -1,0 +1,112 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Status — the state of a machine, said two ways: a STATUS PILL (a dot and a word, on a
+   card or in a row) and an ALERT BANNER (a sentence across the page, with the one action
+   that fixes it). Requires tokens.css; the banner's action is a `.btn` (button.css).
+
+   ── SOURCE OF TRUTH: FIGMA — Akvantis Design Library, V2 ──
+   `Status Pill` (700:5705) and `Alert Banner` (700:5696), added 2026-10-21.
+
+   ── A TONE, NOT A STATUS ──
+   Figma names the pills by what the softener is doing — Softening now, Regenerating,
+   Standby, Offline. Those are one product's words; the kit names what they look like, so the
+   next product's states land on the same four colors without a new class each:
+       data-tone="accent"   Figma «Active»        cyan
+       data-tone="warning"  Figma «Regenerating»  amber
+       data-tone="neutral"  Figma «Standby»       grey (the default)
+       data-tone="danger"   Figma «Error»         red
+       data-tone="success" · "info"               the kit's other two states, same rules
+
+   Each tone is two values: --tone-dot (the hue itself — the dot, and the base of every
+   surface) and --tone-ink (the readable step of it, for the words). The surfaces are the dot
+   mixed down — the pill at 20 %, the banner at 10 %, the banner's dot at 60 % — which is
+   exactly what Figma's cyan/a20, amber/a20, red/a20 and amber/a10, red/a10 are. Light theme:
+   the ink tokens (--warning, --danger …) already turn over; the dots stay the hue.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.status-pill, .alert {
+  --tone-dot: var(--ink-faint);
+  --tone-ink: var(--ink-muted);
+}
+[data-tone="accent"]  { --tone-dot: var(--accent);      --tone-ink: var(--accent-text); }
+:is(.status-pill, .alert)[data-tone="warning"] { --tone-dot: var(--amber-500);   --tone-ink: var(--warning); }
+[data-tone="danger"]  { --tone-dot: var(--danger-edge); --tone-ink: var(--danger); }
+:is(.status-pill, .alert)[data-tone="success"] { --tone-dot: var(--green-500);   --tone-ink: var(--success); }
+[data-tone="info"]    { --tone-dot: var(--blue-500);    --tone-ink: var(--info); }
+
+/* ══════════════ STATUS PILL ══════════════
+   26 tall, 8 in on the dot side and 10 on the other, a 6 dot 6 from a 12 Medium word.
+     <span class="status-pill" data-tone="accent">Softening now</span>
+   The dot is drawn by the pill (::before), so the markup is the word and nothing else. */
+.status-pill {
+  display: inline-flex; align-items: center; gap: calc(var(--space-4) + var(--space-2));
+  height: calc(var(--number-24) + var(--space-2));
+  padding: 0 calc(var(--space-8) + var(--space-2)) 0 var(--space-8);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--tone-dot) 20%, transparent);
+  color: var(--tone-ink);
+  font-family: var(--font-primary); font-size: var(--text-12); font-weight: var(--weight-medium);
+  line-height: var(--leading-relaxed); white-space: nowrap;
+}
+.status-pill::before {
+  content: ''; flex: none; width: calc(var(--number-4) + var(--space-2)); height: calc(var(--number-4) + var(--space-2));
+  border-radius: 50%; background: var(--tone-dot);
+}
+/* Standby is not a hue at 20 % — it is the white at 5 % every quiet surface uses. */
+.status-pill:not([data-tone]), .status-pill[data-tone="neutral"] { background: var(--white-06); }
+
+/* ══════════════ ALERT BANNER ══════════════
+   A pill across the width: 4 in, 16 on the dot side; an 8 dot, the message in the button's
+   type (--control-text, Medium),
+   and one action on the right — a small alpha button in the banner's own tone.
+     <div class="alert" data-tone="warning" role="status">
+       <p class="alert-msg">Salt running low — add 2+ bags soon</p>
+       <a class="btn alert-action" href="…"><svg …/>Order Salt</a>
+     </div>
+   The action is optional.
+   ONE LINE, AND THE BANNER GROWS TO IT (2026-10-21): the banner is as wide as its sentence
+   and its action (`fit-content`), the message never wraps — a pill with two lines in it is
+   a lozenge, not the drawing. Capped at its container: past that the sentence is cut with an
+   ellipsis rather than broken. On a phone (under 520) it is the other way round — the
+   banner takes the full width, the sentence wraps, the action drops under it, and the
+   corners come down to 24. */
+.alert {
+  display: flex; align-items: center; gap: calc(var(--space-8) + var(--space-2));
+  width: fit-content; max-width: 100%;
+  min-height: calc(var(--number-40) + var(--space-4));
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-16);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--tone-dot) 10%, transparent);
+  color: var(--tone-ink);
+  font-family: var(--font-primary);
+}
+.alert::before {
+  content: ''; flex: none; width: var(--number-8); height: var(--number-8); border-radius: 50%;
+  background: color-mix(in srgb, var(--tone-dot) 60%, transparent);
+}
+/* Without an action the 4 on the right was the gap a button needs, and the sentence ran into
+   the curve. The message alone gets 24 there: past the corner's radius, so it ends on the flat. */
+.alert:not(:has(.alert-action)) { padding-right: var(--space-24); }
+.alert-msg {
+  flex: 0 1 auto; min-width: 0; margin: 0; padding: var(--space-8) 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  /* The button's own type (--control-text, Medium): the sentence and its action read as one line,
+     not a headline beside a label. Figma draws the message at 16; changed 2026-10-21. */
+  font-size: var(--control-text); font-weight: var(--weight-medium); line-height: var(--leading-normal);
+}
+/* The action: the kit's button, small (36), its color the banner's tone — so a `.btn` in a
+   warning banner is amber and in a danger banner red without a second class. */
+.alert-action.btn {
+  --btn: color-mix(in srgb, var(--tone-dot) 20%, transparent);
+  --btn-hover: color-mix(in srgb, var(--tone-dot) 40%, transparent);
+  --btn-ink: var(--tone-ink);
+  flex: none; width: auto; height: calc(var(--number-32) + var(--space-4));
+}
+.alert-action.btn > svg { width: var(--number-16); height: var(--number-16); }
+/* Too narrow for the sentence and the action side by side: the action drops to its own
+   row at full width, and the pill becomes a plate. */
+@media (max-width: 520px) {
+  .alert { width: 100%; flex-wrap: wrap; }
+  .alert-msg { flex: 1 1 12em; white-space: normal; }
+  .alert:has(.alert-action) { border-radius: var(--radius-24); padding: var(--space-8) var(--space-8) var(--space-8) var(--space-16); }
+  .alert:has(.alert-action) .alert-action.btn { width: 100%; }
+}

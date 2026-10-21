@@ -41,6 +41,33 @@ a.lang-mark.locale { width: auto; gap: var(--space-8); padding: 0 var(--space-8)
 .locale-long { display: none; }
 a.lang-mark:hover { background: var(--tile); }
 
+/* ── THE LANGUAGE FORM (2026-10-18) ── `En ⌄` · `De ⌄` · `Ua ⌄`
+   `.locale.locale-lang`: the page's language as two letters and a chevron, nothing
+   else. For a page that IS a language — its address is /de/ — the language is the
+   one fact the corner has to say; the region belongs in the sheet it opens. On a
+   phone the corner is the globe alone: the bar there is a row of sections that needs
+   the width, and a globe is the one sign every reader takes for "language".
+     <a class="lang-mark locale locale-lang" href="#regions" aria-controls="regions"
+        aria-haspopup="dialog" aria-label="Language: English. Change">
+       <span class="locale-code">En</span><span class="locale-chev" aria-hidden="true"></span>
+       <span class="locale-globe" aria-hidden="true"><svg>…globe…</svg></span></a>
+   The region form above (`Germany • De`, the passport's) is unchanged. */
+a.lang-mark.locale.locale-lang { gap: var(--space-4); padding: 0 var(--space-8) 0 var(--space-12); }
+.locale-code { font-size: var(--text-16); font-weight: var(--weight-semibold);
+  line-height: var(--leading-none); color: var(--ink); white-space: nowrap; }
+/* The kit's one chevron: an 8 px corner drawn by two 2 px borders, turned to point
+   down. The same marks every fold that opens downward, so the corner and the
+   sections under it speak the same sign. */
+.locale-chev { flex: none; display: block; width: var(--space-8); height: var(--space-8);
+  margin: 0 var(--space-4); border-right: var(--space-2) solid currentColor;
+  border-bottom: var(--space-2) solid currentColor; transform: translateY(-25%) rotate(45deg); }
+.locale-lang .locale-globe { display: none; }
+@media (max-width: 767px) {
+  a.lang-mark.locale.locale-lang { width: var(--number-40); padding: 0; justify-content: center; }
+  .locale-lang .locale-code, .locale-lang .locale-chev { display: none; }
+  .locale-lang .locale-globe { display: block; }
+}
+
 /* ══════════════ THE REGION SHEET (2026-09-28) ══════════════
    Pressing the globe drops a sheet from the top, the full width of the viewport, over a
    dimmed page. Shokobox's pattern: a title and a round close, then one row per region —

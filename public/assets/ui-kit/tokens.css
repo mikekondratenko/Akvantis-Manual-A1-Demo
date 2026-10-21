@@ -4,12 +4,15 @@
    Cloned from the Shokobox Card Generator kit token block, one for one. The grey
    scale, the type, the radii and the spacing are unchanged — those are what make
    the two tools read as the same object. The only substitution is the accent:
-   Shokobox's Peach / Orange family is replaced by Blue, step for step, so every
-   rule that reached for --peach or --orange-1000 in the donor reaches for the
-   same slot here and needs no other edit.
+   Shokobox's Peach / Orange family was replaced step for step, so every rule that
+   reached for --peach or --orange-1000 in the donor reaches for --accent here.
 
-   Peach   #FE8455  →  Blue      #4EA1FF   (brand accent: toggles, slider, focus)
-   Orange  #FF7446  →  Blue-1000 #3D93FF   (UI accent: CTA hover / active only)
+   2026-10-21 — MERGED WITH THE FIGMA LIBRARY (Akvantis Design Library, node 700:4540):
+   the accent is the library's CYAN (#1FB4D9), not the blue that stood here (#4EA1FF);
+   blue moved to INFO, where the library has it. The status colors are the library's
+   ramps (Tailwind's green / amber / red / blue, 50–950, with alphas). The greys stay this
+   kit's own — the library's zinc was not taken. Text on cyan is black (7.7:1), not the
+   library's white (2.3:1, fails WCAG).
 
    The type is the second substitution: Sora goes, Cy Grotesk Key takes its place —
    the face the Akvantis drawings are already set in. See the @font-face note below.
@@ -74,7 +77,6 @@
      use, and naming them is the prerequisite for collapsing them — the roles underneath are
      really five: surface, edge, hover, active, focus. See docs/ui-kit-audit-2026-10-10.md; the
      merge is a design decision, not a rename, so it is not done in passing. */
-  --white-01   : rgba(252, 255, 254, .01);   /* the empty plate */
   --white-03   : rgba(252, 255, 254, .03);   /* a surface lifted off the page */
   --white-04   : rgba(252, 255, 254, .04);   /* hover, on a large surface */
   --white-06   : rgba(252, 255, 254, .06);
@@ -120,7 +122,7 @@
   --frost-900  : rgba(30, 32, 32, .72);   /* --black-900, translucent */
   --frost-700  : rgba(40, 42, 42, .72);   /* --black-700, translucent */
   --frost-blur : blur(24px) saturate(120%);
-  --frost-edge : inset 0 0 0 1px var(--white-07);
+  --frost-edge : inset 0 0 0 var(--hairline) var(--white-07);
 
   /* Grey scale — the sheet, the sidebar, every surface */
   --black-50  : #F4F5F6;
@@ -138,19 +140,43 @@
   --black-800 : #232525;
   --black-900 : #1E2020;
 
-  /* Blue — the brand accent. Occupies the slot Peach holds in the donor kit. */
-  --blue       : #4EA1FF;
-  --blue-900   : #4EA1FF;
-  --blue-100   : #DFECFF;
-  --blue-200   : #BEDAFF;
-  --blue-600   : #9FC8FF;
-  --blue-800   : #6FADFF;
-  --blue-1000  : #3D93FF;
+  /* ── CYAN — the brand (Figma: cyan, brand) ── */
+  --cyan-50  : #E8F8FC;
+  --cyan-100 : #C8EFF6;
+  --cyan-200 : #93DEEC;
+  --cyan-300 : #5CC9DD;
+  --cyan-400 : #34BCDB;   /* brand/hover */
+  --cyan-500 : #1FB4D9;   /* brand/default — 7.7:1 on --page */
+  --cyan-600 : #178FAE;   /* brand/active */
+  --cyan-700 : #136D85;   /* the accent on paper: white on it 5.9:1 */
+  --cyan-800 : #114F61;
+  --cyan-900 : #0A2F3A;
+  --cyan-950 : #051D24;   /* brand/subtle */
+  --cyan-a10 : rgba(31, 180, 217, .10);
+  --cyan-a20 : rgba(31, 180, 217, .20);
+  --cyan-a40 : rgba(31, 180, 217, .40);
+  --cyan-a60 : rgba(31, 180, 217, .60);
 
-  /* Semantic aliases — what components should actually name. */
-  --accent      : var(--blue);
-  --accent-deep : var(--blue-1000);
+  /* ── BLUE — info only (Figma: blue) ── */
+  --blue-50  : #EFF6FF;
+  --blue-100 : #DBEAFE;
+  --blue-200 : #BFDBFE;
+  --blue-300 : #93C5FD;
+  --blue-400 : #60A5FA;
+  --blue-500 : #3B82F6;
+  --blue-600 : #2563EB;
+  --blue-700 : #1D4ED8;
+  --blue-800 : #1E40AF;
+  --blue-900 : #1E3A8A;
+  --blue-950 : #172554;
+  --blue-a10 : rgba(59, 130, 246, .10);
+
+  /* Semantic aliases — what components should actually name. The accent is a state and a
+     call to action; hover goes one step LIGHTER on the dark ground (the library's brand/hover). */
+  --accent      : var(--cyan-500);
+  --accent-deep : var(--cyan-400);
   --accent-ink  : var(--black-1000);
+  --accent-text : var(--accent);       /* the accent as WORDS — one with --accent on the dark ground */
 
   /* ── ROLES (moved here from passport.css, 2026-10-10) ──
      The ramp says what a grey *is*; a role says what it *does*. Every page that reads —
@@ -158,7 +184,7 @@
      step, so this block is the only place a role is mapped onto the ramp.
 
      They lived in `passport/passport.css`, which meant the landing linked a 97 KB passport
-     stylesheet to learn what colour its own page was. A role is a token, so it sits with
+     stylesheet to learn what color its own page was. A role is a token, so it sits with
      the tokens; the components that read it can then live in files of their own.
 
      Values are the passport's, unchanged. A shell may re-point a role for everything
@@ -172,51 +198,83 @@
      -300 is 5.2 and 4.5. */
   --ink-faint   : var(--black-300);
   /* The foot's ink: the page's own white turned down, not a grey off the ramp — over the
-     water a dimmed white takes the water's colour with it, an opaque grey reads as a smudge. */
+     water a dimmed white takes the water's color with it, an opaque grey reads as a smudge. */
   --ink-quiet   : var(--white-32);
   --rule        : var(--white-08);
   /* A plate is `.sidebar-tile`: `--black-900`, no rim. Frost only on a moving ground. */
   --tile        : var(--black-900);
   --tile-hover  : var(--black-700);
   /* The one filled control. On a reading page the accent carries the action. */
-  --btn         : var(--accent);
-  --btn-hover   : var(--accent-deep);
-  --btn-ink     : var(--accent-ink);
+  --btn         : var(--cyan-a20);       /* alpha buttons — see button.css */
+  --btn-hover   : var(--cyan-a40);
+  --btn-ink     : var(--btn-cyan-ink);
 
-  /* Red — destructive only */
-  --red-100  : #FFDDE2;
-  --red-200  : #FFBAC4;
-  --red-600  : #FF788C;
-  --red-800  : #FF4C67;
-  --red-1000 : #FA2041;
+  /* ── RED — danger only (Figma: red) ── */
+  --red-50  : #FEF2F2;
+  --red-100 : #FEE2E2;
+  --red-200 : #FECACA;
+  --red-300 : #FCA5A5;
+  --red-400 : #F87171;
+  --red-500 : #EF4444;
+  --red-600 : #DC2626;
+  --red-700 : #B91C1C;
+  --red-800 : #991B1B;
+  --red-900 : #7F1D1D;
+  --red-950 : #450A0A;
+  --red-a10 : rgba(239, 68, 68, .10);
+  --red-a20 : rgba(239, 68, 68, .20);
+  --red-a40 : rgba(239, 68, 68, .40);
+  --red-a60 : rgba(239, 68, 68, .60);
 
-  /* Green */
-  --green-100  : #CAF8D7;
-  --green-800  : #34C77B;
-  --green-1000 : #244B2F;
+  /* ── GREEN — success only (Figma: green) ── */
+  --green-50  : #ECFDF5;
+  --green-100 : #D1FAE5;
+  --green-200 : #A7F3D0;
+  --green-300 : #6EE7B7;
+  --green-400 : #34D399;
+  --green-500 : #10B981;
+  --green-600 : #059669;
+  --green-700 : #047857;
+  --green-800 : #065F46;
+  --green-900 : #064E3B;
+  --green-950 : #022C22;
+  --green-a10 : rgba(16, 185, 129, .10);
 
-  /* Amber — warning only */
-  --amber-800  : #F5A524;
+  /* ── AMBER — warning only (Figma: amber) ── */
+  --amber-50  : #FFFBEB;
+  --amber-100 : #FEF3C7;
+  --amber-200 : #FDE68A;
+  --amber-300 : #FCD34D;
+  --amber-400 : #FBBF24;
+  --amber-500 : #F59E0B;
+  --amber-600 : #D97706;
+  --amber-700 : #B45309;
+  --amber-800 : #92400E;
+  --amber-900 : #78350F;
+  --amber-950 : #451A03;
+  --amber-a10 : rgba(245, 158, 11, .10);
+  --amber-a20 : rgba(245, 158, 11, .20);
+  --amber-a40 : rgba(245, 158, 11, .40);
+  --amber-a60 : rgba(245, 158, 11, .60);
 
-  /* ── STATUS (2026-10-10) ──
-     Four states, each an ink and a surface. The ink is text, an icon or a field's edge on the
-     dark ground; the surface is the same hue at 12 % behind a message. Measured on --page /
-     --tile: danger 5.8 / 5.1, success 8.6 / 7.5, warning 9.2 / 8.0, info 7.0 / 6.1 — all
-     clear 4.5 for text. --red-1000 stays the error EDGE (4.2 on a tile is fine for a line,
-     not for an 11px message), which is why danger's ink is -800. */
-  --danger          : var(--red-800);
-  --danger-edge     : var(--red-1000);
-  --danger-surface  : rgba(255, 76, 103, .12);
-  --success         : var(--green-800);
-  --success-surface : rgba(52, 199, 123, .12);
-  --warning         : var(--amber-800);
-  --warning-surface : rgba(245, 165, 36, .12);
-  --info            : var(--blue);
-  --info-surface    : rgba(78, 161, 255, .12);
+  /* ── STATUS (2026-10-10; the library's ramps 2026-10-21) ──
+     Four states, each an ink and a surface — the library's «text» step (the ink) and the hue at
+     10 % (its alpha a10) behind a message, which works on any ground where the library's
+     opaque «subtle» would be a dark hole on paper. The ink is text, an icon or an edge.
+     Measured on --page / --tile: danger 6.8 / 5.9, success 9.8 / 8.5, warning 11.3 / 9.8,
+     info 7.4 / 6.4 — all clear 4.5. The error EDGE is the library's red/500 (5.0 / 4.4). */
+  --danger          : var(--red-400);
+  --danger-edge     : var(--red-500);
+  --danger-surface  : var(--red-a10);
+  --success         : var(--green-400);
+  --success-surface : var(--green-a10);
+  --warning         : var(--amber-400);
+  --warning-surface : var(--amber-a10);
+  --info            : var(--blue-400);
+  --info-surface    : var(--blue-a10);
 
   /* Type */
   --font-primary : 'Cy Grotesk Key', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-mono    : 'Spline Sans Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* ── TYPE SCALE ──
      This file named the face and then stopped, so every size in the kit and in three pages
@@ -286,7 +344,7 @@
 
   /* ── MOTION (2026-10-10) ──
      Seventeen durations were in use; these five are what they meant. .08 is a press; .12
-     and .15 a colour or a hover; .18 and .2 a small move — a thumb, a toggle; .24 to .32 a
+     and .15 a color or a hover; .18 and .2 a small move — a thumb, a toggle; .24 to .32 a
      panel, a fold, a sheet; .5 to .6 an entrance. Three one-offs stay literal where they are
      written: the 3s fade of the water, the .8s loop of the loader, the .36s entrance delay.
      Two curves: standard for things that move inside the page, emphasized (fast out, long
@@ -316,16 +374,22 @@
   --focus-offset : 2px;
   --focus-halo   : 0 0 0 2px var(--white-32);
 
-  /* ── LINK (2026-10-11) ── the hairline under a text link at rest, and the line that draws
-     over it under the cursor. The hairline is half a pixel — one device pixel — on a 2× screen
-     and a whole one on a 1× screen, where half a pixel rounds away and the line disappears
-     (the 2× value is set at the end of this file). */
-  --link-line       : 1px;
-  --link-line-hover : 1px;
+  /* ── LINK (2026-10-11) ── the line a text link draws under the cursor (and always shows on
+     a touch screen). A whole pixel — see type.css → LINK. */
+  --link-line : 1px;
+  --link-offset : 2px;   /* the line sits this far under the text's own box (2026-10-21) */
+  --link-rest   : 32%;   /* the line at rest, as a share of the link's own ink */
 
   /* ── FIELD (2026-10-10) ── the input family's numbers, read by field.css and by the
      controls in kit.css drawn from the same materials (.stepper, .dd-btn). */
-  --field-h            : var(--number-48);
+  /* ── CONTROL (2026-10-21) ── one height and one type size for everything you press or type
+     into: a button and a field stand side by side at the same 48 and the same 14, on a phone
+     and on a desktop alike. 14, one step under the 16 first chosen (asked for 2026-10-21).
+     ⚠ iOS Safari zooms the page when a field under 16px takes focus; a page that minds that
+     sets `maximum-scale=1` in its viewport meta or raises --control-text to 16 for itself. */
+  --control-h          : var(--number-48);
+  --control-text       : var(--text-14);
+  --field-h            : var(--control-h);
   --field-radius       : var(--radius-8);
   --field-pad          : var(--space-16);
   --field-edge         : var(--black-300);
@@ -346,6 +410,19 @@
   /* Fully round — every pressable pill. Was `9999px` typed at each use. Off the number
      scale on purpose: it is not a measurement, it is "as round as the box allows". */
   --radius-pill : 9999px;
+
+  /* The Figma library's names for the same corners (2026-10-21) — use either; they are one
+     value. 64 and 76 exist there too, for pictures; they are layouts, not corners of a control. */
+  --radius-none : 0;
+  --radius-xs   : var(--number-2);
+  --radius-sm   : var(--radius-4);
+  --radius-md   : var(--radius-8);
+  --radius-lg   : var(--radius-12);
+  --radius-xl   : var(--radius-16);   /* a button, 48 tall */
+  --radius-2xl  : var(--radius-24);   /* a large button, 64 tall; a card */
+  --radius-3xl  : var(--radius-32);
+  --radius-4xl  : var(--radius-48);
+  --radius-full : var(--radius-pill);
 
   /* ── NUMBERS ──
      The primitive scale, and the only place a pixel value is written down. Everything
@@ -457,16 +534,143 @@
      button. 108px is the content's own minimum; the extra 12 is breathing room
      so the button never sits flush against the mark. */
   --rail-collapsed : 120px;
+
+  /* ── TWO ROLES THE LIGHT PAGE NEEDED FIRST (2026-10-18) ──
+     A sunk ground (a tile one step into the page rather than one step out of it) and a
+     softer rule for the line that only separates, never frames. The dark tools had no
+     use for either and wrote a white at low alpha where they meant it; they are named
+     here so the two themes say the same thing in the same word. */
+  --page-sunk : var(--black-900);
+  --rule-soft : var(--white-06);
+  /* The thinnest line the kit draws: a frame, a separator, a frosted edge. */
+  --hairline  : 1px;
 }
+
+/* ══════════════ THE LIGHT THEME (2026-10-18) ══════════════
+   `data-theme="light"` on <html> (or on any block) turns the page over: paper ground,
+   black ink. The guide (A1-Manual-Page) is the first light page; the kit's preview has a
+   switch for it.
+
+   2026-10-20 — NOT AN INVERT. The first version mirrored the ramp value for value, so a
+   tile came out grey on white and the white button black: the dark theme in negative.
+   Paper works the other way round, so three things are now light-theme decisions rather
+   than mirrors:
+     ground and surface   the page is white and a tile a faint grey on it (#F4F5F6) — a
+                          sidebar or a plate reads as a quiet panel, not as a hole; what
+                          you type into or choose (a field, a box, a tab's thumb, the
+                          white button) is the page's own white, so it stands on the tile
+     the accent           a deeper cyan of the same hue (--cyan-700, #136D85): the dark
+                          theme's #1FB4D9 carries white text at 2.3:1, this one at 5.9:1;
+                          the accent button is cyan with WHITE words in this theme
+     the white button     white with a hairline (button.css), never black
+
+   HOW: THE NEUTRAL RAMP IS READ FROM THE PAGE OUTWARD.
+   Every component in the kit was written against the dark ground: a tile is
+   `--black-900`, its hover `--black-700`, a label `--black-250`, the ink `--white`, and
+   a checked box is a white square. Re-pointing a dozen roles turned the page over and
+   left every component dark. So in the light theme the ramp itself is mirrored: the
+   names stop meaning a paint and mean a POSITION —
+     --black-1000 / --black   the page          (paper)
+     --black-900 … -400       one step, two steps … into the page   (tiles, hovers, edges)
+     --black-350 … -50        text, from the faintest to the strongest
+     --white                  the ink           (black)
+     --white-NN               the ink at NN %   (hairlines, hover veils)
+   — the way Radix's `gray-1…12` are positions in both themes. A component that said
+   "a tile one step off the page" says it in both themes with no rule of its own; a
+   checked box that was white on black is black on paper.
+   The light steps are tuned for paper rather than mirrored by value: the dark side's
+   steps are a few points apart, and the same few points on white are invisible.
+     --black-250 (muted)  #656867 on paper  5.6:1   --black-300 (faint) #6F7271  4.8:1
+   THE ROLES that are not the ramp are set here by value: the rule, the button (ink),
+   the frost (paper, translucent), the scrim (lighter — a dark one turns paper into a
+   hole), the accent's ink (white on the deep cyan), the status inks (one step darker
+   each: on white the dark theme's -400s are 1.7–2.8:1). */
+[data-theme="light"] {
+  /* ── ONE STEP DARKER ON PAPER (2026-10-21) ──
+     The surfaces — a tile, the rail, a track, a hover — were too close to white to read as
+     surfaces: the sidebar plate all but vanished on the page. The grey steps 900 … 400 each take
+     the next one's value (--tile is now #EDEEEF, 400 a new #B0B2B2), and the ink-alpha surfaces
+     03 … 10 gain 2 %. The text greys (350 and darker), the edges (12 % and up) and the field
+     edges are untouched, so nothing that is read or outlined loses contrast. */
+  --white      : #111211;
+  --black      : #FFFFFF;
+  --black-1000 : #FFFFFF;
+  --black-900  : #EDEEEF;
+  --black-800  : #E8E9EA;
+  --black-700  : #DEE0E1;
+  --black-600  : #D6D8D8;
+  --black-500  : #CBCDCD;
+  --black-450  : #BDBFBF;
+  --black-400  : #B0B2B2;
+  --black-350  : #989B9A;
+  --black-300  : #6A6D6C;
+  --black-250  : #656867;
+  --black-200  : #515353;
+  --black-150  : #3C3E3E;
+  --black-100  : #282A2A;
+  --black-50   : #1E2020;
+  --white-03   : rgba(17, 18, 17, .05);
+  --white-04   : rgba(17, 18, 17, .06);
+  --white-06   : rgba(17, 18, 17, .08);
+  --white-07   : rgba(17, 18, 17, .09);
+  --white-08   : rgba(17, 18, 17, .10);
+  --white-09   : rgba(17, 18, 17, .11);
+  --white-10   : rgba(17, 18, 17, .12);
+  --white-12   : rgba(17, 18, 17, .12);
+  --white-14   : rgba(17, 18, 17, .14);
+  --white-18   : rgba(17, 18, 17, .18);
+  --white-20   : rgba(17, 18, 17, .20);
+  --white-22   : rgba(17, 18, 17, .22);
+  --white-32   : rgba(17, 18, 17, .32);
+
+  --rule        : rgba(17, 18, 17, .20);
+  --rule-soft   : rgba(17, 18, 17, .08);
+  /* ── THE BRIGHT CYAN ON PAPER TOO (2026-10-21) ──
+     A fill — the switch, the slider, a chosen swatch's ring, a chosen day — is the brand's own
+     --cyan-500, as on the dark ground; the deep --cyan-700 read as a different, duller brand.
+     It is 2.3:1 on white, which is fine for a fill and not for words or a focus ring, so the
+     accent splits in two on paper: --accent (fills, ink on them dark as on the dark theme) and
+     --accent-text (words in the accent, still --cyan-700: 5.9:1). The focus ring and a focused
+     field's edge take --cyan-600 (3.3:1 — the 3:1 a control's outline needs). */
+  --accent      : var(--cyan-500);
+  --accent-deep : var(--cyan-400);
+  --accent-ink  : #111211;
+  --accent-text : var(--cyan-700);
+  /* Status on paper — measured on white: danger 6.5, edge 4.8, success 5.5, warning 5.0, info 5.2. */
+  --danger      : var(--red-700);
+  --danger-edge : var(--red-600);
+  --success     : var(--green-700);
+  --warning     : var(--amber-700);
+  --info        : var(--blue-600);
+  --btn         : var(--cyan-a20);       /* alpha buttons — see button.css */
+  --btn-hover   : var(--cyan-a40);
+  --btn-ink     : var(--btn-cyan-ink);
+  --tile-hover  : var(--black-800);
+  --page-sunk   : var(--black-700);
+  /* Fields on paper: a white box with a pale edge at rest, a darker one under the cursor,
+     the accent with the caret in it — three steps you can tell apart, not three near-blacks. */
+  --field-edge       : var(--black-350);   /* 2.8:1 on white — the palest edge that still reads as a box */
+  --field-edge-hover : var(--black-250);
+  --field-edge-focus : var(--cyan-600);
+  --on-frost       : rgba(17, 18, 17, .05);
+  --on-frost-hover : rgba(17, 18, 17, .09);
+  --frost-900   : rgba(252, 255, 254, .86);
+  --frost-700   : rgba(252, 255, 254, .72);
+  --scrim-32    : rgba(17, 18, 17, .16);
+  --scrim-50    : rgba(17, 18, 17, .32);
+  --scrim-60    : rgba(17, 18, 17, .20);
+  --scrim-64    : rgba(17, 18, 17, .24);
+  --scrim-80    : rgba(17, 18, 17, .48);
+  --focus-ring  : 2px solid var(--cyan-600);
+  color-scheme  : light;
+}
+[data-theme="light"] body { color-scheme: light; }
 
 /* ── ONE FOCUS RING (2026-10-10) ──
    Every focusable thing gets the same keyboard ring unless its own rule says otherwise —
    eleven components were writing this line out. Zero specificity (:where), so any
    component rule, including `outline: none` on a field that shows focus by its edge, wins. */
 :where(:focus-visible) { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
-
-/* ── A HAIRLINE ON A DENSE SCREEN ── */
-@media (min-resolution: 2dppx) { :root { --link-line: .5px; } }
 
 /* ── LESS MOTION ──
    One rule for every transition written with a duration token. 1ms, not 0: a zero-length
