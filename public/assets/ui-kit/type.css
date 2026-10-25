@@ -6,8 +6,8 @@
    four that have to be remembered in step. The role names the job, not the tag: a section
    title that has to read as large as the page title is `<h2 class="t-h1">`.
 
-     .t-display   56 → 72 → 96 / 1 / 600 / -.02em   a landing's object — a name, a price as a picture
-     .t-h1        40 → 48 → 56 / 1 / 600            a page or a screen's title
+     .t-display   40 → 72 → 96 / 1 / 600 / -.02em   a landing's object — a name, a price as a picture
+     .t-h1        32 → 48 → 56 / 1 / 600            a page or a screen's title
      .t-h2        24 → 32      / 1.1 / 600          a section's title, a price
      .t-h3        24 / 1.25 / 600            a group inside a section
      .t-title     16 / 1.25 / 600            a card's name, a row's name, a question
@@ -34,10 +34,11 @@
    Requires tokens.css.
    ───────────────────────────────────────────────────────────────────────────── */
 
-/* The role sizes, mobile first. */
+/* The role sizes, mobile first. The phone's two a step smaller (2026-10-25): 56 / 40 put four
+   or five letters on a 390 line. */
 :root {
-  --type-display: var(--text-56);
-  --type-h1:      var(--text-40);
+  --type-display: var(--text-40);
+  --type-h1:      var(--text-32);
   --type-h2:      var(--text-24);
 }
 @media (min-width: 768px)  { :root { --type-display: var(--text-72); --type-h1: var(--text-48); --type-h2: var(--text-32); } }

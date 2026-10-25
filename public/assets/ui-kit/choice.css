@@ -1,0 +1,149 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Choice — a plate that is chosen (2026-10-25). From the A1 landing's order form: a bundle,
+   a way to install, a way to pay. A page and a tool both load it (no kit.css needed).
+   Three elements on one plate, one hover and one chosen edge (the kit's preview shows each):
+     OPTION        label.choice.is-row      — a radio or checkbox and its words
+     SET CARD      label.choice             — a set to choose: pictures, the name, a price
+     COUNTER CARD  div.choice.is-count      — how many: the same card with a count at its foot
+
+     label.choice               a card: a hidden radio or checkbox inside, the content centred —
+                                .choice-pics (one .choice-pic — a card has one picture), .choice-name,
+                                .choice-sub, .choice-price
+     label.choice.is-row        a row: the input shown (.ui-radio / .ui-checkbox, field.css) and
+                                the words — <b>, <small> and an optional .choice-price in a <span>; the same plate and the
+                                same chosen edge as a card, the kit's marker inside
+     .choice-logo               (in a row) a logo at the right edge of the plate — any mark: an
+                                <img>/<svg>; two files for the two themes as <img class="is-dark">
+                                + <img class="is-light">, the theme shows its own; a <picture> per
+                                theme with a phone <source> for the stacked file. 32 high
+                                (--choice-logo-h)
+     div.choice.is-count        a counted card [data-qty]: a card's content and, at its foot, the
+                                kit's counter — `.stepper.is-bare` (field.css). A tap on the card takes one
+                                or puts it back; `.is-on` while the count is over 0 (order.js)
+     .choice-name               the name; a product's name is its lockup — `.sec-lockup
+                                [data-device]` (section.js fills it from the catalogue)
+     .choice-grid.is-3 / .is-2  cards three (two) a row; on a phone a row that scrolls (1 + 60 %) ·
+     .choice-scroll             always a row that scrolls · .choice-group a row choice and what it
+                                opens, on one plate with one edge ·
+                                .choice-list a column of rows
+
+   Rest: --choice, a shade under the controls (black-800; on paper a step under the tile).
+   Hover: --choice-hover. Chosen: a 1.8px edge in the accent (--choice-edge-on) — the width of a
+   field's edge, so the chosen card and the focused input draw one line. Focus by keyboard:
+   the kit's focus ring. Disabled: .4. A picture not there yet is not drawn (.sec-ph is
+   transparent). Requires tokens.css; field.css for the row's marker.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.choice { position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--space-4);
+  margin: 0; padding: var(--space-16); text-align: center;
+  border: 1px solid var(--choice-edge, transparent); border-radius: var(--radius-16); background: var(--choice); color: var(--ink);
+  cursor: pointer; transition: background var(--duration-fast), border-color var(--duration-fast); }
+.choice:hover { background: var(--choice-hover); }
+.choice:has(> input:checked), .choice.is-on { background: var(--choice-on, var(--choice)); border-color: var(--choice-edge-on); box-shadow: inset 0 0 0 0.8px var(--choice-edge-on); }   /* active is 1.8px: border + .8 inset, nothing moves */
+.choice:not(.is-row) > input { position: absolute; opacity: 0; pointer-events: none; }
+.choice:not(.is-row):has(> input:focus-visible) { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
+.choice:has(> input:disabled), .choice.is-disabled { opacity: .4; pointer-events: none; }
+
+.choice-name, .choice > b, .choice > span > b { font-size: var(--text-16); line-height: var(--leading-snug); font-weight: var(--weight-semibold); text-wrap: balance; }
+/* The second line a step quieter than the muted ink (2026-10-25): --ink-faint — 4.25:1 on the
+   dark plate (a hair under AA's 4.5 for 12px), 4.5:1 on paper. */
+.choice-sub, .choice > small, .choice > span > small { font-size: var(--text-12); line-height: var(--leading-normal); color: var(--ink-faint); }
+.choice-price { font-weight: var(--weight-semibold); }
+/* A price that was (2026-10-25): <s class="choice-was">€590</s> before the price, inside
+   .choice-price — muted, struck, a step lighter, 8 before the price that is. */
+.choice-was { margin-right: var(--space-8); color: var(--ink-faint); font-weight: var(--weight-regular); text-decoration-thickness: 1px; }
+/* In a row of cards the prices stand on one line (2026-10-25): the price goes to the card's foot,
+   whatever is above it (a finish row or none). A counted card keeps its words together. */
+.choice:not(.is-row):not(.is-count) > .choice-price { margin-top: auto; padding-top: var(--space-8); }
+/* A product's name as its lockup: the marks a size up from the words, on one line with the «+». */
+.choice-name { display: inline-flex; align-items: center; gap: var(--space-8); min-height: 1em; font-size: var(--text-24); line-height: 1; margin-block: var(--space-4); }
+.choice-name .sec-lockup { display: inline-block; height: .72em; line-height: 0; }
+.choice-name .sec-lockup svg { height: 100%; width: auto; display: block; }
+
+.choice.is-row { flex-direction: row; align-items: center; gap: var(--space-16); min-height: var(--number-64); text-align: left; }
+.choice.is-row > span { display: grid; gap: var(--space-2); }
+/* A price in a row (2026-10-25): a third line under the words — the right edge is the logo's,
+   and on a phone the two would crowd it. Same .choice-price (and <s class="choice-was">). */
+.choice.is-row > span > .choice-price { margin-top: var(--space-4); font-size: var(--text-14); }
+/* A LOGO in a row (2026-10-25): the right edge of the plate, centred on the words. */
+.choice-logo { --choice-logo-h: var(--number-32); display: flex; align-items: center; flex: none; margin-left: auto; padding-left: var(--space-16); }
+.choice-logo > img, .choice-logo > svg, .choice-logo > picture > img { display: block; height: var(--choice-logo-h); width: auto; }
+.choice-logo > picture { display: block; }
+/* A compact logo on a phone (2026-10-25): a <picture> with a <source media="(max-width: 767px)">
+   for the stacked file — the words in two lines, so the row keeps its width for the words. */
+.choice-logo > .is-light, [data-theme="light"] .choice-logo > .is-dark { display: none; }
+[data-theme="light"] .choice-logo > .is-light { display: block; }
+@media (max-width: 767px) { .choice-logo { --choice-logo-h: var(--number-32); padding-left: var(--space-8); } }   /* the stacked file at 32: «Service» ~9px */
+/* The marker on the plate: the kit's --black-700 box is the plate's own shade here, so an
+   unchosen one takes the field's edge (the 3:1 line) — as on paper, where it always has one. */
+.choice > :is(.ui-radio, .ui-checkbox):not(:checked):not(:indeterminate) { border-color: var(--field-edge); background-color: transparent; }
+.choice:hover > :is(.ui-radio, .ui-checkbox):not(:checked):not(:indeterminate) { border-color: var(--field-edge-hover); }
+
+.choice-pics { display: flex; justify-content: center; align-items: flex-end; gap: var(--space-8); width: 100%; margin-bottom: var(--space-8); }
+/* A picture is a square of --choice-pic (80 by default, 2026-10-25), the product drawn whole
+   inside it (contain) — the same size in every card, two or three side by side. */
+.choice { --choice-pic: var(--number-80); }
+.choice-pic { display: block; flex: none; width: var(--choice-pic); height: var(--choice-pic); object-fit: contain; border-radius: var(--radius-12); }
+
+.choice-grid, .choice-list { display: grid; gap: var(--space-12); min-width: 0; }
+.choice-grid.is-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.choice-grid.is-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* A row that scrolls sideways (2026-10-25, mobile first): one whole card and 60 % of the next —
+   width = (row − gap) / 1.6. `.choice-scroll` always; a `.choice-grid` becomes one on a phone.
+   From 768 a `.choice-scroll` shows three and a peek of the fourth. */
+/* Never narrower than --choice-min (224, 2026-10-25): the longest cartridge name, «I · Sediment +
+   Carbon», is 179 at 16 — with the card's 16 + 16 and its edge it needs 213, so every name sits
+   on one line; on a phone that leaves a little over half of the next card in view. */
+.choice-scroll { --choice-min: var(--number-224); grid-auto-flow: column; grid-auto-columns: max(var(--choice-min), calc((100% - var(--space-12)) / 1.6)); }
+@media (min-width: 768px) { .choice-scroll { grid-auto-columns: max(var(--choice-min), calc((100% - var(--space-12) * 2) / 3 - var(--space-16))); } }
+/* On a phone a card is exactly 3 of the page's 6 modules (2026-10-25) — measured on the page's
+   grid (the viewport), not on its holder, so a card lines up with the columns: 179 at 390. */
+@media (max-width: 767px) {
+  :root { --choice-3mod: calc((100vw - var(--grid-margin) * 2 - var(--grid-gutter) * 5) / 2 + var(--grid-gutter) * 2); }
+  .choice-grid.is-3, .choice-grid.is-2 { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: var(--choice-3mod); }
+  .choice-scroll { grid-auto-columns: var(--choice-3mod); }
+}
+.choice-scroll, .choice-grid { min-width: 0; }
+@media (max-width: 767px) { .choice-grid { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
+  padding: var(--space-4) var(--choice-bleed, var(--space-4)); margin: calc(-1 * var(--space-4)) calc(-1 * var(--choice-bleed, var(--space-4)));
+  scroll-padding-inline: var(--choice-bleed, var(--space-4)); } .choice-grid::-webkit-scrollbar { display: none; } }
+/* `--choice-bleed`: how far the row runs out past its column on a phone — set it to the
+   holder's inner padding and the cards slide out to the holder's edge, not clipped short of it
+   (the order form's step: 16). The first card still starts on the column. */
+.choice-scroll { display: grid; gap: var(--space-12); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.choice-scroll::-webkit-scrollbar { display: none; }
+.choice-scroll > .choice, .choice-grid > .choice { scroll-snap-align: start; }
+
+/* A GROUP — a row choice and what it opens, on one plate (2026-10-25): «Replacement filters only»
+   and the cartridges it brings. Open, it is a --choice-plate with no edge of its own; the row
+   inside gives up its own plate, and each taken card in it shows its choice as any card does. */
+.choice-group { display: grid; border: 1px solid var(--choice-edge, transparent); border-radius: var(--radius-16); background: var(--choice);
+  transition: background var(--duration-fast), border-color var(--duration-fast); }
+.choice-group:has(> .choice.is-row > input:not(:checked)):hover { background: var(--choice-hover); }
+.choice-group:has(> .choice.is-row > input:checked) { border-color: transparent; box-shadow: none; background: var(--choice-plate); }   /* open: no edge — a --choice-plate (dark black-800, light black-900); the taken cards in it carry the accent (2026-10-25) */
+.choice-group > .choice.is-row { background: none; border: 0; box-shadow: none; }
+.choice-group > :not(.choice) { padding: 0 var(--space-16) var(--space-16); margin: 0; scroll-padding-inline: var(--space-16); }
+/* A card inside the group shows its own choice like any card (2026-10-25: several can be taken
+   at once, so each says so) — the accent edge, white on paper; the rest plain. */
+.choice-group .choice:not(.is-row):not(.is-on) { border-color: transparent; box-shadow: none; }
+.choice-group .choice:not(.is-row):hover { background: var(--choice-hover); }
+
+/* A COUNTED CARD (2026-10-25): a card with a .stepper at its foot. */
+/* The words and the count sit together at the card's foot (2026-10-25): the air goes between
+   the picture and the name, the counter follows the price 8 below. */
+.choice.is-count > .choice-pics + * { margin-top: auto; }
+/* The count is the kit's counter, `.stepper.is-bare` (field.css): no box, the number close to
+   its − / +. Here it only sits at the card's foot. */
+.choice.is-count .stepper { margin-top: var(--space-8); align-self: center; cursor: default; }
+/* Hidden until the card is taken (2026-10-25): at 0 the counter keeps its place but is not
+   shown — a tap on the card (or Enter / Space on it) takes one and brings it in. */
+.choice.is-count:not(.is-on) .stepper { visibility: hidden; opacity: 0; }
+.choice.is-count .stepper { transition: opacity var(--duration-fast); }
+.choice.is-count:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
+
+/* FINISHES in a card (2026-10-25): swatch.css's row, centred, its name under it; a little air
+   above so the discs read as part of the card, not of its price. */
+.choice-finish { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); margin-block: var(--space-8) var(--space-4); }
+.choice-finish .pair-row { justify-content: center; }
+.choice-finish .pair-name { font-size: var(--text-12); color: var(--ink-faint); }

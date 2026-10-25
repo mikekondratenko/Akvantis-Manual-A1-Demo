@@ -113,11 +113,13 @@
 .btn-warning { --btn: var(--amber-a20); --btn-hover: var(--amber-a40); --btn-ink: var(--btn-amber-ink); --btn-edge: none; }
 .btn-danger  { --btn: var(--red-a20);   --btn-hover: var(--red-a40);   --btn-ink: var(--btn-red-ink);   --btn-edge: none; }
 
-/* Ghost — under the tertiary: an outline and no fill, a plate under the cursor. Its ink is the page's. */
-.btn-ghost   { --btn: transparent; --btn-hover: var(--black-700); --btn-ink: var(--ink); --btn-edge: inset 0 0 0 1px var(--black-700); }
-/* Ghost on paper (2026-10-25): white with the one control edge, grey under the cursor — no fill of
-   its own, so it stays empty on a plate. (It was the label alone; the tertiary was this.) */
-[data-theme="light"] .btn-ghost { --btn-hover: var(--black-700); --btn-edge: inset 0 0 0 1px var(--control-edge); }
+/* Ghost — under the tertiary: an outline and nothing else (2026-10-25). Never a fill, not even
+   under the cursor: hover only brings the edge up. At rest a step quieter than a field's edge —
+   --black-350 (3.4:1 on black, 2.8:1 on paper); under the cursor the field's hover edge. */
+.btn-ghost   { --btn: transparent; --btn-hover: transparent; --btn-ink: var(--ink);
+               --btn-edge: inset 0 0 0 1px var(--black-350); --btn-edge-hover: inset 0 0 0 1px var(--field-edge-hover); }
+.btn-ghost:hover:not(:disabled) { --btn-edge: var(--btn-edge-hover); }
+.btn-ghost { transition: background var(--duration-fast), color var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-instant); }
 
 /* Frost — a button floating over a page or a scene: the frosted plate the header wears,
    from the --frost-* tokens. `.is-on` still turns it to the accent. */

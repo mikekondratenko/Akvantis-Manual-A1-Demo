@@ -15,18 +15,21 @@
      .sec-actions      a row of buttons (and a price) under it — buttons 8 apart (--btn-gap)
      .sec-banner       the picture of a hero or a CTA — an object over the text by default,
                        a photograph behind it on `.is-cover`
-     .sec-ph           a picture slot until the picture exists
+     .sec-ph           a picture slot until the picture exists — always transparent (no fill)
      .sec-lockup       a product's lockup in a title, from the catalogue (data-device)
 
    ── THE SET (2026-10-25) — what a landing is built from, in this order on the specimen:
        1 hero · 2 banner, full screen · 3 banner, fixed height · 4 cards, square and vertical ·
        5 card carousel · 6–7 image + text, left and right · 8 FAQ · 9 quote · 10 highlights ·
-       11 reviews · 12 footer.
+       11 reviews · 12 order form · 13 footer.
      Every part of every section and card is optional — a kicker, a title, a caption, buttons,
      a picture — and `.sec-actions` (buttons 8 apart) may stand in any of them.
      .sec-cover        a banner: a picture filling the frame, the words on it; full screen, or
                        `.is-fixed` / `--cover-h` for a height; the words centred or `.is-start`,
                        at the foot or `.is-middle`
+     .sec-order        the order form (from the A1 landing, 2026-10-25): a stepper of accordions —
+                       choice → … → contacts — then Send, and a frosted bar at the window's foot
+                       with what is chosen and its price. Behaviour: kit/order.js. See «ORDER».
      .sec-quote        large words on the black, two or three lines; `.is-center`
      .sec-footer       the mark and a line, columns of links, the legal line and the social marks
      .sec-cards.is-vertical   cards 3:4 (with `.is-square` 1:1)
@@ -53,8 +56,8 @@
      .sec-slides       the highlights: wide slides one at a time, a caption on each, dots that
                        fill as they play and a pause button (kit/slider.js, data-autoplay)
      .sec-gallery      cards about half a screen wide, words under each, arrows (kit/slider.js)
-     .sec-reviews      reviews three a row, cards without a plate (`.is-plates` for tiles), a quote mark
-                       behind the words, an avatar and a name under a hairline, arrows
+     .sec-reviews      reviews three a row, each on a plate (`.is-bare` without), the words and,
+                       at the foot, an avatar and a name; arrows
        .slider · .slider-track · .slide · .slider-ctrl (built by the script)
      .sec-price        a price as the object of a line: large figure, the rest small and muted
      .sec-split        picture on one half of the grid, text on the other
@@ -91,7 +94,7 @@
 @media (min-width: 1920px) { :root { --sec-head: 1 / span 10; --sec-half: 10; --split-text-at: 6; --split-text-at-flip: 13; --sec-narrow: 7 / 15; } }
 
 /* ── THE STACK AND THE SHEET ── */
-.sec-stack { display: grid; gap: var(--space-2); padding: var(--space-2); background: var(--page); }
+.sec-stack { --stack-gap: var(--space-2); display: grid; gap: var(--stack-gap); padding: var(--space-2); background: var(--page); }
 /* Dark (2026-10-25): the ground is the sheets' own black — one black from top to bottom, the
    sections told apart by what is in them. On paper the grey ground stays under the white sheets. */
 [data-theme="light"] .sec-stack { background: var(--page-sunk); }
@@ -132,8 +135,11 @@ img.sec-banner { object-fit: contain; }
 .sec-ph {
   display: grid; place-items: center; padding: var(--space-16); text-align: center;
   border-radius: var(--sec-card-radius); color: var(--ink-faint); font-size: var(--text-12);
-  /* A solid dark grey, --black-900, not the hatch that reads as «transparent» (2026-10-25). */
-  background: var(--black-900);
+  /* A picture that is not there yet is not drawn (2026-10-25, a rule of the kit): a stand-in is
+     always transparent — no fill, no hatch. The product's photographs come cut out, on the
+     ground they sit on, so a grey square would be a shape the real thing never has. The slot
+     keeps its size; what holds it (a card's plate, a slide, a hero's frame) keeps its own fill. */
+  background: none;
 }
 
 /* ── HERO ──
@@ -165,6 +171,9 @@ img.sec-banner { object-fit: contain; }
   content: ''; position: absolute; inset: var(--hero-inset); z-index: -1; pointer-events: none;
   border-radius: var(--hero-radius); background: var(--black-900);
 }
+/* Two frames in a row are one inset apart, not two (2026-10-25): the second sheet is drawn over
+   the first's bottom inset. The frames keep their size — the hero stays exactly a screen. */
+:is(.sec-hero, .sec-cover) + :is(.sec-hero, .sec-cover) { margin-top: calc(-1 * var(--hero-inset) - var(--stack-gap, 0px)); }
 .sec-hero > .sec-head, .sec-cta > .sec-head { grid-column: 1 / -1; justify-items: center; }
 .sec-hero .sec-actions, .sec-cta .sec-actions { justify-content: center; }
 /* Centred lines are balanced, caption included: two near-equal lines, never a word alone. */
@@ -226,7 +235,7 @@ img.sec-banner { object-fit: contain; }
    own sentence, set at 32 → 48 → 64 → 80; it fills from --black-800 to white as the page is
    scrolled (section.js). `.is-muted` inside dims a part of it (no fill); `.sec-quote-by`
    names who said it; buttons may follow. Left by default, `.is-center` on the axis. */
-:root { --type-quote: var(--text-32); --quote-span: 1 / -1; }
+:root { --type-quote: var(--text-28); --quote-span: 1 / -1; }   /* 28 on a phone (2026-10-25) */
 @media (min-width: 768px)  { :root { --type-quote: var(--text-48); } }
 @media (min-width: 1024px) { :root { --type-quote: var(--text-64); --quote-span: 1 / span 10; } }
 @media (min-width: 1440px) { :root { --type-quote: var(--text-80); } }
@@ -247,7 +256,14 @@ img.sec-banner { object-fit: contain; }
   background-size: var(--fill) 100%, 100% 100%; background-repeat: no-repeat;
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-@media (prefers-reduced-motion: reduce) { .sec-quote-fill { --fill: 100% !important; } }
+/* …and who said it comes in once the words are white (2026-10-25): faded and 8 lower until
+   section.js marks the quote `.is-filled`, gone again if the page goes back up. Only where the
+   script has wrapped the words — with no script the line is simply there. */
+.sec-quote:has(.sec-quote-fill) > .sec-quote-by { opacity: 0; transform: translateY(var(--space-8));
+  transition: opacity var(--duration-slow) var(--ease-standard), transform var(--duration-slow) var(--ease-standard); }
+.sec-quote.is-filled > .sec-quote-by { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .sec-quote-fill { --fill: 100% !important; }
+  .sec-quote:has(.sec-quote-fill) > .sec-quote-by { opacity: 1; transform: none; transition: none; } }
 .sec-quote-by { font-size: var(--text-16); color: var(--black-300); }   /* a step under the muted ink (2026-10-25) */
 .sec-quote.is-center { justify-items: center; text-align: center; }
 .sec-quote.is-center > * { grid-column: 1 / -1; max-width: 22ch; }
@@ -296,14 +312,30 @@ img.sec-banner { object-fit: contain; }
 .benefit > .t-small { color: var(--ink-muted); max-width: var(--number-288); }
 
 /* ── SPLIT ── picture on a half of the grid, the text a narrow column in the other: two empty
-   columns to the picture, one to the edge (2026-10-25). On a phone and a tablet they stack,
-   picture first; from 1024 they share a row, and `.is-flip` puts the picture on the left. */
+   columns to the picture, one to the edge (2026-10-25). Below 1024 (mobile first, 2026-10-25)
+   they share a row too: the picture half the columns, one empty, the text the rest at the
+   edge — 3 · 1 · 2 on a phone, 4 · 1 · 3 on a tablet — the lead a step down, no full-screen
+   height; `.is-flip` puts the picture on the left. */
 .sec-split { align-items: center; }
 .sec-split-text { display: grid; justify-items: start; gap: var(--space-16); max-width: calc(var(--number-288) * 2); }
 .sec-split-text .sec-actions { margin-top: var(--space-16); }
 .sec-split-pic { display: grid; place-items: center; order: -1; }
 .sec-split-pic > img { width: 100%; max-height: min(72svh, calc(var(--number-288) * 2)); aspect-ratio: 1; object-fit: contain; }
 .sec-split-pic > .sec-ph { width: 100%; aspect-ratio: 1; max-height: 72svh; }
+@media (max-width: 1023px) {
+  .sec-split { --split-half: calc(var(--grid-cols) / 2); }
+  .sec-split { --split-text-n: calc(var(--grid-cols) / 2 - 1); }
+  .sec-split > .sec-split-text { grid-column: 1 / span var(--split-text-n); grid-row: 1; max-width: none; }
+  .sec-split > .sec-split-pic  { grid-column: span var(--split-half) / -1; grid-row: 1; order: 0; }
+  .sec-split.is-flip > .sec-split-text { grid-column: span var(--split-text-n) / -1; }
+  .sec-split.is-flip > .sec-split-pic  { grid-column: 1 / span var(--split-half); }
+  .sec-split.is-screen { min-height: 0; }
+  .sec-split-text { gap: var(--space-12); }
+  .sec-split-text .sec-actions { margin-top: var(--space-8); }
+}
+@media (max-width: 767px) {
+  .sec-split-text > .t-lead { font-size: var(--text-14); }
+}
 @media (min-width: 1024px) {
   /* The picture takes its half. The text is three columns in the other half, two empty columns from
      the picture, centred on the picture's height. */
@@ -313,13 +345,29 @@ img.sec-banner { object-fit: contain; }
   .sec-split.is-flip > .sec-split-pic  { grid-column: 1 / span var(--sec-half); }
 }
 
-/* ── CARDS ── a title and two or three cards: picture, title, line, an action. One a row on a
-   phone; `.is-2` two from 768; `.is-3` two from 768 and three from 1024. A card is the kit's
+/* ── CARDS ── a title and two or three cards: picture, title, line, an action. On a phone a row
+   that scrolls sideways (2026-10-25, mobile first): a card 4 of the 6 columns wide, the next
+   one showing at the edge, the row running out to the screen's edge and snapping to the grid.
+   `.is-2` two from 768; `.is-3` two from 768 and three from 1024. A card is the kit's
    `.plate`; its picture is an <img> or a `.sec-ph`, 4:3, inset in the plate. */
 .sec-cards-grid { display: grid; gap: var(--grid-gutter); list-style: none; margin: 0; padding: 0; }
 @media (min-width: 768px)  { .sec-cards.is-2 .sec-cards-grid, .sec-cards.is-3 .sec-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1024px) { .sec-cards.is-3 .sec-cards-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .sec-cards-grid > .plate + .plate { margin-top: 0; }
+@media (max-width: 767px) {
+  .sec-cards { container-type: inline-size; }
+  .sec-cards-grid {
+    --card-w: calc((100cqi - (var(--grid-cols) - 1) * var(--grid-gutter)) / var(--grid-cols) * 4 + 3 * var(--grid-gutter));
+    grid-auto-flow: column; grid-auto-columns: var(--card-w); align-items: stretch;
+    margin-inline: calc(-1 * var(--grid-margin)); padding-inline: var(--grid-margin);
+    overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--grid-margin); scrollbar-width: none; }
+  .sec-cards-grid::-webkit-scrollbar { display: none; }
+  .sec-cards-grid > .card { scroll-snap-align: start; border-radius: var(--radius-24); }
+  .sec-cards-grid .card-pic { border-radius: var(--radius-16); }
+  .sec-cards-grid .card > :not(.card-pic) { margin-inline: var(--space-12); }
+  .sec-cards-grid .card > .t-small { font-size: var(--text-14); }
+}
 .card { display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-8) var(--space-8) var(--space-24);
   border-radius: var(--sec-card-radius); }
 .card-pic { width: 100%; aspect-ratio: 4 / 3; border-radius: calc(var(--sec-card-radius) - var(--space-8)); object-fit: contain; }
@@ -479,21 +527,149 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 /* A card in the carousel may carry buttons (2026-10-25), at the words' inset. */
 .sec-gallery .slide > .sec-actions { padding-inline: var(--space-24); }
 
-/* ── REVIEWS ── three cards a row from 1024, the fourth peeking; a quote mark behind the
-   words, a hairline, the avatar and the name at the foot. */
-.sec-reviews .slider-track { grid-auto-columns: 86%; }
+/* ── REVIEWS ── three cards a row from 1024, the fourth peeking (2026-10-25: on plates, no quote
+   mark, no hairline). A card is the words — as long as the buyer wrote them; the row is as tall
+   as the longest — and at its foot the avatar and the name. `.is-bare` takes the plate off. */
+/* On a phone (2026-10-25, mobile first): a card 4 of the 6 columns, the next one at the edge. */
+.sec-reviews .slider-track { grid-auto-columns: calc((100% - (var(--grid-cols) - 1) * var(--grid-gutter)) / var(--grid-cols) * 4 + 3 * var(--grid-gutter)); }
 @media (min-width: 768px)  { .sec-reviews .slider-track { grid-auto-columns: 46%; } }
 @media (min-width: 1024px) { .sec-reviews .slider-track { grid-auto-columns: calc((100% - var(--grid-margin) * 2 - var(--grid-gutter) * 2) / 3.15); } }
-.review { position: relative; display: flex; flex-direction: column; gap: var(--space-24); padding: var(--space-32); border-radius: var(--sec-card-radius); }
-/* `.is-plates` puts each review on a tile, as the gallery cards are. */
-.sec-reviews.is-plates .review { background: var(--tile); }
-.review::before { content: '\201C'; position: absolute; top: var(--space-8); left: var(--space-24); z-index: 0;
-  font-size: var(--text-160); line-height: 1; font-weight: var(--weight-semibold); color: var(--white-10); pointer-events: none; }
-.review-text { position: relative; z-index: 1; flex: 1; font-size: var(--text-16); line-height: var(--leading-relaxed); text-wrap: pretty; }
-.review-who { display: flex; align-items: center; gap: var(--space-12); padding-top: var(--space-24); border-top: 1px solid var(--rule); }
+.review { display: flex; flex-direction: column; gap: var(--space-32); padding: var(--space-32);
+  border-radius: var(--sec-card-radius); background: var(--tile); }
+.sec-reviews.is-bare .review { background: none; padding-inline: 0; }
+.review-text { flex: 1; margin: 0; font-size: var(--text-16); line-height: var(--leading-relaxed); text-wrap: pretty; }
+.review-who { display: flex; align-items: center; gap: var(--space-12); }
 .review-avatar { display: grid; place-items: center; flex: none; width: var(--number-48); height: var(--number-48); border-radius: 50%;
   overflow: hidden; background: var(--avatar, var(--black-700)); color: var(--avatar-ink, var(--ink-muted)); font-size: var(--text-14); font-weight: var(--weight-semibold); }
 /* An avatar without a photograph: initials on a tint — set --avatar / --avatar-ink on the element. */
 .review-avatar img, .review-avatar svg { width: 100%; height: 100%; object-fit: cover; display: block; }
 .review-name { display: grid; gap: var(--space-2); }
 .review-name small { font-size: var(--text-12); color: var(--ink-muted); }
+/* On a phone the words a step down (16 → 14), the plate tighter (32 → 24), the avatar 40. */
+@media (max-width: 767px) {
+  .review { gap: var(--space-24); padding: var(--space-24); border-radius: var(--radius-24); }
+  .review-text, .review-name b { font-size: var(--text-14); }
+  .review-avatar { width: var(--number-40); height: var(--number-40); }
+}
+
+/* ── ORDER (2026-10-25) ── the A1 landing's order form, made the kit's and audited against it.
+   One column at the reading measure: a stepper of the kit's accordion (panel.css, accordion.js
+   data-accordion="one"), one step open at a time, a closed step showing what was chosen in its
+   strip; each step ends with its action on the right — Next, and Send on the last; a frosted
+   bar at the foot of the window with what is chosen and its price. Behaviour: kit/order.js.
+
+   Built from the kit, not beside it:
+     a step          `.plate` — the kit's tile; a step not reached yet is dimmed (.4, disabled)
+     its number      `.num` (number.css) in the page's ink: a white disc, a black one on paper
+     a choice        the kit's `.choice` (choice.css): a card a shade under the controls, chosen →
+                     a 1px accent edge; a row is a marker and words, no plate
+     a product       its lockup, not its letters (`.sec-lockup[data-device]`, section.js)
+     a count         the kit's `.stepper` (field.css) with minus / plus icons
+     fields          `.field` + `.dark-input` (field.css); required gets the asterisk by itself
+     buttons         `.btn-primary` for Next and Send, 8 apart in `.sec-actions`
+
+     form.order-form [data-endpoint]       the form; no endpoint → nothing is sent, and it says so
+     .order-steps > .plate.order-step       .panel-title > .order-step-head
+                                            (.num · .order-step-name · .order-step-val) + .panel-fold
+       [data-need="name"] [data-hint]       a radio group that must be chosen before Next
+       [data-next] · [type=submit]          the step's action, in its `.sec-actions`
+       [data-alt-skip]                      a step left out when the alternative is on
+     .choice-grid.is-3 · .choice-list       cards three a row from 768 · a column of rows
+     label.choice [data-price]              a card: hidden input, .choice-pics, .choice-name,
+                                            .choice-sub, .choice-price (choice.css)
+     label.choice.is-row                    a row: .ui-radio / .ui-checkbox and the words
+     input[data-alt]                        «something else instead»: [data-alt-off] steps back,
+                                            [data-alt-show] comes forward
+     .choice-group > .choice-scroll > .choice.is-count     counted cards in a row that scrolls, a
+                                            `.stepper` at the foot; a tap on a card takes one
+     .order-row2                            two fields a row from 768
+     .order-status                          the notice and the line under the steps
+     .order-dock                            the bar: .order-dock-pics · -txt · -price          */
+.sec-order > * { grid-column: var(--sec-narrow); }
+.sec-order > .sec-head { justify-items: center; text-align: center; }
+.order-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-16); width: 100%; }
+.order-form fieldset { border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-12); min-width: 0; }
+.order-form .plate + .plate { margin-top: 0; }   /* page.css spaces stacked plates; here the grids do */
+
+/* The choices are the kit's `.choice` (choice.css): cards in a `.choice-grid.is-3`, rows in a
+   `.choice-list`; a product's name is its lockup. */
+.order-tbd { color: var(--ink-faint); }
+
+/* The stepper. */
+.order-steps { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-12); }
+.order-step { --choice-bleed: var(--space-16); scroll-margin-top: calc(var(--bar-max, 0px) + var(--bar-top, 0px) + var(--space-16)); }
+.order-step[hidden] { display: none; }
+.order-step.is-locked { opacity: .4; }
+.order-step.is-locked button.panel-title { cursor: default; }
+.order-step.is-locked button.panel-title:hover { background: none; }
+.order-step.is-locked .order-step-val { visibility: hidden; }
+.order-step .num { --num-paper: var(--ink); --num-ink: var(--page); }
+.order-step-head { display: flex; align-items: center; gap: var(--space-12); flex: 1; min-width: 0; text-align: left; }
+.order-step-name { font-size: var(--text-16); }
+.order-step-val { margin-left: auto; padding-left: var(--space-16); color: var(--ink-muted); font-weight: var(--weight-regular);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.order-step .panel-title[aria-expanded="true"] .order-step-val { display: none; }
+.order-step .panel-body { color: var(--ink); font-size: var(--text-14); gap: var(--space-16); }
+.order-step .panel-body > :first-child { margin-top: var(--space-8); }
+.order-step .sec-actions { justify-content: flex-end; margin-top: var(--space-8); }
+.order-hint { justify-content: flex-end; }
+
+/* The alternative on: what it replaces folds away and what it brings unfolds (2026-10-25) — the
+   bundles close up smoothly, the cartridges open under the row that asked for them. Height,
+   fade and the gap after it move together; order.js sets the height to fold from. */
+[data-alt-off], [data-alt-show] { overflow-y: clip;
+  transition: max-height var(--duration-slow) var(--ease-standard), opacity var(--duration-base), margin var(--duration-slow) var(--ease-standard), padding var(--duration-slow) var(--ease-standard); }
+[data-alt-off].is-off { max-height: 0 !important; opacity: 0; margin-bottom: calc(-1 * var(--space-12)); padding-block: 0 !important; pointer-events: none; }
+[data-alt-show]:not(.is-shown) { max-height: 0 !important; opacity: 0; padding-bottom: 0 !important; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { [data-alt-off], [data-alt-show] { transition: none; } }
+/* Counted cards: the kit's `.choice.is-count` (choice.css). */
+
+.order-row2 { display: grid; gap: var(--space-12); }
+@media (min-width: 768px) { .order-row2 { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-16); } }
+
+/* The skeleton of the full order (2026-10-25): country → bundle → installation → Akvantis Club →
+   delivery → contacts → payment. order.js hides what the country or a choice leaves out
+   (data-country, data-when, data-when-not) — hidden is gone, whatever the element's display. */
+.order-form [hidden] { display: none !important; }
+.order-country { width: 100%; }
+@media (min-width: 768px) { .order-country { max-width: var(--number-288); } }
+.order-note { margin: 0; color: var(--ink-muted); }
+.order-note > b { color: var(--ink); }
+.order-fields { display: grid; gap: var(--space-12); }
+.choice-pic.sec-ph { padding: 0; font-size: var(--text-12); }
+/* The summary: what each step chose, then the total under a rule. */
+.order-summary { display: grid; grid-template-columns: auto minmax(0, 1fr); row-gap: var(--space-8); margin: 0; }
+.order-summary dt { color: var(--ink-muted); }
+.order-summary dd { margin: 0; padding-left: var(--space-16); text-align: right; }   /* the gap is padding, so the total's rule runs unbroken */
+.order-summary .is-total { padding-top: var(--space-12); border-top: var(--hairline) solid var(--rule); font-weight: var(--weight-medium); color: var(--ink); font-size: var(--text-16); }
+/* A code (promo or a friend's): folded until asked for. */
+.order-code > summary { list-style: none; width: max-content; }
+.order-code > summary::-webkit-details-marker { display: none; }
+.order-code-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-8); align-items: end; margin-top: var(--space-12); }
+.order-pay-note { margin: 0; text-align: right; color: var(--ink-faint); }
+
+.order-status { display: grid; gap: var(--space-12); }
+.order-status > .t-caption { text-align: center; }
+
+/* The bar: what is chosen and its price, frosted like the head and as wide as it; on a phone
+   the full width less the gutter. Comes up with the first choice. */
+.order-dock { position: fixed; z-index: 19; left: 50%; bottom: max(var(--space-12), env(safe-area-inset-bottom));
+  width: var(--bar-w, calc(var(--number-288) * 2)); max-width: calc(100% - var(--space-24));
+  display: flex; align-items: center; gap: var(--space-16); padding: var(--space-8) var(--space-24) var(--space-8) var(--space-8);
+  border-radius: var(--radius-24); background: var(--frost-900); box-shadow: var(--frost-edge);
+  -webkit-backdrop-filter: var(--frost-blur); backdrop-filter: var(--frost-blur);
+  transform: translate(-50%, calc(100% + var(--space-24))); opacity: 0; pointer-events: none;
+  transition: transform var(--duration-slow) var(--ease-emphasized), opacity var(--duration-base); }
+.order-dock.is-on { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+.order-dock-pics { display: flex; gap: var(--space-4); flex: none; }
+.order-dock-pics > * { width: var(--number-48); height: var(--number-48); object-fit: contain; max-height: none;
+  border-radius: var(--radius-16); background: var(--on-frost); padding: var(--space-4); }
+.order-dock-pics > .sec-ph { padding: 0; background: none; }
+
+.order-dock-txt { display: grid; gap: var(--space-2); min-width: 0; flex: 1; }
+.order-dock-txt > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.order-dock-txt .t-small, .order-dock-price .t-small { color: var(--ink-muted); }
+.order-dock-price { display: grid; justify-items: end; flex: none; text-align: right; }
+@media (max-width: 767px) { .order-dock-pics > :nth-child(n + 2) { display: none; } }
+body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--number-96) + env(safe-area-inset-bottom)); }
+body.has-dock .btn.grid-fab { bottom: calc(var(--number-96) + var(--space-8)); }

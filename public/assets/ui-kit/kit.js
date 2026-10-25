@@ -426,6 +426,8 @@
 
   Kit.stepper = function (input, opts) {
     if (!input || input.__stepper) return input && input.__stepper;
+    /* Already in a stepper written in the markup (a counter card, choice.css): not wrapped twice. */
+    if (input.closest('.stepper')) return null;
     opts = opts || {};
 
     var step = parseFloat(opts.step != null ? opts.step : input.step) || 1;
@@ -436,7 +438,8 @@
     var dec = (String(step).split('.')[1] || '').length;
 
     var wrap = document.createElement('div');
-    wrap.className = 'stepper';
+    /* data-stepper="bare" → the counter without a box (field.css «.stepper.is-bare»). */
+    wrap.className = 'stepper' + (input.getAttribute('data-stepper') === 'bare' ? ' is-bare' : '');
     input.parentNode.insertBefore(wrap, input);
     wrap.appendChild(input);
 

@@ -96,6 +96,7 @@
   }
 
   function swap(el) {
+    if (!el.parentNode) return;   // replaced before the observer came to it (a line rewritten twice)
     var html = svg(el.getAttribute('data-icon'), {
       size: el.getAttribute('data-size'), fill: el.hasAttribute('data-fill'),
       cls: el.className, label: el.getAttribute('aria-label')

@@ -230,3 +230,7 @@
 .cpick-tool:hover { background: var(--white-20); }
 .cpick-tool:focus-visible { outline: none; box-shadow: var(--focus-halo); }
 .cpick-tool[hidden] { display: none; }
+
+/* On paper the chosen ring is the accent's darker step, as every chosen edge there (2026-10-25,
+   the edge audit): --cyan-500 on white is 2.4:1, --cyan-600 is 3.8:1. */
+[data-theme="light"] .swatch-btn { --accent: var(--cyan-600); }

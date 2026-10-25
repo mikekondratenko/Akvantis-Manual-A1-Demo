@@ -428,6 +428,14 @@
   --field-edge-hover   : var(--black-200);
   --field-edge-focus   : var(--white);
 
+  /* ── CHOICE (choice.css, 2026-10-25) ── a plate that is chosen: a shade under the controls'
+     fill, lighter under the cursor; chosen → a 1px edge in the accent, the width of a field's
+     edge, so a chosen card and a focused input draw the same line. */
+  --choice             : var(--black-800);
+  --choice-hover       : var(--black-700);
+  --choice-edge-on     : var(--accent);
+  --choice-plate       : var(--black-800);   /* an open group's plate: black-900 merged with the step's tile (2026-10-25) */
+
   /* ── RADIUS ──
      Four corners off the same scale, so a 16px inset and a 16px corner are the same
      measurement rather than two that happen to agree. */
@@ -702,16 +710,26 @@
   --page-sunk   : var(--black-700);
   /* ONE EDGE ON PAPER (2026-10-25): every white control with an outline — a field, a select, a
      stepper, a dropdown, an unchosen checkbox or radio, the tertiary button, round button and
-     hotspot — takes the same edge, one step lighter than the button's was; one step darker under
-     the cursor; the accent with the caret in it. (The edge was --black-350 on a field and the
-     ink at 20 % on a button: two greys for one idea.) #D6D8D8 is 1.4:1 on white — a box you see
-     by its edge, not an outline that passes WCAG's 3:1 for controls on its own; the label and
-     the placeholder carry it. */
-  --control-edge       : var(--black-500);
-  --control-edge-hover : var(--black-400);
+     hotspot — takes the same edge; a step darker under the cursor; the accent with the caret
+     in it. (The edge was --black-350 on a field and the ink at 20 % on a button: two greys for
+     one idea.) */
+  /* 2026-10-25 (the edge audit): a control's edge is ≥ 3:1 on its ground in both themes —
+     the same grey as the dark theme's field edge, #848786: 3.6:1 on white, 3.3 on the tile,
+     3.1 on a choice's plate. It was --black-500 (#D6D8D8, 1.2–1.4:1), which is why paper's
+     lines read thinner than the dark theme's at the same 1px. Hover: --black-300 (#6A6D6C). */
+  --control-edge       : #848786;
+  --control-edge-hover : var(--black-300);
   --field-edge       : var(--control-edge);
   --field-edge-hover : var(--control-edge-hover);
   --field-edge-focus : var(--cyan-600);
+  --choice-edge-on   : var(--cyan-600);   /* the focused field's edge on paper */
+  /* A choice on paper (2026-10-25): grey and edgeless at rest — --black-800, a step under the
+     step's tile so it shows on the tile and on white; a step darker under the cursor; chosen,
+     it turns white and takes the accent edge. */
+  --choice           : var(--black-800);
+  --choice-hover     : var(--black-700);
+  --choice-on        : #FFFFFF;
+  --choice-plate     : var(--black-900);
   --on-frost       : rgba(17, 18, 17, .05);
   --on-frost-hover : rgba(17, 18, 17, .09);
   --frost-900   : rgba(252, 255, 254, .86);

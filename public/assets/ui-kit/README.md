@@ -58,6 +58,9 @@ ui-kit/kit/           →  <project>/public/assets/ui-kit/
 │                specimen preview/sections.html; requires tokens, grid, type, button (+ page);
 │                every section is listed in docs/DESIGN.md → Sections
 ├── section.js   the sections' behaviour: the quote's fill on scroll (2026-10-25)
+├── choice.css   a plate that is chosen: cards (a 1px accent edge when chosen) and rows (a marker, no plate) (2026-10-25)
+├── choice.js    a counted choice: − / + and a tap on the card, the ends dimmed, `input` fired (2026-10-25)
+├── order.js     the order form (section.css «ORDER», from the A1 landing): steps, counts, the bar, sending (2026-10-25)
 ├── accordion.js the collapsible plate's behaviour — aria-expanded, data-open, inert; no kit.js
 ├── locale.js    the location picker's behaviour — open / close, `akv-region`, the current row
 ├── slider.js    the controls of .sec-slides / .sec-gallery / .sec-reviews — arrows, or dots and
@@ -466,3 +469,18 @@ that uses kit icons without loading `icons.js`.
 
 Not interface icons, and not in this set: product and feature pictograms, flags, social marks,
 the Akvantis logo — each has its own source.
+
+## Edges (2026-10-25)
+
+Two widths — 1px at rest, 1.8px active — and colour by role, the same contrast in both themes:
+
+| Role | Width | Colour | Contrast on its ground |
+|---|---|---|---|
+| A rule — a divider, a plate's or a frosted bar's edge, a table line | 1px | `--rule`, frost edge | ~1.2:1, decoration |
+| A control's edge — a field, select, stepper, unchosen checkbox / radio, ghost / tertiary button | 1px | `--field-edge` / `--control-edge` | ≥ 3:1 (WCAG 1.4.11) — dark #848786, paper #848786 |
+| Chosen or focused — a chosen choice, a field with the caret, an open group | 1.8px (the 1px border + a .8px inset shadow: the box does not grow) | the accent (`--choice-edge-on`, `--field-edge-focus`) | ≥ 3:1 — paper takes `--cyan-600` |
+| The keyboard's focus ring; a chosen swatch's ring | 2px | the accent | ≥ 3:1 |
+
+Nothing else: no 1.5, no 3. A line on paper reads thinner than the same line on black, so its
+colour, not its width, carries the difference — that is why the paper edge is a grey of the dark
+theme's weight, not the near-white it was.

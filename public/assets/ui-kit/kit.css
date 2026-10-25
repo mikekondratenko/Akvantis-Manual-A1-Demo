@@ -517,67 +517,7 @@ a { color: inherit; }
 .field-group { margin-bottom: var(--space-12); }
 .field-group:last-child { margin-bottom: 0; }
 
-/* ── STEPPER ──
-   A numeric field with its own − / + ends. Not a restyled `appearance: auto` spinner:
-   the native one is 12px tall, appears on hover only, and cannot be held down. This is
-   one plate — the two buttons live inside the field's own border, so focus, hover and
-   the disabled state are stated once on the wrapper and the control never reads as
-   three objects sitting next to each other.
-
-   Kit.stepper() supplies the behaviour, including hold-to-repeat. */
-.stepper {
-  position: relative; display: flex; align-items: center;
-  height: 48px; padding: 4px; background: transparent;
-  border: 1px solid var(--field-edge); border-radius: var(--field-radius);
-  transition: border-color var(--duration-fast);
-}
-.stepper:hover { border-color: var(--field-edge-hover); }
-.stepper:focus-within { border-color: var(--field-edge-focus); }
-/* The input keeps .dark-input for its type, and gives up everything that belonged to
-   the plate — ground, border, radius — to the wrapper.
-
-   Centred, and the − / + sit on either side of it rather than both on one end. A value
-   pushed against the left edge with its controls bunched at the right reads as a text
-   field that happens to have buttons; centred between them it reads as one counter, and
-   the number stays put as it grows from 45 to 110. */
-.stepper .dark-input {
-  flex: 1; min-width: 0; width: auto; height: 100%; order: 2;
-  text-align: center; padding: 0 2px;
-  background: transparent; border: 0; border-radius: 0;
-}
-.stepper .dark-input:hover, .stepper .dark-input:focus { border-color: transparent; outline: none; }
-/* − takes the left end, + the right. The buttons are direct children of .stepper — a
-   wrapper around them would break `order`, since order only applies to flex children. */
-.stepper-btn:first-of-type { order: 1; }
-.stepper-btn:last-of-type  { order: 3; }
-/* Square, so the hover plate is a circle rather than a tall pill. It used to be 28 × 38
-   — the field's full inner height — and at that ratio a 9999px radius draws a lozenge,
-   which is a different shape from every other round target in the kit. 28 × 28 leaves
-   the plate a proper disc and still clears the 44px-tall field it sits in.
-
-   This is .icon-btn's behaviour at the stepper's size: no chrome until the cursor
-   arrives, then a disc behind the glyph. */
-.stepper-btn {
-  width: 28px; height: 28px; flex: none;
-  display: flex; align-items: center; justify-content: center;
-  background: transparent; border: 0; border-radius: 50%;
-  color: var(--black-200); cursor: pointer;
-  transition: background var(--duration-fast), color var(--duration-fast);
-  -webkit-user-select: none; user-select: none; touch-action: none;
-}
-.stepper-btn:hover { background: var(--black-600); color: var(--white); }
-.stepper-btn:active { background: var(--black-500); }
-.stepper-btn:focus-visible {
-  outline: none; background: var(--black-600); color: var(--white);
-  box-shadow: var(--focus-halo);
-}
-.is-frosted .stepper-btn:hover { background: var(--white-08); }
-.is-frosted .stepper-btn:active { background: var(--white-14); }
-/* At the end of its range the button stops being an offer. Dimmed rather than removed,
-   so the field does not change width when a value reaches its limit. */
-.stepper-btn[disabled] { opacity: .3; pointer-events: none; }
-.stepper-btn svg { display: block; pointer-events: none; }
-.is-frosted .stepper { background-color: var(--frost-700); }
+/* ── STEPPER ── in field.css since 2026-10-25, so a page can draw it (the order form). */
 
 .field-row-2 { display: flex; gap: var(--space-8); }
 .field-row-2 .field-group { flex: 1; }
@@ -860,69 +800,7 @@ a { color: inherit; }
 .toast-chip { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(17, 18, 17, .15); }
 .toast-invert .toast-chip { box-shadow: inset 0 0 0 1px var(--white-20); }
 
-/* ══════════════ CHECKBOX ══════════════
-   A real <input type="checkbox"> with appearance stripped, so keyboard, form submission
-   and :indeterminate keep working. Shares the input shell: --black-700 fill, transparent
-   1px border going --black-500 on hover and --white on focus. Checked fills white with a
-   --black-1000 glyph — the accent is not spent here, because a checkbox is a statement of
-   fact rather than a call to action. Square at --radius-4: the pill rule is for buttons,
-   and a round checkbox is a radio. */
-.ui-checkbox {
-  appearance: none; -webkit-appearance: none;
-  width: 20px; height: 20px; flex-shrink: 0; margin: 0;
-  border-radius: var(--radius-4);
-  background-color: var(--black-700);
-  background-repeat: no-repeat; background-position: center;
-  border: 1px solid transparent; cursor: pointer;
-  transition: background-color var(--duration-fast), border-color var(--duration-fast);
-}
-.ui-checkbox:hover { border-color: var(--black-500); }
-.ui-checkbox:focus-visible { outline: none; border-color: var(--white); }
-.ui-checkbox:checked {
-  background-color: var(--white);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'><path d='M20 6 9 17l-5-5' stroke='%23111211' stroke-width='1.5' vector-effect='non-scaling-stroke' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
-}
-/* A white border would be invisible on a white fill, so the surface darkens instead. */
-.ui-checkbox:checked:hover { background-color: var(--black-100); }
-/* Mixed state — a parent whose children are only partly selected. */
-.ui-checkbox:indeterminate {
-  background-color: var(--white);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'><path d='M5 12h14' stroke='%23111211' stroke-width='1.5' vector-effect='non-scaling-stroke' fill='none' stroke-linecap='round'/></svg>");
-}
-.checkbox-row { display: flex; align-items: center; gap: var(--space-12); }
-.checkbox-row label { font-size: var(--text-13); font-weight: var(--weight-semibold); color: var(--white); cursor: pointer; }
-.checkbox-row.is-disabled { opacity: .4; pointer-events: none; }
-.checkbox-group { display: flex; flex-direction: column; gap: var(--space-12); }
-.checkbox-group .checkbox-group { padding-left: var(--space-32); margin-top: var(--space-12); }
-.is-frosted .ui-checkbox { background-color: var(--frost-700); }
-.is-frosted .ui-checkbox:checked { background-color: var(--white); }
-
-/* ══════════════ RADIO ══════════════
-   The checkbox's shell and state ladder, round and mutually exclusive. Kept as a real
-   <input type="radio"> so arrow-key navigation within a name group, form submission and
-   label clicks all keep working without script. */
-.ui-radio {
-  appearance: none; -webkit-appearance: none;
-  width: 20px; height: 20px; flex-shrink: 0; margin: 0;
-  border-radius: 50%;
-  background-color: var(--black-700);
-  background-repeat: no-repeat; background-position: center;
-  border: 1px solid transparent; cursor: pointer;
-  transition: background-color var(--duration-fast), border-color var(--duration-fast);
-}
-.ui-radio:hover { border-color: var(--black-500); }
-.ui-radio:focus-visible { outline: none; border-color: var(--white); }
-.ui-radio:checked {
-  background-color: var(--white);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'><circle cx='8' cy='8' r='3.4' fill='%23111211'/></svg>");
-}
-.ui-radio:checked:hover { background-color: var(--black-100); }
-.radio-row { display: flex; align-items: center; gap: var(--space-12); }
-.radio-row label { font-size: var(--text-13); font-weight: var(--weight-semibold); color: var(--white); cursor: pointer; }
-.radio-row.is-disabled { opacity: .4; pointer-events: none; }
-.radio-group { display: flex; flex-direction: column; gap: var(--space-12); }
-.is-frosted .ui-radio { background-color: var(--frost-700); }
-.is-frosted .ui-radio:checked { background-color: var(--white); }
+/* ══════════════ CHECKBOX · RADIO ══════════════ in field.css since 2026-10-25 (pages use them). */
 
 /* ══════════════ ICON BUTTON ══════════════
    A glyph standing on its own, with no chrome until the cursor arrives. Hover draws a
@@ -1043,6 +921,8 @@ a { color: inherit; }
    behaviour, and these only mirror them. */
 /* The field states mirror the field's own roles (2026-10-21): a hard-coded --black-200 / --white
    painted near-black edges on paper — heavier than anything a real field ever shows. */
+[data-state="hover"].choice { background: var(--choice-hover); }
+[data-state="hover"].btn-ghost { --btn-edge: var(--btn-edge-hover); }
 [data-state="hover"].dark-input,
 [data-state="hover"].select,
 [data-state="hover"].field-value-input,
@@ -1053,6 +933,7 @@ a { color: inherit; }
 [data-state="focus"].select,
 [data-state="focus"].field-value-input,
 [data-state="focus"].stepper { border-color: var(--field-edge-focus); }
+[data-state="focus"]:is(.dark-input, .select, .field-value-input, .stepper) { box-shadow: inset 0 0 0 0.8px var(--field-edge-focus); }   /* active is 1.8px */
 [data-state="focus"].ui-checkbox,
 [data-state="focus"].ui-radio { border-color: var(--white); }
 [data-state="hover"].btn { background: var(--btn-hover); }
@@ -1344,24 +1225,7 @@ a { color: inherit; }
    A checkbox and a radio are NOT the accent (2026-10-20): ticking a box is a statement, not
    a call to action, so it takes the page's own ink — the dark theme's white box with a black
    mark, inverted on paper to a black box with a white mark. Focus is the ink's edge too. */
-[data-theme="light"] .ui-checkbox:checked,
-[data-theme="light"] .is-frosted .ui-checkbox:checked {
-  background-color: var(--ink);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'><path d='M20 6 9 17l-5-5' stroke='%23FFFFFF' stroke-width='1.5' vector-effect='non-scaling-stroke' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
-}
-[data-theme="light"] .ui-checkbox:indeterminate {
-  background-color: var(--ink);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'><path d='M5 12h14' stroke='%23FFFFFF' stroke-width='1.5' vector-effect='non-scaling-stroke' fill='none' stroke-linecap='round'/></svg>");
-}
-[data-theme="light"] .ui-radio:checked,
-[data-theme="light"] .is-frosted .ui-radio:checked {
-  background-color: var(--ink);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'><circle cx='8' cy='8' r='3.4' fill='%23FFFFFF'/></svg>");
-}
-[data-theme="light"] .ui-checkbox:checked:hover,
-[data-theme="light"] .ui-radio:checked:hover { background-color: color-mix(in srgb, var(--ink) 80%, var(--page)); }
-[data-theme="light"] .ui-checkbox:focus-visible,
-[data-theme="light"] .ui-radio:focus-visible { border-color: var(--ink); }
+/* The checkbox and the radio on paper: field.css. */
 [data-theme="light"] [data-state="checked-hover"]:is(.ui-checkbox, .ui-radio) { background-color: color-mix(in srgb, var(--ink) 80%, var(--page)); }
 
 /* The switch: a grey track the white knob shows against; the accent when on. */
@@ -1377,11 +1241,6 @@ a { color: inherit; }
 
 /* A toast stays dark on paper: a dark note over a light page is the convention, not an invert. */
 
-/* Unchosen on paper: a white box with a visible edge. The dark theme's --black-700 fill is a
-   near-white smudge on the grey page. */
-[data-theme="light"] :is(.ui-checkbox, .ui-radio):not(:checked):not(:indeterminate) {
-  background-color: var(--page); border-color: var(--control-edge); }
-[data-theme="light"] :is(.ui-checkbox, .ui-radio):not(:checked):not(:indeterminate):hover { border-color: var(--control-edge-hover); }
 
 /* The icon toggle: as the segmented tabs, the chosen panel is a paper plate on a 6 % ink track. */
 [data-theme="light"] .iconseg { --seg-track: var(--tile); --seg-thumb: var(--page); }
