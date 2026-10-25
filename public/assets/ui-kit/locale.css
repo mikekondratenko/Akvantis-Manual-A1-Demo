@@ -92,7 +92,8 @@ a.lang-mark.locale.locale-lang { gap: var(--space-4); padding: 0 var(--space-8) 
   background: var(--frost-900);
   backdrop-filter: blur(24px) saturate(120%);
   -webkit-backdrop-filter: blur(24px) saturate(120%);
-  box-shadow: var(--frost-edge), var(--shadow-lg);
+  /* The frost's own 1px edge and no drop shadow (2026-10-21): the scrim already lifts it. */
+  box-shadow: var(--frost-edge);
   border-radius: 0 0 var(--radius-24) var(--radius-24);
   transform: translateY(-100%);
   transition: transform var(--duration-slow) var(--ease-emphasized);
@@ -129,11 +130,13 @@ a.lang-mark.locale.locale-lang { gap: var(--space-4); padding: 0 var(--space-8) 
 .regions-x:hover { background: var(--tile-hover); }
 .regions-list { display: flex; flex-direction: column; gap: var(--space-8);
   max-width: var(--bar-w); margin: 0 auto; }
-.region { display: flex; align-items: center; gap: var(--space-16);
+/* ── ROWS (reworked 2026-10-21) ── no plate at rest; the cursor brings the frost's white,
+   and the chosen row keeps it, a step lighter — light and colourless, not the accent. */
+.region { position: relative; display: flex; align-items: center; gap: var(--space-16);
   min-height: var(--number-72); padding: 0 var(--space-16);
-  border-radius: var(--radius-16); background: var(--tile);
+  border-radius: var(--radius-16); background: transparent;
   color: var(--ink); text-decoration: none; transition: background var(--duration-fast); }
-.region:hover { background: var(--tile-hover); }
+.region:hover { background: var(--tile); }
 .region-ico { display: flex; flex: none; color: var(--ink); }
 .region-ico svg { width: calc(var(--number-16) + var(--space-4)); height: calc(var(--number-16) + var(--space-4)); display: block; }
 .region-txt { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
@@ -141,10 +144,33 @@ a.lang-mark.locale.locale-lang { gap: var(--space-4); padding: 0 var(--space-8) 
 .region-txt span { font-size: var(--text-14); color: var(--ink-muted); }
 .region-on { display: flex; flex: none; color: currentColor; }
 .region:not([aria-current="true"]) .region-on { visibility: hidden; }
-/* The chosen row, in the accent — the same blue and the same ink as the page's button,
-   so "this is the one" reads the way "press this" already does. */
-.region[aria-current="true"] { background: var(--btn); color: var(--btn-ink); }
-.region[aria-current="true"]:hover { background: var(--btn-hover); }
-.region[aria-current="true"] .region-ico { color: currentColor; }
-.region[aria-current="true"] .region-txt span { color: currentColor; opacity: .72; }
+.region[aria-current="true"], .region[aria-current="true"]:hover { background: var(--tile-hover); }
+
+/* ── A REGION AND ITS LANGUAGES (2026-10-21) ──
+   A row may offer more than one language — Germany: Deutsch and English, its own first. Then the row is a
+   `div.region`: the region's own page is `.region-main`, a link laid over the whole row,
+   and the languages are `.region-lang` pills on the right, above it. The pill of the page
+   being read is the solid one (the white primary button's colours); a region with one
+   language shows that one pill, so every row says what it opens in.
+     <div class="region" data-region="de">
+       <a class="region-main" href="de.html" aria-label="Germany — Deutsch"></a>
+       <span class="region-ico">…</span><span class="region-txt"><b>Germany</b></span>
+       <span class="region-langs"><a class="region-lang" href="index.html" lang="en">English</a>
+         <a class="region-lang" href="de.html" lang="de" aria-current="true">Deutsch</a></span>
+     </div> */
+.region-main { position: absolute; inset: 0; border-radius: inherit; }
+.region-main:focus-visible { outline: none; box-shadow: var(--focus-halo); }
+.region-ico, .region-txt { pointer-events: none; }
+.region-langs { position: relative; z-index: 1; display: flex; flex: none; gap: var(--space-4); }
+.region-lang {
+  display: flex; align-items: center; height: var(--number-32); padding: 0 var(--space-12);
+  border-radius: var(--radius-pill); color: var(--ink-muted); text-decoration: none;
+  font-size: var(--text-14); font-weight: var(--weight-medium); white-space: nowrap;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+/* A choice at rest is an outline, so the row reads as offering it; the chosen one is solid. */
+.region-lang { box-shadow: inset 0 0 0 1px var(--tile-hover); }
+.region-lang:hover { color: var(--ink); background: var(--tile); }
+.region-lang[aria-current="true"], .region-lang[aria-current="true"]:hover { background: #FCFFFE; color: #111211; box-shadow: none; }
+.region-lang:focus-visible { outline: none; box-shadow: var(--focus-halo); }
 html.regions-lock { overflow: hidden; }

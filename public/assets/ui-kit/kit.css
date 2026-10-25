@@ -24,17 +24,6 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── THE SHELL'S BUTTON ──
-   `tokens.css` maps `--btn` to the accent, because on a page the button IS the action.
-   An instrument is the other way round: a rail full of buttons where the accent is a state
-   — `.btn.is-on`, the toggle, the slider thumb — and the resting button is neutral. Every
-   page that links this file is an instrument, so the shell re-points the role once. */
-:root {
-  --btn       : var(--white-10);   /* the library's white alpha button (button.css) */
-  --btn-hover : var(--white-20);
-  --btn-ink   : var(--ink);
-}
-
 html, body { height: 100%; height: 100dvh; overflow: hidden; }
 
 body {
@@ -130,7 +119,7 @@ a { color: inherit; }
 /* A button takes the frost through its role, not through `background-color`: a direct
    property here would outrank `.btn:hover` and `.btn.is-on` now that those live in a file
    loaded before this one. The accent and the white button keep their own fill. */
-.is-frosted .btn:not(.is-on, .btn-accent, .btn-white, .btn-primary, .btn-secondary) { --btn: var(--frost-700); }
+.is-frosted .btn:not(.is-on, .btn-primary, .btn-secondary, .btn-warning, .btn-danger, .btn-ghost) { --btn: var(--frost-700); }
 .is-frosted .sidebar-divider { background: var(--white-09); }
 /* Anything floating directly over the scene rather than inside a plate needs its own
    blur — there is no frosted surface beneath it to do the job. */
@@ -186,6 +175,7 @@ a { color: inherit; }
    this is the identity of the row, not a caption on one. */
 .dd-word { font-size: 15px; font-weight: var(--weight-medium); letter-spacing: var(--tracking-normal); color: var(--white); }
 .dd-mark.is-word { font-size: 15px; font-weight: var(--weight-medium); color: var(--white); }
+.dd-mark.is-placeholder { color: var(--ink-muted); font-weight: var(--weight-regular, 400); }
 /* ── The generation, in grey, beside the mark ──
    A tag and not a second mark: `A1` and `A1G2` are the same drawing, and the matrix is explicit
    that the generation is words on the carton and a code everywhere else. Grey because it is a
@@ -257,8 +247,8 @@ a { color: inherit; }
    that the list is a grid somebody could sort.
 
    Built from the kit's own materials: `--black-800` a step off the plate it sits on,
-   `--radius-8` for a row inside a `--radius-16` plate, and the fields at 40 rather than
-   48 because a control inside a card is one level down from a control on a panel. */
+   `--radius-8` for a row inside a `--radius-16` plate. The fields are the kit's 48 — they were 40,
+   «one level down», and next to a 48 field on the same panel that read as a mistake (2026-10-25). */
 .spec-list { display: flex; flex-direction: column; gap: var(--space-8); }
 .spec-row {
   position: relative;
@@ -266,7 +256,6 @@ a { color: inherit; }
   padding: var(--space-12);
   display: flex; flex-direction: column; gap: var(--space-8);
 }
-.spec-row .dark-input { height: var(--number-40); }
 .spec-row-head { display: flex; align-items: center; gap: var(--space-8); }
 /* The name reads as the row's title rather than as another value: a step quieter than
    the field under it, which carries the ink. */
@@ -359,6 +348,10 @@ a { color: inherit; }
    It never showed in the Box Maker because that tool's logo tile has no divider in it,
    so the omission sat here unnoticed until a rail with one collapsed. */
 .app.is-collapsed #logoTile > .sidebar-panel > .sidebar-divider { display: none; }
+/* …and so does anything else the logo tile holds (2026-10-25): collapsed, the rail is the mark
+   and nothing more. A toggle row (the preview's light-theme switch) stayed behind and wrapped
+   into the 48-wide strip. Everything but the header goes. */
+.app.is-collapsed #logoTile > .sidebar-panel > :not(.sidebar-header) { display: none; }
 
 /* ── AND THE TOOL'S NAME GOES WITH THEM ──
    ⚠ 2026-09-11. Collapsed, the rail is 120 wide and the head holds a 24 mark, an 8 gap and
@@ -627,20 +620,23 @@ a { color: inherit; }
    dashed to keep it apart from the solid hover edge; now that hover has no edge at all
    the distinction is free, and dashed is still the better drawing for "let go here". */
 .file-in {
-  display: flex; align-items: center; justify-content: center; gap: var(--space-8);
+  display: flex; align-items: center; justify-content: center; gap: calc(var(--space-8) + var(--space-2));
   width: 100%; height: var(--control-h); padding: 0 var(--space-24);
-  background: var(--white-10); border: 1px solid transparent; border-radius: var(--radius-xl);
-  color: var(--ink); font-size: var(--control-text); font-weight: var(--weight-medium); cursor: pointer;
+  /* The tertiary button's tokens (2026-10-25): it sits beside `.btn`s and is one of them — the
+     same plate, hover, label and icon, in both themes. It had its own 10 / 20 % and a muted icon,
+     so on paper it was a step darker than the button next to it. */
+  background: var(--btn-tertiary); box-shadow: var(--btn-tertiary-edge);
+  border: 1px solid transparent; border-radius: var(--radius-xl);
+  color: var(--btn-tertiary-ink); font-family: var(--font-primary); font-size: var(--control-text); font-weight: var(--weight-medium);
+  line-height: var(--leading-normal); cursor: pointer;
   transition: border-color var(--duration-fast), background-color var(--duration-fast), color var(--duration-fast);
 }
-.file-in:hover { background-color: var(--white-20); }
+.file-in:hover { background-color: var(--btn-tertiary-hover); }
 .file-in input { display: none; }
-.file-in svg { flex-shrink: 0; color: var(--black-250); transition: color var(--duration-fast); }
-.file-in:hover svg { color: var(--white); }
+.file-in svg { flex-shrink: 0; width: 20px; height: 20px; color: currentColor; transition: color var(--duration-fast); }
 .file-in.is-dropping {
   border: 1px dashed var(--accent);
-  background-color: var(--black-600);
-  color: var(--white);
+  background-color: var(--btn-tertiary-hover);
 }
 .file-in.is-dropping svg { color: var(--accent); }
 
@@ -750,7 +746,7 @@ a { color: inherit; }
 .range.is-disabled { opacity: .4; pointer-events: none; }
 
 /* ══════════════ BUTTONS ══════════════
-   `.btn`, `.btn-ghost`, `.btn-danger` (and `.btn-white`, `.btn-accent`, `.btn-neutral`) live
+   `.btn` and its levels (`.btn-primary`, `.btn-secondary`, `.btn-tertiary`, `.btn-ghost`, `.btn-danger`) live
    in `button.css` since 2026-10-10 — one button for the tools and the pages. What stays here
    is the shell's opinion of it: see `--btn` at the top of this file. */
 
@@ -784,9 +780,12 @@ a { color: inherit; }
    The two numbers are the component's, not the page's — no modifier class, because a
    caller choosing between them is a caller who will pick wrong on one of the two screens.
 
-   ── THE HOVER IS THE ACCENT ──
-   Same bargain `.print-btn` makes: neutral at rest, the accent kept for the moment
-   somebody reaches for it. Blue is the UI accent here and not a brand color.
+   ── THE LEVELS ARE THE BUTTON'S (2026-10-25) ──
+   It paints from the `--btn` role and has two levels (button.css): `.btn-primary` — the solid
+   ink, white on the dark ground and black on paper, never the cyan — and the tertiary, white at
+   10 % / white with an edge, which it is without a class, as a bare `.btn` is. Under the cursor
+   both are simply the solid ink.
+   Until today it was its own grey with a cyan hover — a third rule for one gesture.
 
    Transitions are `.btn`'s, to the millisecond, because they are the same gesture. */
 .round-btn {
@@ -795,15 +794,17 @@ a { color: inherit; }
   display: inline-flex; align-items: center; justify-content: center;
   width: var(--round-size); height: var(--round-size); padding: 0;
   border: none; border-radius: var(--radius-pill);
-  background: var(--black-700); color: var(--white);
+  background: var(--btn); color: var(--btn-ink); box-shadow: var(--btn-edge, none);
   cursor: pointer;
   transition: background var(--duration-fast), color var(--duration-fast), transform var(--duration-instant);
 }
+/* Its tertiary is the outline: white with the control edge on paper (2026-10-25). */
+.round-btn:not(.btn-primary, .btn-secondary) { --btn: var(--btn-outline); --btn-hover: var(--btn-outline-hover); --btn-ink: var(--btn-outline-ink); --btn-edge: var(--btn-outline-edge); }
 .round-btn[hidden] { display: none; }
 .round-btn svg { display: block; }
-/* On the cyan the glyph is white, in both themes (2026-10-21) — #FFFFFF, not --white, which turns
-   to ink on paper. */
-.round-btn:hover:not(:disabled) { background: var(--accent); color: #FFFFFF; }
+/* Under the cursor it is simply the solid ink (2026-10-25) — black on paper, white on the dark
+   ground — whatever its level at rest: no lighter step, no grey. */
+.round-btn:hover:not(:disabled) { background: var(--btn-solid); color: var(--btn-solid-ink); box-shadow: none; }
 .round-btn:active:not(:disabled) { transform: scale(.98); }
 .round-btn:focus-visible { outline: none; box-shadow: var(--focus-halo); }
 /* Dimmed rather than removed, the same as every other switched-off control in the kit: a
@@ -816,22 +817,10 @@ a { color: inherit; }
   .round-btn svg { transform: scale(.667); }
 }
 
-/* The one filled call to action per tool. White at rest so it is the brightest object
-   on screen; the accent is reserved for its hover and active states (UI accent, not a
-   brand color — same rule as the donor's Print button). */
-.print-btn {
-  position: relative;
-  display: flex; align-items: center; justify-content: center;
-  width: 100%; height: var(--control-h); padding: 0 var(--space-24); border-radius: var(--radius-xl); border: none;
-  background: var(--white); color: var(--black-1000);
-  font-size: var(--control-text); font-weight: var(--weight-medium); font-family: var(--font-primary);
-  cursor: pointer; transition: background var(--duration-fast), transform var(--duration-instant);
-}
-/* Icon is pulled out of the flow and pinned left, so the label stays optically centred
-   whether or not an icon is present. */
-.print-btn > svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); }
-.print-btn:hover { background: var(--accent-deep); }
-.print-btn:active { background: var(--accent-deep); transform: scale(.98); }
+/* The tool's one call to action is `.btn.btn-secondary` (button.css; `.btn-primary.btn-white` before
+   2026-10-25) — white on the dark ground, the cyan on paper, one step lighter under the cursor. Until 2026-10-25 it was its own
+   `.print-btn` with a cyan hover and an icon pinned to the left edge: a second primary with a
+   second hover. */
 .print-note { font-size: var(--text-10); color: var(--ink-faint); line-height: var(--leading-relaxed); }
 
 /* ── FOOTER ──
@@ -992,17 +981,20 @@ a { color: inherit; }
 .is-frosted .field-value-input { background-color: var(--frost-700); }
 
 /* ══════════════ POPUP ══════════════
-   A panel that happens to float. Same plate as every other surface in the kit, so it
-   inherits the language rather than inventing a modal one: --black-900 ground, 24px
-   inset, 16px between blocks. The confirming action sits rightmost, closest to the
-   corner the cursor leaves from. */
+   A panel that happens to float: 24px inset, 16px between blocks, the confirming action
+   rightmost, closest to the corner the cursor leaves from.
+
+   ── FROST, ALWAYS (2026-10-21) ── every popup is the frost the location sheet and the bar
+   wear: --frost-900 with the blur, the frost's 1px edge, no drop shadow. It was a solid
+   --black-900 plate, frosted only inside an `.is-frosted` surface; one surface for every
+   floating thing now. Inside it the tiles follow the frost rule — white at low alpha, not
+   a grey step — so a row or a field on a popup takes whatever shows through. */
 .popup {
   position: relative; width: 468px; max-width: 100%;
   display: flex; flex-direction: column; gap: var(--space-16);
   padding: var(--space-24);
-  background: var(--black-900); border-radius: var(--radius-16);
-}
-.is-frosted .popup {
+  border-radius: var(--radius-16);
+  --tile: var(--on-frost); --tile-hover: var(--on-frost-hover);
   background: var(--frost-900);
   backdrop-filter: var(--frost-blur); -webkit-backdrop-filter: var(--frost-blur);
   box-shadow: var(--frost-edge);
@@ -1033,8 +1025,15 @@ a { color: inherit; }
 .popup-title { font-size: var(--text-24); font-weight: var(--weight-semibold); line-height: var(--leading-snug); color: var(--white); }
 .popup-text { font-size: var(--text-14); font-weight: var(--weight-regular); line-height: var(--leading-relaxed); color: var(--black-200); }
 .popup-actions { display: flex; gap: var(--space-8); justify-content: flex-end; }
-.popup-actions .btn,
-.popup-actions .print-btn { width: 124px; }
+.popup-actions .btn { width: 124px; }
+/* ── ALIGNMENT (2026-10-25) ── three, by a class on `.popup`:
+     (none)       the text on the left, the actions on the right — a question with an answer
+     .is-start    everything on the left edge — the actions under the line that asks for them
+     .is-center   everything on the axis — a short notice, a confirmation with one or two words
+   Centered, the header keeps 40 clear on both sides, so the title never runs under the ✕. */
+.popup.is-start  .popup-actions { justify-content: flex-start; }
+.popup.is-center .popup-header  { text-align: center; align-items: center; padding-inline: var(--space-40); }
+.popup.is-center .popup-actions { justify-content: center; }
 
 /* ══════════════ STATIC STATES ══════════════
    `data-state` paints a control in a state it is not actually in. This exists for the
@@ -1057,21 +1056,16 @@ a { color: inherit; }
 [data-state="focus"].ui-checkbox,
 [data-state="focus"].ui-radio { border-color: var(--white); }
 [data-state="hover"].btn { background: var(--btn-hover); }
-[data-state="hover"].btn-danger {
-  background: var(--red-600); box-shadow: inset 0 0 0 1px var(--red-600); color: #FFFFFF;
-}
 [data-state="hover"].icon-btn.icon-btn-danger { background: var(--danger-surface); color: var(--danger); }
 [data-state="active"].btn { transform: scale(.98); }
-[data-state="hover"].print-btn,
-[data-state="active"].print-btn { background: var(--accent-deep); }
-[data-state="active"].print-btn { transform: scale(.98); }
 [data-state="hover"].icon-btn { background: var(--white-08); }
 [data-state="active"].icon-btn { background: var(--white-14); }
 [data-state="hover"].round-btn,
-[data-state="active"].round-btn { background: var(--accent); color: #FFFFFF; }
+[data-state="active"].round-btn { background: var(--btn-solid); color: var(--btn-solid-ink); box-shadow: none; }
 [data-state="active"].round-btn { transform: scale(.98); }
+[data-state="hover"].hotspot { background: var(--btn-solid); color: var(--btn-solid-ink); box-shadow: none; }
 [data-state="hover"].swatch-btn { opacity: .78; }
-[data-state="hover"].file-in { background-color: var(--black-600); }
+[data-state="hover"].file-in { background-color: var(--btn-tertiary-hover); }
 [data-state="hover"].stepper-btn { background: var(--black-600); color: var(--white); }
 [data-state="checked-hover"].ui-checkbox,
 [data-state="checked-hover"].ui-radio { background-color: var(--black-100); }
@@ -1381,16 +1375,16 @@ a { color: inherit; }
 [data-theme="light"] .range-input::-webkit-slider-thumb { background: #FFFFFF; box-shadow: var(--shadow-sm), inset 0 0 0 var(--hairline) var(--white-14); }
 [data-theme="light"] .range-input::-moz-range-thumb { background: #FFFFFF; box-shadow: var(--shadow-sm), inset 0 0 0 var(--hairline) var(--white-14); }
 
-/* The tool's one call to action is the accent on paper, as `.btn` is. A toast stays dark:
-   a dark note over a light page is the convention, not an invert. */
-[data-theme="light"] .print-btn { background: var(--accent); color: var(--accent-ink); }
+/* A toast stays dark on paper: a dark note over a light page is the convention, not an invert. */
 
 /* Unchosen on paper: a white box with a visible edge. The dark theme's --black-700 fill is a
    near-white smudge on the grey page. */
 [data-theme="light"] :is(.ui-checkbox, .ui-radio):not(:checked):not(:indeterminate) {
-  background-color: var(--page); border-color: var(--black-350); }
-[data-theme="light"] :is(.ui-checkbox, .ui-radio):not(:checked):not(:indeterminate):hover { border-color: var(--black-250); }
+  background-color: var(--page); border-color: var(--control-edge); }
+[data-theme="light"] :is(.ui-checkbox, .ui-radio):not(:checked):not(:indeterminate):hover { border-color: var(--control-edge-hover); }
 
 /* The icon toggle: as the segmented tabs, the chosen panel is a paper plate on a 6 % ink track. */
-[data-theme="light"] .iconseg { --seg-track: var(--white-06); --seg-thumb: var(--page); }
+[data-theme="light"] .iconseg { --seg-track: var(--tile); --seg-thumb: var(--page); }
+/* A spec row on paper is the one surface grey (2026-10-25), not a step darker than the plate. */
+[data-theme="light"] .spec-row { background: var(--tile); }
 [data-theme="light"] .iconseg-thumb { box-shadow: var(--shadow-sm); }

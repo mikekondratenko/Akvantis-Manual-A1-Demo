@@ -217,6 +217,8 @@
          items      : [{ id, group, svg, h, core, word, gen }],
          value      : id of the current item,
          labelledBy : id of the field label, for the button's accessible name,
+         placeholder: words for the button while nothing is chosen (2026-10-22) — without
+                      it the first item is chosen for you, as before,
          onChange   : function (id) {}
        })
 
@@ -246,7 +248,7 @@
   Kit.markPicker = function (host, opts) {
     opts = opts || {};
     var items = opts.items || [];
-    var value = opts.value || (items[0] && items[0].id);
+    var value = opts.value || (opts.placeholder ? '' : (items[0] && items[0].id));
     var uid = 'dd' + (++Kit._n);
 
     var groups = [];
@@ -292,12 +294,19 @@
     var cursor  = 0;
 
     function itemOf(id) {
-      return items.filter(function (d) { return d.id === id; })[0] || items[0];
+      return items.filter(function (d) { return d.id === id; })[0] || (opts.placeholder ? null : items[0]);
     }
 
     function paint() {
       var d = itemOf(value);
+      if (!d && opts.placeholder) {
+        current.textContent = opts.placeholder; current.style.height = '';
+        current.classList.add('is-word', 'is-placeholder'); genTag.hidden = true;
+        options.forEach(function (o) { o.setAttribute('aria-selected', 'false'); });
+        return;
+      }
       if (!d) return;
+      current.classList.remove('is-placeholder');
       current.innerHTML = d.word ? esc(d.word) : (d.svg || '');
       current.style.height = d.word ? '' : markHeight(d) + 'px';
       current.classList.toggle('is-word', !!d.word);

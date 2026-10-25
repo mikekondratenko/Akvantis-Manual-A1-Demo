@@ -229,7 +229,7 @@
               '<span class="m-buy-art">' + (pr.photo ? '<img src="' + esc(ctx.resolve(pr.photo)) + '" alt="" loading="lazy" decoding="async">' : '') + '</span>' +
               '<span class="m-buy-text"><strong class="m-buy-name">' + esc(pr.name || '') + '</strong>' +
               (pr.kind ? '<span class="m-buy-kind">' + esc(pr.kind) + '</span>' : '') + '</span>' +
-              '<a class="btn m-buy-btn" href="' + esc(pr.url) + '" target="_blank" rel="noopener">' + esc(pr.button || 'Buy') + '</a></div>';
+              '<a class="btn btn-primary m-buy-btn" href="' + esc(pr.url) + '" target="_blank" rel="noopener">' + esc(pr.button || 'Buy') + '</a></div>';
       }
       return h('div', { 'class':'m-page', 'data-block':b.id, 'data-page':b.page || null,
                         style:'--pw:' + (+b.w || 736) + ';--ph:' + (+b.h || 1026) }, cards) + buy;
@@ -263,7 +263,7 @@
                (c.sub ? '<span class="m-cart-sub">' + esc(c.sub) + '</span>' : '') + '</figcaption></figure>';
       }).join('');
       var o = b.order || {};
-      var order = o.url ? '<a class="btn m-filters-order" href="' + esc(o.url) + '" target="_blank" rel="noopener">' + esc(o.label || 'Order filters') + '</a>' : '';
+      var order = o.url ? '<a class="btn btn-primary m-filters-order" href="' + esc(o.url) + '" target="_blank" rel="noopener">' + esc(o.label || 'Order filters') + '</a>' : '';
       var specs = (b.specs || []).map(function(i){
         return '<div class="m-fspec"><span class="m-fspec-icon">' + img(i.icon, ctx.resolve) + '</span>' +
                '<span class="m-fspec-value">' + esc(i.value || '') + '</span><span class="m-fspec-what">' + esc(i.what || '') + '</span></div>';

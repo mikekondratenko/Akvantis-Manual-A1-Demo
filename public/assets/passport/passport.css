@@ -496,7 +496,15 @@ body.is-frosted .plate .card {
   padding: calc(var(--bar-max) + var(--bar-top) + var(--space-24) + env(safe-area-inset-top))
            var(--space-16)
            calc(var(--space-24) + env(safe-area-inset-bottom));
+  /* ── THE FOOT SITS ON THE FLOOR (2026-10-22) ──
+     A short page — an empty draft, a model with two blocks — ended with the foot halfway
+     up the screen and black under it. The column is at least a screen tall, and the foot
+     takes whatever is left above it. */
+  min-height: 100svh;
+  display: flex; flex-direction: column;
 }
+.wrap > .foot { margin-top: auto; padding-top: calc(var(--space-32) + var(--space-16)); }
+
 
 /* ══════════════ HEAD ══════════════
    The kit's `.header`, from `header.css` — not a pill drawn here that resembles it.
@@ -1211,7 +1219,7 @@ div.card { cursor: default; }
 .ph .btn { margin-top: var(--space-4); }
 
 /* ── THE BUTTONS ──
-   `.btn` and `.btn-white` live in `ui-kit/kit/button.css` (2026-10-10). This file used to
+   `.btn` and its levels (primary, secondary, tertiary) live in `ui-kit/kit/button.css` (2026-10-10; levels 2026-10-25). This file used to
    carry a second `.btn` that was the kit's with different values — same class, accent here
    and grey in the tools — and was marked "the second place to edit". There is one place now;
    link `button.css` after `tokens.css`. The accent on this page comes from the `--btn` role. */
@@ -1227,27 +1235,49 @@ div.card { cursor: default; }
    id.akvantis.com sends a reader in Germany to `de`, in Ukraine to `ua` (the site's worker,
    by the country Cloudflare reports), and the page says so once: a compact note at the top
    in the page's own language, with Change (opens the location sheet) and a close. The kit's
-   `.alert` (status.css) in the neutral tone, on an opaque plate of its own — the alert's 10 %
-   surface is meant to sit on a page, and this one floats over it. Under the location sheet
+   `.alert` (status.css) in the neutral tone, without its dot, on the frost every popup wears. Under the location sheet
    (40), over the bar (20). Shown by the page's script when the address carries `?geo=`;
    without script it stays hidden. */
 .geo-note {
   position: fixed; z-index: 30; left: var(--space-12); right: var(--space-12); margin: 0 auto;
-  top: max(var(--space-12), env(safe-area-inset-top));
+  /* Under the bar, not over it (2026-10-21): over it, the note covered the globe — the one
+     control it points to — and a tap meant for the language menu landed on the note. */
+  top: calc(var(--bar-top, var(--space-12)) + var(--bar-h, 56px) + var(--space-8) + env(safe-area-inset-top));
   max-width: calc(var(--number-288) * 2 - var(--space-32));
-  border-radius: var(--radius-pill); background: var(--black-800); box-shadow: var(--shadow-md);
+  border-radius: var(--radius-pill);
+  /* Frost, like every popup (2026-10-21): the page shows through, blurred. */
+  background: var(--frost-900);
+  backdrop-filter: var(--frost-blur); -webkit-backdrop-filter: var(--frost-blur);
+  box-shadow: var(--frost-edge);
   transition: opacity var(--duration-base) var(--ease-standard), translate var(--duration-base) var(--ease-standard);
 }
 .geo-note[hidden] { display: none; }
+/* Not part of the entrance: it is news about the page, not the page arriving. */
+html.anim .wrap > .geo-note { opacity: 1; transform: none; transition-delay: 0s; }
 .geo-note.is-away { opacity: 0; translate: 0 calc(var(--space-8) * -1); pointer-events: none; }
 .geo-note .alert { width: 100%; flex-wrap: nowrap; }
+/* No dot: a note about the page, not a state of a machine. */
+.geo-note .alert::before { display: none; }
+.geo-note .alert { padding-left: var(--space-24); gap: var(--space-8); }
+/* Two lines at most on a phone: the action as narrow as its word. */
+.geo-note .alert-action.btn { padding: 0 var(--space-16); }
 .geo-note .alert-msg { flex: 1 1 auto; white-space: normal; font-size: var(--text-14); }
+/* Change is the one thing to do here: the primary button, not the alert's tinted action. */
+.geo-note .alert-action.btn.btn-primary { --btn: var(--btn-primary); --btn-hover: var(--btn-primary-hover); --btn-ink: var(--btn-primary-ink); --btn-edge: none; }
 .geo-x {
   flex: none; display: flex; align-items: center; justify-content: center;
   width: calc(var(--number-32) + var(--space-4)); height: calc(var(--number-32) + var(--space-4)); border-radius: 50%;
   color: var(--ink-muted); transition: color var(--duration-fast), background-color var(--duration-fast);
 }
 .geo-x:hover { color: var(--ink); background: var(--white-10); }
+/* From 1024 the bar has room in its middle — the mark on the left, the language on the
+   right — so the note sits there, on the bar's centre line, instead of under it. */
+@media (min-width: 1024px) {
+  .geo-note { top: calc(var(--bar-top, var(--space-16)) + var(--bar-h, 72px) / 2); translate: 0 -50%;
+    max-width: calc(var(--number-240) * 2); }
+  .geo-note.is-away { translate: 0 calc(-50% - var(--space-8)); }
+  .geo-note .alert { min-height: 0; padding-top: var(--space-2); padding-bottom: var(--space-2); }
+}
 @media (max-width: 520px) {
   .geo-note { border-radius: var(--radius-24); }
   .geo-note .alert { flex-wrap: nowrap; border-radius: var(--radius-24); }

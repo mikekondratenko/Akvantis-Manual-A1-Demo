@@ -188,8 +188,7 @@
      the tokens; the components that read it can then live in files of their own.
 
      Values are the passport's, unchanged. A shell may re-point a role for everything
-     inside it — `kit.css` does that for `--btn*`, because in an instrument the resting
-     button is neutral and the accent is a state (`.btn.is-on`). */
+     inside it (frost does, for `--btn`). */
   --page        : var(--black);
   --ink         : var(--white);
   --ink-muted   : var(--black-250);
@@ -204,10 +203,40 @@
   /* A plate is `.sidebar-tile`: `--black-900`, no rim. Frost only on a moving ground. */
   --tile        : var(--black-900);
   --tile-hover  : var(--black-700);
-  /* The one filled control. On a reading page the accent carries the action. */
-  --btn         : var(--cyan-a20);       /* alpha buttons — see button.css */
-  --btn-hover   : var(--cyan-a40);
-  --btn-ink     : var(--btn-cyan-ink);
+  /* ── BUTTON LEVELS (2026-10-25) — see button.css ──
+     primary   cyan          (paper: black)
+     secondary white, filled (paper: cyan)
+     tertiary  white at 10 % (paper: white with an edge, grey under the cursor)
+     Each level is four values; `.btn-primary` / `.btn-secondary` / `.btn-tertiary` copy them into
+     the `--btn*` role, which `.btn`, `.round-btn` and `.hotspot` paint from. */
+  --btn-primary             : var(--cyan-500);
+  --btn-primary-hover       : var(--cyan-400);
+  --btn-primary-ink         : #111211;
+  --btn-primary-edge        : none;
+  --btn-secondary           : #FCFFFE;
+  --btn-secondary-hover     : #EAEBEC;
+  --btn-secondary-ink       : #111211;
+  --btn-secondary-edge      : none;
+  --btn-tertiary            : var(--white-10);
+  --btn-tertiary-hover      : var(--white-20);
+  --btn-tertiary-ink        : var(--ink);
+  --btn-tertiary-edge       : none;
+  /* Solid — the primary of a button with no words (`.round-btn`, `.hotspot`; 2026-10-25): the
+     page's ink, never the cyan — white on the dark ground, black on paper. */
+  --btn-solid               : #FCFFFE;
+  --btn-solid-hover         : #EAEBEC;
+  --btn-solid-ink           : #111211;
+  /* Outline — the tertiary of a button with no words (`.round-btn`, `.hotspot`): the tertiary on
+     the dark ground, white with an edge on paper. */
+  --btn-outline             : var(--btn-tertiary);
+  --btn-outline-hover       : var(--btn-tertiary-hover);
+  --btn-outline-ink         : var(--btn-tertiary-ink);
+  --btn-outline-edge        : var(--btn-tertiary-edge);
+  /* The resting button is the tertiary. */
+  --btn         : var(--btn-tertiary);
+  --btn-hover   : var(--btn-tertiary-hover);
+  --btn-ink     : var(--btn-tertiary-ink);
+  --btn-edge    : var(--btn-tertiary-edge);
 
   /* ── RED — danger only (Figma: red) ── */
   --red-50  : #FEF2F2;
@@ -586,22 +615,22 @@
    hole), the accent's ink (white on the deep cyan), the status inks (one step darker
    each: on white the dark theme's -400s are 1.7–2.8:1). */
 [data-theme="light"] {
-  /* ── ONE STEP DARKER ON PAPER (2026-10-21) ──
-     The surfaces — a tile, the rail, a track, a hover — were too close to white to read as
-     surfaces: the sidebar plate all but vanished on the page. The grey steps 900 … 400 each take
-     the next one's value (--tile is now #EDEEEF, 400 a new #B0B2B2), and the ink-alpha surfaces
-     03 … 10 gain 2 %. The text greys (350 and darker), the edges (12 % and up) and the field
+  /* ── THE SURFACES ON PAPER (2026-10-21, one step lighter again 2026-10-25) ──
+     2026-10-21 moved the surface greys one step darker so a plate read on the page; 2026-10-25
+     moves them one step back up (--tile #F3F4F4) and puts every surface that holds controls on
+     the one --tile — the tab track, a spec row, an accordion, the rail's plate — instead of three
+     greys a step apart. The text greys (350 and darker), the edges (12 % and up) and the field
      edges are untouched, so nothing that is read or outlined loses contrast. */
   --white      : #111211;
   --black      : #FFFFFF;
   --black-1000 : #FFFFFF;
-  --black-900  : #EDEEEF;
-  --black-800  : #E8E9EA;
-  --black-700  : #DEE0E1;
-  --black-600  : #D6D8D8;
-  --black-500  : #CBCDCD;
-  --black-450  : #BDBFBF;
-  --black-400  : #B0B2B2;
+  --black-900  : #F3F4F4;
+  --black-800  : #EDEEEF;
+  --black-700  : #E8E9EA;
+  --black-600  : #DEE0E1;
+  --black-500  : #D6D8D8;
+  --black-450  : #CBCDCD;
+  --black-400  : #BDBFBF;
   --black-350  : #989B9A;
   --black-300  : #6A6D6C;
   --black-250  : #656867;
@@ -609,13 +638,13 @@
   --black-150  : #3C3E3E;
   --black-100  : #282A2A;
   --black-50   : #1E2020;
-  --white-03   : rgba(17, 18, 17, .05);
-  --white-04   : rgba(17, 18, 17, .06);
-  --white-06   : rgba(17, 18, 17, .08);
-  --white-07   : rgba(17, 18, 17, .09);
-  --white-08   : rgba(17, 18, 17, .10);
-  --white-09   : rgba(17, 18, 17, .11);
-  --white-10   : rgba(17, 18, 17, .12);
+  --white-03   : rgba(17, 18, 17, .03);
+  --white-04   : rgba(17, 18, 17, .04);
+  --white-06   : rgba(17, 18, 17, .06);
+  --white-07   : rgba(17, 18, 17, .07);
+  --white-08   : rgba(17, 18, 17, .08);
+  --white-09   : rgba(17, 18, 17, .09);
+  --white-10   : rgba(17, 18, 17, .10);
   --white-12   : rgba(17, 18, 17, .12);
   --white-14   : rgba(17, 18, 17, .14);
   --white-18   : rgba(17, 18, 17, .18);
@@ -642,15 +671,43 @@
   --success     : var(--green-700);
   --warning     : var(--amber-700);
   --info        : var(--blue-600);
-  --btn         : var(--cyan-a20);       /* alpha buttons — see button.css */
-  --btn-hover   : var(--cyan-a40);
-  --btn-ink     : var(--btn-cyan-ink);
+  /* Button levels on paper (2026-10-25): the primary is black, the secondary the cyan, the
+     tertiary a pale plate — the ink at 8 %, 14 % under the cursor, as the dark ground's white at
+     10 %. White with an edge is the ghost's (button.css) and the outline's (round, hotspot). */
+  --btn-primary             : #111211;
+  --btn-primary-hover       : #323434;
+  --btn-primary-ink         : #FFFFFF;
+  --btn-secondary           : var(--cyan-500);
+  --btn-secondary-hover     : var(--cyan-400);
+  --btn-secondary-ink       : #111211;
+  --btn-solid               : #111211;
+  --btn-solid-hover         : #323434;
+  --btn-solid-ink           : #FFFFFF;
+  --btn-tertiary            : var(--white-08);
+  --btn-tertiary-hover      : var(--white-14);
+  --btn-tertiary-ink        : var(--ink);
+  --btn-tertiary-edge       : none;
+  --btn-outline             : #FFFFFF;
+  --btn-outline-hover       : var(--black-700);
+  --btn-outline-ink         : var(--ink);
+  --btn-outline-edge        : inset 0 0 0 1px var(--control-edge);
+  --btn         : var(--btn-tertiary);
+  --btn-hover   : var(--btn-tertiary-hover);
+  --btn-ink     : var(--btn-tertiary-ink);
+  --btn-edge    : var(--btn-tertiary-edge);
   --tile-hover  : var(--black-800);
   --page-sunk   : var(--black-700);
-  /* Fields on paper: a white box with a pale edge at rest, a darker one under the cursor,
-     the accent with the caret in it — three steps you can tell apart, not three near-blacks. */
-  --field-edge       : var(--black-350);   /* 2.8:1 on white — the palest edge that still reads as a box */
-  --field-edge-hover : var(--black-250);
+  /* ONE EDGE ON PAPER (2026-10-25): every white control with an outline — a field, a select, a
+     stepper, a dropdown, an unchosen checkbox or radio, the tertiary button, round button and
+     hotspot — takes the same edge, one step lighter than the button's was; one step darker under
+     the cursor; the accent with the caret in it. (The edge was --black-350 on a field and the
+     ink at 20 % on a button: two greys for one idea.) #D6D8D8 is 1.4:1 on white — a box you see
+     by its edge, not an outline that passes WCAG's 3:1 for controls on its own; the label and
+     the placeholder carry it. */
+  --control-edge       : var(--black-500);
+  --control-edge-hover : var(--black-400);
+  --field-edge       : var(--control-edge);
+  --field-edge-hover : var(--control-edge-hover);
   --field-edge-focus : var(--cyan-600);
   --on-frost       : rgba(17, 18, 17, .05);
   --on-frost-hover : rgba(17, 18, 17, .09);

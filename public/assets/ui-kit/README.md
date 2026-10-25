@@ -125,18 +125,29 @@ out of `passport.css` with their values unchanged, plus `--radius-pill`.
 
 **`button.css` is the one button.** It replaced two `.btn`s that disagreed: grey in
 `kit.css`, accent in `passport.css`. The shape is written once and the color is the
-`--btn` role:
+`--btn` role (`--btn`, `--btn-hover`, `--btn-ink`, `--btn-edge`). Since 2026-10-25 there are three
+levels, each four tokens per theme (`--btn-primary*`, `--btn-secondary*`, `--btn-tertiary*`);
+a level class copies them into the role, so the same class works on `.btn`, `.round-btn` and
+`.hotspot`:
 
-| | `--btn` resolves to | why |
-|---|---|---|
-| a page (`tokens.css` default) | the accent | on a page the button *is* the action |
-| a tool (`kit.css` re-points `:root`) | `--black-700` | in an instrument the accent is a state |
+| | `.btn-primary` | `.btn-secondary` | `.btn-tertiary` = bare `.btn` |
+|---|---|---|---|
+| dark | cyan, one step lighter on hover | white, filled | white at 10 %, 20 % on hover |
+| light | black, `#323434` on hover | cyan | the ink at 8 %, 14 % on hover |
 
-Variants re-point the role on the element and never paint a background of their own:
-`.is-on`, `.btn-accent`, `.btn-neutral`, `.btn-white`, `.btn-ghost`, `.btn-danger`. That is
+`.btn-warning` and `.btn-danger` are tertiary in weight (20 % of their hue). `.btn-ghost` is the
+quietest: an outline and no fill (on paper the one control edge, grey under the cursor). There is no cyan
+secondary: the accent is the primary's. `.is-on` (a toggle that stays pressed) takes the
+primary's fill. `.round-btn` and `.hotspot` have two levels and no cyan: primary is the solid ink
+(`--btn-solid*`: white on the dark ground, black on paper) and tertiary, drawn as the outline
+(`--btn-outline*`: white with the control edge on paper); `.round-btn` is
+tertiary by default, `.hotspot` primary. The tool's call to
+action is `.btn-secondary` — `.print-btn` is gone. Old names still resolve, for published
+pages: `.btn-primary.btn-white` → secondary; `.btn-secondary.btn-white`, `.btn-white`,
+`.btn-neutral` → tertiary.
+Variants re-point the role on the element and never paint a background of their own. That is
 what lets `.is-frosted` swap a button's fill (`--btn: var(--frost-700)`) without outranking
-hover or `.is-on`. Verified 2026-10-10 against 18 pages, computed styles and hover: identical
-except the inset, 20 → 24 (`--space-24`; 20 is off the scale), invisible on full-width buttons.
+hover or `.is-on`.
 
 ## Heading levels
 
@@ -191,7 +202,7 @@ on cannot move anything by a pixel.
 **CSS-only** — `.sidebar-tile`, `.sidebar-panel`, `.panel-title`, `.group-label`,
 `.group-note`, `.sidebar-divider`, `.toggle-row` + `.toggle-switch`, `.dark-input`,
 `.select`, `.file-in`, `.swatch-input`, `.swatch-btn`, `.slider` + `.value-row` +
-`.ends`, `.print-btn`, `.toast`, `.stage`, `.stage-hint`,
+`.ends`, `.toast`, `.stage`, `.stage-hint`,
 `.view-tab`, `.camera-tab`, `.bottom-bar`, `.header` + `.header-mark` + `.header-nav` +
 `.header-ink` + `.header-aside`, `.preview-caption`, `.section-disabled`,
 `.popup` + `.popup-overlay`.
@@ -275,6 +286,10 @@ scrim that dims what is behind, centres the plate and swallows clicks aimed past
 `hidden` rather than a class, so the subtree leaves the accessibility tree instead of merely
 going invisible.
 
+Alignment (2026-10-25), a class on `.popup`: none — the text on the left, the actions on the
+right; `.is-start` — everything on the left edge; `.is-center` — everything centered (the header
+keeps 40 clear on both sides so the title never runs under the ✕).
+
 **Built by `kit.js`** — the segmented tabs, the icon toggle, the stepper and the color picker. The first
 two carry a sliding thumb whose geometry is derived from the option count, and a
 hand-written copy of that maths is a copy that will eventually disagree with the
@@ -346,7 +361,7 @@ Regions today: Global / English (`index.html`), Germany / Deutsch (`de.html`),
   (inline `background-image`), `.swatch-custom` (the color mesh + a native color input).
 - **Every control is 48 px** on a `--black-700` ground at `--radius-8`, except the
   icon toggle (64 px) and the switch.
-- **Buttons are fully rounded** — `.btn`, `.btn-ghost`, `.print-btn`, `.file-in` and the
+- **Buttons are fully rounded** — `.btn`, `.btn-ghost`, `.file-in` and the
   stepper ends are pills, not `--radius-8` plates. This is the one deliberate departure
   from the donor's geometry: in Akvantis the radius separates the things you *press*
   from the surfaces you put things *on*. Tabs (`.segmented`, `.iconseg`) are a track with a

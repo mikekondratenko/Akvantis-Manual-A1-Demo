@@ -61,10 +61,13 @@
    scrolls and is masked. kit.js sets .is-fade-start / .is-fade-end on the track from the
    rail's scroll position; each opens a 64px ramp at its end — long enough that the segment
    cut by the edge is seen fading out rather than missing, which is what says "there is more". */
-.segmented.is-scroll { overflow: hidden; }
+/* The 4 of inset lives on the rail, not on the track (2026-10-25): a scrolling box clips on both
+   axes, and with the thumb flush against the rail's edges its shadow (light theme) was cut along
+   the bottom and the sides. Inside the rail's padding it has room to fall. */
+.segmented.is-scroll { overflow: hidden; padding: 0; }
 .segmented-rail {
   --fade-start: 0px; --fade-end: 0px;
-  position: relative; display: flex; flex: 1; min-width: 0;
+  position: relative; display: flex; flex: 1; min-width: 0; padding: var(--space-4);
   overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain;
   -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,.08), #000 var(--fade-start), #000 calc(100% - var(--fade-end)), rgba(0,0,0,.08));
           mask-image: linear-gradient(to right, rgba(0,0,0,.08), #000 var(--fade-start), #000 calc(100% - var(--fade-end)), rgba(0,0,0,.08));
@@ -72,7 +75,7 @@
 .segmented-rail::-webkit-scrollbar { display: none; }
 .segmented.is-fade-start .segmented-rail { --fade-start: var(--number-64); }
 .segmented.is-fade-end   .segmented-rail { --fade-end: var(--number-64); }
-.segmented-rail .segmented-thumb { top: 0; bottom: 0; left: 0; }
+.segmented-rail .segmented-thumb { top: var(--space-4); bottom: var(--space-4); left: 0; }
 .segmented.is-scroll .segment-btn { flex: none; white-space: nowrap; }
 .segmented.is-scroll .segmented-thumb { transition: transform var(--duration-base) var(--ease-standard), width var(--duration-base) var(--ease-standard); }
 /* No hover state on an inactive segment, by design. The fill that used to appear under
@@ -86,12 +89,12 @@
 .segment-btn:disabled:hover { color: var(--ink-muted); }
 
 /* Light theme (2026-10-21, with the Figma sync): the same control turned over. The track is
-   the ink at 6 % on paper (the dark theme's 10 % of white reads twice as heavy in ink); the
+   --tile, the one surface grey on paper (2026-10-25; it was the ink at 6 %, a third grey); the
    choice is a paper plate lifted off it with a small shadow — on a light ground "a step of
    light" is a white plate, not a darker one — see tokens.css «NOT AN INVERT». Labels are
    already roles (--ink / --ink-muted) and turn over with the theme. */
 [data-theme="light"] .segmented {
-  --seg-track: var(--white-06);
+  --seg-track: var(--tile);
   --seg-thumb: var(--page);
 }
 [data-theme="light"] .segmented-thumb { box-shadow: var(--shadow-sm); }

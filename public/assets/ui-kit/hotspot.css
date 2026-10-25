@@ -14,27 +14,31 @@
    `--hot-size` (32 by default; 40 on a wide screen is the manual's choice).
    The plus is 3/8 of the disc across, its stroke 1/16.
 
-   ── BLACK ONLY, NOTHING AROUND IT ──
-   One look: black disc, white plus — the number's default. No rim and no
-   moving ring (both tried and taken off, 2026-10-07): it is a quiet mark.
-   Where it stands relative to the part is the page's choice (the manual
-   draws it 10 px to the right of the point it marks).
+   ── THE BUTTON'S LEVELS (2026-10-25) ──
+   It paints from the `--btn` role (button.css), so it is a button in the same three levels:
+     .hotspot                  primary — the solid ink: white on the dark ground, black on paper
+     .hotspot.btn-tertiary     white at 10 % / white with an edge
+   (no cyan and no secondary on a button with no words — 2026-10-25)
+   and simply the solid ink under the cursor, as `.round-btn`. No rim and no moving ring (both tried
+   and taken off, 2026-10-07): it is a quiet mark. Until 2026-10-25 it was always black, with
+   no hover — print colors that ignored the theme.
    Pressed: scale .94, as the kit's `.btn`.
-
-   Colors are the number's: override `--hot-ink` / `--hot-paper` on any ancestor.
    Placing it (position, left, top) is the page's job, not the kit's.
    ───────────────────────────────────────────────────────────────────────────── */
 .hotspot{
   --hot-size  : var(--number-32, 32px);
-  --hot-ink   : #010006;
-  --hot-paper : #FDFEFF;
-
   position:relative;display:inline-block;flex:none;box-sizing:border-box;
   width:var(--hot-size);height:var(--hot-size);padding:0;margin:0;
   border:0;border-radius:999px;
-  background:var(--hot-ink);color:var(--hot-paper);
+  background:var(--btn);color:var(--btn-ink);box-shadow:var(--btn-edge, none);
   cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:transform var(--duration-instant);
+  transition:background var(--duration-fast), transform var(--duration-instant);
+}
+/* Its tertiary is the outline: white with the control edge on paper (2026-10-25). */
+.hotspot.btn-tertiary{--btn:var(--btn-outline);--btn-hover:var(--btn-outline-hover);--btn-ink:var(--btn-outline-ink);--btn-edge:var(--btn-outline-edge)}
+/* The default level is the primary; a level class on the hotspot itself takes over. */
+.hotspot:not(.btn-tertiary){
+  --btn:var(--btn-solid);--btn-hover:var(--btn-solid-hover);--btn-ink:var(--btn-solid-ink);--btn-edge:none;
 }
 .hotspot::before,.hotspot::after{
   content:'';position:absolute;left:50%;top:50%;
@@ -43,5 +47,7 @@
   background:currentColor;border-radius:999px;
 }
 .hotspot::after{transform:rotate(90deg)}
+/* Under the cursor it is simply the solid ink, whatever its level — as `.round-btn` (2026-10-25). */
+@media (hover:hover){ .hotspot:hover{background:var(--btn-solid);color:var(--btn-solid-ink);box-shadow:none} }
 .hotspot:active{transform:scale(.94)}
-.hotspot:focus-visible{outline:calc(var(--hot-size) / 16) solid var(--hot-ink);outline-offset:calc(var(--hot-size) / 8)}
+.hotspot:focus-visible{outline:none;box-shadow:var(--focus-halo)}

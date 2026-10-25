@@ -29,6 +29,12 @@
 }
 .foot p { margin: 0; }
 .foot p + p { margin-top: var(--space-4); }
+/* The company's site (2026-10-21): a line of its own over the fine print, a step larger and
+   in the page's muted ink, full ink under the cursor. */
+.foot-link { font-size: var(--text-12); color: var(--ink-muted); text-decoration: none;
+  transition: color var(--duration-fast); }
+.foot-link:hover { color: var(--ink); }
+.foot-link:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset, 2px); border-radius: var(--radius-4); }
 .foot-mark { display: block; width: var(--number-72); margin: 0 auto var(--space-12); color: var(--ink-quiet); }
 .foot-mark svg { display: block; width: 100%; height: auto; }
 

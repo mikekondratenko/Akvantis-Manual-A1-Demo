@@ -73,7 +73,7 @@
       mark(); restart();
     } else {
       var prev = document.createElement('button'), next = document.createElement('button');
-      prev.type = next.type = 'button'; prev.className = next.className = 'btn btn-neutral btn-round';
+      prev.type = next.type = 'button'; prev.className = next.className = 'btn btn-round';
       prev.innerHTML = ICON.prev; next.innerHTML = ICON.next;
       prev.setAttribute('aria-label', 'Previous'); next.setAttribute('aria-label', 'Next');
       var step = function (dir) { var i = current() + dir; if (i >= 0 && i < slides.length) go(i); };
