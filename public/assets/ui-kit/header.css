@@ -44,8 +44,8 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 :root { --bar-h: 56px; --bar-max: 72px; --bar-mark: 40px; --bar-w: 888px;
-        --bar-top: var(--space-12); }
-@media (min-width: 768px) { :root { --bar-h: 72px; --bar-top: var(--space-16); } }
+        --bar-top: var(--space-24); }
+@media (min-width: 768px) { :root { --bar-h: 72px; } }
 
 .header {
   position: fixed; top: var(--bar-top); left: 50%;
@@ -64,8 +64,14 @@
   -webkit-backdrop-filter: blur(24px) saturate(120%);
   box-shadow: var(--frost-edge);
   transition: transform var(--duration-slow) var(--ease-emphasized),
+              top var(--duration-base) var(--ease-standard),
               border-radius var(--duration-base) var(--ease-emphasized);
 }
+/* ── FIXED, 24 FROM THE TOP, 12 ONCE THE PAGE MOVES (2026-10-25) ──
+   The bar stays: 24 from the top of the window at the top of the page, 12 as soon as the page
+   is scrolled — header.js sets `.is-scrolled`. On the element, not a variable on the body, so
+   what a page pads against `--bar-top` (the hero's first line) does not move with it. */
+.header.is-scrolled { top: var(--space-12); }
 
 /* ── The row is tightened to fit the bar, not the bar widened to fit the row ──
    888 stays 888. A pill that sized itself to its contents would be a different width in

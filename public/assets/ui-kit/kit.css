@@ -1024,7 +1024,7 @@ a { color: inherit; }
 .popup-header { display: flex; flex-direction: column; gap: var(--space-12); padding-bottom: var(--space-24); }
 .popup-title { font-size: var(--text-24); font-weight: var(--weight-semibold); line-height: var(--leading-snug); color: var(--white); }
 .popup-text { font-size: var(--text-14); font-weight: var(--weight-regular); line-height: var(--leading-relaxed); color: var(--black-200); }
-.popup-actions { display: flex; gap: var(--space-8); justify-content: flex-end; }
+.popup-actions { display: flex; gap: var(--btn-gap); justify-content: flex-end; }
 .popup-actions .btn { width: 124px; }
 /* ── ALIGNMENT (2026-10-25) ── three, by a class on `.popup`:
      (none)       the text on the left, the actions on the right — a question with an answer

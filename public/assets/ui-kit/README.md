@@ -45,6 +45,7 @@ ui-kit/kit/           →  <project>/public/assets/ui-kit/
 ├── locale.css   the location picker and the region sheet; `.locale-lang` = the `En ⌄` form
 ├── foot.css     the page's foot: social marks and the legal line
 ├── header.css   the bar: .header — the tools' top bar and a page's head; requires tokens.css
+├── header.js    the bar's behaviour: away on a scroll down, the ink under the section on screen (2026-10-25)
 ├── swatch.css   the color swatch and the finish row (.swatch-btn, .color-block); requires tokens.css
 ├── panel.css    the plate title and the collapsible plate; requires tokens.css
 ├── number.css   the step number in a circle (Figma «Number»); requires tokens.css
@@ -56,6 +57,7 @@ ui-kit/kit/           →  <project>/public/assets/ui-kit/
 ├── section.css  the screens of a landing: .sec-hero .sec-benefits .sec-split .sec-cta .sec-faq;
 │                specimen preview/sections.html; requires tokens, grid, type, button (+ page);
 │                every section is listed in docs/DESIGN.md → Sections
+├── section.js   the sections' behaviour: the quote's fill on scroll (2026-10-25)
 ├── accordion.js the collapsible plate's behaviour — aria-expanded, data-open, inert; no kit.js
 ├── locale.js    the location picker's behaviour — open / close, `akv-region`, the current row
 ├── slider.js    the controls of .sec-slides / .sec-gallery / .sec-reviews — arrows, or dots and
@@ -145,6 +147,8 @@ tertiary by default, `.hotspot` primary. The tool's call to
 action is `.btn-secondary` — `.print-btn` is gone. Old names still resolve, for published
 pages: `.btn-primary.btn-white` → secondary; `.btn-secondary.btn-white`, `.btn-white`,
 `.btn-neutral` → tertiary.
+**In a row**, buttons stand 8 apart (`--btn-gap`, also between wrapped rows) — `.sec-actions`,
+`.popup-actions` and the slider's arrows read it.
 Variants re-point the role on the element and never paint a background of their own. That is
 what lets `.is-frosted` swap a button's fill (`--btn: var(--frost-700)`) without outranking
 hover or `.is-on`.

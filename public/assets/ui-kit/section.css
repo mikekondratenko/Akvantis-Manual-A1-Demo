@@ -12,13 +12,30 @@
      .sec              one sheet: grid.css's columns, corners 24 → 48 from 1024, 64 → 96 inset
        .is-screen        at least the height of the viewport
      .sec-head         label · title · caption, the title block of any section
-     .sec-actions      a row of buttons (and a price) under it
+     .sec-actions      a row of buttons (and a price) under it — buttons 8 apart (--btn-gap)
      .sec-banner       the picture of a hero or a CTA — an object over the text by default,
                        a photograph behind it on `.is-cover`
      .sec-ph           a picture slot until the picture exists
+     .sec-lockup       a product's lockup in a title, from the catalogue (data-device)
 
-     .sec-hero         banner, label, display title, caption, button — centred, first screen
-       .is-cover         the banner fills the sheet, the text sits on it over a scrim
+   ── THE SET (2026-10-25) — what a landing is built from, in this order on the specimen:
+       1 hero · 2 banner, full screen · 3 banner, fixed height · 4 cards, square and vertical ·
+       5 card carousel · 6–7 image + text, left and right · 8 FAQ · 9 quote · 10 highlights ·
+       11 reviews · 12 footer.
+     Every part of every section and card is optional — a kicker, a title, a caption, buttons,
+     a picture — and `.sec-actions` (buttons 8 apart) may stand in any of them.
+     .sec-cover        a banner: a picture filling the frame, the words on it; full screen, or
+                       `.is-fixed` / `--cover-h` for a height; the words centred or `.is-start`,
+                       at the foot or `.is-middle`
+     .sec-quote        large words on the black, two or three lines; `.is-center`
+     .sec-footer       the mark and a line, columns of links, the legal line and the social marks
+     .sec-cards.is-vertical   cards 3:4 (with `.is-square` 1:1)
+   Kept until the landing is rebuilt on the set, not on the specimen: .sec-benefits, .sec-bento,
+   .sec-infographic, .sec-statement, .sec-cta, .sec-hero.is-cover.
+
+     .sec-hero         banner, label, display title, caption, button — centred, first screen,
+                       in a frame one step off the black (corners 40, 24 from the sheet's edge)
+       .is-cover         the banner fills the frame, the text sits straight on it
      .sec-cta          the same anatomy one size down: title, caption, button over a banner
      .sec-benefits     blocks of picture + title + line, centred, no title — 1 → 2 → 4 a row
        .is-3             three a row (two on a phone), at the reading measure — a box's benefits
@@ -59,6 +76,9 @@
   --sec-gap: var(--space-32);
   --sec-head: 1 / -1;          /* the title block's span */
   --sec-half: 6;               /* a split's side, in columns (from 1024) */
+  /* Split's text (2026-10-25): three columns, two empty columns from the picture — on 12 columns
+     the picture 6, two empty, the text 3, one to the edge; on 20 the picture 10, two, the text 3. */
+  --split-text-span: 3; --split-text-at: 2; --split-text-at-flip: 9;
   --sec-narrow: 1 / -1;        /* a reading measure, centred — FAQ, a form */
   --sec-card-radius: var(--radius-32);   /* cards, tiles, slides, pictures: 32 → 48 from 768 */
   --type-statement: var(--text-48);
@@ -68,10 +88,13 @@
                                      --sec-gap: var(--space-48); --sec-head: 1 / span 8;
                                      --sec-narrow: 3 / 11; --type-statement: var(--text-96); } }
 @media (min-width: 1440px) { :root { --sec-head: 1 / span 7; --sec-narrow: 4 / 10; --type-statement: var(--text-128); } }
-@media (min-width: 1920px) { :root { --sec-head: 1 / span 10; --sec-half: 10; --sec-narrow: 7 / 15; } }
+@media (min-width: 1920px) { :root { --sec-head: 1 / span 10; --sec-half: 10; --split-text-at: 6; --split-text-at-flip: 13; --sec-narrow: 7 / 15; } }
 
 /* ── THE STACK AND THE SHEET ── */
-.sec-stack { display: grid; gap: var(--space-2); padding: var(--space-2); background: var(--page-sunk); }   /* = --black-900 in the dark theme; a grey under the sheets on paper */
+.sec-stack { display: grid; gap: var(--space-2); padding: var(--space-2); background: var(--page); }
+/* Dark (2026-10-25): the ground is the sheets' own black — one black from top to bottom, the
+   sections told apart by what is in them. On paper the grey ground stays under the white sheets. */
+[data-theme="light"] .sec-stack { background: var(--page-sunk); }
 
 .sec {
   position: relative; overflow: hidden;
@@ -90,19 +113,27 @@
 /* ── PARTS ── */
 .sec-head { grid-column: var(--sec-head); display: grid; gap: var(--space-16); justify-items: start; }
 .sec-head > .t-lead { max-width: calc(var(--number-288) * 2); }
-.sec-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-16) var(--space-24); }
+.sec-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--btn-gap); }
+/* A price in the row keeps its distance from the buttons: 24 to the first one (8 of gap + 16). */
+.sec-actions > .sec-price { margin-right: var(--space-16); }
 .sec-actions .btn { width: auto; }
 /* A price said loud: the figure at h1, what follows it («/ month») small and muted. */
 .sec-price { font-size: var(--type-h1); line-height: var(--leading-none); font-weight: var(--weight-semibold); }
 .sec-price small { font-size: var(--text-16); font-weight: var(--weight-regular); color: var(--ink-muted); margin-left: var(--space-4); }
 
+/* A product's lockup in a title (2026-10-25): the device's own mark from the catalogue
+   (ui-kit/devices/devices.js) set at the size of the line — cap height, on the baseline. The
+   markup keeps the name as text, so the title reads with no script. */
+.sec-lockup { display: inline-block; height: .72em; vertical-align: baseline; line-height: 0; }
+.sec-lockup svg { height: 100%; width: auto; display: block; }
 .sec-banner { display: block; max-width: 100%; }
 img.sec-banner { object-fit: contain; }
 
 .sec-ph {
   display: grid; place-items: center; padding: var(--space-16); text-align: center;
   border-radius: var(--sec-card-radius); color: var(--ink-faint); font-size: var(--text-12);
-  background: repeating-linear-gradient(135deg, var(--tile) 0 var(--space-12), var(--black-800) var(--space-12) var(--space-24));
+  /* A solid dark grey, --black-900, not the hatch that reads as «transparent» (2026-10-25). */
+  background: var(--black-900);
 }
 
 /* ── HERO ──
@@ -110,22 +141,45 @@ img.sec-banner { object-fit: contain; }
    header.css bar where the page has one (--bar-max and --bar-top are header.css's; with no
    bar they fall back to 0). */
 .sec-hero {
-  min-height: 100vh; min-height: 100svh;
+  /* The browser's viewport, exactly (2026-10-25) — not «at least»: the first screen is one
+     screen. The picture takes what the words and the buttons leave and shrinks on a short
+     window, rather than pushing the buttons below the fold. */
+  height: 100vh; height: 100svh; min-height: 0;
   justify-items: center; text-align: center; row-gap: var(--space-24);
   padding-top: calc(var(--bar-max, 0px) + var(--bar-top, 0px) + var(--space-24));
+}
+/* THE FRAME (2026-10-25): inside the hero's sheet a plate one step off the black (--black-900;
+   one step off the white on paper), corners 40, kept 24 from the sheet's edges on a desktop.
+   Drawn as ::before behind the content (isolation keeps it inside the sheet), so the markup is
+   unchanged; the content's own inset is measured from the frame. A cover's picture fills the
+   frame, not the sheet. On a phone and a tablet the frame sits closer to the edge. */
+.sec-hero, .sec-cover {
+  --hero-inset: var(--space-8); --hero-radius: var(--radius-32);
+  isolation: isolate;
+  padding: calc(var(--hero-inset) + var(--sec-pad)) calc(var(--hero-inset) + var(--grid-margin));
+}
+.sec-hero { padding-top: calc(var(--bar-max, 0px) + var(--bar-top, 0px) + var(--hero-inset) + var(--space-24)); }
+@media (min-width: 768px)  { .sec-hero, .sec-cover { --hero-inset: var(--space-16); } }
+@media (min-width: 1024px) { .sec-hero, .sec-cover { --hero-inset: var(--space-24); --hero-radius: var(--radius-40); } }
+.sec-hero::before, .sec-cover::before {
+  content: ''; position: absolute; inset: var(--hero-inset); z-index: -1; pointer-events: none;
+  border-radius: var(--hero-radius); background: var(--black-900);
 }
 .sec-hero > .sec-head, .sec-cta > .sec-head { grid-column: 1 / -1; justify-items: center; }
 .sec-hero .sec-actions, .sec-cta .sec-actions { justify-content: center; }
 /* Centred lines are balanced, caption included: two near-equal lines, never a word alone. */
 .sec-hero .sec-head > *, .sec-cta .sec-head > * { text-wrap: balance; }
-.sec-hero > img.sec-banner { width: auto; height: min(52svh, calc(var(--number-288) * 2)); aspect-ratio: 1; }
+.sec-hero:has(> .sec-banner):not(.is-cover) { grid-template-rows: minmax(0, 1fr); grid-auto-rows: auto; align-content: stretch; }
+.sec-hero > img.sec-banner { width: auto; height: 100%; max-height: calc(var(--number-288) * 2); min-height: 0; aspect-ratio: 1; align-self: center; }
+/* …and its slot until the picture exists: the same square. */
+.sec-hero:not(.is-cover) > .sec-banner.sec-ph { width: auto; height: 100%; max-height: calc(var(--number-288) * 2); min-height: 0; aspect-ratio: 1; align-self: center; }
 
 /* ── CTA ── the hero's anatomy, a sheet tall rather than a screen. */
 .sec-cta { justify-items: center; text-align: center; row-gap: var(--space-24); min-height: calc(var(--number-288) * 2); }
 
 /* ── COVER ── on a hero `.is-cover`, and on a CTA always when it has a banner: the banner
-   fills the sheet and the words stand on it. The scrim is the page's black from the bottom,
-   so the text keeps its contrast whatever the photograph does. */
+   fills the sheet and the words stand on it. No scrim (2026-10-25: the gradients are gone) — the
+   picture is chosen, or graded, so the words read on it. */
 .sec-hero.is-cover > .sec-banner, .sec-cta > .sec-banner {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; border-radius: 0;
   /* Placed on a grid line, an absolute child takes the grid AREA as its box (inside the
@@ -133,12 +187,89 @@ img.sec-banner { object-fit: contain; }
   grid-column: auto; grid-row: auto;
 }
 .sec-hero.is-cover > :where(:not(.sec-banner)), .sec-cta > :where(:not(.sec-banner)) { position: relative; z-index: 1; }
-.sec-hero.is-cover::after, .sec-cta:has(> .sec-banner)::after {
-  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background: linear-gradient(to top, var(--scrim-80), var(--scrim-32) 60%, transparent);
-}
 .sec-hero.is-cover { align-content: end; }
+/* In the hero the picture fills the frame, not the sheet. */
+.sec-hero.is-cover > .sec-banner {
+  inset: var(--hero-inset); width: auto; height: auto; border-radius: var(--hero-radius);
+}
 .sec-hero.is-cover > .sec-banner.sec-ph, .sec-cta > .sec-banner.sec-ph { place-items: start center; padding-top: var(--space-24); }
+
+/* ── BANNER (2026-10-25) ── `.sec-cover`: a picture or a film filling the hero's frame, the words on
+   it at the foot, centred. Full screen by default; `.is-fixed` sets a height — 480 on a phone,
+   640 from 1024 — and `--cover-h` on the element sets any other. The words grow it if they need
+   more. Across they are centred, `.is-start` sets them on the left; down they sit at the foot,
+   `.is-middle` puts them in the middle. Every part is optional: a banner may be the picture
+   alone. The picture is `.sec-media` — an <img>, a <video> or a `.sec-ph` until it exists. */
+.sec-cover {
+  min-height: var(--cover-h, 100svh);
+  align-content: end; justify-items: center; text-align: center; row-gap: var(--space-24);
+}
+.sec-cover.is-fixed { --cover-h: 480px; }
+@media (min-width: 1024px) { .sec-cover.is-fixed { --cover-h: 640px; } }
+.sec-cover > .sec-media {
+  position: absolute; inset: var(--hero-inset); z-index: 0; width: auto; height: auto;
+  border-radius: var(--hero-radius); object-fit: cover; grid-column: auto; grid-row: auto;
+}
+.sec-cover > :not(.sec-media) { position: relative; z-index: 1; }
+.sec-cover > .sec-head { grid-column: 1 / -1; justify-items: center; }
+.sec-cover .sec-actions { justify-content: center; }
+.sec-cover .sec-head > * { text-wrap: balance; }
+.sec-cover.is-start { justify-items: start; text-align: left; }
+.sec-cover.is-start > .sec-head { grid-column: var(--sec-head); justify-items: start; }
+.sec-cover.is-start .sec-actions { justify-content: flex-start; }
+/* `.is-middle`: the words in the middle of the banner rather than at its foot (2026-10-25).
+   Alignment is two choices: across — centred (default) or `.is-start`; down — the foot
+   (default) or `.is-middle`. */
+.sec-cover.is-middle { align-content: center; }
+
+/* ── QUOTE (2026-10-25) ── large words on the black: two or three lines, a thought or a buyer's
+   own sentence, set at 32 → 48 → 64 → 80; it fills from --black-800 to white as the page is
+   scrolled (section.js). `.is-muted` inside dims a part of it (no fill); `.sec-quote-by`
+   names who said it; buttons may follow. Left by default, `.is-center` on the axis. */
+:root { --type-quote: var(--text-32); --quote-span: 1 / -1; }
+@media (min-width: 768px)  { :root { --type-quote: var(--text-48); } }
+@media (min-width: 1024px) { :root { --type-quote: var(--text-64); --quote-span: 1 / span 10; } }
+@media (min-width: 1440px) { :root { --type-quote: var(--text-80); } }
+@media (min-width: 1920px) { :root { --quote-span: 1 / span 16; } }
+.sec-quote { row-gap: var(--space-24); padding-block: calc(var(--sec-pad) * 1.5); }
+.sec-quote > * { grid-column: var(--quote-span); }
+.sec-quote-text { margin: 0; font-size: var(--type-quote); line-height: var(--leading-tight); font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight); text-wrap: balance; }
+.sec-quote-text .is-muted { color: var(--ink-muted); }
+/* THE FILL ON SCROLL (2026-10-25): the words start in --black-800 and white runs over them, line
+   after line, as the page goes down — and back as it goes up. section.js wraps the words in
+   `.sec-quote-fill` and sets `--fill` (0 … 100 %) from where the quote is in the window. An
+   inline box's background runs along its lines as one strip, so a width of `--fill` fills the
+   first line, then the second. With no script, or with less motion, the words are simply white. */
+.sec-quote-fill {
+  --fill: 0%;
+  background-image: linear-gradient(var(--ink), var(--ink)), linear-gradient(var(--black-800), var(--black-800));
+  background-size: var(--fill) 100%, 100% 100%; background-repeat: no-repeat;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+@media (prefers-reduced-motion: reduce) { .sec-quote-fill { --fill: 100% !important; } }
+.sec-quote-by { font-size: var(--text-16); color: var(--black-300); }   /* a step under the muted ink (2026-10-25) */
+.sec-quote.is-center { justify-items: center; text-align: center; }
+.sec-quote.is-center > * { grid-column: 1 / -1; max-width: 22ch; }
+.sec-quote.is-center > .sec-quote-by, .sec-quote.is-center > .sec-actions { max-width: none; justify-content: center; }
+
+/* ── FOOTER (2026-10-25) ── the page's last sheet: the mark and a line, columns of links, and a
+   bottom row — the legal line on one side, the social marks (foot.css `.social`) on the other.
+   Every column and row is optional. */
+.sec-footer { align-content: start; row-gap: var(--space-48); padding-block: var(--space-64) var(--space-32); }
+.sec-footer-top { display: grid; gap: var(--space-40) var(--grid-gutter); }
+@media (min-width: 768px)  { .sec-footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .sec-footer-top { grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); } }
+.sec-footer-brand { display: grid; gap: var(--space-16); justify-items: start; align-content: start; color: var(--ink-muted); }
+.sec-footer-brand > svg, .sec-footer-brand > a > svg { width: var(--number-32); height: var(--number-32); color: var(--ink); display: block; }
+.sec-footer-col { display: grid; gap: var(--space-12); align-content: start; justify-items: start; }
+.sec-footer-col > b { font-size: var(--text-14); font-weight: var(--weight-semibold); color: var(--ink); }
+.sec-footer-col a { color: var(--ink-muted); text-decoration: none; font-size: var(--text-14); transition: color var(--duration-fast); }
+.sec-footer-col a:hover { color: var(--ink); }
+.sec-footer-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-16) var(--space-24);
+  padding-top: var(--space-24); border-top: 1px solid var(--rule); font-size: var(--text-12); color: var(--ink-quiet, var(--ink-faint)); }
+.sec-footer-bottom > p { margin: 0; }
+.sec-footer-bottom .social { margin: 0; }
 
 /* ── BENEFITS ── blocks of picture + title + line, centred, no section title over them. One a
    row on a phone, two on a tablet, four from 1024 — four is the design; a fifth starts a row.
@@ -156,7 +287,7 @@ img.sec-banner { object-fit: contain; }
 .benefit-icon {
   display: grid; place-items: center; width: var(--number-64); height: var(--number-64);
   margin-bottom: var(--space-16); border-radius: var(--radius-16); color: var(--accent-text);
-  background: repeating-linear-gradient(135deg, var(--tile) 0 var(--space-8), var(--black-800) var(--space-8) var(--space-16));
+  background: var(--black-900);
 }
 .benefit-icon:has(> *) { background: var(--tile); }
 .benefit-icon > svg { width: var(--number-32); height: var(--number-32); fill: none; stroke: currentColor;
@@ -164,7 +295,8 @@ img.sec-banner { object-fit: contain; }
 .benefit-icon > img { width: 100%; height: 100%; object-fit: contain; }
 .benefit > .t-small { color: var(--ink-muted); max-width: var(--number-288); }
 
-/* ── SPLIT ── picture and text on two halves of the grid. On a phone and a tablet they stack,
+/* ── SPLIT ── picture on a half of the grid, the text a narrow column in the other: two empty
+   columns to the picture, one to the edge (2026-10-25). On a phone and a tablet they stack,
    picture first; from 1024 they share a row, and `.is-flip` puts the picture on the left. */
 .sec-split { align-items: center; }
 .sec-split-text { display: grid; justify-items: start; gap: var(--space-16); max-width: calc(var(--number-288) * 2); }
@@ -173,9 +305,11 @@ img.sec-banner { object-fit: contain; }
 .sec-split-pic > img { width: 100%; max-height: min(72svh, calc(var(--number-288) * 2)); aspect-ratio: 1; object-fit: contain; }
 .sec-split-pic > .sec-ph { width: 100%; aspect-ratio: 1; max-height: 72svh; }
 @media (min-width: 1024px) {
-  .sec-split > .sec-split-text { grid-column: 1 / span var(--sec-half); grid-row: 1; }
+  /* The picture takes its half. The text is three columns in the other half, two empty columns from
+     the picture, centred on the picture's height. */
+  .sec-split > .sec-split-text { grid-column: var(--split-text-at) / span var(--split-text-span); grid-row: 1; max-width: none; }
   .sec-split > .sec-split-pic  { grid-column: span var(--sec-half) / -1; grid-row: 1; order: 0; }
-  .sec-split.is-flip > .sec-split-text { grid-column: span var(--sec-half) / -1; }
+  .sec-split.is-flip > .sec-split-text { grid-column: var(--split-text-at-flip) / span var(--split-text-span); }
   .sec-split.is-flip > .sec-split-pic  { grid-column: 1 / span var(--sec-half); }
 }
 
@@ -197,6 +331,14 @@ img.card-pic { background: var(--black-800); }
 
 /* Square cards: from 768 the card is 1:1 and the picture takes what the words leave; on a
    phone the card is as tall as it needs and the picture is square. */
+/* Vertical cards (2026-10-25): the same, 3:4. */
+.sec-cards.is-vertical .card-pic { aspect-ratio: 3 / 4; }
+@media (min-width: 768px) {
+  .sec-cards.is-vertical .card { aspect-ratio: 3 / 4; }
+  .sec-cards.is-vertical .card-pic { aspect-ratio: auto; flex: 1 1 0; min-height: 0; }
+}
+/* Every part of a card is optional (2026-10-25): with no picture it starts at the words' inset. */
+.card:not(:has(> .card-pic)) { padding-top: var(--space-24); }
 .sec-cards.is-square .card-pic { aspect-ratio: 1; }
 @media (min-width: 768px) {
   .sec-cards.is-square .card { aspect-ratio: 1; }
@@ -294,7 +436,7 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 @media (prefers-reduced-motion: no-preference) { .slider-track { scroll-behavior: smooth; } }
 
 /* The controls row: dots + pause (highlights), arrows (gallery, reviews). */
-.slider-ctrl { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-8);
+.slider-ctrl { display: flex; align-items: center; justify-content: flex-end; gap: var(--btn-gap);
   padding: var(--space-24) var(--grid-margin) 0; }
 .slider-ctrl .btn { width: var(--number-48); }
 .slider-ctrl .btn:disabled { opacity: .35; }
@@ -308,8 +450,7 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .slide-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
 img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .slide-cap { position: absolute; top: 0; left: 0; right: 0; z-index: 1; padding: var(--space-32) var(--space-24) var(--space-96);
-  text-align: center; text-wrap: balance; font-size: var(--text-24); line-height: var(--leading-snug); font-weight: var(--weight-semibold);
-  background: linear-gradient(to bottom, var(--scrim-50), transparent); }
+  text-align: center; text-wrap: balance; font-size: var(--text-24); line-height: var(--leading-snug); font-weight: var(--weight-semibold); }
 @media (min-width: 1024px) { .slide-cap { font-size: var(--text-32); padding-inline: 20%; } }
 .sec-slides .slider-ctrl { position: absolute; left: 50%; bottom: var(--space-24); transform: translateX(-50%); padding: 0; justify-content: center; }
 .slider-dots { display: flex; align-items: center; gap: var(--space-12); height: var(--number-48); padding: 0 var(--space-24);
@@ -335,6 +476,8 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .sec-gallery .slide-pic { width: 100%; aspect-ratio: 3 / 2; border-radius: var(--sec-card-radius); background: var(--tile); object-fit: contain; }
 .sec-gallery .slide-text { padding-inline: var(--space-24); max-width: 44ch; color: var(--ink-muted); font-size: var(--text-16); line-height: var(--leading-relaxed); }
 .sec-gallery .slide-text b { color: var(--ink); font-weight: var(--weight-semibold); }
+/* A card in the carousel may carry buttons (2026-10-25), at the words' inset. */
+.sec-gallery .slide > .sec-actions { padding-inline: var(--space-24); }
 
 /* ── REVIEWS ── three cards a row from 1024, the fourth peeking; a quote mark behind the
    words, a hairline, the avatar and the name at the foot. */

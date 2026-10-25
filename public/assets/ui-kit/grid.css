@@ -31,7 +31,7 @@
 }
 @media (min-width: 1440px) {
   :root { --grid-bp: 1440; --grid-name: "Desktop";
-          --grid-cols: 12; --grid-gutter: var(--space-8); --grid-margin: var(--space-32); }
+          --grid-cols: 12; --grid-gutter: var(--space-8); --grid-margin: var(--space-24); }
 }
 @media (min-width: 1920px) {
   :root { --grid-bp: 1920; --grid-name: "Wide";

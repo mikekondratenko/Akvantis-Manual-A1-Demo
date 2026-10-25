@@ -30,6 +30,8 @@
      .btn-warning              amber at 20 %           tertiary in weight: an action to look at twice
      .btn-danger               red at 20 %             tertiary in weight: an action that deletes
      .btn-ghost                an outline, no fill — the quietest
+   IN A ROW: buttons side by side stand 8 apart, 8 between rows when they wrap — `--btn-gap`
+   (tokens.css). `.sec-actions`, `.popup-actions` and the slider's arrows read it.
    The values of each level are tokens (tokens.css, --btn-primary* …), set per theme; a level class
    copies them into the --btn role, so the same class works on `.round-btn` and `.hotspot` too —
    which have two levels: primary (the solid ink, white / black — never cyan) and tertiary.

@@ -232,6 +232,9 @@
   --btn-outline-hover       : var(--btn-tertiary-hover);
   --btn-outline-ink         : var(--btn-tertiary-ink);
   --btn-outline-edge        : var(--btn-tertiary-edge);
+  /* BUTTONS IN A ROW (2026-10-25): two or more buttons side by side stand 8 apart — and 8
+     between rows when they wrap. Every row of buttons in the kit reads this. */
+  --btn-gap                 : var(--space-8);
   /* The resting button is the tertiary. */
   --btn         : var(--btn-tertiary);
   --btn-hover   : var(--btn-tertiary-hover);
