@@ -379,6 +379,7 @@ img.sec-banner { object-fit: contain; }
        <h3 class="t-h3">Title</h3><p class="t-small">Description</p>    the default: title + description
        [<div class="sec-actions"><a class="btn btn-tertiary">…</a></div>]   a button only when asked, last
      </li>
+   ALIGNMENT — the words on the left by default; `.is-center` (section or card) centres words and button.
    SHAPES — on the section (applies to all its cards) or on one card:
      (none)          the card as tall as it needs, picture 4:3
      .is-horizontal  card 4:3 from 768, the picture takes what the words leave
@@ -411,6 +412,10 @@ img.card-pic { background: var(--black-800); }
   .card > :not(.card-pic) { margin-inline: var(--space-24); }
   .card:not(:has(> .card-pic)) { padding-top: var(--space-32); }
 }
+/* Alignment (2026-10-26): the words and the button on the left by default; `.is-center` on the
+   section or on one card centres them. The insets stay the same. */
+.sec.is-center .card, .card.is-center { text-align: center; }
+.sec.is-center .card > .sec-actions, .card.is-center > .sec-actions { justify-content: center; }
 /* Shapes. On a phone only the picture takes the ratio; from 768 the whole card does and the
    picture fills what the words leave. */
 .sec.is-square .card-pic, .card.is-square > .card-pic { aspect-ratio: 1; }
