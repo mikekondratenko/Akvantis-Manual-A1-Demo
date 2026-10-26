@@ -34,6 +34,8 @@
            data-rate: the € prices shown in another currency, e.g. UAH × 48.
    PAY     form[data-pay-url="/api/pay"]: on send the order (FormData — hidden rows are disabled, so left
            out) goes to that address; the answer's pageUrl (monobank's payment page) is opened.
+   GATE    [data-next] is disabled until its step is complete: the choice (data-need) and the
+           required fields in use. Nothing required → open (Akvantis Club).
    PARCEL  form[data-kg] (Σ data-kg of what is chosen) and form[data-goods] (the sum less the delivery, €)
            — what np.js asks Nova Poshta a price for.
    CODE    .order-code: [data-code-open] → .order-code-row (field · [data-code] Apply · [data-code-close] ×).
@@ -162,6 +164,7 @@
         + '<dt class="is-total">' + T('Total') + '</dt><dd class="is-total">' + (off && !open ? '<s class="choice-was">' + eur(sum - off) + '</s>' : '') + sumTxt + '</dd>'
         /* form[data-uah-rate]: in Ukraine the invoice is in hryvnia — the sum the bank will show, said here first */
         + (form.dataset.uahRate && cur !== 'UAH' && valOf('country') === 'UA' && !open && chosen ? '<dt>' + T('Charged in hryvnia') + '</dt><dd>≈ ' + new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(sum * form.dataset.uahRate) + '</dd>' : '');
+      gate();
       if (!dock || !chosen) return;
       var card = on ? null : pick.closest('.choice');
       var pics = card ? $$(card, '.choice-pic') : $$(form, '.choice.is-count.is-on .choice-pic').slice(0, 3);
@@ -191,6 +194,15 @@
     /* steps */
     /* With the alternative on, the step needs a count over 0 (data-alt-hint says so). */
     var altOn = function (s) { return alt && alt.checked && s.contains(alt); };
+    /* GATE (2026-10-26): a step's Next is disabled until the step is complete — its choice made
+       (data-need) and every required field in it that is in use filled right (a field turned off
+       or hidden by a condition does not count). A step with nothing to ask (Akvantis Club) stays open. */
+    function gate() {
+      steps().forEach(function (s) { var b = s.querySelector('[data-next]'); if (!b) return;
+        var ok = passes(s) && $$(s, 'input[required], select[required], textarea[required]').every(function (f) {
+          return f.disabled || f.closest('[hidden]') || f.validity.valid; });
+        b.disabled = !ok; b.setAttribute('aria-disabled', String(!ok)); });
+    }
     var passes = function (s) { var n = s.dataset.need; if (!n) return true;
       if (altOn(s)) return counted(s).length > 0;
       if (!$$(form, 'input[name="' + n + '"]').filter(live).length) return true;   /* nothing to choose here now */
