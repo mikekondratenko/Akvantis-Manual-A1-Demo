@@ -60,6 +60,10 @@
 /* An icon sits before or after the label in source order — no class for left or right. The gap
    above spaces it; flex: none keeps a long label from squeezing it. */
 .btn > svg { flex: none; width: calc(var(--number-16) + var(--space-4)); height: calc(var(--number-16) + var(--space-4)); }
+/* A chevron is drawn in the middle third of its 24 grid, so at 20 it carries ~7 px of air on each
+   side: «Next ›» read 17 from the word and 31 from the edge against 24 on the other (2026-10-26).
+   It gives 6 back on both sides — 11 from the word, 25 from the edge. */
+.btn > svg[data-icon^="chevron"] { margin-inline: calc(-1 * (var(--space-4) + var(--space-2))); }
 .btn:hover  { background: var(--btn-hover); }
 .btn:active { transform: scale(.98); }
 /* Focus: the one ring, from tokens.css. */

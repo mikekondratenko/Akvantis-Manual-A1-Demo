@@ -119,6 +119,9 @@
    (the order form's step: 16). The first card still starts on the column. */
 .choice-scroll { display: grid; gap: var(--space-12); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .choice-scroll::-webkit-scrollbar { display: none; }
+/* Not cut by the holder (2026-10-26): a scrolling row runs out to the holder's edge on every width,
+   --choice-bleed past its column (the order step: 16), its first card still on the column. */
+.choice-scroll { margin-inline: calc(-1 * var(--choice-bleed, 0px)); padding-inline: var(--choice-bleed, 0px); scroll-padding-inline: var(--choice-bleed, 0px); }
 .choice-scroll > .choice, .choice-grid > .choice { scroll-snap-align: start; }
 
 /* A GROUP — a row choice and what it opens, on one plate (2026-10-25): «Replacement filters only»
@@ -126,10 +129,12 @@
    inside gives up its own plate, and each taken card in it shows its choice as any card does. */
 .choice-group { display: grid; border: 1px solid var(--choice-edge, transparent); border-radius: var(--radius-16); background: var(--choice);
   transition: background var(--duration-fast), border-color var(--duration-fast); }
-.choice-group:has(> .choice.is-row > input:not(:checked)):hover { background: var(--choice-hover); }
-.choice-group:has(> .choice.is-row > input:checked) { border-color: transparent; box-shadow: none; background: var(--choice-plate); }   /* open: no edge — a --choice-plate (dark black-800, light black-900); the taken cards in it carry the accent (2026-10-25) */
-.choice-group > .choice.is-row { background: none; border: 0; box-shadow: none; }
-.choice-group > :not(.choice) { padding: 0 var(--space-16) var(--space-16); margin: 0; scroll-padding-inline: var(--space-16); }
+/* Separate plates (2026-10-26): the row is an option on its own plate and what it opens comes
+   under it, 12 below — each card its own plate; nothing is drawn around the two. (Was one plate,
+   then a --choice-plate under them.) A PICK (.is-pick, below) is still one plate. */
+.choice-group:not(.is-pick) { border: 0; background: none; }
+.choice-group:not(.is-pick) > :not(.choice) { margin-top: var(--space-12); }
+.choice-group.is-pick > .choice.is-row { background: none; border: 0; box-shadow: none; }
 /* A card inside the group shows its own choice like any card (2026-10-25: several can be taken
    at once, so each says so) — the accent edge, white on paper; the rest plain. */
 .choice-group .choice:not(.is-row):not(.is-on) { border-color: transparent; box-shadow: none; }

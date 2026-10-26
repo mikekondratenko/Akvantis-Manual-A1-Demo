@@ -33,6 +33,7 @@
            choice without a price makes it «price on request»). data-currency, default EUR.
    PAY     form[data-pay-url="/api/pay"]: on send the order (FormData — hidden rows are disabled, so left
            out) goes to that address; the answer's pageUrl (monobank's payment page) is opened.
+   CODE    .order-code: [data-code-open] → .order-code-row (field · [data-code] Apply · [data-code-close] ×).
    PARTS   form[data-parts-url="/api/parts"]: a payment of N parts (not «full») is applied for there
            instead (monobank «Покупка частинами»); the form waits on <url>/state, then thanks.html.
            [data-per-month="N"] shows the total over N; the button reads «Apply for N payments».
@@ -40,7 +41,12 @@
            .field-error line, cleared as it is typed in; the button turns .is-loading; the
            answer is the .notice. No data-endpoint → nothing is sent, and the notice says so. */
 (function () {
-  var SAY = { valueMissing: 'Please fill this in', typeMismatch: 'Check the address', badInput: 'Check this value' };
+  /* WORDS (2026-10-26): every word this file writes goes through T() — window.KitLang.t when a page
+     has one (the preview's EN / UA switch, ui-kit/preview/lang.js), else the English as written.
+     {name} in a string is filled from the second argument. */
+  var T = function (s, v) { var d = (window.KitLang && KitLang.t && KitLang.t(s)) || s;
+    return v ? d.replace(/\{(\w+)\}/g, function (m, k) { return v[k] != null ? v[k] : m; }) : d; };
+  var SAY = { valueMissing: T('Please fill this in'), typeMismatch: T('Check the address'), badInput: T('Check this value') };
   var ICON = '<i data-icon="circle-alert" data-size="13"></i>';
   var $$ = function (r, s) { return [].slice.call(r.querySelectorAll(s)); };
   var acc = function (b, on) { if (window.Accordion) Accordion.set(b, on); };
@@ -48,7 +54,7 @@
   function init(form) {
     var lang = document.documentElement.lang || 'en';
     var cur = form.dataset.currency || 'EUR';
-    var eur = function (n) { return n == null ? '€ ···' : new Intl.NumberFormat(lang, { style: 'currency', currency: cur,
+    var eur = function (n) { return n == null ? '€ ···' : new Intl.NumberFormat(lang, { style: 'currency', currency: cur, currencyDisplay: 'narrowSymbol',   /* «395 €», not «395 EUR» in Ukrainian */
       minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }).format(n); };
     var dock = document.getElementById(form.id + '-dock');
     var alt = form.querySelector('input[data-alt]');
@@ -92,7 +98,8 @@
         if (open) setTimeout(function () { if (g.classList.contains(cls) === (cls === 'is-shown')) g.style.maxHeight = 'none'; }, 450);
       };
       $$(form, '[data-alt-off]').forEach(function (g) { fold(g, !on, 'is-off'); $$(g, 'input').forEach(function (i) { i.disabled = on; }); });
-      $$(form, '[data-alt-show]').forEach(function (g) { fold(g, on, 'is-shown'); });
+      $$(form, '[data-alt-show]').forEach(function (g) { fold(g, on, 'is-shown');
+        if (!on) $$(g, '.choice.is-count input').forEach(function (i) { i.value = 0; }); });   /* put away, its counts go back to 0 — they are not in the order */
       $$(form, '[data-alt-skip]').forEach(function (s) { s.hidden = on; });
       var land = form.querySelector('select[name="country"]');
       if (land) $$(form, '[data-country]').forEach(function (g) {
@@ -125,25 +132,25 @@
       var first = steps()[0], pick = first && first.querySelector('input:checked:not(:disabled):not([data-alt])');
       var chosen = on ? counted(first).length > 0 : !!pick;
       if (dock) { dock.classList.toggle('is-on', chosen); document.body.classList.toggle('has-dock', chosen); }
-      var sum = 0, open = false;
+      var sum = 0, open = false, off = 0;   /* off: the discounts taken (a negative data-price — trade-in) */
       $$(form, 'input:checked:not(:disabled):not([data-alt])').filter(live).forEach(function (i) {
         var l = i.closest('[data-price], label'); if (!l || !l.closest('.order-step')) return;
-        if (l.hasAttribute('data-price')) { var p = l.dataset.price; if (p === '') open = true; else sum += +p; }
+        if (l.hasAttribute('data-price')) { var p = l.dataset.price; if (p === '') open = true; else { sum += +p; if (+p < 0) off += +p; } }
         else if (i.type === 'radio' && l.closest('[data-priced]')) open = true;
       });
       $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return; var p = c.dataset.price; if (p === undefined || p === '') open = true; else sum += +p * +c.querySelector('input').value; });
       var sumTxt = open ? eur(null) : eur(sum);
       var plan = valOf('payment'), inParts = plan && plan !== 'full';
-      var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) pay.textContent = inParts ? 'Apply for ' + plan + ' payments' : chosen ? 'Pay ' + sumTxt : 'Pay';
+      var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) pay.textContent = inParts ? T('Apply for {n} payments', { n: plan }) : chosen ? T('Pay {sum}', { sum: sumTxt }) : T('Pay');
       /* [data-per-month="10"]: the total over that many parts (2026-10-26 — was typed by hand) */
       $$(form, '[data-per-month]').forEach(function (el) { var n = +el.dataset.perMonth;
-        el.textContent = chosen && !open ? eur(Math.round(sum / n * 100) / 100) + ' / month · ' + n + ' × with monobank' : 'monobank «Покупка частинами»'; });
+        el.textContent = chosen && !open ? T('{sum} / month · {n} × with monobank', { sum: eur(Math.round(sum / n * 100) / 100), n: n }) : T('monobank «Покупка частинами»'); });
       var dl = form.querySelector('[data-summary]');
       if (dl) dl.innerHTML = steps().slice(0, -1).map(function (s) { var v = stepVal(s, true);
           return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('')
-        + '<dt class="is-total">Total</dt><dd class="is-total">' + sumTxt + '</dd>'
+        + '<dt class="is-total">' + T('Total') + '</dt><dd class="is-total">' + (off && !open ? '<s class="choice-was">' + eur(sum - off) + '</s>' : '') + sumTxt + '</dd>'
         /* form[data-uah-rate]: in Ukraine the invoice is in hryvnia — the sum the bank will show, said here first */
-        + (form.dataset.uahRate && valOf('country') === 'UA' && !open && chosen ? '<dt>Charged in hryvnia</dt><dd>≈ ' + new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(sum * form.dataset.uahRate) + '</dd>' : '');
+        + (form.dataset.uahRate && valOf('country') === 'UA' && !open && chosen ? '<dt>' + T('Charged in hryvnia') + '</dt><dd>≈ ' + new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(sum * form.dataset.uahRate) + '</dd>' : '');
       if (!dock || !chosen) return;
       var card = on ? null : pick.closest('.choice');
       var pics = card ? $$(card, '.choice-pic') : $$(form, '.choice.is-count.is-on .choice-pic').slice(0, 3);
@@ -154,7 +161,7 @@
         : steps().slice(1, -1).map(stepVal).filter(Boolean).join(' · ');
       var total = dock.querySelector('[data-dock="total"]');
       total.textContent = open ? eur(null) : eur(sum); total.classList.toggle('order-tbd', open);
-      dock.querySelector('[data-dock="total-sub"]').textContent = open ? 'price on request' : '';
+      dock.querySelector('[data-dock="total-sub"]').textContent = open ? T('price on request') : '';
     }
 
     /* SEGMENTS: .order-seg holds a radio group (sr-only); the kit's segmented tabs are drawn
@@ -177,7 +184,7 @@
       if (altOn(s)) return counted(s).length > 0;
       if (!$$(form, 'input[name="' + n + '"]').filter(live).length) return true;   /* nothing to choose here now */
       return !!form.querySelector('input[name="' + n + '"]:checked:not(:disabled)'); };
-    var hintOf = function (s) { return (altOn(s) && s.dataset.altHint) || s.dataset.hint || 'Choose one first'; };
+    var hintOf = function (s) { return T((altOn(s) && s.dataset.altHint) || s.dataset.hint || 'Choose one first'); };
     var lock = function () { steps().forEach(function (s, i) {
       var off = i > reached, b = s.querySelector('.panel-title');
       b.disabled = off; s.classList.toggle('is-locked', off);
@@ -218,7 +225,7 @@
       notice.className = 'notice' + (kind ? ' is-' + kind : ''); notice.setAttribute('role', kind === 'error' ? 'alert' : 'status');
       notice.querySelector('span').textContent = text; notice.hidden = false; };
     var busy = function (on) { if (!send) return; send.classList.toggle('is-loading', on); send.setAttribute('aria-busy', on);
-      send.textContent = on ? 'Sending' : sendTxt; if (!on) update(); };
+      send.textContent = on ? T('Sending') : sendTxt; if (!on) update(); };
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -245,45 +252,58 @@
         var WHY = { EXCEEDED_SUM_LIMIT: 'the sum is over your limit', NOT_ENOUGH_MONEY_FOR_INIT_DEBIT: 'not enough money for the first payment',
           CLIENT_NOT_FOUND: 'no monobank client with this number', REJECTED_BY_CLIENT: 'you declined it in the app', CLIENT_PUSH_TIMEOUT: 'it was not confirmed in time',
           EXISTS_OTHER_OPEN_ORDER: 'another purchase in parts is still open', PAY_PARTS_ARE_NOT_ACCEPTABLE: 'this number of payments is not available' };
-        busy(true); send.textContent = 'Sending to monobank';
+        busy(true); send.textContent = T('Sending to monobank');
         var wait = function (order) {
-          send.textContent = 'Waiting for monobank';
-          tell('', 'Confirm the purchase in the monobank app — we are waiting for the bank.');
+          send.textContent = T('Waiting for monobank');
+          tell('', T('Confirm the purchase in the monobank app — we are waiting for the bank.'));
           fetch(base + '/state', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
             if (j.state === 'SUCCESS' || (j.state === 'IN_PROCESS' && j.sub === 'WAITING_FOR_STORE_CONFIRM'))
               return location.assign('thanks.html?order=' + encodeURIComponent(order) + '&parts=' + plan);
-            if (j.state === 'FAIL') { busy(false); return tell('error', 'monobank did not approve it: ' + (WHY[j.sub] || (j.sub || 'declined').toLowerCase().replace(/_/g, ' ')) + '. You can pay in full instead.'); }
+            if (j.state === 'FAIL') { busy(false); return tell('error', T('monobank did not approve it: {why}. You can pay in full instead.', { why: T(WHY[j.sub] || (j.sub || 'declined').toLowerCase().replace(/_/g, ' ')) })); }
             if (tries++ < 90) setTimeout(function () { wait(order); }, 2000);
-            else { busy(false); tell('error', 'No answer from monobank yet. If you confirm it in the app, we will email you.'); }
+            else { busy(false); tell('error', T('No answer from monobank yet. If you confirm it in the app, we will email you.')); }
           }).catch(function () { if (tries++ < 90) setTimeout(function () { wait(order); }, 2000); });
         };
         fetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
           .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.order) throw new Error(j.error || r.status); return j; }); })
           .then(function (j) { wait(j.order); })
-          .catch(function (e) { busy(false); tell('error', 'The request did not go through (' + e.message + '). Please try again in a minute.'); });
+          .catch(function (e) { busy(false); tell('error', T('The request did not go through ({why}). Please try again in a minute.', { why: e.message })); });
         return;
       }
       if (form.dataset.payUrl) {
-        busy(true); send.textContent = 'Opening payment';
+        busy(true); send.textContent = T('Opening payment');
         fetch(form.dataset.payUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
           .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.pageUrl) throw new Error(j.error || r.status); return j; }); })
           .then(function (j) { location.assign(j.pageUrl); })
-          .catch(function (e) { busy(false); tell('error', 'The payment could not be opened (' + e.message + '). Please try again in a minute.'); });
+          .catch(function (e) { busy(false); tell('error', T('The payment could not be opened ({why}). Please try again in a minute.', { why: e.message })); });
         return;
       }
       var url = form.dataset.endpoint;
       (url ? fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
-              .then(function (r) { if (!r.ok) throw new Error(r.status); tell('success', form.dataset.thanks || 'Thank you — we will call you back.'); form.reset(); update(); })
+              .then(function (r) { if (!r.ok) throw new Error(r.status); tell('success', T(form.dataset.thanks || 'Thank you — we will call you back.')); form.reset(); update(); })
            : new Promise(function (r) { setTimeout(r, 800); }).then(function () {
                console.info('[order] not sent — no data-endpoint:', lead);
-               tell('', 'Preview: the request was not sent — the form is not connected yet.'); }))
-        .catch(function () { tell('error', 'The request did not go through. Please try again in a minute.'); })
+               tell('', T('Preview: the request was not sent — the form is not connected yet.')); }))
+        .catch(function () { tell('error', T('The request did not go through. Please try again in a minute.')); })
         .then(function () { busy(false); });
     });
 
-    /* a code: not checked yet — says so (2026-10-25, the skeleton) */
-    $$(form, '[data-code]').forEach(function (b) { b.addEventListener('click', function () {
-      var f = b.closest('.order-code').querySelector('input'); hint(b.closest('.order-step'), f.value.trim() ? 'Codes are not connected yet — the discount shows here once they are.' : 'Type the code first'); }); });
+    /* CODE (2026-10-26): [data-code-open] gives its place to the row with the field; × puts it back
+       (the code cleared); Apply turns busy while the code is checked — not connected yet, it says so. */
+    $$(form, '.order-code').forEach(function (box) {
+      var open = box.querySelector('[data-code-open]'), row = box.querySelector('.order-code-row'), f = row && row.querySelector('input'),
+          apply = box.querySelector('[data-code]'), close = box.querySelector('[data-code-close]'), step = box.closest('.order-step');
+      if (!open || !row) return;
+      open.addEventListener('click', function () { open.hidden = true; row.hidden = false; f.focus(); });
+      close.addEventListener('click', function () { row.hidden = true; open.hidden = false; f.value = ''; hint(step, ''); open.focus(); });
+      f.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); apply.click(); } });
+      apply.addEventListener('click', function () {
+        if (!f.value.trim()) { hint(step, T('Type the code first')); f.focus(); return; }
+        hint(step, ''); apply.classList.add('is-loading'); apply.setAttribute('aria-busy', 'true'); apply.textContent = T('Checking');
+        setTimeout(function () { apply.classList.remove('is-loading'); apply.removeAttribute('aria-busy'); apply.textContent = T('Apply');
+          hint(step, T('Codes are not connected yet — the discount shows here once they are.')); }, 1200);
+      });
+    });
 
     /* a link that names an option chooses it on its way down: <a href="#order" data-choose="A1"> */
     $$(document, 'a[data-choose]').forEach(function (a) { a.addEventListener('click', function () {

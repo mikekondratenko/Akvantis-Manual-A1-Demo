@@ -24,6 +24,7 @@
   var API = 'https://api.novaposhta.ua/v2.0/json/';
   var TYPES = { branch: ['841339c7-591a-42e2-8233-7a0a00f0ed6f', '9a68df70-0267-42a8-bb5c-37f427e36ee4'],   /* post · cargo branch */
                 locker: ['f9316480-5f2d-425d-bc2c-ac7cd29decf0'] };                                          /* Nova Poshta parcel locker */
+  var T = function (s) { return (window.KitLang && KitLang.t && KitLang.t(s)) || s; };   /* the words, as in order.js */
   var esc = function (t) { var d = document.createElement('div'); d.textContent = t == null ? '' : t; return d.innerHTML; };
 
   function call(url, method, props, signal) {
@@ -57,11 +58,11 @@
       if (q.length < (opts.min || 0)) { items = []; open(false); return; }
       ctl = new AbortController(); box.classList.add('is-busy');
       Promise.resolve().then(function () { return source(q, ctl.signal); }).then(function (r) { items = r; draw(); })
-        .catch(function (e) { if (e.name !== 'AbortError') { items = []; list.innerHTML = '<li class="suggest-empty">Nova Poshta does not answer — try again in a minute</li>'; open(true); } })
+        .catch(function (e) { if (e.name !== 'AbortError') { items = []; list.innerHTML = '<li class="suggest-empty">' + esc(T('Nova Poshta does not answer — try again in a minute')) + '</li>'; open(true); } })
         .then(function () { box.classList.remove('is-busy'); });
     };
     input.addEventListener('input', function (e) { if (!e.isTrusted) return;   /* our own event after a pick */
-      picked = null; input.setCustomValidity(input.value.trim() ? 'Choose from the list' : ''); onPick(null);
+      picked = null; input.setCustomValidity(input.value.trim() ? T('Choose from the list') : ''); onPick(null);
       clearTimeout(timer); timer = setTimeout(run, 250); });
     input.addEventListener('focus', function () { if (!picked && (opts.min === 0 || input.value.trim().length >= opts.min)) run(); });
     input.addEventListener('keydown', function (e) {
@@ -102,7 +103,7 @@
           .map(function (w) { var parts = w.Description.split(': '), limit = (parts[0].match(/\(([^)]*)\)/) || [])[1];
             /* «№12 · вул. Родини Бунге, 8», and under it what the point says of itself — «до 30 кг на одне місце» */
             return { line: '№' + w.Number + ' · ' + (parts.slice(1).join(': ') || w.ShortAddress), sub: limit || '', value: w.Ref }; }); });
-    }, function (it) { ref.value = it ? it.value : ''; }, { min: 0, empty: kind === 'locker' ? 'No parcel locker here takes this parcel — try a branch' : 'Nothing found — try the number or the street' });
+    }, function (it) { ref.value = it ? it.value : ''; }, { min: 0, empty: kind === 'locker' ? T('No parcel locker here takes this parcel — try a branch') : T('Nothing found — try the number or the street') });
     /* Held until a city is taken: disabled, and data-hold tells order.js (which turns hidden
        fields off and back on) to leave it off when the row opens. */
     var hold = function (on) { point.disabled = on; if (on) point.dataset.hold = ''; else delete point.dataset.hold; };
@@ -115,7 +116,7 @@
       place = it ? it.value : null; pointBox.reset(); ref.value = '';
       hold(!place); point.required = true;
       if (place) setTimeout(function () { point.focus(); }, 0);
-    }, { min: 2, empty: 'No such place with a Nova Poshta branch — type it in Ukrainian: Київ, Львів…' });
+    }, { min: 2, empty: T('No such place with a Nova Poshta branch — type it in Ukrainian: Київ, Львів…') });
   }
 
   var go = function () { [].forEach.call(document.querySelectorAll('.np-pick'), init); };
