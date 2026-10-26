@@ -54,7 +54,8 @@
                        `.is-flip` puts the picture right
        .sec-info-grid · .sec-info-pic · .sec-info-stats · .stat · .stat-value
      .sec-statement    a kicker and one huge line, centred — «Best battery life.» (apple.com)
-     .sec-bar          a title on the left and a link on the right, over a slider
+     .sec-bar          a title on the left (`.t-h1`, as every cards section — 2026-10-26) and a link or
+                       the arrows on the right, over a slider
      .sec-kicker       the small line over a title — muted, semibold, never in caps
      .sec-slides       the highlights: wide slides one at a time, a caption on each, dots that
                        fill as they play and a pause button (kit/slider.js, data-autoplay)
