@@ -644,6 +644,9 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-summary { display: grid; grid-template-columns: auto minmax(0, 1fr); row-gap: var(--space-8); margin: 0; }
 .order-summary dt { color: var(--ink-muted); }
 .order-summary dd { margin: 0; padding-left: var(--space-16); text-align: right; }   /* the gap is padding, so the total's rule runs unbroken */
+/* A long value — a parcel locker's address — wraps at three grid columns on a desktop (2026-10-26), right-aligned
+   under the others, instead of running the plate's width. The total keeps its full row (its rule). */
+@media (min-width: 1024px) { .order-summary dd:not(.is-total) { justify-self: end; max-width: calc(3 * var(--grid-col) + 2 * var(--grid-gutter)); text-wrap: pretty; } }
 .order-summary .is-total { padding-top: var(--space-12); border-top: var(--hairline) solid var(--rule); font-weight: var(--weight-medium); color: var(--ink); font-size: var(--text-16); display: flex; align-items: center; gap: var(--space-8); }
 .order-summary dd.is-total { font-size: var(--text-24); justify-content: flex-end; }   /* the sum a step up from its name (2026-10-26) */
 .order-summary dd.is-total .choice-was { font-size: var(--text-16); margin-right: 0; }   /* before it, struck, what it was without the discount (trade-in) */

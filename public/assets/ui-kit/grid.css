@@ -10,6 +10,9 @@
      --grid-cols     columns
      --grid-gutter   the gap between columns
      --grid-margin   the inset at either edge
+     --grid-col      one column's width on the page (2026-10-26) — derived from the three, so a
+                     block that is not in a .grid can still be «3 columns» wide:
+                     calc(3 * var(--grid-col) + 2 * var(--grid-gutter))
    `--grid-name` and `--grid-bp` are labels for the docs and the preview, not for layout.
 
    Edit a value here, run build-docs, commit both. Mobile first: the base block is 360.
@@ -38,6 +41,7 @@
           --grid-cols: 20; --grid-gutter: var(--space-8); --grid-margin: var(--space-24); }
 }
 
+:root { --grid-col: calc((100vw - 2 * var(--grid-margin) - (var(--grid-cols) - 1) * var(--grid-gutter)) / var(--grid-cols)); }
 /* The container. Children place themselves with `grid-column: span n`. */
 .grid {
   display: grid;
