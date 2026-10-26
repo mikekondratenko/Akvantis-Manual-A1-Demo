@@ -615,7 +615,8 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-step .sec-actions { justify-content: flex-end; margin-top: var(--space-8); }
 .order-hint { justify-content: flex-end; }
 /* ISLANDS (2026-10-26): what «Payment» settles stands under it as plates of its own, 8 apart (the rail's
-   way): Trade-in (the choice itself is the plate), the summary, the code, the total with Pay. Shown while
+   way): the bank of a plan in parts (with the monobank phone), Trade-in (the choice itself is the plate), the
+   summary, the code, the total with Pay. Shown while
    Payment is open; markup `.order-step#step-6 + .order-islands > .order-island`. */
 .order-islands { display: none; gap: var(--space-8); margin-top: calc(var(--space-8) - var(--space-12)); font-size: var(--text-14); }
 .order-step:has(> .panel-title[aria-expanded="true"]) + .order-islands { display: grid; }
@@ -623,6 +624,7 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-island.plate { padding: var(--space-16); }
 .order-islands > .choice { --choice: var(--tile); }
 .order-island.order-code { margin: 0; }
+.order-island .order-seg { margin: 0; }   /* the bank's tabs: the island's own 16 around them */
 .order-island-pay { display: grid; gap: var(--space-16); }
 .order-island-pay .order-total .is-total { border-top: 0; padding-top: 0; }
 .order-island-pay .sec-actions { justify-content: flex-end; margin-top: 0; }
