@@ -566,7 +566,8 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
      a product       its lockup, not its letters (`.sec-lockup[data-device]`, section.js)
      a count         the kit's `.stepper` (field.css) with minus / plus icons
      fields          `.field` + `.dark-input` (field.css); required gets the asterisk by itself
-     buttons         `.btn-primary` for Next and Send, 8 apart in `.sec-actions`
+     buttons         `.btn-secondary` for Next (the stepper, 2026-10-26), `.btn-primary` for Pay / Send — one
+                     primary on the form; 8 apart in `.sec-actions`
 
      form.order-form [data-endpoint]       the form; no endpoint → nothing is sent, and it says so
      .order-steps > .plate.order-step       .panel-title > .order-step-head
