@@ -46,6 +46,8 @@
        .benefit · .benefit-icon (empty = placeholder)
      .sec-cards        a title and 2 or 3 cards — `.is-2` / `.is-3`; `.is-square` makes each card 1:1
        .sec-cards-grid · .card (on .plate) · .card-pic
+       by default a card is picture + title + description (2026-10-26); a button is added when needed:
+       `<div class="sec-actions"><a class="btn btn-tertiary" href="…">…</a></div>` last in the card
      .sec-bento        tiles of different sizes on a 12-column grid, Apple-style
        .sec-bento-grid · .tile (+ .is-half .is-wide .is-full .is-tall) · .tile-pic
      .sec-infographic  big figures stacked beside a close-up (Bluewater's Cleone page);
