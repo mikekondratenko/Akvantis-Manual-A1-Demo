@@ -442,7 +442,7 @@ div.sec-info-pic { display: grid; place-items: center; }
 }
 
 /* ── FAQ ── the kit's accordion (panel.css + accordion.js), centred title, at a reading measure.
-   By default no plates — `.plate.is-line` (panel.css LINE): no fill, a hairline under an open answer, a
+   By default no plates — `.plate.is-line` (panel.css LINE): no fill, no divider, a
    plus that turns into a cross (`.sec-faq-sign`, in place of the chevron). `.is-plates` with plain
    `.plate`s keeps the collapsible plates as the kit draws them. */
 .sec-faq > * { grid-column: var(--sec-narrow); }
@@ -450,10 +450,17 @@ div.sec-info-pic { display: grid; place-items: center; }
 .sec-faq-list { display: grid; gap: var(--space-12); }
 .sec-faq-list > .plate + .plate { margin-top: 0; }
 /* No plates by default: the kit's line accordion (panel.css LINE, `.plate.is-line` in the markup) — no fill,
-   a hairline under an open answer (2026-10-26; was a plate lit under the cursor and when open). */
+   no divider (2026-10-26; was a plate lit under the cursor and when open). */
 .sec-faq-sign { flex: none; width: var(--number-16); height: var(--number-16); color: var(--ink-faint);
   transition: transform var(--duration-base) var(--ease-emphasized), color var(--duration-fast); }
 button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg); color: var(--ink); }
+/* The FAQ's type a step up from the plate's (2026-10-26): the question 16 (was 14), the answer 14 (was
+   12); 24 from the question to the answer, ≈ 56 from one question (or its answer) to the next. */
+.sec-faq .panel-title > span { font-size: var(--text-16); }
+.sec-faq .panel-body { font-size: var(--text-14); }
+.sec-faq .panel-fold > * > :first-child { margin-top: var(--space-2); }   /* + the strip's 22 under the words = 24 from the question to the answer */
+.sec-faq .panel-fold > * > :last-child { margin-bottom: calc(var(--space-24) - var(--space-2)); }   /* + the list's 12 + the next strip's 22 ≈ 56 from an answer to the next question — as from one closed question to the next */
+.sec-faq .panel-body p + p { margin-top: var(--space-8); }
 
 /* ── KICKER ── the small line over a title. Never caps: muted, semibold, a size up from body. */
 .sec-kicker { font-size: var(--text-16); font-weight: var(--weight-semibold); color: var(--ink-muted); }
