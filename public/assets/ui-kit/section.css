@@ -627,7 +627,8 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-island .order-seg { margin: 0; }   /* the bank's tabs: the island's own 16 around them */
 .order-island-pay { display: grid; gap: var(--space-16); }
 .order-island-pay .order-total .is-total { border-top: 0; padding-top: 0; }
-.order-island-pay .sec-actions { justify-content: flex-end; margin-top: 0; }
+.order-island-pay .sec-actions { margin-top: 0; }
+.order-island-pay .sec-actions > [data-pay] { flex: 1; }   /* Pay the island's whole width, on every screen (2026-10-26) */
 
 /* The alternative on: what it replaces folds away and what it brings unfolds (2026-10-25) — the
    bundles close up smoothly, the cartridges open under the row that asked for them. Height,
@@ -676,7 +677,7 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-code-row[hidden] { display: none; }
 /* Under Pay: how one can pay, in words — no bank or card logos (monobank's brandbook: one acquiring
    on the site → the button's words only, Apple Pay / Google Pay may be named; 2026-10-26). */
-.order-pay-note { margin: 0; text-align: right; color: var(--ink-faint); }
+.order-pay-note { margin: 0; text-align: center; color: var(--ink-faint); }
 /* WALLET (2026-10-26, prototype — order.js): Apple Pay and Google Pay — the kit's .btn-wallet (button.css) —
    before Pay; on a phone they share a row, Pay under them. */
 .order-wallet { display: flex; gap: var(--btn-gap); }

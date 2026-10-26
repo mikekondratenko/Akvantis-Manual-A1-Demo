@@ -46,7 +46,7 @@
    PRIVAT  form[data-privat-url="/api/privat"]: the same plan with name="bank" value="privat" (the
            .order-seg monobank | PrivatBank) goes there instead (PrivatBank «Оплата частинами») — the
            answer's url is the bank's own page; the bank sends the buyer back to thanks.html.
-   WALLET  [data-wallet="<logos folder>"] (in the Pay row, with data-when="payment=full"): Apple Pay and
+   WALLET  (not in the form since 2026-10-26 — monobank's page offers the wallets) [data-wallet="<logos folder>"] (in the Pay row, with data-when="payment=full"): Apple Pay and
            Google Pay as the kit's wallet button (button.css WALLET, .btn-wallet) — a white plate on the dark
            page, a black one on paper (2026-10-26: was the vendors' SDK buttons; Google's showed the
            visitor's own card and grew over Pay, Apple's hid itself off Safari). A PROTOTYPE: not wired to the wallets — a
