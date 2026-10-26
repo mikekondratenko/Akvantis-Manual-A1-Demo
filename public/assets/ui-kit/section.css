@@ -614,6 +614,18 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-step .panel-body > :first-child { margin-top: var(--space-8); }
 .order-step .sec-actions { justify-content: flex-end; margin-top: var(--space-8); }
 .order-hint { justify-content: flex-end; }
+/* ISLANDS (2026-10-26): what «Payment» settles stands under it as plates of its own, 8 apart (the rail's
+   way): Trade-in (the choice itself is the plate), the summary, the code, the total with Pay. Shown while
+   Payment is open; markup `.order-step#step-6 + .order-islands > .order-island`. */
+.order-islands { display: none; gap: var(--space-8); margin-top: calc(var(--space-8) - var(--space-12)); font-size: var(--text-14); }
+.order-step:has(> .panel-title[aria-expanded="true"]) + .order-islands { display: grid; }
+.order-islands > * { margin: 0; }
+.order-island.plate { padding: var(--space-16); }
+.order-islands > .choice { --choice: var(--tile); }
+.order-island.order-code { margin: 0; }
+.order-island-pay { display: grid; gap: var(--space-16); }
+.order-island-pay .order-total .is-total { border-top: 0; padding-top: 0; }
+.order-island-pay .sec-actions { justify-content: flex-end; margin-top: 0; }
 
 /* The alternative on: what it replaces folds away and what it brings unfolds (2026-10-25) — the
    bundles close up smoothly, the cartridges open under the row that asked for them. Height,
@@ -668,8 +680,8 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-wallet { display: flex; gap: var(--btn-gap); }
 .order-wallet[hidden] { display: none; }
 .order-wallet .btn-wallet { flex: none; width: calc(var(--number-72) * 2 + var(--space-16)); }   /* .sec-actions .btn would make it hug */
-@media (max-width: 767px) { .order-step .sec-actions > [data-pay] { flex: 1; } .order-pay-note { text-align: center; }
-  .order-wallet { flex: 1 1 100%; } .order-wallet .btn-wallet { flex: 1; width: auto; } .order-step .sec-actions > [data-pay] { flex-basis: 100%; } }   /* on a phone Pay is the whole row */
+@media (max-width: 767px) { .order-island-pay .sec-actions > [data-pay] { flex: 1; } .order-pay-note { text-align: center; }
+  .order-wallet { flex: 1 1 100%; } .order-wallet .btn-wallet { flex: 1; width: auto; } .order-island-pay .sec-actions > [data-pay] { flex-basis: 100%; } }   /* on a phone Pay is the whole row */
 
 .order-status { display: grid; gap: var(--space-12); }
 .order-status > .t-caption { text-align: center; }

@@ -155,7 +155,7 @@
       if (dock) { dock.classList.toggle('is-on', chosen); document.body.classList.toggle('has-dock', chosen); }
       var sum = 0, open = false, off = 0, kg = 0, ship = 0;   /* off: the discounts taken (a negative data-price — trade-in); kg: data-kg of what is chosen; ship: the delivery's price */
       $$(form, 'input:checked:not(:disabled):not([data-alt])').filter(live).forEach(function (i) {
-        var l = i.closest('[data-price], label'); if (!l || !l.closest('.order-step')) return;
+        var l = i.closest('[data-price], label'); if (!l || !l.closest('.order-step, .order-islands')) return;   /* Payment's islands count too (trade-in) */
         if (l.dataset.kg) kg += +l.dataset.kg;
         if (i.name === 'delivery' && l.dataset.price) ship = +l.dataset.price;
         if (l.hasAttribute('data-price')) { var p = l.dataset.price; if (p === '') open = true; else { sum += +p; if (+p < 0) off += +p; } }

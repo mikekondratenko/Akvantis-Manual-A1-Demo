@@ -763,3 +763,12 @@
     --duration-slow: 1ms; --duration-slower: 1ms;
   }
 }
+
+/* ── DISABLED (2026-10-26) ── RULE: a disabled control has no hover, no pressed state and no motion —
+   it does not answer the pointer at all. One rule for the whole kit, so no component has to remember
+   to say `:hover:not(:disabled)`: the pointer passes through (no :hover, no :active, the cursor of
+   what is under it) and nothing transitions or turns. A component's own `:disabled` look still applies. */
+button:disabled, input:disabled, select:disabled, textarea:disabled,
+[aria-disabled="true"], .is-disabled {
+  pointer-events: none; transition: none !important; animation: none !important;
+}
