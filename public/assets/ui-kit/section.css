@@ -647,7 +647,8 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 @media (max-width: 767px) { .story { --story-inset: calc(var(--space-16) + var(--space-4)); border-radius: var(--radius-24); } }
 @media (min-width: 1440px) { .story { --story-inset: var(--space-32); } }
 .story-pic { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; border-radius: 0; object-fit: cover; }
-.story-label { margin: 0; font-size: var(--text-14); line-height: var(--leading-snug); font-weight: var(--weight-medium); }
+.story-label { margin: 0; font-size: var(--text-14); line-height: var(--leading-snug); font-weight: var(--weight-medium);
+  color: color-mix(in srgb, currentColor 50%, transparent); }   /* the story's ink at 50 % (2026-10-26) — follows .on-dark / .on-light */
 .story-title { margin: 0; font-size: var(--text-24); line-height: var(--leading-tight); font-weight: var(--weight-semibold); text-wrap: balance; }
 @media (min-width: 1024px) { .story-title { font-size: var(--text-28); } }
 .story-btn { position: absolute; right: var(--story-inset); bottom: var(--story-inset); }
