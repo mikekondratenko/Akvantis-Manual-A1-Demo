@@ -478,7 +478,7 @@ div.sec-info-pic { display: grid; place-items: center; }
 }
 
 /* ── SPECIFICATIONS (2026-10-26) ── a list of parameters: the name on the left half, the value on
-   the right half, a hairline between rows (Apple / Bluewater «Technical specifications»). On a
+   the right half, a soft hairline between rows (--rule-soft, 2026-10-26; Apple / Bluewater «Technical specifications»). On a
    phone the name stands over its value.
      <section class="sec sec-specs"><header class="sec-head"><h2 class="t-h1">Specifications</h2></header>
        <dl class="specs">
@@ -487,8 +487,8 @@ div.sec-info-pic { display: grid; place-items: center; }
    The name 14 muted, the value 16 in ink; rows 20 above and below the words. The two halves are
    the grid's halves (12 and 8 columns are even, the gutter the same), so the value starts where
    a half-width block would. */
-.specs { margin: 0; border-bottom: 1px solid var(--rule); }
-.specs-row { display: grid; gap: var(--space-4); padding-block: calc(var(--space-16) + var(--space-4)); border-top: 1px solid var(--rule); }
+.specs { margin: 0; border-bottom: 1px solid var(--rule-soft); }
+.specs-row { display: grid; gap: var(--space-4); padding-block: calc(var(--space-16) + var(--space-4)); border-top: 1px solid var(--rule-soft); }
 .specs-row > dt { font-size: var(--text-14); line-height: var(--leading-relaxed); color: var(--ink-muted); }
 .specs-row > dd { margin: 0; font-size: var(--text-16); line-height: var(--leading-relaxed); color: var(--ink); }
 @media (min-width: 768px) { .specs-row { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--grid-gutter); align-items: baseline; } }
@@ -514,8 +514,8 @@ div.sec-info-pic { display: grid; place-items: center; }
 .compare-pic { display: block; width: var(--number-64); height: var(--number-64); margin-bottom: var(--space-16); overflow: hidden;
   border-radius: var(--radius-16); background: var(--tile); }
 .compare-pic > img, .compare-pic > .sec-ph { display: block; width: 100%; height: 100%; padding: 0; border-radius: inherit; object-fit: contain; }
-.compare tbody tr { border-top: 1px solid var(--rule); }
-.compare tbody tr:last-child { border-bottom: 1px solid var(--rule); }
+.compare tbody tr { border-top: 1px solid var(--rule-soft); }
+.compare tbody tr:last-child { border-bottom: 1px solid var(--rule-soft); }
 .compare tbody th, .compare tbody td { padding-block: calc(var(--space-16) + var(--space-4)); font-size: var(--text-16); line-height: var(--leading-relaxed); }
 .compare tbody th { font-size: var(--text-14); color: var(--ink-muted); }
 .compare tbody td { color: var(--ink); }
