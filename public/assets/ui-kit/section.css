@@ -15,7 +15,8 @@
      .sec-actions      a row of buttons (and a price) under it — buttons 8 apart (--btn-gap)
      .sec-banner       the picture of a hero or a CTA — an object over the text by default,
                        a photograph behind it on `.is-cover`
-     .sec-ph           a picture slot until the picture exists — --black-900, nothing drawn in it
+     .sec-ph           a picture slot until the picture exists — transparent; inside .ph-fill (the
+                       specimen, the test mode) --black-900
      .sec-lockup       a product's lockup in a title, from the catalogue (data-device)
 
    ── THE SET (2026-10-25) — what a landing is built from, in this order on the specimen:
@@ -135,11 +136,16 @@ img.sec-banner { object-fit: contain; }
 .sec-ph {
   display: grid; place-items: center; padding: var(--space-16); text-align: center;
   border-radius: var(--sec-card-radius); color: var(--ink-faint); font-size: var(--text-12);
-  /* RULE (2026-10-26, was «transparent» since 10-25): where there is no picture yet, the slot is
-     --black-900 — the size and the place of the picture are seen, nothing is drawn in it (no
-     photograph in a specimen, no hatch). On paper the token is the light grey of the same step. */
-  background: var(--black-900);
+  /* RULE (2026-10-26) — a picture slot has two modes:
+     1) PRODUCTION, the default: transparent — no fill, no hatch. The product's photographs come cut
+        out, on the ground they sit on, so a filled square would be a shape the real thing never has;
+        what holds the slot (a card's plate, a slide, a hero's frame) keeps its own fill.
+     2) TEST — the Sections specimen: `.ph-fill` on a container (the specimen's <body>) fills every
+        slot in it with --black-900, so the size and the place of each picture are seen. No
+        photographs in the specimen. On paper the token is the light grey of the same step. */
+  background: none;
 }
+.ph-fill .sec-ph { background: var(--black-900); }   /* TEST mode — see the RULE above */
 
 /* ── HERO ──
    The first screen: the object, then the words, centred. The top inset clears a fixed
