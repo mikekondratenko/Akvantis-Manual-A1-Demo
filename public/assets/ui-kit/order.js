@@ -94,7 +94,9 @@
     /* A card with a finish (choice.js) adds it: «A1 + K1 · Brushed Steel». */
     var fin = function (i) { var c = i.closest('.choice'); return c && c.dataset.finishLabel ? ' · ' + c.dataset.finishLabel : ''; };
     var label = function (i) { var n = nameEl(i); return (n ? text(n) : i.value) + fin(i); };
-    var labelHtml = function (i) { var n = nameEl(i); return (n ? n.innerHTML.trim() : esc(i.value)) + esc(fin(i)); };
+    var labelHtml = function (i) { var n = nameEl(i);
+      if (n && n.querySelector('[data-bubble]')) { n = n.cloneNode(true); $$(n, '[data-bubble]').forEach(function (b) { b.remove(); }); }   /* the (i) of bubble.js stays in the card */
+      return (n ? n.innerHTML.trim() : esc(i.value)) + esc(fin(i)); };
     var counted = function (root, html) { return $$(root, '.choice.is-count').map(function (c) {
       var i = c.querySelector('input'), n = +i.value; return n > 0 ? n + ' × ' + (html ? labelHtml(i) : label(i)) : ''; }).filter(Boolean); };
     var stepVal = function (s, html) {

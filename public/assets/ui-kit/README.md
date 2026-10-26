@@ -49,6 +49,8 @@ ui-kit/kit/           →  <project>/public/assets/ui-kit/
 ├── swatch.css   the color swatch and the finish row (.swatch-btn, .color-block); requires tokens.css
 ├── panel.css    the plate title and the collapsible plate; requires tokens.css
 ├── number.css   the step number in a circle (Figma «Number»); requires tokens.css
+├── bubble.css   the (i) after a name and the bubble of a few words it opens (.bubble-btn, .bubble) (2026-10-26)
+├── bubble.js    the bubble's behaviour: [data-bubble="words"] opens it on a click; Esc, a click away close it
 ├── hotspot.css  the "+" in a black disc on a picture — a button that opens more; requires tokens.css
 ├── button.css   the one button, tools and pages alike — color from the --btn role; requires tokens.css
 ├── segmented.css the segmented tabs (Kit.segmented) — kit.css @imports it; a page links it alone

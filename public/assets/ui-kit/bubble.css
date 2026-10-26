@@ -1,0 +1,49 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Bubble — a few words that open from an (i), on a click (2026-10-26)
+
+     <b>Service partner<button class="bubble-btn" type="button" aria-label="About Service partner"
+        data-bubble="A certified installer near you …"><i data-icon="info" data-size="16"></i></button></b>
+
+   The (i): the kit's small round icon button (button.css .icon-btn idea — the glyph's own ink at
+   8 / 14 % under it), 24 on a 16 glyph, the faint ink until it is pointed at or open; it sits in
+   the line of words after a name and does not make the line taller.
+   The bubble: one for the page, made by bubble.js — the toast's colours (the white on the dark
+   ground, the black on paper: --white / --black-1000 swap with the theme), 12 round, 12 / 16 in,
+   at most 280 wide, the small text; a 6px nose toward the (i). Under the (i), or over it when
+   there is no room under; never off the screen (16 from its edge). Behaviour: bubble.js.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.bubble-btn {
+  display: inline-flex; align-items: center; justify-content: center; vertical-align: middle;
+  width: var(--number-24); height: var(--number-24); margin: calc(-1 * var(--space-4)) 0 calc(-1 * var(--space-4)) var(--space-4);
+  padding: 0; border: none; border-radius: var(--radius-pill); background: transparent;
+  color: var(--ink-faint); cursor: pointer; font: inherit;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+.bubble-btn svg { display: block; }
+.bubble-btn:hover, .bubble-btn[aria-expanded="true"] { color: var(--ink); background: color-mix(in srgb, currentColor 8%, transparent); }
+.bubble-btn:active { background: color-mix(in srgb, currentColor 14%, transparent); }
+.bubble-btn:focus-visible { outline: none; color: var(--ink); box-shadow: var(--focus-halo); }
+
+.bubble {
+  position: fixed; z-index: 90; top: 0; left: 0;
+  max-width: min(calc(var(--number-288) - var(--space-8)), calc(100vw - 2 * var(--space-16)));
+  padding: var(--space-12) var(--space-16); border-radius: var(--radius-12);
+  background: var(--white); color: var(--black-1000); box-shadow: var(--shadow-md);
+  font-family: var(--font-primary); font-size: var(--text-14); line-height: var(--leading-normal); font-weight: var(--weight-regular);
+  text-align: left; text-wrap: pretty;
+  opacity: 0; transform: translateY(var(--bubble-shift, 4px)); pointer-events: none;
+  transition: opacity var(--duration-fast), transform var(--duration-fast);
+}
+.bubble.is-open { opacity: 1; transform: none; pointer-events: auto; }
+.bubble[hidden] { display: none; }
+.bubble::before {   /* the nose: a square turned 45°, half of it out of the bubble */
+  content: ''; position: absolute; left: var(--bubble-nose, 50%); width: 12px; height: 12px; margin-left: -6px;
+  background: inherit; border-radius: 2px; transform: rotate(45deg);
+}
+.bubble:not(.is-above)::before { top: -5px; }
+.bubble.is-above { --bubble-shift: -4px; }
+.bubble.is-above::before { bottom: -5px; }
+.bubble b { font-weight: var(--weight-semibold); }
+/* In a specimen: the bubble drawn in place, open, the nose up (preview only). */
+.bubble.is-static { position: relative; display: inline-block; opacity: 1; transform: none; pointer-events: auto; margin-top: var(--space-8); }
