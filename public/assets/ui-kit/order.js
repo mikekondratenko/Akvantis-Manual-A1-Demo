@@ -47,7 +47,7 @@
            .order-seg monobank | PrivatBank) goes there instead (PrivatBank «Оплата частинами») — the
            answer's url is the bank's own page; the bank sends the buyer back to thanks.html.
    WALLET  [data-wallet="<logos folder>"] (in the Pay row, with data-when="payment=full"): Apple Pay and
-           Google Pay as the kit's button with the wallet's mark (ui-kit/logos) — a white plate on the dark
+           Google Pay as the kit's wallet button (button.css WALLET, .btn-wallet) — a white plate on the dark
            page, a black one on paper (2026-10-26: was the vendors' SDK buttons; Google's showed the
            visitor's own card and grew over Pay, Apple's hid itself off Safari). A PROTOTYPE: not wired to the wallets — a
            press sends the form as Pay does, to monobank's page, which offers Apple Pay / Google Pay
@@ -356,8 +356,8 @@
       var base = box.dataset.wallet || 'assets/logos/';
       var go = function () { if (form.requestSubmit) form.requestSubmit(); else { var b = form.querySelector('[data-pay]'); if (b) b.click(); } };
       [['apple-pay', 'Apple Pay'], ['google-pay', 'Google Pay']].forEach(function (w) {
-        var b = document.createElement('button'); b.type = 'button'; b.className = 'btn order-wallet-btn'; b.setAttribute('aria-label', w[1]);
-        b.innerHTML = '<img class="is-dark" src="' + base + w[0] + '-light.svg" alt=""><img class="is-light" src="' + base + w[0] + '-dark.svg" alt="">';
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-wallet'; b.setAttribute('aria-label', w[1]);   /* button.css WALLET */
+        b.innerHTML = '<img class="on-white" src="' + base + w[0] + '-light.svg" alt=""><img class="on-black" src="' + base + w[0] + '-dark.svg" alt="">';
         b.addEventListener('click', go); box.appendChild(b); });
     });
 
@@ -392,8 +392,8 @@
       f.addEventListener('input', function () { if (field.classList.contains('is-error')) state(''); });
       apply.addEventListener('click', function () {
         if (!f.value.trim()) { state('error', T('Type the code first')); f.focus(); return; }
-        state(''); apply.classList.add('is-loading'); apply.setAttribute('aria-busy', 'true'); word.textContent = T('Checking');
-        setTimeout(function () { apply.classList.remove('is-loading'); apply.removeAttribute('aria-busy'); word.textContent = T('Apply');
+        state(''); apply.style.minWidth = apply.offsetWidth + 'px'; apply.classList.add('is-loading'); apply.setAttribute('aria-busy', 'true'); apply.setAttribute('aria-label', T('Checking'));   /* the ring alone, no word (field.css) */
+        setTimeout(function () { apply.classList.remove('is-loading'); apply.removeAttribute('aria-busy'); apply.removeAttribute('aria-label'); apply.style.minWidth = '';
           var c = f.value.trim().toUpperCase();
           if (c in DEMO) { f.value = c; take(c, DEMO[c]); state('success', T('Code applied — {sum} off', { sum: eur(DEMO[c]) })); }
           else state('error', T('We could not find this code')); }, 1200);

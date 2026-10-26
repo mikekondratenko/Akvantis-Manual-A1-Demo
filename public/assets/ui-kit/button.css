@@ -148,6 +148,24 @@
 }
 /* Hover through the role (2026-10-25) — a direct box-shadow here outranked the edge of every theme. */
 .btn-frost { --btn-edge-hover: inset 0 0 0 1px var(--white-14); }
+
+/* ── WALLET (2026-10-26) ── Apple Pay / Google Pay: the kit's button with the wallet's mark (ui-kit/logos,
+   24 tall) and no words, 160 wide. Two plates, pure white or pure black (--wallet-white / --wallet-black,
+   which do not swap with the theme):
+     .btn-wallet            by the theme — white on the dark ground, black on paper
+     .btn-wallet.is-white   always white (on paper it takes a 1px edge, or it would vanish)
+     .btn-wallet.is-black   always black (on the dark ground a faint 1px edge)
+   Each carries both marks — <img class="on-white" src="…-light.svg"> and <img class="on-black"
+   src="…-dark.svg"> — and shows the one its plate needs. aria-label names the wallet. */
+.btn-wallet { --btn: var(--wallet-white); --btn-hover: var(--wallet-white); --btn-edge: none; width: calc(var(--number-72) * 2 + var(--space-16)); padding: 0 var(--space-16); }
+.btn-wallet:hover:not(:disabled) { opacity: .88; }
+.btn-wallet > img { display: block; height: var(--number-24); width: auto; }
+.btn-wallet > .on-black { display: none; }
+.btn-wallet.is-black, [data-theme="light"] .btn-wallet:not(.is-white) { --btn: var(--wallet-black); --btn-hover: var(--wallet-black); }
+.btn-wallet.is-black > .on-white, [data-theme="light"] .btn-wallet:not(.is-white) > .on-white { display: none; }
+.btn-wallet.is-black > .on-black, [data-theme="light"] .btn-wallet:not(.is-white) > .on-black { display: block; }
+:root:not([data-theme="light"]) .btn-wallet.is-black { --btn-edge: inset 0 0 0 1px var(--white-20); }
+[data-theme="light"] .btn-wallet.is-white { --btn-edge: inset 0 0 0 1px var(--field-edge); }
 .btn-frost:hover:not(:disabled) { --btn-edge: var(--btn-edge-hover); }
 /* On paper a floating button is the ghost on frost (2026-10-25): the frosted white, the one control
    edge, grey under the cursor — it had its own 7 % hairline and went MORE transparent on hover,

@@ -660,18 +660,13 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 /* Under Pay: how one can pay, in words — no bank or card logos (monobank's brandbook: one acquiring
    on the site → the button's words only, Apple Pay / Google Pay may be named; 2026-10-26). */
 .order-pay-note { margin: 0; text-align: right; color: var(--ink-faint); }
-/* WALLET (2026-10-26, prototype — order.js): Apple Pay and Google Pay, the kit's button with the wallet's
-   mark (24 tall) on --white — white on the dark ground, black on paper (the swapped token) — before Pay;
-   on a phone they share a row, Pay under them. */
+/* WALLET (2026-10-26, prototype — order.js): Apple Pay and Google Pay — the kit's .btn-wallet (button.css) —
+   before Pay; on a phone they share a row, Pay under them. */
 .order-wallet { display: flex; gap: var(--btn-gap); }
 .order-wallet[hidden] { display: none; }
-.order-wallet .order-wallet-btn { flex: none; width: calc(var(--number-72) * 2 + var(--space-16)); --btn: var(--white); --btn-hover: var(--white); --btn-edge: none; }
-.order-wallet-btn:hover { opacity: .9; }
-.order-wallet-btn img { display: block; height: var(--number-24); width: auto; }
-.order-wallet-btn > .is-light, [data-theme="light"] .order-wallet-btn > .is-dark { display: none; }
-[data-theme="light"] .order-wallet-btn > .is-light { display: block; }
+.order-wallet .btn-wallet { flex: none; width: calc(var(--number-72) * 2 + var(--space-16)); }   /* .sec-actions .btn would make it hug */
 @media (max-width: 767px) { .order-step .sec-actions > [data-pay] { flex: 1; } .order-pay-note { text-align: center; }
-  .order-wallet { flex: 1 1 100%; } .order-wallet .order-wallet-btn { flex: 1; width: auto; } .order-step .sec-actions > [data-pay] { flex-basis: 100%; } }   /* on a phone Pay is the whole row */
+  .order-wallet { flex: 1 1 100%; } .order-wallet .btn-wallet { flex: 1; width: auto; } .order-step .sec-actions > [data-pay] { flex-basis: 100%; } }   /* on a phone Pay is the whole row */
 
 .order-status { display: grid; gap: var(--space-12); }
 .order-status > .t-caption { text-align: center; }

@@ -226,6 +226,10 @@
   --btn-solid               : #FCFFFE;
   --btn-solid-hover         : #EAEBEC;
   --btn-solid-ink           : #111211;
+  /* WALLET (2026-10-26): Apple Pay / Google Pay buttons are pure black or pure white by the brands' own
+     rules, the same on either theme — the two never swap (button.css WALLET). */
+  --wallet-white            : #FFFFFF;
+  --wallet-black            : #000000;
   /* Outline — the tertiary of a button with no words (`.round-btn`, `.hotspot`): the tertiary on
      the dark ground, white with an edge on paper. */
   --btn-outline             : var(--btn-tertiary);
