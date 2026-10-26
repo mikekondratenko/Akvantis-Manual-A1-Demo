@@ -68,9 +68,12 @@
 .btn:active { transform: scale(.98); }
 /* Focus: the one ring, from tokens.css. */
 
-/* Dims at .35 like every other control in the kit; `:hover` is said again because it is a
-   separate rule and would otherwise keep lighting a button that cannot be pressed. */
-.btn:disabled { opacity: .35; cursor: default; }
+/* Disabled = the button at .2 (2026-10-26; was .35, as the other controls). A filled button is the
+   loudest thing on its plate, and at .35 a white «Next» still read as something to press; at .2
+   it stays in its place, readable, and quiet. A disabled control is outside WCAG's contrast rule.
+   `:hover` is said again because it is a separate rule and would otherwise keep lighting a button
+   that cannot be pressed. */
+.btn:disabled { opacity: .2; cursor: default; }
 .btn:disabled:hover { background: var(--btn); }
 
 /* ── SENDING (2026-10-11) ──
