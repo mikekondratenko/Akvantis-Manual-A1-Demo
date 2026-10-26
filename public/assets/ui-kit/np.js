@@ -17,6 +17,8 @@
    VALUE   the point's line goes in the visible field (the order reads it), its Ref in the
            hidden one. Typed over and not taken from the list, the field says «Choose from the
            list» (a custom validity — order.js shows it on send).
+   CITY    data-np="city": the place alone (the courier's city, before the street).
+   QUOTE   label[data-np-quote] — Nova Poshta's price and date for the place, see QUOTE below.
    KEY     no API key: searchSettlements and getWarehouses answer without one. The endpoint is
            Nova Poshta's by default; a page with a worker points data-np-endpoint at its own
            proxy (where a key can be added and answers cached). */
@@ -83,7 +85,11 @@
     var kg = parseFloat(root.dataset.npWeight) || 0;
     var size = (root.dataset.npSize || '').split(/[x×]/).map(Number).filter(Boolean).sort(function (a, b) { return a - b; });
     var city = root.querySelector('[data-np-city]'), point = root.querySelector('[data-np-point]'), ref = root.querySelector('[data-np-ref]');
-    var place = null;
+    var form = root.closest('form'), place = null;
+    /* A place chosen here is the place of every Nova Poshta row that has none yet (a branch → the
+       locker, the courier), and the place the prices are asked for (QUOTE, below). */
+    var tell = function (p) { var r = form && form.querySelector('[data-np-city-ref]'); if (r) r.value = p ? p.DeliveryCity : '';
+      if (form) form.dispatchEvent(new CustomEvent('np-city', { detail: { place: p, from: root } })); };
     var fits = function (w) {
       var max = +w.PlaceMaxWeightAllowed || +w.TotalMaxWeightAllowed || 0;
       if (kg && max && max < kg) return false;
@@ -93,7 +99,7 @@
       if (/тільки для/i.test(w.Description)) return false;   /* «ТІЛЬКИ ДЛЯ МЕШКАНЦІВ» — a locker behind a door */
       return w.WarehouseStatus === 'Working' || !w.WarehouseStatus;
     };
-    var pointBox = combo(point, point.parentNode.querySelector('.suggest-list'), function (q, signal) {
+    var pointBox = point && combo(point, point.parentNode.querySelector('.suggest-list'), function (q, signal) {
       if (!place) return Promise.resolve([]);   /* no city yet — nothing to list */
       return Promise.all(TYPES[kind].map(function (t) {
         return call(url, 'getWarehouses', { SettlementRef: place.Ref, TypeOfWarehouseRef: t, FindByString: q, Limit: '300', Page: '1' }, signal); }))
@@ -106,19 +112,67 @@
     }, function (it) { ref.value = it ? it.value : ''; }, { min: 0, empty: kind === 'locker' ? T('No parcel locker here takes this parcel — try a branch') : T('Nothing found — try the number or the street') });
     /* Held until a city is taken: disabled, and data-hold tells order.js (which turns hidden
        fields off and back on) to leave it off when the row opens. */
-    var hold = function (on) { point.disabled = on; if (on) point.dataset.hold = ''; else delete point.dataset.hold; };
+    var hold = function (on) { if (!point) return; point.disabled = on; if (on) point.dataset.hold = ''; else delete point.dataset.hold; };
     hold(true);
-    combo(city, city.parentNode.querySelector('.suggest-list'), function (q, signal) {
+    if (form) form.addEventListener('np-city', function (e) {   /* another row named the place: take it if this one has none */
+      var p = e.detail.place; if (e.detail.from === root || !p || place) return;
+      place = p; city.value = p.Present; city.setCustomValidity(''); hold(false); if (point) point.required = true;
+    });
+    var cityBox = combo(city, city.parentNode.querySelector('.suggest-list'), function (q, signal) {
       return call(url, 'searchSettlements', { CityName: q, Limit: '20', Page: '1' }, signal).then(function (d) {
         return ((d[0] && d[0].Addresses) || []).filter(function (a) { return a.Warehouses > 0; })
           .map(function (a) { return { line: a.Present, value: a }; }); });
     }, function (it) {
-      place = it ? it.value : null; pointBox.reset(); ref.value = '';
-      hold(!place); point.required = true;
-      if (place) setTimeout(function () { point.focus(); }, 0);
+      place = it ? it.value : null; if (pointBox) { pointBox.reset(); ref.value = ''; }
+      hold(!place); if (point) point.required = true;
+      if (place && point) setTimeout(function () { point.focus(); }, 0);
+      tell(place);
     }, { min: 2, empty: T('No such place with a Nova Poshta branch — type it in Ukrainian: Київ, Львів…') });
   }
 
-  var go = function () { [].forEach.call(document.querySelectorAll('.np-pick'), init); };
+  /* ── QUOTE (2026-10-26) ── a row label[data-np-quote="WarehouseWarehouse | WarehousePostomat |
+     WarehouseDoors"] gets Nova Poshta's own price and date for the place chosen, the parcel's
+     weight (form[data-kg]) and worth (form[data-goods], €, declared in hryvnia): the price in
+     its .choice-price and in its data-price (€, the form's rate back), the day in [data-np-term].
+     From form[data-np-sender] (a city Ref) — Kyiv until the client says (docs 4.4). Asked again
+     only when the place, the weight or the worth changes. */
+  var KYIV = '8d5a980d-391c-11dd-90d9-001a92567626';
+  function quotes(form) {
+    var rows = [].slice.call(form.querySelectorAll('[data-np-quote]')); if (!rows.length) return;
+    var refEl = form.querySelector('[data-np-city-ref]'), to = refEl && refEl.value;
+    var rate = +form.dataset.rate || +form.dataset.uahRate || 48, kg = Math.max(0.5, +form.dataset.kg || 0.5);
+    var worth = Math.max(1, Math.round((+form.dataset.goods || 0) * rate)), key = [to, kg, worth].join('|');
+    if (!to || form.dataset.npQuoted === key) return;
+    form.dataset.npQuoted = key;
+    var url = form.dataset.npEndpoint || API, from = form.dataset.npSender || KYIV, lang = document.documentElement.lang || 'en';
+    var money = function (uah) { return form.dataset.currency === 'UAH'
+      ? new Intl.NumberFormat(lang, { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(Math.round(uah))
+      : new Intl.NumberFormat(lang, { style: 'currency', currency: 'EUR', currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(uah / rate); };
+    var doc = function (method, svc) { return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apiKey: '',
+      modelName: 'InternetDocument', calledMethod: method, methodProperties: { CitySender: from, CityRecipient: to, ServiceType: svc, Weight: String(kg),
+        Cost: String(worth), CargoType: 'Parcel', SeatsAmount: '1' } }) }).then(function (r) { return r.json(); })
+      .then(function (j) { if (!j.success || !j.data || !j.data[0]) throw new Error('quote'); return j.data[0]; }); };
+    rows.forEach(function (row) {
+      var svc = row.dataset.npQuote, price = row.querySelector('.choice-price'), term = row.querySelector('[data-np-term]');
+      row.classList.add('is-quoting');
+      Promise.all([doc('getDocumentPrice', svc), doc('getDocumentDeliveryDate', svc).catch(function () { return null; })]).then(function (r) {
+        if (form.dataset.npQuoted !== key) return;   /* asked again since */
+        var uah = +r[0].Cost; row.dataset.price = String(Math.round(uah / rate * 100) / 100);
+        if (price) { price.textContent = money(uah); price.classList.remove('order-tbd'); }
+        var d = r[1] && r[1].DeliveryDate && r[1].DeliveryDate.date;
+        if (term && d) term.textContent = T('Delivery {date}').replace('{date}', new Date(d.slice(0, 10) + 'T12:00:00').toLocaleDateString(lang, { day: 'numeric', month: 'long' }));
+        form.dispatchEvent(new Event('change', { bubbles: true }));   /* order.js recounts */
+      }).catch(function () { delete form.dataset.npQuoted; }).then(function () { row.classList.remove('is-quoting'); });
+    });
+  }
+
+  var go = function () {
+    [].forEach.call(document.querySelectorAll('.np-pick'), init);
+    [].forEach.call(document.querySelectorAll('form'), function (f) {
+      if (!f.querySelector('[data-np-quote]')) return;
+      var t; var later = function () { clearTimeout(t); t = setTimeout(function () { quotes(f); }, 400); };
+      f.addEventListener('change', later); f.addEventListener('input', later); f.addEventListener('np-city', later);
+    });
+  };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();

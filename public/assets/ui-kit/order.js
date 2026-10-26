@@ -34,6 +34,8 @@
            data-rate: the € prices shown in another currency, e.g. UAH × 48.
    PAY     form[data-pay-url="/api/pay"]: on send the order (FormData — hidden rows are disabled, so left
            out) goes to that address; the answer's pageUrl (monobank's payment page) is opened.
+   PARCEL  form[data-kg] (Σ data-kg of what is chosen) and form[data-goods] (the sum less the delivery, €)
+           — what np.js asks Nova Poshta a price for.
    CODE    .order-code: [data-code-open] → .order-code-row (field · [data-code] Apply · [data-code-close] ×).
    PARTS   form[data-parts-url="/api/parts"]: a payment of N parts (not «full») is applied for there
            instead (monobank «Покупка частинами»); the form waits on <url>/state, then thanks.html.
@@ -137,14 +139,18 @@
       var first = steps()[0], pick = first && first.querySelector('input:checked:not(:disabled):not([data-alt])');
       var chosen = on ? counted(first).length > 0 : !!pick;
       if (dock) { dock.classList.toggle('is-on', chosen); document.body.classList.toggle('has-dock', chosen); }
-      var sum = 0, open = false, off = 0;   /* off: the discounts taken (a negative data-price — trade-in) */
+      var sum = 0, open = false, off = 0, kg = 0, ship = 0;   /* off: the discounts taken (a negative data-price — trade-in); kg: data-kg of what is chosen; ship: the delivery's price */
       $$(form, 'input:checked:not(:disabled):not([data-alt])').filter(live).forEach(function (i) {
         var l = i.closest('[data-price], label'); if (!l || !l.closest('.order-step')) return;
+        if (l.dataset.kg) kg += +l.dataset.kg;
+        if (i.name === 'delivery' && l.dataset.price) ship = +l.dataset.price;
         if (l.hasAttribute('data-price')) { var p = l.dataset.price; if (p === '') open = true; else { sum += +p; if (+p < 0) off += +p; } }
         else if (i.type === 'radio' && l.closest('[data-priced]')) open = true;
       });
-      $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return; var p = c.dataset.price; if (p === undefined || p === '') open = true; else sum += +p * +c.querySelector('input').value; });
+      $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return; kg += (+c.dataset.kg || 0) * +c.querySelector('input').value; var p = c.dataset.price; if (p === undefined || p === '') open = true; else sum += +p * +c.querySelector('input').value; });
       var sumTxt = open ? eur(null) : eur(sum);
+      /* what the parcel is, for a carrier's quote (np.js): its weight and its worth without the delivery, € */
+      form.dataset.kg = Math.round(kg * 10) / 10; form.dataset.goods = open ? '' : sum - ship;
       var plan = valOf('payment'), inParts = plan && plan !== 'full';
       var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) pay.textContent = inParts ? T('Apply for {n} payments', { n: plan }) : chosen ? T('Pay {sum}', { sum: sumTxt }) : T('Pay');
       /* [data-per-month="10"]: the total over that many parts (2026-10-26 — was typed by hand) */
