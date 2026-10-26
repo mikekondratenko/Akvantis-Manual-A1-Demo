@@ -46,6 +46,12 @@
    PRIVAT  form[data-privat-url="/api/privat"]: the same plan with name="bank" value="privat" (the
            .order-seg monobank | PrivatBank) goes there instead (PrivatBank «Оплата частинами») — the
            answer's url is the bank's own page; the bank sends the buyer back to thanks.html.
+   WALLET  [data-wallet] (in the Pay row, with data-when="payment=full"): the Apple Pay and Google Pay
+           buttons — their own, drawn by Apple's SDK (<apple-pay-button>) and Google's pay.js (TEST),
+           white on the dark page, black on a light one (where Apple's script hides its button, the kit's
+           white button reads «Apple Pay»). A PROTOTYPE: not wired to the wallets — a
+           press sends the form as Pay does, to monobank's page, which offers Apple Pay / Google Pay
+           itself. Paying in the button needs merchant certificates (docs/order-form-questions.md 5.7).
    SEND    checked here, not by the browser's bubbles: a wrong field gets aria-invalid and a
            .field-error line, cleared as it is typed in; the button turns .is-loading; the
            answer is the .notice. No data-endpoint → nothing is sent, and the notice says so. */
@@ -327,6 +333,30 @@
                tell('', T('Preview: the request was not sent — the form is not connected yet.')); }))
         .catch(function () { tell('error', T('The request did not go through. Please try again in a minute.')); })
         .then(function () { busy(false); });
+    });
+
+    /* WALLET (2026-10-26, prototype): see the head of this file. */
+    $$(form, '[data-wallet]').forEach(function (box) {
+      var go = function () { if (form.requestSubmit) form.requestSubmit(); else { var b = form.querySelector('[data-pay]'); if (b) b.click(); } };
+      var load = function (src, cb) { var s = document.createElement('script'); s.src = src; s.async = true; if (cb) s.onload = cb; document.head.appendChild(s); };
+      var light = document.documentElement.dataset.theme === 'light', uk = /^uk/.test(lang);
+      var a = document.createElement('div'); a.className = 'order-wallet-apple';
+      var ab = document.createElement('apple-pay-button');
+      ab.setAttribute('buttonstyle', light ? 'black' : 'white'); ab.setAttribute('type', 'plain'); ab.setAttribute('locale', uk ? 'uk-UA' : 'en-US');
+      ab.addEventListener('click', go); a.appendChild(ab); box.appendChild(a);
+      /* Apple's script hides its button where Apple Pay is not offered (a browser off Apple's list):
+         the kit's white button with the words stands in, so the row never has a hole. */
+      var stand = function () { if (!ab.hasAttribute('hidden') || a.querySelector('.btn')) return;
+        var t = document.createElement('button'); t.type = 'button'; t.className = 'btn btn-secondary'; t.textContent = 'Apple Pay';
+        t.addEventListener('click', go); ab.remove(); a.appendChild(t); };
+      if (window.MutationObserver) new MutationObserver(stand).observe(ab, { attributes: true, attributeFilter: ['hidden'] });
+      stand(); setTimeout(stand, 1500);
+      if (!window.customElements || !customElements.get('apple-pay-button')) load('https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js');
+      var g = document.createElement('div'); g.className = 'order-wallet-google'; box.appendChild(g);
+      var draw = function () { try { var c = new google.payments.api.PaymentsClient({ environment: 'TEST' });
+        g.appendChild(c.createButton({ onClick: function (e) { if (e && e.preventDefault) e.preventDefault(); go(); },
+          buttonColor: light ? 'black' : 'white', buttonType: 'plain', buttonSizeMode: 'fill', buttonRadius: 16, buttonLocale: uk ? 'uk' : 'en' })); } catch (e) { g.remove(); } };
+      if (window.google && google.payments) draw(); else load('https://pay.google.com/gp/p/js/pay.js', draw);
     });
 
     /* CODE (2026-10-26): [data-code-open] gives its place to the row with the field; × puts it back
