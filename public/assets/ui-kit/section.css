@@ -33,7 +33,7 @@
                        with what is chosen and its price. Behaviour: kit/order.js. See «ORDER».
      .sec-quote        large words on the black, two or three lines; `.is-center`
      .sec-footer       the mark and a line, columns of links, the legal line and the social marks
-     .sec-cards.is-vertical   cards 3:4 (with `.is-square` 1:1)
+     card shapes   .is-horizontal 4:3 · .is-square 1:1 · .is-vertical 3:4 — on .sec-cards / .sec-gallery or one .card
    Kept until the landing is rebuilt on the set, not on the specimen: .sec-benefits, .sec-bento,
    .sec-infographic, .sec-statement, .sec-cta, .sec-hero.is-cover.
 
@@ -58,7 +58,7 @@
      .sec-kicker       the small line over a title — muted, semibold, never in caps
      .sec-slides       the highlights: wide slides one at a time, a caption on each, dots that
                        fill as they play and a pause button (kit/slider.js, data-autoplay)
-     .sec-gallery      cards about half a screen wide, words under each, arrows (kit/slider.js)
+     .sec-gallery      the same cards (.plate.card) in a carousel, about half a screen wide, arrows (kit/slider.js)
      .sec-reviews      reviews three a row, each on a plate (`.is-bare` without), the words and,
                        at the foot, an avatar and a name; arrows
        .slider · .slider-track · .slide · .slider-ctrl (built by the script)
@@ -370,11 +370,23 @@ img.sec-banner { object-fit: contain; }
     overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
     scroll-padding-inline: var(--grid-margin); scrollbar-width: none; }
   .sec-cards-grid::-webkit-scrollbar { display: none; }
-  .sec-cards-grid > .card { scroll-snap-align: start; border-radius: var(--radius-24); }
-  .sec-cards-grid .card-pic { border-radius: var(--radius-16); }
-  .sec-cards-grid .card > :not(.card-pic) { margin-inline: var(--space-12); }
-  .sec-cards-grid .card > .t-small { font-size: var(--text-14); }
+  .sec-cards-grid > .card { scroll-snap-align: start; }
 }
+/* ══ THE CARD — one component wherever it stands (2026-10-26): the cards' row (.sec-cards) and the
+   carousel (.sec-gallery) are the same `.plate.card`. Only its shape changes; the picture, the
+   words and the button sit the same way in all of them.
+     <li class="plate card"><div class="card-pic sec-ph"></div>     picture (<img> or .sec-ph), optional
+       <h3 class="t-h3">Title</h3><p class="t-small">Description</p>    the default: title + description
+       [<div class="sec-actions"><a class="btn btn-tertiary">…</a></div>]   a button only when asked, last
+     </li>
+   SHAPES — on the section (applies to all its cards) or on one card:
+     (none)          the card as tall as it needs, picture 4:3
+     .is-horizontal  card 4:3 from 768, the picture takes what the words leave
+     .is-square      card 1:1 from 768, likewise
+     .is-vertical    card 3:4 from 768, likewise
+   On a phone the card is as tall as it needs and the picture takes the shape's own ratio.
+   INSETS — picture 8 from the edge; words 24 from the edge (32 from 1440; 20 on a phone); bottom 24
+   (32 from 1440); between parts 12, picture → title 24; the button pinned to the foot. */
 .card { display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-8) var(--space-8) var(--space-24);
   border-radius: var(--sec-card-radius); }
 .card-pic { width: 100%; aspect-ratio: 4 / 3; border-radius: calc(var(--sec-card-radius) - var(--space-8)); object-fit: contain; }
@@ -383,17 +395,15 @@ img.card-pic { background: var(--black-800); }
 .card > .card-pic + * { margin-top: var(--space-12); }
 .card > .t-small { color: var(--ink-muted); }
 .card > .sec-actions { margin-top: auto; padding-top: var(--space-12); }
-
-/* Square cards: from 768 the card is 1:1 and the picture takes what the words leave; on a
-   phone the card is as tall as it needs and the picture is square. */
-/* Vertical cards (2026-10-25): the same, 3:4. */
-.sec-cards.is-vertical .card-pic { aspect-ratio: 3 / 4; }
-@media (min-width: 768px) {
-  .sec-cards.is-vertical .card { aspect-ratio: 3 / 4; }
-  .sec-cards.is-vertical .card-pic { aspect-ratio: auto; flex: 1 1 0; min-height: 0; }
-}
 /* Every part of a card is optional (2026-10-25): with no picture it starts at the words' inset. */
 .card:not(:has(> .card-pic)) { padding-top: var(--space-24); }
+/* A phone (2026-10-25): smaller corners, the words 20 in, the description 14. */
+@media (max-width: 767px) {
+  .card { border-radius: var(--radius-24); }
+  .card-pic { border-radius: var(--radius-16); }
+  .card > :not(.card-pic) { margin-inline: var(--space-12); }
+  .card > .t-small { font-size: var(--text-14); }
+}
 /* From 1440 the words sit 32 from the card's edge instead of 24 (2026-10-26): sides, bottom, and the
    top of a card with no picture. The picture keeps its 8. */
 @media (min-width: 1440px) {
@@ -401,10 +411,16 @@ img.card-pic { background: var(--black-800); }
   .card > :not(.card-pic) { margin-inline: var(--space-24); }
   .card:not(:has(> .card-pic)) { padding-top: var(--space-32); }
 }
-.sec-cards.is-square .card-pic { aspect-ratio: 1; }
+/* Shapes. On a phone only the picture takes the ratio; from 768 the whole card does and the
+   picture fills what the words leave. */
+.sec.is-square .card-pic, .card.is-square > .card-pic { aspect-ratio: 1; }
+.sec.is-vertical .card-pic, .card.is-vertical > .card-pic { aspect-ratio: 3 / 4; }
 @media (min-width: 768px) {
-  .sec-cards.is-square .card { aspect-ratio: 1; }
-  .sec-cards.is-square .card-pic { aspect-ratio: auto; flex: 1 1 0; min-height: 0; }
+  .sec.is-horizontal .card, .card.is-horizontal { aspect-ratio: 4 / 3; }
+  .sec.is-square .card,     .card.is-square     { aspect-ratio: 1; }
+  .sec.is-vertical .card,   .card.is-vertical   { aspect-ratio: 3 / 4; }
+  :is(.sec.is-horizontal, .sec.is-square, .sec.is-vertical) .card-pic,
+  .card:is(.is-horizontal, .is-square, .is-vertical) > .card-pic { aspect-ratio: auto; flex: 1 1 0; min-height: 0; }
 }
 
 /* ── BENTO ── tiles of different sizes, Apple's way of showing one thing from several sides.
@@ -534,17 +550,13 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .slider.is-paused .slider-dot.is-on::after, .slider:not(.is-playing) .slider-dot.is-on::after { animation: none; transform: none; }
 @keyframes slider-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-/* ── GALLERY ── cards about half the content wide from 1024 (the third peeks), most of the
-   width on a phone; the picture on top, words under it: a bold lead-in, the rest muted. */
+/* ── GALLERY ── the carousel of cards (2026-10-26: its slides are the kit's `.plate.card`, see THE CARD;
+   until then a picture with a line under it). About half the content wide from 1024 (the third
+   peeks), most of the width on a phone; `.is-horizontal` by default. */
 .sec-gallery .slider-track { grid-auto-columns: 86%; }
 @media (min-width: 768px)  { .sec-gallery .slider-track { grid-auto-columns: 62%; } }
 @media (min-width: 1024px) { .sec-gallery .slider-track { grid-auto-columns: calc((100% - var(--grid-margin) * 2 - var(--grid-gutter)) * .46); } }
-.sec-gallery .slide { display: grid; gap: var(--space-24); align-content: start; }
-.sec-gallery .slide-pic { width: 100%; aspect-ratio: 3 / 2; border-radius: var(--sec-card-radius); background: var(--tile); object-fit: contain; }
-.sec-gallery .slide-text { padding-inline: var(--space-24); max-width: 44ch; color: var(--ink-muted); font-size: var(--text-16); line-height: var(--leading-relaxed); }
-.sec-gallery .slide-text b { color: var(--ink); font-weight: var(--weight-semibold); }
-/* A card in the carousel may carry buttons (2026-10-25), at the words' inset. */
-.sec-gallery .slide > .sec-actions { padding-inline: var(--space-24); }
+.sec-gallery .slide.card + .slide.card { margin-top: 0; }
 
 /* ── REVIEWS ── three cards a row from 1024, the fourth peeking (2026-10-25: on plates, no quote
    mark, no hairline). A card is the words — as long as the buyer wrote them; the row is as tall
