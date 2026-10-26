@@ -638,6 +638,7 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-fields, .order-ship { display: grid; gap: var(--space-12); }
 .order-seg .segmented { width: 100%; }
 .order-seg { margin-block: calc(var(--space-16) - var(--space-12)); }   /* 16 above and under the tabs: the list's 12 + 4 (2026-10-26) */
+.order-bank { display: grid; gap: var(--space-12); }   /* the plan's bank (monobank | PrivatBank) and what it asks for — the list's own gap (2026-10-26) */
 .choice-pic.sec-ph { padding: 0; font-size: var(--text-12); }
 /* The summary: what each step chose, then the total under a rule. */
 .order-summary { display: grid; grid-template-columns: auto minmax(0, 1fr); row-gap: var(--space-8); margin: 0; }

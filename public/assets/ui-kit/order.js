@@ -43,6 +43,9 @@
    PARTS   form[data-parts-url="/api/parts"]: a payment of N parts (not «full») is applied for there
            instead (monobank «Покупка частинами»); the form waits on <url>/state, then thanks.html.
            [data-per-month="N"] shows the total over N; the button reads «Apply for N payments».
+   PRIVAT  form[data-privat-url="/api/privat"]: the same plan with name="bank" value="privat" (the
+           .order-seg monobank | PrivatBank) goes there instead (PrivatBank «Оплата частинами») — the
+           answer's url is the bank's own page; the bank sends the buyer back to thanks.html.
    SEND    checked here, not by the browser's bubbles: a wrong field gets aria-invalid and a
            .field-error line, cleared as it is typed in; the button turns .is-loading; the
            answer is the .notice. No data-endpoint → nothing is sent, and the notice says so. */
@@ -160,7 +163,7 @@
       var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) pay.textContent = inParts ? T('Apply for {n} payments', { n: plan }) : chosen ? T('Pay {sum}', { sum: sumTxt }) : T('Pay');
       /* [data-per-month="10"]: the total over that many parts (2026-10-26 — was typed by hand) */
       $$(form, '[data-per-month]').forEach(function (el) { var n = +el.dataset.perMonth;
-        el.textContent = chosen && !open ? T('{sum} / month · {n} × with monobank', { sum: eur(Math.round(sum / n * 100) / 100), n: n }) : T('monobank «Покупка частинами»'); });
+        el.textContent = chosen && !open ? T('{sum} / month · {n} × with ' + (valOf('bank') === 'privat' ? 'PrivatBank' : 'monobank'), { sum: eur(Math.round(sum / n * 100) / 100), n: n }) : T('monobank or PrivatBank, interest-free'); });
       var dl = form.querySelector('[data-summary]'), dt = form.querySelector('[data-summary-total]');   /* the total in a list of its own when there is one (the code stands between) */
       var rowsHtml = steps().slice(0, -1).map(function (s) { var v = stepVal(s, true);
           return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('')
@@ -275,6 +278,16 @@
       /* PARTS (2026-10-26): a plan of N payments goes to form[data-parts-url] instead — monobank pushes
          the offer to the buyer's app; the form waits on <url>/state until it is approved or not. */
       var plan = valOf('payment');
+      /* PRIVAT (2026-10-26): the plan with PrivatBank — the worker opens a payment there and answers the
+         bank's page; the buyer logs in to Privat24 and confirms it on that page. */
+      if (plan && plan !== 'full' && valOf('bank') === 'privat' && form.dataset.privatUrl) {
+        busy(true); send.textContent = T('Opening PrivatBank');
+        fetch(form.dataset.privatUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
+          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.url) throw new Error(j.error || r.status); return j; }); })
+          .then(function (j) { location.assign(j.url); })
+          .catch(function (e) { busy(false); tell('error', T('PrivatBank could not open the payment ({why}). Please try again in a minute.', { why: e.message })); });
+        return;
+      }
       if (plan && plan !== 'full' && form.dataset.partsUrl) {
         var base = form.dataset.partsUrl, tries = 0;
         var WHY = { EXCEEDED_SUM_LIMIT: 'the sum is over your limit', NOT_ENOUGH_MONEY_FOR_INIT_DEBIT: 'not enough money for the first payment',
