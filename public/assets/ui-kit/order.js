@@ -46,7 +46,7 @@
    PRIVAT  form[data-privat-url="/api/privat"]: the same plan with name="bank" value="privat" (the
            .order-seg monobank | PrivatBank) goes there instead (PrivatBank «Оплата частинами») — the
            answer's url is the bank's own page; the bank sends the buyer back to thanks.html.
-   WALLET  (not in the form since 2026-10-26 — monobank's page offers the wallets) [data-wallet="<logos folder>"] (in the Pay row, with data-when="payment=full"): Apple Pay and
+   WALLET  (Google Pay only, TEST, since 2026-10-26 13:55 — see the block below) [data-wallet="<logos folder>"] (in the Pay row, with data-when="payment=full"): Apple Pay and
            Google Pay as the kit's wallet button (button.css WALLET, .btn-wallet) — a white plate on the dark
            page, a black one on paper (2026-10-26: was the vendors' SDK buttons; Google's showed the
            visitor's own card and grew over Pay, Apple's hid itself off Safari). A PROTOTYPE: not wired to the wallets — a
@@ -167,6 +167,7 @@
       var sumTxt = open ? eur(null) : eur(sum);
       /* what the parcel is, for a carrier's quote (np.js): its weight and its worth without the delivery, € */
       form.dataset.kg = Math.round(kg * 10) / 10; form.dataset.goods = open ? '' : sum + codeOff - ship;
+      form.dataset.sum = open || !chosen ? '' : sum;   /* the total in €, for the Google Pay sheet (WALLET) */
       var plan = valOf('payment'), inParts = plan && plan !== 'full';
       var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) pay.textContent = inParts ? T('Apply for {n} payments', { n: plan }) : chosen ? T('Pay {sum}', { sum: sumTxt }) : T('Pay');
       /* [data-per-month="10"]: the total over that many parts (2026-10-26 — was typed by hand) */
@@ -282,6 +283,7 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      var via = form.dataset.via; delete form.dataset.via;   /* «gpay» when the Google Pay button sent it (WALLET) */
       var all = steps(), stuck = all.filter(function (s) { return !passes(s); })[0], first = null;
       if (stuck) { all.forEach(function (x) { acc(x.querySelector('.panel-title'), x === stuck); }); tell('error', hintOf(stuck) + '.'); return; }
       $$(form, 'input:not([type=radio]):not([type=checkbox]):not([type=hidden]), textarea').forEach(function (el) {
@@ -294,6 +296,7 @@
         if (s && s.querySelector('.panel-title').getAttribute('aria-expanded') !== 'true') all.forEach(function (x) { acc(x.querySelector('.panel-title'), x === s); });
         setTimeout(function () { first.focus(); }, 300); return; }
       var lead = Object.fromEntries(new FormData(form)); lead.page = location.href; lead.lang = lang;
+      if (via === 'gpay' && gpay) { if (notice) notice.hidden = true; return gpay(lead); }   /* in the click's own turn — Google asks for that */
       if (notice) notice.hidden = true; busy(true);
       /* PAY (2026-10-26): form[data-pay-url="/api/pay"] — the order goes to the page's own worker, which
          counts the total itself, opens a monobank invoice and answers { pageUrl }; the buyer goes there. */
@@ -351,14 +354,39 @@
         .then(function () { busy(false); });
     });
 
-    /* WALLET (2026-10-26, prototype): see the head of this file. */
+    /* WALLET (2026-10-26, prototype): see the head of this file. Google Pay only — Apple Pay needs an Apple
+       Developer account even to test. The button checks the form as Pay does, then opens Google's own
+       sheet (pay.js, environment TEST — the visitor's real cards, a test token, nothing charged); the token
+       goes to form[data-gpay-url] (the worker records the order) and the buyer to thanks.html?gpay=…  */
+    var gpay = null;
     $$(form, '[data-wallet]').forEach(function (box) {
-      var base = box.dataset.wallet || 'assets/logos/';
-      var go = function () { if (form.requestSubmit) form.requestSubmit(); else { var b = form.querySelector('[data-pay]'); if (b) b.click(); } };
-      [['apple-pay', 'Apple Pay'], ['google-pay', 'Google Pay']].forEach(function (w) {
-        var b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-wallet'; b.setAttribute('aria-label', w[1]);   /* button.css WALLET */
-        b.innerHTML = '<img class="on-white" src="' + base + w[0] + '-light.svg" alt=""><img class="on-black" src="' + base + w[0] + '-dark.svg" alt="">';
-        b.addEventListener('click', go); box.appendChild(b); });
+      var base = box.dataset.wallet || 'assets/logos/', client = null;
+      var CARD = { type: 'CARD', parameters: { allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'], allowedCardNetworks: ['MASTERCARD', 'VISA'] } };
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-wallet'; b.setAttribute('aria-label', 'Google Pay'); b.hidden = true;   /* button.css WALLET */
+      b.innerHTML = '<img class="on-white" src="' + base + 'google-pay-light.svg" alt=""><img class="on-black" src="' + base + 'google-pay-dark.svg" alt="">';
+      b.addEventListener('click', function () { form.dataset.via = 'gpay'; if (form.requestSubmit) form.requestSubmit(); });
+      box.appendChild(b);
+      var s = document.createElement('script'); s.src = 'https://pay.google.com/gp/p/js/pay.js'; s.async = true;
+      s.onload = function () { try { client = new google.payments.api.PaymentsClient({ environment: 'TEST' });
+        client.isReadyToPay({ apiVersion: 2, apiVersionMinor: 0, allowedPaymentMethods: [CARD] }).then(function (r) { b.hidden = !r.result; }); } catch (e) {} };
+      document.head.appendChild(s);
+      gpay = function (lead) {
+        var uah = !!form.dataset.uahRate, n = +form.dataset.sum || 0, total = uah ? Math.round(n * form.dataset.uahRate) : n;
+        var req = { apiVersion: 2, apiVersionMinor: 0, merchantInfo: { merchantName: 'AKVANTIS' },
+          allowedPaymentMethods: [Object.assign({}, CARD, { tokenizationSpecification: { type: 'PAYMENT_GATEWAY',
+            parameters: { gateway: 'example', gatewayMerchantId: 'exampleGatewayMerchantId' } } })],   /* TEST: Google's example gateway */
+          transactionInfo: { totalPriceStatus: 'FINAL', totalPrice: total.toFixed(2), currencyCode: uah ? 'UAH' : 'EUR', countryCode: uah ? 'UA' : 'DE' } };
+        client.loadPaymentData(req).then(function (pd) {
+          busy(true); send.textContent = T('Sending');
+          lead.gpay = { token: pd.paymentMethodData.tokenizationData.token, card: pd.paymentMethodData.info || {}, description: pd.paymentMethodData.description || '' };
+          if (!form.dataset.gpayUrl) { busy(false); return tell('', T('Preview: Google Pay gave a test token — the form is not connected here.')); }
+          return fetch(form.dataset.gpayUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
+            .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.order) throw new Error(j.error || r.status); return j; }); })
+            .then(function (j) { location.assign('thanks.html?order=' + encodeURIComponent(j.order) + '&gpay=' + encodeURIComponent(j.sum)); });
+        }).catch(function (err) { busy(false);
+          if (err && err.statusCode === 'CANCELED') return;   /* closed the sheet — nothing to say */
+          tell('error', T('Google Pay could not finish the payment ({why}). Please try again or pay by card.', { why: (err && (err.statusMessage || err.message)) || 'error' })); });
+      };
     });
 
     /* CODE (2026-10-26): [data-code-open] gives its place to the row with the field; × puts it back

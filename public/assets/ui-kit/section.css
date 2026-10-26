@@ -628,7 +628,11 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-island-pay { display: grid; gap: var(--space-16); }
 .order-island-pay .order-total .is-total { border-top: 0; padding-top: 0; }
 .order-island-pay .sec-actions { margin-top: 0; }
-.order-island-pay .sec-actions > [data-pay] { flex: 1; }   /* Pay the island's whole width, on every screen (2026-10-26) */
+.order-island-pay .sec-actions { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }   /* Pay the island's width; with Google Pay, halves */
+.order-island-pay .order-wallet { display: contents; }
+.order-island-pay .order-wallet[hidden], .order-island-pay .order-wallet > [hidden] { display: none; }
+.order-island-pay .sec-actions .btn { width: 100%; }
+@media (max-width: 767px) { .order-island-pay .sec-actions { grid-auto-flow: row; } }
 
 /* The alternative on: what it replaces folds away and what it brings unfolds (2026-10-25) — the
    bundles close up smoothly, the cartridges open under the row that asked for them. Height,
