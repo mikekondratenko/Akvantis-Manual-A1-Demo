@@ -68,19 +68,20 @@
 .btn:active { transform: scale(.98); }
 /* Focus: the one ring, from tokens.css. */
 
-/* Disabled = the button at .12 (2026-10-26; was .35, as the other controls, then .2). A filled
+/* Disabled = the button at .25 (2026-10-26 13:30; was .35, as the other controls, then .2, then .12). A filled
    button is the loudest thing on its plate, and at .35 — and still at .2 — a white «Next» read as
    something to press; at .12 it is only a trace of where the button will be. A disabled control is outside WCAG's contrast rule.
    `:hover` is said again because it is a separate rule and would otherwise keep lighting a button
    that cannot be pressed. */
-.btn:disabled { opacity: .12; cursor: default; }
+.btn:disabled { opacity: .25; cursor: default; }
 .btn:disabled:hover { background: var(--btn); }
-/* DARK GROUND (2026-10-26): the plate keeps its .12 trace, but the label is white — at .12 the dark
-   ink of a cyan or white button sank into the plate and the words could not be read at all. The
-   whole-button .12 stays on paper (the light theme) and for a text button, which has no plate. */
+/* DARK GROUND (2026-10-26): the label is white — the button's own dark ink on cyan or white sank into
+   the plate. RULE: the plate and the label are at ONE opacity, .25 (75 % off) — the plate is the
+   button's colour at 25 %, the label white at 25 %. On paper and for a text button (no plate) the whole
+   button is at .25, which is the same rule. */
 :root:not([data-theme="light"]) .btn:disabled:not(.btn-text),
 :root:not([data-theme="light"]) .btn:disabled:not(.btn-text):hover {
-  opacity: 1; background: color-mix(in srgb, var(--btn) 12%, transparent); color: var(--white); box-shadow: none;
+  opacity: 1; background: color-mix(in srgb, var(--btn) 25%, transparent); color: color-mix(in srgb, var(--white) 25%, transparent); box-shadow: none;
 }
 
 /* ── SENDING (2026-10-11) ──
