@@ -620,6 +620,7 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-islands { display: none; gap: var(--space-8); margin-top: calc(var(--space-8) - var(--space-12)); font-size: var(--text-14); }
 .order-step:has(> .panel-title[aria-expanded="true"]) + .order-islands { display: grid; }
 .order-islands > * { margin: 0; }
+.order-islands > [data-alt-off].is-off { display: none; }   /* Trade-in with filters only: gone, with its gap (an island does not fold) */
 .order-island.plate { padding: var(--space-16); }
 .order-islands > .choice { --choice: var(--tile); }
 .order-island.order-code { margin: 0; }
