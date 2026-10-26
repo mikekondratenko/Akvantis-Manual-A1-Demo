@@ -6,7 +6,7 @@
    four that have to be remembered in step. The role names the job, not the tag: a section
    title that has to read as large as the page title is `<h2 class="t-h1">`.
 
-     .t-display   40 → 72 → 96 / 1 / 600 / -.02em   a landing's object — a name, a price as a picture
+     .t-display   40 → 72 → 80 → 96 / 1 / 600 / -.02em (96 from 1460)   a landing's object — a name, a price as a picture
      .t-h1        32 → 48 → 56 / 1 / 600            a page or a screen's title
      .t-h2        24 → 32      / 1.1 / 600          a section's title, a price
      .t-h3        24 / 1.25 / 600            a group inside a section
@@ -42,7 +42,9 @@
   --type-h2:      var(--text-24);
 }
 @media (min-width: 768px)  { :root { --type-display: var(--text-72); --type-h1: var(--text-48); --type-h2: var(--text-32); } }
-@media (min-width: 1024px) { :root { --type-display: var(--text-96); --type-h1: var(--text-56); } }
+@media (min-width: 1024px) { :root { --type-display: var(--text-80); --type-h1: var(--text-56); } }
+/* The display's 96 only from 1460 (2026-10-26): at 1440 a 96 title read a step too large. */
+@media (min-width: 1460px) { :root { --type-display: var(--text-96); } }
 
 .t-display { font-size: var(--type-display); line-height: var(--leading-none);    font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); }
 .t-h1      { font-size: var(--type-h1); line-height: var(--leading-none);    font-weight: var(--weight-semibold); }

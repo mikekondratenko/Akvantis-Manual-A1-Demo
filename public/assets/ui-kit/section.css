@@ -495,8 +495,13 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 /* The controls row: dots + pause (highlights), arrows (gallery, reviews). */
 .slider-ctrl { display: flex; align-items: center; justify-content: flex-end; gap: var(--btn-gap);
   padding: var(--space-24) var(--grid-margin) 0; }
-.slider-ctrl .btn { width: var(--number-48); }
-.slider-ctrl .btn:disabled { opacity: .35; }
+/* The arrows are the kit's round button with no words (2026-10-26) — the same disc as the "+"
+   (`.round-btn`, `.hotspot`): a 48 circle in both themes, the tertiary at rest (white at 10 % on the
+   dark ground, white with an edge on paper), the solid ink under the cursor. Switched off at an end,
+   they follow the kit's disabled rule (tokens.css, button.css) — no own opacity. */
+.slider-ctrl .btn-round:not(.btn-frost) { width: var(--number-48); height: var(--number-48); border-radius: var(--radius-pill);
+  --btn: var(--btn-outline); --btn-hover: var(--btn-outline-hover); --btn-ink: var(--btn-outline-ink); --btn-edge: var(--btn-outline-edge); }
+@media (hover: hover) { .slider-ctrl .btn-round:not(.btn-frost):hover:not(:disabled) { background: var(--btn-solid); color: var(--btn-solid-ink); box-shadow: none; } }
 
 /* ── HIGHLIGHTS ── one slide a view, the full content width, 4:5 on a phone and 16:9 from
    1024; the caption sits on the picture at the top, the controls float at the bottom. */
