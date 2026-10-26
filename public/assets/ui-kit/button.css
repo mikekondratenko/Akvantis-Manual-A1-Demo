@@ -177,6 +177,22 @@
 /* Round — an icon and nothing else, 48 across. Give it an aria-label. */
 .btn-round { width: var(--number-48); padding: 0; flex: none; }
 
+/* ══════════════ CIRCLE — a round arrow (2026-10-26) ══════════════
+   A chevron in a disc: the slider's previous / next (slider.js), any step back and forth.
+   The icon button's two sizes — 32 / 16 and 40 / 20 (`.btn-circle-md`), the plate twice the glyph —
+   in the tertiary at rest (white at 10 % on the dark ground, white with an edge on paper) and the
+   solid ink under the cursor, as `.round-btn` and `.hotspot`. Pressed scale .94; switched off it is
+   the kit's disabled `.btn` (.25, no hover, no motion).
+     <button class="btn btn-circle" aria-label="Next"><i data-icon="chevron-right" data-size="16"></i></button>
+     <button class="btn btn-circle btn-circle-md" aria-label="Next"><i data-icon="chevron-right" data-size="20"></i></button> */
+.btn.btn-circle { width: var(--number-32); height: var(--number-32); padding: 0; flex: none; border-radius: var(--radius-pill);
+  --btn: var(--btn-outline); --btn-hover: var(--btn-solid); --btn-ink: var(--btn-outline-ink); --btn-edge: var(--btn-outline-edge); }
+.btn.btn-circle.btn-circle-md { width: var(--number-40); height: var(--number-40); }
+.btn.btn-circle > svg { width: var(--number-16); height: var(--number-16); margin: 0; }
+.btn.btn-circle.btn-circle-md > svg { width: calc(var(--number-16) + var(--space-4)); height: calc(var(--number-16) + var(--space-4)); }
+.btn.btn-circle:hover:not(:disabled), .btn.btn-circle[data-state="hover"] { background: var(--btn-solid); color: var(--btn-solid-ink); box-shadow: none; }
+.btn.btn-circle:active:not(:disabled), .btn.btn-circle[data-state="active"] { background: var(--btn-solid); color: var(--btn-solid-ink); box-shadow: none; transform: scale(.94); }
+
 /* ── THE LABELS OF AMBER AND RED, PER THEME ──
    Paper: the deep step of the hue — on white the 20 % fills are pale and a -400 label would
    vanish (measured on #FFFFFF, rest / hover: amber-800 6.1 / 5.2, red-700 5.0 / 3.8). */

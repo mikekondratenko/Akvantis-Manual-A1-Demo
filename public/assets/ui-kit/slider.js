@@ -2,7 +2,8 @@
    Slider — the behaviour of .sec-slides, .sec-gallery and .sec-reviews (2026-10-12)
 
    The track is a CSS scroll-snap row (section.css) and works by finger with no script.
-   This adds the controls, after the track, in a `.slider-ctrl` row:
+   This adds the controls, after the track, in a `.slider-ctrl` row (arrows: in the `.sec-bar`
+   right above the slider, on the title's right, when that bar has no link — 2026-10-26):
      data-autoplay="5000" on .slider → dots that fill over that many ms, and a pause button;
                                        plays only while the slider is on screen, and never
                                        under prefers-reduced-motion
@@ -16,8 +17,8 @@
   'use strict';
   /* The kit's icons (icons.js swaps each <i data-icon> for its <svg>); play and pause filled. */
   var ICON = {
-    prev: '<i data-icon="chevron-left" data-size="16"></i>',
-    next: '<i data-icon="chevron-right" data-size="16"></i>',
+    prev: '<i data-icon="chevron-left" data-size="20"></i>',
+    next: '<i data-icon="chevron-right" data-size="20"></i>',
     pause: '<i data-icon="pause" data-size="14" data-fill></i>',
     play: '<i data-icon="play" data-size="14" data-fill></i>'
   };
@@ -73,7 +74,7 @@
       mark(); restart();
     } else {
       var prev = document.createElement('button'), next = document.createElement('button');
-      prev.type = next.type = 'button'; prev.className = next.className = 'btn btn-round';
+      prev.type = next.type = 'button'; prev.className = next.className = 'btn btn-circle btn-circle-md';
       prev.innerHTML = ICON.prev; next.innerHTML = ICON.next;
       prev.setAttribute('aria-label', 'Previous'); next.setAttribute('aria-label', 'Next');
       var step = function (dir) { var i = current() + dir; if (i >= 0 && i < slides.length) go(i); };
@@ -85,7 +86,12 @@
       track.addEventListener('scroll', ends, { passive: true }); addEventListener('resize', ends);
       ctrl.append(prev, next); ends();
     }
-    root.appendChild(ctrl);
+    /* Arrows go up into the section's title bar, on the right of the title (2026-10-26), when
+       the slider sits right under a `.sec-bar` with nothing on its right yet; dots stay below. */
+    var bar = root.previousElementSibling;
+    if (!auto && bar && bar.classList.contains('sec-bar') && !bar.querySelector('.link, .slider-ctrl')) {
+      ctrl.classList.add('is-in-bar'); bar.appendChild(ctrl);
+    } else root.appendChild(ctrl);
   }
   window.Slider = { init: init };
   var all = function () { document.querySelectorAll('.slider').forEach(init); };
