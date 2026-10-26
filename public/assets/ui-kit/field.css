@@ -16,6 +16,8 @@
      .dark-input            the text field; `textarea.dark-input` grows, `[type=number]` is tabular
      .select                the same box with a chevron
      .stepper               a number with its own − / + inside the box (.stepper-btn, minus/plus icons)
+     .input-action          a field with its button inside the box, at the right: a code and its Apply
+                            (`.dark-input` + `.btn`, any level; 2026-10-26)
        .is-bare             the counter: no box, the number close to − / + (a counter card)
      .ui-checkbox · .ui-radio  20, the input shell; chosen = the ink (white box / black on paper),
                             never the accent; in a .checkbox-row / .radio-row
@@ -345,3 +347,20 @@ textarea.dark-input {
 @keyframes suggest-busy { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 [data-theme="light"] .suggest-list { background: #FFFFFF; }
 [data-theme="light"] .suggest-opt:hover, [data-theme="light"] .suggest-opt.is-active { background: var(--black-800); }
+
+/* ══════════════ A FIELD WITH ITS BUTTON INSIDE (2026-10-26) ══════════════
+   <div class="input-action"><input class="dark-input">  <button class="btn btn-secondary">Apply</button></div>
+   The box is the holder: the field's edge, hover, the 1.8 px active edge and the error, all on it;
+   the field inside gives up its own. The button stands 4 in from the edge on every side, so the
+   whole is one field's height (4 + 38 + 4 + the edge); its corners are the box's less those 4 —
+   the two curves run parallel. Its words set its width; the field takes the rest. */
+.input-action { display: flex; align-items: center; gap: var(--space-4); height: var(--field-h); padding: var(--space-4);
+  border: 1px solid var(--field-edge); border-radius: var(--field-radius); background-color: transparent;
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
+.input-action:hover { border-color: var(--field-edge-hover); }
+.input-action:focus-within { border-color: var(--field-edge-focus); box-shadow: inset 0 0 0 0.8px var(--field-edge-focus); }
+.input-action:has(> [aria-invalid="true"]) { border-color: var(--danger-edge); }
+.input-action > .dark-input { flex: 1; min-width: 0; height: 100%; border: 0; box-shadow: none; background: none;
+  padding: 0 var(--space-12) 0 calc(var(--field-pad) - var(--space-4)); }
+.input-action > .btn { flex: none; width: auto; height: 100%; padding: 0 var(--space-16); border-radius: calc(var(--field-radius) - var(--space-4)); }
+[data-theme="light"] .input-action { background-color: var(--page); }

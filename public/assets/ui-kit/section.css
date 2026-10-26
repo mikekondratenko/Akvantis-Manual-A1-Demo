@@ -649,11 +649,12 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 /* A code (promo or a friend's): folded until asked for. */
 /* The code (2026-10-26): a link «I have a referral code» between the lines and the total — the
    code changes the total, so it stands before it; pressed, the field takes its place on the same
-   row — Apply (secondary; busy while the code is checked) and the kit's × (.icon-btn) to put it away. */
+   row — Apply inside the field (field.css .input-action, secondary; busy while the code is checked)
+   and the kit's × (.icon-btn) to put it away. */
 .order-code-open { appearance: none; border: 0; margin: 0; padding: 0 0 var(--link-offset); background-color: transparent;
   font: inherit; font-size: var(--text-14); color: var(--ink); cursor: pointer; justify-self: start; }   /* a link (type.css .link), a <button> underneath */
-.order-code { display: grid; }
-.order-code-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--space-8); align-items: center; }
+.order-code { display: grid; margin-block: calc(var(--space-24) - var(--space-12)); }   /* 24 from the lines above and from the total's rule: the fieldset's 12 + 12 */
+.order-code-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-8); align-items: center; }   /* the field with Apply inside (field.css .input-action) · × */
 .order-code-row[hidden] { display: none; }
 /* Under Pay: how one can pay, in words — no bank or card logos (monobank's brandbook: one acquiring
    on the site → the button's words only, Apple Pay / Google Pay may be named; 2026-10-26). */

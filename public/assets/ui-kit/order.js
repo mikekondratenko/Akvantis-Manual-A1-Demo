@@ -316,7 +316,7 @@
     /* CODE (2026-10-26): [data-code-open] gives its place to the row with the field; × puts it back
        (the code cleared); Apply turns busy while the code is checked — not connected yet, it says so. */
     $$(form, '.order-code').forEach(function (box) {
-      var open = box.querySelector('[data-code-open]'), row = box.querySelector('.order-code-row'), f = row && row.querySelector('input'),
+      var open = box.querySelector('[data-code-open]'), row = box.querySelector('.order-code-row'), f = row && row.querySelector('input:not([type=hidden])'),
           apply = box.querySelector('[data-code]'), close = box.querySelector('[data-code-close]'), step = box.closest('.order-step');
       if (!open || !row) return;
       open.addEventListener('click', function () { open.hidden = true; row.hidden = false; f.focus(); });
