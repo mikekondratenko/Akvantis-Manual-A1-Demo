@@ -144,6 +144,14 @@ button.panel-title[aria-expanded="true"] { border-radius: var(--radius-16) var(-
 .panel-fold > * > :first-child { margin-top: var(--space-24); }
 
 .panel-body { display: flex; flex-direction: column; gap: var(--space-16); }
+
+/* ── LINE (2026-10-26) ── `.plate.is-line`: the collapsible plate without its plate — no fill at rest,
+   none under the cursor (the title lifting to the ink is the only hover), none open. Open, a hairline
+   (--rule) closes it under the answer, so the question and its answer read as one block. The strip,
+   the inset, the type and the fold are the plate's own. The landing's FAQ uses it (section.css). */
+.plate.is-line { background: none; border-radius: 0; transition: box-shadow var(--duration-base); }
+.plate.is-line > button.panel-title, .plate.is-line > button.panel-title:hover { background: none; }
+.plate.is-line:has(> button.panel-title[aria-expanded="true"]) { box-shadow: inset 0 calc(-1 * var(--hairline)) 0 var(--rule); }
 .panel-body[hidden] { display: none; }
 
 @media (prefers-reduced-motion: reduce) {

@@ -442,18 +442,15 @@ div.sec-info-pic { display: grid; place-items: center; }
 }
 
 /* ── FAQ ── the kit's accordion (panel.css + accordion.js), centred title, at a reading measure.
-   By default no plates: questions are rows on hairlines, larger, with a plus that turns into a
-   cross when the answer opens (`.sec-faq-sign`, in place of the chevron). `.is-plates` keeps
-   the collapsible plates as the kit draws them. */
+   By default no plates — `.plate.is-line` (panel.css LINE): no fill, a hairline under an open answer, a
+   plus that turns into a cross (`.sec-faq-sign`, in place of the chevron). `.is-plates` with plain
+   `.plate`s keeps the collapsible plates as the kit draws them. */
 .sec-faq > * { grid-column: var(--sec-narrow); }
 .sec-faq > .sec-head { justify-items: center; text-align: center; }
 .sec-faq-list { display: grid; gap: var(--space-12); }
 .sec-faq-list > .plate + .plate { margin-top: 0; }
-/* No plates: the kit's accordion exactly — strip, inset, type, hover — with the plate hidden
-   at rest. The cursor still lights it (the kit's closed-hover), and an open question stands on
-   it, so the question and its answer read as one object. */
-.sec-faq:not(.is-plates) .sec-faq-list > .plate { background: none; transition: background var(--duration-fast); }
-.sec-faq:not(.is-plates) .sec-faq-list > .plate:has(> button.panel-title[aria-expanded="true"]) { background: var(--tile); }
+/* No plates by default: the kit's line accordion (panel.css LINE, `.plate.is-line` in the markup) — no fill,
+   a hairline under an open answer (2026-10-26; was a plate lit under the cursor and when open). */
 .sec-faq-sign { flex: none; width: var(--number-16); height: var(--number-16); color: var(--ink-faint);
   transition: transform var(--duration-base) var(--ease-emphasized), color var(--duration-fast); }
 button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg); color: var(--ink); }
