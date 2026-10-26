@@ -23,6 +23,9 @@
      .field-hint            a line under the control, faint
      .field-error           the same line when something is wrong, with an icon if given
      .is-error / .is-success, or aria-invalid="true" on the control — the edge carries the state
+     .field.suggest         a text field with a list under it (a combobox): .suggest-list > .suggest-opt
+                            (<b> the line, <small> the second); .suggest-empty when nothing matches
+                            — the list is drawn by a script (np.js)
      .notice                what a form says after it is sent — a plate in the status surface:
                             .notice (info) · .notice.is-success · .notice.is-error
 
@@ -323,3 +326,22 @@ textarea.dark-input {
 .stepper.is-bare:hover, .stepper.is-bare:focus-within { border-color: transparent; box-shadow: none; }
 .stepper.is-bare:has(:focus-visible) { border-color: var(--field-edge-focus); box-shadow: inset 0 0 0 0.8px var(--field-edge-focus); }
 .stepper.is-bare .dark-input { flex: none; width: var(--number-40); padding: 0; }
+
+/* ══════════════ SUGGEST — a field with a list under it (2026-10-26) ══════════════
+   A combobox: you type, the list under the field offers what matches, a tap (or ↑ ↓ Enter)
+   takes one. The list is the field's own: the same radius, the field's focus edge around both
+   while it is open. Drawn by a script — np.js for the Nova Poshta branches. */
+.suggest { position: relative; }
+.suggest-list { position: absolute; z-index: 30; top: calc(100% + var(--space-4)); left: 0; right: 0;
+  max-height: 280px; overflow-y: auto; overscroll-behavior: contain; margin: 0; padding: var(--space-4); list-style: none;
+  background: var(--black-800); border: 1px solid var(--field-edge); border-radius: var(--field-radius); box-shadow: var(--shadow-md); }
+.suggest-list[hidden] { display: none; }
+.suggest-opt { display: grid; gap: var(--space-2); padding: var(--space-8) var(--space-12); border-radius: var(--radius-4); cursor: pointer; color: var(--ink); }
+.suggest-opt > b { font-size: var(--text-14); font-weight: var(--weight-medium); line-height: var(--leading-snug); }
+.suggest-opt > small { font-size: var(--text-12); color: var(--ink-faint); line-height: var(--leading-normal); }
+.suggest-opt:hover, .suggest-opt.is-active { background: var(--black-700); }
+.suggest-empty { padding: var(--space-8) var(--space-12); font-size: var(--text-14); color: var(--ink-faint); }
+.suggest.is-busy > .dark-input { background-image: linear-gradient(90deg, transparent, var(--white-10), transparent); background-size: 200% 100%; animation: suggest-busy 1s linear infinite; }
+@keyframes suggest-busy { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+[data-theme="light"] .suggest-list { background: #FFFFFF; }
+[data-theme="light"] .suggest-opt:hover, [data-theme="light"] .suggest-opt.is-active { background: var(--black-800); }

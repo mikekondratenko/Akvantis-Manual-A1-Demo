@@ -61,6 +61,7 @@ ui-kit/kit/           →  <project>/public/assets/ui-kit/
 ├── choice.css   a plate that is chosen: cards (a 1px accent edge when chosen) and rows (a marker, no plate) (2026-10-25)
 ├── choice.js    a counted choice: − / + and a tap on the card, the ends dimmed, `input` fired (2026-10-25)
 ├── order.js     the order form (section.css «ORDER», from the A1 landing): steps, counts, the bar, sending (2026-10-25)
+├── np.js        a Nova Poshta branch or parcel locker, picked from the carrier's own list (field.css «SUGGEST»; public API, no key) (2026-10-26)
 ├── accordion.js the collapsible plate's behaviour — aria-expanded, data-open, inert; no kit.js
 ├── locale.js    the location picker's behaviour — open / close, `akv-region`, the current row
 ├── slider.js    the controls of .sec-slides / .sec-gallery / .sec-reviews — arrows, or dots and

@@ -12,17 +12,27 @@
            steps [data-alt-skip] are left out.
    COUNTRY select[name=country]: an element with data-country="DE PL" is there only for those
            countries; a radio taken in it falls back to the first one left (2026-10-25).
-   WHEN    [data-when="name=value"] is there only while that radio is taken; [data-when-not] only
+   OFF     option[data-off-when="name=value"]: that option is disabled while the radio is taken —
+           Ukraine while AKVANTIS service is (Germany and Poland only); data-off-note
+           is added to its words while it is off.
+   WHEN    [data-when="name=value"] (or «a=b&c=d», all of them; a select answers as a radio does) is there only while that radio is taken; [data-when-not] only
            while it is not — the delivery that the installer brings, the address a pickup does not
            need. A field hidden so is not checked and not sent.
+   ONE     [data-pick-one] around a radio list: when only one is left to choose, it is chosen.
+   SEGMENT .order-seg: a radio group drawn as the kit's segmented tabs (the delivery's Pickup | Courier;
+           a label's data-icon gives its tab an icon) —
+           needs kit.js (Kit.segmented) and segmented.css on the page.
    SAY     [data-say="…"] on something shown in a step is that step's value (the delivery the installer brings).
    NUMBERS a step's .num is its place among the steps shown, so a skipped step leaves no gap.
-   SUMMARY [data-summary] (a <dl>) lists each step's value and the total; [data-pay] reads «Pay €…».
+   SUMMARY [data-summary] (a <dl>) lists each step's value and the total (and, with form[data-uah-rate]
+           and the country UA, the sum in hryvnia the invoice will carry); [data-pay] reads «Pay €…».
    COUNT   a .choice.is-count card — its behaviour is kit/choice.js (load it before this file);
            a change there fires `input`, and the strip, the bar and the total recount.
    DOCK    #<form>-dock (.order-dock): up with the first choice — the chosen card's pictures, its
            name, the other steps' values, and the sum of data-price of everything chosen (a
            choice without a price makes it «price on request»). data-currency, default EUR.
+   PAY     form[data-pay-url="/api/pay"]: on send the order (FormData — hidden rows are disabled, so left
+           out) goes to that address; the answer's pageUrl (monobank's payment page) is opened.
    SEND    checked here, not by the browser's bubbles: a wrong field gets aria-invalid and a
            .field-error line, cleared as it is typed in; the button turns .is-loading; the
            answer is the .notice. No data-endpoint → nothing is sent, and the notice says so. */
@@ -41,8 +51,9 @@
     var alt = form.querySelector('input[data-alt]');
     var steps = function () { return $$(form, '.order-step:not([hidden])'); };
     var live = function (i) { return !i.disabled && !i.closest('[hidden]'); };
-    var valOf = function (n) { var i = $$(form, 'input[name="' + n + '"]:checked').filter(live)[0]; return i ? i.value : ''; };
-    var cond = function (c) { var k = c.split('='); return valOf(k[0]) === k.slice(1).join('='); };
+    var valOf = function (n) { var sel = form.querySelector('select[name="' + n + '"]'); if (sel && live(sel)) return sel.value;   /* a select answers too: data-when="country=UA" */
+      var i = $$(form, 'input[name="' + n + '"]:checked').filter(live)[0]; return i ? i.value : ''; };
+    var cond = function (c) { return c.split('&').every(function (t) { var k = t.split('='); return valOf(k[0]) === k.slice(1).join('='); }); };   /* «a=b&c=d»: all of them */
     var reached = 0;
 
     /* What a choice is called: its .choice-name (lockups and all) or its <b>. `text` reads a
@@ -59,9 +70,11 @@
     var counted = function (root, html) { return $$(root, '.choice.is-count').map(function (c) {
       var i = c.querySelector('input'), n = +i.value; return n > 0 ? n + ' × ' + (html ? labelHtml(i) : label(i)) : ''; }).filter(Boolean); };
     var stepVal = function (s, html) {
-      var bits = $$(s, 'input:checked:not(:disabled):not([data-alt])').filter(live).map(html ? labelHtml : label).concat(counted(s, html));
+      var bits = $$(s, 'input:checked:not(:disabled):not([data-alt])').filter(function (i) { return live(i) && !i.closest('.order-seg'); }).map(html ? labelHtml : label).concat(counted(s, html));
       $$(s, '[data-say]').forEach(function (e) { if (!e.closest('[hidden]')) bits.push(esc(e.dataset.say)); });   /* a note that is the step's value */
-      $$(s, '[data-show]').forEach(function (f) { if (!f.closest('[hidden]') && f.value.trim()) bits.push(html ? esc(f.value.trim()) : f.value.trim()); });
+      $$(s, '[data-show]').forEach(function (f) { if (f.closest('[hidden]')) return;
+        var v = (f.tagName === 'SELECT' ? (f.selectedOptions[0] || {}).text || '' : f.value).replace(/\s+—.*$/, '').trim();   /* a select shows its option's words, without the note after a dash */
+        if (v) bits.push(html ? esc(v) : v); });
       return bits.join(' · ');
     };
 
@@ -84,8 +97,24 @@
         $$(g, 'input').forEach(function (i) { i.disabled = off;
           if (off && i.checked && i.type === 'radio') { i.checked = false;
             var to = $$(form, 'input[name="' + i.name + '"]').filter(live)[0]; if (to) to.checked = true; } }); });
+      var again = false, whens = function () {
       $$(form, '[data-when]').forEach(function (g) { g.hidden = !cond(g.dataset.when); });
+      /* an option a choice rules out: disabled; taken, the select moves to the first one left */
+      $$(form, 'option[data-off-when]').forEach(function (o) { o.disabled = cond(o.dataset.offWhen);
+        if (o.dataset.base == null) o.dataset.base = o.textContent;   /* data-off-note follows the name only while it is off */
+        o.textContent = o.dataset.base + (o.disabled && o.dataset.offNote ? ' — ' + o.dataset.offNote : '');
+        var sel = o.parentNode.closest('select') || o.parentNode;
+        if (o.disabled && o.selected) { var to = [].filter.call(sel.options, function (x) { return !x.disabled; })[0]; if (to) sel.value = to.value; } });
       $$(form, '[data-when-not]').forEach(function (g) { g.hidden = cond(g.dataset.whenNot); });
+      /* what is hidden so is not sent either: its fields go disabled (out of the FormData) */
+      $$(form, '[data-when] :is(input, select, textarea), [data-when-not] :is(input, select, textarea)').forEach(function (i) {
+        if (i.closest('[hidden]')) { if (!i.disabled) { i.disabled = true; i.dataset.whenOff = ''; } }
+        else if ('whenOff' in i.dataset) { delete i.dataset.whenOff; if (!('hold' in i.dataset)) i.disabled = false; } });   /* data-hold: another script keeps it off (np.js until a city) */   /* only what it turned off itself — a field another script holds stays held */
+      /* [data-pick-one]: a list down to one choice takes it — the only courier of a country */
+      $$(form, '[data-pick-one]').forEach(function (l) { var rs = $$(l, 'input[type=radio]').filter(live);
+        if (rs.length === 1 && !rs[0].checked) { rs[0].checked = true; again = true; } });
+      };
+      whens(); if (again) whens();   /* a choice taken by [data-pick-one] shows what it asks (its own data-when) */
       steps().forEach(function (s, i) { var n = s.querySelector('.num'); if (n) n.textContent = i + 1; });
       if (window.Choice) Choice.sync(form);
       steps().forEach(function (s) { var v = s.querySelector('.order-step-val'); if (v) v.innerHTML = stepVal(s, true); });
@@ -105,7 +134,9 @@
       var dl = form.querySelector('[data-summary]');
       if (dl) dl.innerHTML = steps().slice(0, -1).map(function (s) { var v = stepVal(s, true);
           return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('')
-        + '<dt class="is-total">Total</dt><dd class="is-total">' + sumTxt + '</dd>';
+        + '<dt class="is-total">Total</dt><dd class="is-total">' + sumTxt + '</dd>'
+        /* form[data-uah-rate]: in Ukraine the invoice is in hryvnia — the sum the bank will show, said here first */
+        + (form.dataset.uahRate && valOf('country') === 'UA' && !open && chosen ? '<dt>Charged in hryvnia</dt><dd>≈ ' + new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(sum * form.dataset.uahRate) + '</dd>' : '');
       if (!dock || !chosen) return;
       var card = on ? null : pick.closest('.choice');
       var pics = card ? $$(card, '.choice-pic') : $$(form, '.choice.is-count.is-on .choice-pic').slice(0, 3);
@@ -118,6 +149,17 @@
       total.textContent = open ? eur(null) : eur(sum); total.classList.toggle('order-tbd', open);
       dock.querySelector('[data-dock="total-sub"]').textContent = open ? 'price on request' : '';
     }
+
+    /* SEGMENTS: .order-seg holds a radio group (sr-only); the kit's segmented tabs are drawn
+       from it (Kit.segmented, kit.js) and a tab takes its radio — «Pickup | Courier» (2026-10-26). */
+    $$(form, '.order-seg').forEach(function (g) {
+      var rs = $$(g, 'input[type=radio]'), host = document.createElement('div'); g.appendChild(host);
+      if (!window.Kit || !Kit.segmented) return;
+      Kit.segmented(host, rs.map(function (r) { var ic = r.parentNode.dataset.icon;   /* <label data-icon="truck"> → the tab's icon (icons.js) */
+          return { label: r.parentNode.textContent.trim(), value: r.value, icon: ic && window.KitIcons ? KitIcons.svg(ic, { size: 20 }) : null }; }),
+        Math.max(0, rs.findIndex(function (r) { return r.checked; })),
+        function (v, i) { rs[i].checked = true; rs[i].dispatchEvent(new Event('change', { bubbles: true })); });
+    });
 
     /* counts: kit/choice.js steps them and fires `input`, which recounts here. */
 
@@ -178,13 +220,24 @@
       $$(form, 'input:not([type=radio]):not([type=checkbox]):not([type=hidden]), textarea').forEach(function (el) {
         if (el.closest('[hidden]')) return;
         var v = el.validity, why = Object.keys(SAY).filter(function (k) { return v[k]; })[0];
-        mark(el, why ? SAY[why] : ''); if (why && !first) first = el; });
+        var msg = why ? SAY[why] : v.customError ? el.validationMessage : '';   /* a script's own word: «Choose from the list» */
+        mark(el, msg); if (msg && !first) first = el; });
       reached = all.length - 1; lock();
       if (first) { var s = first.closest('.order-step');
         if (s && s.querySelector('.panel-title').getAttribute('aria-expanded') !== 'true') all.forEach(function (x) { acc(x.querySelector('.panel-title'), x === s); });
         setTimeout(function () { first.focus(); }, 300); return; }
       var lead = Object.fromEntries(new FormData(form)); lead.page = location.href; lead.lang = lang;
       if (notice) notice.hidden = true; busy(true);
+      /* PAY (2026-10-26): form[data-pay-url="/api/pay"] — the order goes to the page's own worker, which
+         counts the total itself, opens a monobank invoice and answers { pageUrl }; the buyer goes there. */
+      if (form.dataset.payUrl) {
+        busy(true); send.textContent = 'Opening payment';
+        fetch(form.dataset.payUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
+          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.pageUrl) throw new Error(j.error || r.status); return j; }); })
+          .then(function (j) { location.assign(j.pageUrl); })
+          .catch(function (e) { busy(false); tell('error', 'The payment could not be opened (' + e.message + '). Please try again in a minute.'); });
+        return;
+      }
       var url = form.dataset.endpoint;
       (url ? fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
               .then(function (r) { if (!r.ok) throw new Error(r.status); tell('success', form.dataset.thanks || 'Thank you — we will call you back.'); form.reset(); update(); })

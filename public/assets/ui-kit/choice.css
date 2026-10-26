@@ -17,6 +17,12 @@
                                 + <img class="is-light">, the theme shows its own; a <picture> per
                                 theme with a phone <source> for the stacked file. 32 high
                                 (--choice-logo-h)
+     label.choice.is-row.is-mark  an option with a MARK (2026-10-26): no marker — a 32 mark on the left
+                                (.choice-mark: a carrier's sign, a kit icon), the words, the price
+                                at the right edge; chosen, the edge says so, as on a card
+     .choice-group.is-pick      a mark option and what it asks next: chosen, the whole plate takes
+                                the edge and its .choice-more (a field, a note)
+                                comes in under the words, on the same plate (order.js data-when shows it)
      div.choice.is-count        a counted card [data-qty]: a card's content and, at its foot, the
                                 kit's counter — `.stepper.is-bare` (field.css). A tap on the card takes one
                                 or puts it back; `.is-on` while the count is over 0 (order.js)
@@ -128,6 +134,22 @@
    at once, so each says so) — the accent edge, white on paper; the rest plain. */
 .choice-group .choice:not(.is-row):not(.is-on) { border-color: transparent; box-shadow: none; }
 .choice-group .choice:not(.is-row):hover { background: var(--choice-hover); }
+
+/* AN OPTION WITH A MARK (2026-10-26) — a delivery: the carrier's sign, what and when, the price.
+   The input is hidden like a card's; the chosen edge is the choice. */
+.choice.is-row.is-mark > input { position: absolute; opacity: 0; pointer-events: none; }
+.choice.is-row.is-mark:has(> input:focus-visible) { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
+.choice-mark { flex: none; display: grid; place-items: center; width: var(--number-32); height: var(--number-32); color: var(--ink); }
+.choice-mark > img, .choice-mark > svg { display: block; width: 100%; height: 100%; object-fit: contain; }
+.choice-mark.is-akvantis > svg { width: 28px; height: 28px; }   /* the AKVANTIS wave in its ring — drawn in the ink, a hair under the carriers' signs so the ring reads at their weight */
+.choice.is-row.is-mark > .choice-price { margin-left: auto; padding-left: var(--space-16); font-size: var(--text-16); white-space: nowrap; }
+/* A PICK — the mark option and what it asks next on one plate: chosen, the plate takes the edge
+   (not the row) and under the words it asks the question — a branch, an address. */
+.choice-group.is-pick:has(> .choice > input:checked) { background: var(--choice-on, var(--choice)); border-color: var(--choice-edge-on); box-shadow: inset 0 0 0 0.8px var(--choice-edge-on); }
+.choice-group.is-pick:has(> .choice > input:not(:checked)):hover { background: var(--choice-hover); }
+.choice-group.is-pick > .choice-more { display: grid; gap: var(--space-12); margin: 0; padding: 0 var(--space-16) var(--space-16); }   /* no inset plate (2026-10-26): the fields sit on the chosen plate itself */
+[data-theme="light"] .choice-group.is-pick > .choice-more :is(.dark-input, .select) { background-color: #FFFFFF; }
+.choice-group.is-pick:not(:has(> .choice > input:checked)) > .choice-more { display: none; }   /* asks only once chosen */
 
 /* A COUNTED CARD (2026-10-25): a card with a .stepper at its foot. */
 /* The words and the count sit together at the card's foot (2026-10-25): the air goes between
