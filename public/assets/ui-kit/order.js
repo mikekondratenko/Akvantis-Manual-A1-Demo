@@ -72,9 +72,9 @@
        hryvnia — times the rate, whole, «23 760 грн» (2026-10-26: the Ukrainian version). */
     var cur = form.dataset.currency || 'EUR', rate = +form.dataset.rate || 1;
     var eur = function (n) { if (n == null) return cur === 'EUR' ? '€ ···' : '··· ' + cur;
-      var v = n * rate, whole = cur !== 'EUR';
+      var v = n * rate, whole = cur !== 'EUR';   /* € always with its cents — «€495.00» (2026-10-26); hryvnia whole */
       return new Intl.NumberFormat(lang, { style: 'currency', currency: cur, currencyDisplay: cur === 'EUR' ? 'narrowSymbol' : 'symbol',   /* «395 €», not «395 EUR» */
-        minimumFractionDigits: whole || v % 1 === 0 ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(whole ? Math.round(v) : v); };
+        minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(whole ? Math.round(v) : v); };
     var dock = document.getElementById(form.id + '-dock');
     var alt = form.querySelector('input[data-alt]');
     var steps = function () { return $$(form, '.order-step:not([hidden])'); };

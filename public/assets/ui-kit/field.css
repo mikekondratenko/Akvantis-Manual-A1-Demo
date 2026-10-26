@@ -25,7 +25,8 @@
      .field-value-input     a short number, right-aligned, beside its label (.field-row)
      .field-hint            a line under the control, faint
      .field-error           the same line when something is wrong, with an icon if given
-     .is-error / .is-success, or aria-invalid="true" on the control — the edge carries the state
+     .is-error, or aria-invalid="true" on the control — the edge carries the error; .is-success is
+                            green in its sign only (the check), never the edge or the words (2026-10-26)
      .field.suggest         a text field with a list under it (a combobox): .suggest-list > .suggest-opt
                             (<b> the line, <small> the second); .suggest-empty when nothing matches
                             — the list is drawn by a script (np.js)
@@ -106,7 +107,10 @@ textarea.dark-input {
 .field-hint { color: var(--ink-faint); }
 .field-error { color: var(--danger); font-weight: var(--weight-medium); }
 .field-success { display: flex; align-items: center; gap: var(--space-8); font-size: var(--text-11); line-height: var(--leading-normal);
-  color: var(--success); font-weight: var(--weight-medium); }   /* the line when it worked (a code taken; 2026-10-26) */
+  color: var(--ink); font-weight: var(--weight-medium); }   /* the line when it worked (a code taken; 2026-10-26) */
+/* RULE (2026-10-26): success is green in its sign only — the check, the circle-check — never in the words or
+   an edge. An error stays red throughout: that one has to stop the eye. */
+.field-success svg { flex-shrink: 0; color: var(--success); }
 :not(.field) > .field-success { margin-top: var(--space-8); }
 .field-error svg, .field-hint svg { flex-shrink: 0; }
 /* Not stacked by .field's gap — a message sits 8 under the control, like the label above it. */
@@ -126,8 +130,8 @@ textarea.dark-input {
 /* .field-label.is-error kept as a name only (2026-10-26): by the label rule above the label stays its own
    ink in an error too — the edge and the line under the field say what is wrong. */
 
-.dark-input.is-success, .select.is-success, .field-value-input.is-success { border-color: var(--success); }
-.field-hint.is-success { color: var(--success); }
+.field-hint.is-success { color: var(--ink); }
+.field-hint.is-success svg { color: var(--success); }   /* success: green in the sign only (the RULE at .field-success) */
 
 /* ── NOTICE (2026-10-11) ──
    The answer a form gives after sending: a plate on the status surface, its icon in the
@@ -376,9 +380,9 @@ textarea.dark-input {
 .input-action > .dark-input { flex: 1; min-width: 0; height: 100%; border: 0; box-shadow: none; background: none;
   padding: 0 var(--space-12) 0 calc(var(--field-pad) - var(--space-4)); }
 .input-action > .btn { flex: none; width: auto; height: 100%; padding: 0 var(--space-16); }   /* the kit's button, 38 tall */
-.input-action.is-success { border-color: var(--success); box-shadow: inset 0 0 0 0.8px var(--success); }
+.input-action.is-success { border-color: var(--field-edge); box-shadow: none; }   /* the edge at rest — green is the check's alone */
 .input-action.is-error, .input-action.is-error:focus-within { border-color: var(--danger-edge); box-shadow: inset 0 0 0 0.8px var(--danger-edge); }
-.input-action.is-success > .btn { --btn: var(--success); --btn-hover: var(--success); --btn-ink: var(--page); --btn-edge: none; pointer-events: none; }
+.input-action.is-success > .btn { --btn-hover: var(--btn); --btn-ink: var(--success); pointer-events: none; }   /* the button keeps its plate; only the check is green */
 /* A text (.btn-text) or icon action stays without a plate in every state: done, the check is drawn in
    the success green; the 16 of padding is the word's own room (an icon takes the square). */
 .input-action.is-success > .btn-text { --btn: transparent; --btn-hover: transparent; --btn-ink: var(--success); }
