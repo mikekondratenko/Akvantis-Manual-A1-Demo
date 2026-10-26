@@ -12,7 +12,8 @@
    the droplist, which are built from the tokens below — and loads after this file.
 
      .field                 a label and a control stacked, with a hint or a message under it
-     .field-label           11, the muted ink, 8 above the control
+     .field-label           11, the muted ink, 8 above the control — ONE ink for the whole label, the
+                            required asterisk included: no second colour in a label (2026-10-26)
      .dark-input            the text field; `textarea.dark-input` grows, `[type=number]` is tabular
      .select                the same box with a chevron
      .stepper               a number with its own − / + inside the box (.stepper-btn, minus/plus icons)
@@ -88,12 +89,13 @@ textarea.dark-input {
 }
 
 /* ── REQUIRED (2026-10-12) ── a field whose control carries `required` gets an asterisk after
-   its label, drawn here so no page types it. The red is the danger ink at rest — the one
-   convention every form reader already knows; it is a mark, not an error state. The
-   asterisk is decoration (`speak: never`): the control's own `required` is what a screen
-   reader announces. Fields without it need no «(optional)». */
+   its label, drawn here so no page types it. The asterisk is decoration (`speak: never`): the
+   control's own `required` is what a screen reader announces. Fields without it need no «(optional)».
+   RULE (2026-10-26): a label over a field has one colour — the label's own muted ink. The asterisk
+   takes it too (it was the danger red until today): red in a form means something is wrong, and
+   a label that is not wrong does not wear it. No part of a label is coloured apart. */
 .field:has(:is(input, textarea, select)[required]) > .field-label::after {
-  content: ' *'; color: var(--danger); speak: never;
+  content: ' *'; color: inherit; speak: never;
 }
 
 /* ── THE LINE UNDER ── */
@@ -121,7 +123,8 @@ textarea.dark-input {
 .dark-input[aria-invalid="true"]:hover, .select[aria-invalid="true"]:hover { border-color: var(--danger); }
 .dark-input.is-error:focus, .select.is-error:focus, .field-value-input.is-error:focus, .stepper.is-error:focus-within,
 .dark-input[aria-invalid="true"]:focus, .select[aria-invalid="true"]:focus { outline: none; border-color: var(--danger-edge); }
-.field-label.is-error { color: var(--danger); }
+/* .field-label.is-error kept as a name only (2026-10-26): by the label rule above the label stays its own
+   ink in an error too — the edge and the line under the field say what is wrong. */
 
 .dark-input.is-success, .select.is-success, .field-value-input.is-success { border-color: var(--success); }
 .field-hint.is-success { color: var(--success); }
