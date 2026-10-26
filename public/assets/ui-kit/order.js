@@ -30,7 +30,8 @@
            a change there fires `input`, and the strip, the bar and the total recount.
    DOCK    #<form>-dock (.order-dock): up with the first choice — the chosen card's pictures, its
            name, the other steps' values, and the sum of data-price of everything chosen (a
-           choice without a price makes it «price on request»). data-currency, default EUR.
+           choice without a price makes it «price on request»). data-currency (default EUR) and
+           data-rate: the € prices shown in another currency, e.g. UAH × 48.
    PAY     form[data-pay-url="/api/pay"]: on send the order (FormData — hidden rows are disabled, so left
            out) goes to that address; the answer's pageUrl (monobank's payment page) is opened.
    CODE    .order-code: [data-code-open] → .order-code-row (field · [data-code] Apply · [data-code-close] ×).
@@ -53,9 +54,13 @@
 
   function init(form) {
     var lang = document.documentElement.lang || 'en';
-    var cur = form.dataset.currency || 'EUR';
-    var eur = function (n) { return n == null ? '€ ···' : new Intl.NumberFormat(lang, { style: 'currency', currency: cur, currencyDisplay: 'narrowSymbol',   /* «395 €», not «395 EUR» in Ukrainian */
-      minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }).format(n); };
+    /* The prices are written in € (data-price). form[data-currency="UAH"][data-rate="48"] shows them in
+       hryvnia — times the rate, whole, «23 760 грн» (2026-10-26: the Ukrainian version). */
+    var cur = form.dataset.currency || 'EUR', rate = +form.dataset.rate || 1;
+    var eur = function (n) { if (n == null) return cur === 'EUR' ? '€ ···' : '··· ' + cur;
+      var v = n * rate, whole = cur !== 'EUR';
+      return new Intl.NumberFormat(lang, { style: 'currency', currency: cur, currencyDisplay: cur === 'EUR' ? 'narrowSymbol' : 'symbol',   /* «395 €», not «395 EUR» */
+        minimumFractionDigits: whole || v % 1 === 0 ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(whole ? Math.round(v) : v); };
     var dock = document.getElementById(form.id + '-dock');
     var alt = form.querySelector('input[data-alt]');
     var steps = function () { return $$(form, '.order-step:not([hidden])'); };
@@ -124,7 +129,7 @@
       $$(form, '[data-pick-one]').forEach(function (l) { var rs = $$(l, 'input[type=radio]').filter(live);
         if (rs.length === 1 && !rs[0].checked) { rs[0].checked = true; again = true; } });
       };
-      whens(); if (again) whens();   /* a choice taken by [data-pick-one] shows what it asks (its own data-when) */
+      whens(); whens();   /* twice: what one pass turns on (a field enabled again, a choice taken by [data-pick-one]) is what the next pass reads — a row's question shows at once (2026-10-26: the courier's address stayed hidden after Pickup → Courier) */
       steps().forEach(function (s, i) { var n = s.querySelector('.num'); if (n) n.textContent = i + 1; });
       if (window.Choice) Choice.sync(form);
       steps().forEach(function (s) { var v = s.querySelector('.order-step-val'); if (v) v.innerHTML = stepVal(s, true); });
@@ -150,7 +155,7 @@
           return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('')
         + '<dt class="is-total">' + T('Total') + '</dt><dd class="is-total">' + (off && !open ? '<s class="choice-was">' + eur(sum - off) + '</s>' : '') + sumTxt + '</dd>'
         /* form[data-uah-rate]: in Ukraine the invoice is in hryvnia — the sum the bank will show, said here first */
-        + (form.dataset.uahRate && valOf('country') === 'UA' && !open && chosen ? '<dt>' + T('Charged in hryvnia') + '</dt><dd>≈ ' + new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(sum * form.dataset.uahRate) + '</dd>' : '');
+        + (form.dataset.uahRate && cur !== 'UAH' && valOf('country') === 'UA' && !open && chosen ? '<dt>' + T('Charged in hryvnia') + '</dt><dd>≈ ' + new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(sum * form.dataset.uahRate) + '</dd>' : '');
       if (!dock || !chosen) return;
       var card = on ? null : pick.closest('.choice');
       var pics = card ? $$(card, '.choice-pic') : $$(form, '.choice.is-count.is-on .choice-pic').slice(0, 3);
