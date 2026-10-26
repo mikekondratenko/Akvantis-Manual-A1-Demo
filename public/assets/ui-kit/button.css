@@ -156,3 +156,42 @@
   --btn-amber-ink : var(--amber-800);
   --btn-red-ink   : var(--red-700);
 }
+
+/* ══════════════ ICON BUTTON ══════════════
+   A glyph standing on its own, with no chrome until the cursor arrives. Hover draws a
+   round plate behind it — white at a very low alpha, so it reads as the surface lifting
+   rather than as a new object, and it works over any of the kit's greys without a
+   per-surface value. The glyph never changes color: the plate already says "this one".
+
+   Two sizes on the same 2:1 plate-to-glyph ratio — 32/16 for dense panels, 40/20 (.icon-btn-md)
+   for controls sitting alone in open space. Author the larger glyph on a 20px viewBox
+   rather than scaling the 16px one, or the stroke thickens and the two stop looking
+   like one family. */
+.icon-btn {
+  width: 32px; height: 32px; flex-shrink: 0; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: none; border-radius: var(--radius-pill);
+  color: var(--ink); cursor: pointer;
+  transition: background var(--duration-fast), opacity var(--duration-fast);
+}
+.icon-btn-md { width: 40px; height: 40px; }
+/* ── A THIRD SIZE, ADDED 2026-09-04 ──
+   24/16 — the plate shrinks, the glyph does not. It is for a *row's* controls rather
+   than a panel's: three of the 32s at the end of a 268-wide rail row take 112 with their
+   gaps, and the name in front of them was being truncated to make room for buttons whose
+   targets were already comfortable. The glyph stays 16 because that is what is read; what
+   comes off is the ring of empty plate around it.
+
+   ⚠ 24 is under the 44 both platforms ask for, so it is for pointer surfaces only — a rail
+   in a desktop tool. Do not put it on anything a thumb has to hit. */
+.icon-btn-sm { width: 24px; height: 24px; }
+.icon-btn svg { display: block; }
+/* The plate is the glyph's own ink at 8 / 14 % — white on the dark ground, black on paper (2026-10-26:
+   was white only, from when it lived in the tools' kit.css). */
+.icon-btn:hover:not(:disabled) { background: color-mix(in srgb, currentColor 8%, transparent); }
+.icon-btn:active:not(:disabled) { background: color-mix(in srgb, currentColor 14%, transparent); }
+.icon-btn:focus-visible {
+  outline: none; background: color-mix(in srgb, currentColor 8%, transparent);
+  box-shadow: var(--focus-halo);
+}
+.icon-btn:disabled { opacity: .3; cursor: default; }

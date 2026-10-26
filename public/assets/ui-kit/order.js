@@ -24,7 +24,8 @@
            needs kit.js (Kit.segmented) and segmented.css on the page.
    SAY     [data-say="…"] on something shown in a step is that step's value (the delivery the installer brings).
    NUMBERS a step's .num is its place among the steps shown, so a skipped step leaves no gap.
-   SUMMARY [data-summary] (a <dl>) lists each step's value and the total (and, with form[data-uah-rate]
+   SUMMARY [data-summary] (a <dl>) lists each step's value and the total — the total in
+           [data-summary-total] when the page has one (and, with form[data-uah-rate]
            and the country UA, the sum in hryvnia the invoice will carry); [data-pay] reads «Pay €…».
    COUNT   a .choice.is-count card — its behaviour is kit/choice.js (load it before this file);
            a change there fires `input`, and the strip, the bar and the total recount.
@@ -158,12 +159,13 @@
       /* [data-per-month="10"]: the total over that many parts (2026-10-26 — was typed by hand) */
       $$(form, '[data-per-month]').forEach(function (el) { var n = +el.dataset.perMonth;
         el.textContent = chosen && !open ? T('{sum} / month · {n} × with monobank', { sum: eur(Math.round(sum / n * 100) / 100), n: n }) : T('monobank «Покупка частинами»'); });
-      var dl = form.querySelector('[data-summary]');
-      if (dl) dl.innerHTML = steps().slice(0, -1).map(function (s) { var v = stepVal(s, true);
-          return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('')
-        + '<dt class="is-total">' + T('Total') + '</dt><dd class="is-total">' + (off && !open ? '<s class="choice-was">' + eur(sum - off) + '</s>' : '') + sumTxt + '</dd>'
+      var dl = form.querySelector('[data-summary]'), dt = form.querySelector('[data-summary-total]');   /* the total in a list of its own when there is one (the code stands between) */
+      var rowsHtml = steps().slice(0, -1).map(function (s) { var v = stepVal(s, true);
+          return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('');
+      var totalHtml = '<dt class="is-total">' + T('Total') + '</dt><dd class="is-total">' + (off && !open ? '<s class="choice-was">' + eur(sum - off) + '</s>' : '') + sumTxt + '</dd>'
         /* form[data-uah-rate]: in Ukraine the invoice is in hryvnia — the sum the bank will show, said here first */
         + (form.dataset.uahRate && cur !== 'UAH' && valOf('country') === 'UA' && !open && chosen ? '<dt>' + T('Charged in hryvnia') + '</dt><dd>≈ ' + new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(sum * form.dataset.uahRate) + '</dd>' : '');
+      if (dl && dt) { dl.innerHTML = rowsHtml; dt.innerHTML = totalHtml; } else if (dl) dl.innerHTML = rowsHtml + totalHtml;
       gate();
       if (!dock || !chosen) return;
       var card = on ? null : pick.closest('.choice');

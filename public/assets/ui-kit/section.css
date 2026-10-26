@@ -647,9 +647,12 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-summary dd.is-total { font-size: var(--text-24); justify-content: flex-end; }   /* the sum a step up from its name (2026-10-26) */
 .order-summary dd.is-total .choice-was { font-size: var(--text-16); margin-right: 0; }   /* before it, struck, what it was without the discount (trade-in) */
 /* A code (promo or a friend's): folded until asked for. */
-/* The code (2026-10-26): a ghost «I have a referral code»; pressed, the field takes its place on
-   the same row — Apply (it turns busy while the code is checked) and × to put it away. */
-.order-code > .btn { width: max-content; }
+/* The code (2026-10-26): a link «I have a referral code» between the lines and the total — the
+   code changes the total, so it stands before it; pressed, the field takes its place on the same
+   row — Apply (secondary; busy while the code is checked) and the kit's × (.icon-btn) to put it away. */
+.order-code-open { appearance: none; border: 0; margin: 0; padding: 0 0 var(--link-offset); background-color: transparent;
+  font: inherit; font-size: var(--text-14); color: var(--ink); cursor: pointer; justify-self: start; }   /* a link (type.css .link), a <button> underneath */
+.order-code { display: grid; }
 .order-code-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--space-8); align-items: center; }
 .order-code-row[hidden] { display: none; }
 /* Under Pay: how one can pay, in words — no bank or card logos (monobank's brandbook: one acquiring
