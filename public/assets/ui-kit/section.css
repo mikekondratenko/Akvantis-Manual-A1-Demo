@@ -59,6 +59,8 @@
      .sec-slides       the highlights: wide slides one at a time, a caption on each, dots that
                        fill as they play and a pause button (kit/slider.js, data-autoplay)
      .sec-gallery      the same cards (.plate.card) in a carousel, about half a screen wide, arrows (kit/slider.js)
+     .sec-stories      tall 9:16 cards in a carousel: picture to the edges, words on top, a + or a play
+                       at the foot on the right (`.story`, see «STORIES»); arrows
      .sec-reviews      reviews three a row, each on a plate (`.is-bare` without), the words and,
                        at the foot, an avatar and a name; arrows
        .slider · .slider-track · .slide · .slider-ctrl (built by the script)
@@ -562,6 +564,36 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 @media (min-width: 768px)  { .sec-gallery .slider-track { grid-auto-columns: 62%; } }
 @media (min-width: 1024px) { .sec-gallery .slider-track { grid-auto-columns: calc((100% - var(--grid-margin) * 2 - var(--grid-gutter)) * .46); } }
 .sec-gallery .slide.card + .slide.card { margin-top: 0; }
+
+/* ── STORIES (2026-10-26) ── another type of card, Apple's «Get the highlights»: tall, 9:16, the
+   picture to the edges, the words on top, one round button at the foot on the right — a plus (more)
+   or a play (a film). A carousel with arrows (kit/slider.js), a card 3 columns wide from 768
+   (4 of the 6 on a phone, the next one at the edge).
+     <li class="slide story">
+       <img class="story-pic" src="…" alt="">                 or <div class="story-pic sec-ph"></div>
+       <p class="story-label">Overview</p>                    optional
+       <h3 class="story-title">Bluewater Flow Station in Short</h3>
+       <button class="btn btn-circle btn-circle-md btn-frost story-btn" aria-label="More">
+         <i data-icon="plus" data-size="20"></i></button>     or data-icon="play" data-fill, aria-label="Play"
+     </li>
+   Insets are the card's: 24 (32 from 1440, 20 on a phone), the button in the same corner inset.
+   The words take the theme's ink; on a picture that needs the other one, `.on-dark` (white words)
+   or `.on-light` (black words) on the story. */
+.sec-stories .slider-track { grid-auto-columns: calc(4 * var(--grid-col) + 3 * var(--grid-gutter)); }
+@media (min-width: 768px) { .sec-stories .slider-track { grid-auto-columns: calc(3 * var(--grid-col) + 2 * var(--grid-gutter)); } }
+.story { --story-inset: var(--space-24);
+  position: relative; display: flex; flex-direction: column; gap: var(--space-8); aspect-ratio: 9 / 16;
+  padding: var(--story-inset); padding-bottom: calc(var(--story-inset) * 2 + var(--number-40));
+  border-radius: var(--sec-card-radius); background: var(--tile); overflow: hidden; color: var(--ink); isolation: isolate; }
+@media (max-width: 767px) { .story { --story-inset: calc(var(--space-16) + var(--space-4)); border-radius: var(--radius-24); } }
+@media (min-width: 1440px) { .story { --story-inset: var(--space-32); } }
+.story-pic { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; border-radius: 0; object-fit: cover; }
+.story-label { margin: 0; font-size: var(--text-14); line-height: var(--leading-snug); font-weight: var(--weight-medium); }
+.story-title { margin: 0; font-size: var(--text-24); line-height: var(--leading-tight); font-weight: var(--weight-semibold); text-wrap: balance; }
+@media (min-width: 1024px) { .story-title { font-size: var(--text-28); } }
+.story-btn { position: absolute; right: var(--story-inset); bottom: var(--story-inset); }
+.story.on-dark  { color: var(--white); }
+.story.on-light { color: var(--black); }
 
 /* ── REVIEWS ── three cards a row from 1024, the fourth peeking (2026-10-25: on plates, no quote
    mark, no hairline). A card is the words — as long as the buyer wrote them; the row is as tall

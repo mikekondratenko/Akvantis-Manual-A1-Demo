@@ -190,6 +190,9 @@
 .btn.btn-circle.btn-circle-md { width: var(--number-40); height: var(--number-40); }
 .btn.btn-circle > svg { width: var(--number-16); height: var(--number-16); margin: 0; }
 .btn.btn-circle.btn-circle-md > svg { width: calc(var(--number-16) + var(--space-4)); height: calc(var(--number-16) + var(--space-4)); }
+/* Over a picture — `.btn-frost` on the circle: the frosted plate at rest (a story's + / play). */
+.btn.btn-circle.btn-frost { --btn: var(--frost-900); --btn-ink: var(--white); --btn-edge: var(--frost-edge); }
+[data-theme="light"] .btn.btn-circle.btn-frost { --btn-edge: inset 0 0 0 1px var(--control-edge); }
 .btn.btn-circle:hover:not(:disabled), .btn.btn-circle[data-state="hover"] { background: var(--btn-solid); color: var(--btn-solid-ink); box-shadow: none; }
 .btn.btn-circle:active:not(:disabled), .btn.btn-circle[data-state="active"] { background: var(--btn-solid); color: var(--btn-solid-ink); box-shadow: none; transform: scale(.94); }
 
