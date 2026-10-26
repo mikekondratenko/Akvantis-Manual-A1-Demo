@@ -33,6 +33,9 @@
            choice without a price makes it «price on request»). data-currency, default EUR.
    PAY     form[data-pay-url="/api/pay"]: on send the order (FormData — hidden rows are disabled, so left
            out) goes to that address; the answer's pageUrl (monobank's payment page) is opened.
+   PARTS   form[data-parts-url="/api/parts"]: a payment of N parts (not «full») is applied for there
+           instead (monobank «Покупка частинами»); the form waits on <url>/state, then thanks.html.
+           [data-per-month="N"] shows the total over N; the button reads «Apply for N payments».
    SEND    checked here, not by the browser's bubbles: a wrong field gets aria-invalid and a
            .field-error line, cleared as it is typed in; the button turns .is-loading; the
            answer is the .notice. No data-endpoint → nothing is sent, and the notice says so. */
@@ -130,7 +133,11 @@
       });
       $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return; var p = c.dataset.price; if (p === undefined || p === '') open = true; else sum += +p * +c.querySelector('input').value; });
       var sumTxt = open ? eur(null) : eur(sum);
-      var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) pay.textContent = chosen ? 'Pay ' + sumTxt : 'Pay';
+      var plan = valOf('payment'), inParts = plan && plan !== 'full';
+      var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) pay.textContent = inParts ? 'Apply for ' + plan + ' payments' : chosen ? 'Pay ' + sumTxt : 'Pay';
+      /* [data-per-month="10"]: the total over that many parts (2026-10-26 — was typed by hand) */
+      $$(form, '[data-per-month]').forEach(function (el) { var n = +el.dataset.perMonth;
+        el.textContent = chosen && !open ? eur(Math.round(sum / n * 100) / 100) + ' / month · ' + n + ' × with monobank' : 'monobank «Покупка частинами»'; });
       var dl = form.querySelector('[data-summary]');
       if (dl) dl.innerHTML = steps().slice(0, -1).map(function (s) { var v = stepVal(s, true);
           return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('')
@@ -230,6 +237,32 @@
       if (notice) notice.hidden = true; busy(true);
       /* PAY (2026-10-26): form[data-pay-url="/api/pay"] — the order goes to the page's own worker, which
          counts the total itself, opens a monobank invoice and answers { pageUrl }; the buyer goes there. */
+      /* PARTS (2026-10-26): a plan of N payments goes to form[data-parts-url] instead — monobank pushes
+         the offer to the buyer's app; the form waits on <url>/state until it is approved or not. */
+      var plan = valOf('payment');
+      if (plan && plan !== 'full' && form.dataset.partsUrl) {
+        var base = form.dataset.partsUrl, tries = 0;
+        var WHY = { EXCEEDED_SUM_LIMIT: 'the sum is over your limit', NOT_ENOUGH_MONEY_FOR_INIT_DEBIT: 'not enough money for the first payment',
+          CLIENT_NOT_FOUND: 'no monobank client with this number', REJECTED_BY_CLIENT: 'you declined it in the app', CLIENT_PUSH_TIMEOUT: 'it was not confirmed in time',
+          EXISTS_OTHER_OPEN_ORDER: 'another purchase in parts is still open', PAY_PARTS_ARE_NOT_ACCEPTABLE: 'this number of payments is not available' };
+        busy(true); send.textContent = 'Sending to monobank';
+        var wait = function (order) {
+          send.textContent = 'Waiting for monobank';
+          tell('', 'Confirm the purchase in the monobank app — we are waiting for the bank.');
+          fetch(base + '/state', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+            if (j.state === 'SUCCESS' || (j.state === 'IN_PROCESS' && j.sub === 'WAITING_FOR_STORE_CONFIRM'))
+              return location.assign('thanks.html?order=' + encodeURIComponent(order) + '&parts=' + plan);
+            if (j.state === 'FAIL') { busy(false); return tell('error', 'monobank did not approve it: ' + (WHY[j.sub] || (j.sub || 'declined').toLowerCase().replace(/_/g, ' ')) + '. You can pay in full instead.'); }
+            if (tries++ < 90) setTimeout(function () { wait(order); }, 2000);
+            else { busy(false); tell('error', 'No answer from monobank yet. If you confirm it in the app, we will email you.'); }
+          }).catch(function () { if (tries++ < 90) setTimeout(function () { wait(order); }, 2000); });
+        };
+        fetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
+          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.order) throw new Error(j.error || r.status); return j; }); })
+          .then(function (j) { wait(j.order); })
+          .catch(function (e) { busy(false); tell('error', 'The request did not go through (' + e.message + '). Please try again in a minute.'); });
+        return;
+      }
       if (form.dataset.payUrl) {
         busy(true); send.textContent = 'Opening payment';
         fetch(form.dataset.payUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
