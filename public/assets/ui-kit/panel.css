@@ -146,11 +146,13 @@ button.panel-title[aria-expanded="true"] { border-radius: var(--radius-16) var(-
 .panel-body { display: flex; flex-direction: column; gap: var(--space-16); }
 
 /* ── LINE (2026-10-26) ── `.plate.is-line`: the collapsible plate without its plate — no fill at rest,
-   none under the cursor (the title lifting to the ink is the only hover), none open, and no divider
+   a plate under the cursor while closed only (2026-10-26 17:00), none open, and no divider
    (a hairline under an open answer was tried and taken out the same day). The strip, the inset, the
    type and the fold are the plate's own. The landing's FAQ uses it (section.css). */
-.plate.is-line { background: none; border-radius: 0; }
+.plate.is-line { background: none; border-radius: var(--radius-16); transition: background var(--duration-fast); }
 .plate.is-line > button.panel-title, .plate.is-line > button.panel-title:hover { background: none; }
+/* Closed, the cursor lays the plate under the row (--tile, the plate's own fill and corners); open, none. */
+.plate.is-line:has(> button.panel-title[aria-expanded="false"]:hover) { background: var(--tile); }
 .panel-body[hidden] { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
