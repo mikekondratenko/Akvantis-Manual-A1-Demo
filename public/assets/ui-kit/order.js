@@ -46,10 +46,10 @@
    PRIVAT  form[data-privat-url="/api/privat"]: the same plan with name="bank" value="privat" (the
            .order-seg monobank | PrivatBank) goes there instead (PrivatBank «Оплата частинами») — the
            answer's url is the bank's own page; the bank sends the buyer back to thanks.html.
-   WALLET  [data-wallet] (in the Pay row, with data-when="payment=full"): the Apple Pay and Google Pay
-           buttons — their own, drawn by Apple's SDK (<apple-pay-button>) and Google's pay.js (TEST),
-           white on the dark page, black on a light one (where Apple's script hides its button, the kit's
-           white button reads «Apple Pay»). A PROTOTYPE: not wired to the wallets — a
+   WALLET  [data-wallet="<logos folder>"] (in the Pay row, with data-when="payment=full"): Apple Pay and
+           Google Pay as the kit's button with the wallet's mark (ui-kit/logos) — a white plate on the dark
+           page, a black one on paper (2026-10-26: was the vendors' SDK buttons; Google's showed the
+           visitor's own card and grew over Pay, Apple's hid itself off Safari). A PROTOTYPE: not wired to the wallets — a
            press sends the form as Pay does, to monobank's page, which offers Apple Pay / Google Pay
            itself. Paying in the button needs merchant certificates (docs/order-form-questions.md 5.7).
    SEND    checked here, not by the browser's bubbles: a wrong field gets aria-invalid and a
@@ -204,11 +204,19 @@
       var logos = rs.some(function (r) { return r.parentNode.dataset.logo; });
       var btns = Kit.segmented(host, rs.map(function (r) { var l = r.parentNode, ic = l.dataset.icon, lg = l.dataset.logo;   /* <label data-icon="truck"> → the tab's icon (icons.js) */
           return { label: lg ? '' : l.textContent.trim(), value: r.value,
-            icon: lg ? '<span class="segment-logo"' + (l.dataset.logoH ? ' style="--logo-h:' + l.dataset.logoH + 'px"' : '') + '><img class="is-dark" src="' + lg + '-dark.svg" alt=""><img class="is-light" src="' + lg + '-light.svg" alt=""></span>'
+            icon: lg ? '<span class="segment-logo"' + (l.dataset.logoH ? ' style="--logo-h:' + l.dataset.logoH + 'px"' : '') + '><img class="is-dark" src="' + lg + '-dark.svg" alt=""><img class="is-light" src="' + lg + '-light.svg" alt="">'
+              + (l.dataset.logoOn ? '<img class="is-on" src="' + l.dataset.logoOn + '" alt="">' : '') + '</span>'
               : ic && window.KitIcons ? KitIcons.svg(ic, { size: 20 }) : null }; }),
         Math.max(0, rs.findIndex(function (r) { return r.checked; })),
         function (v, i) { rs[i].checked = true; rs[i].dispatchEvent(new Event('change', { bubbles: true })); });
       if (logos) { host.classList.add('is-tall'); btns.forEach(function (b, i) { b.setAttribute('aria-label', rs[i].parentNode.textContent.trim()); }); }
+      /* BRAND TABS (2026-10-26): <label data-tab-color="#000000" data-logo-on="…-white.svg"> — chosen, the plate
+         under the tab takes the brand's colour and the logo its one-colour version (segmented.css BRAND) */
+      if (rs.some(function (r) { return r.parentNode.dataset.tabColor; })) {
+        host.classList.add('is-brand');
+        var paint = function () { var on = rs.filter(function (r) { return r.checked; })[0];
+          host.style.setProperty('--seg-thumb', (on && on.parentNode.dataset.tabColor) || ''); };
+        rs.forEach(function (r) { r.addEventListener('change', paint); }); paint(); }
     });
 
     /* counts: kit/choice.js steps them and fires `input`, which recounts here. */
@@ -345,26 +353,12 @@
 
     /* WALLET (2026-10-26, prototype): see the head of this file. */
     $$(form, '[data-wallet]').forEach(function (box) {
+      var base = box.dataset.wallet || 'assets/logos/';
       var go = function () { if (form.requestSubmit) form.requestSubmit(); else { var b = form.querySelector('[data-pay]'); if (b) b.click(); } };
-      var load = function (src, cb) { var s = document.createElement('script'); s.src = src; s.async = true; if (cb) s.onload = cb; document.head.appendChild(s); };
-      var light = document.documentElement.dataset.theme === 'light', uk = /^uk/.test(lang);
-      var a = document.createElement('div'); a.className = 'order-wallet-apple';
-      var ab = document.createElement('apple-pay-button');
-      ab.setAttribute('buttonstyle', light ? 'black' : 'white'); ab.setAttribute('type', 'plain'); ab.setAttribute('locale', uk ? 'uk-UA' : 'en-US');
-      ab.addEventListener('click', go); a.appendChild(ab); box.appendChild(a);
-      /* Apple's script hides its button where Apple Pay is not offered (a browser off Apple's list):
-         the kit's white button with the words stands in, so the row never has a hole. */
-      var stand = function () { if (!ab.hasAttribute('hidden') || a.querySelector('.btn')) return;
-        var t = document.createElement('button'); t.type = 'button'; t.className = 'btn btn-secondary'; t.textContent = 'Apple Pay';
-        t.addEventListener('click', go); ab.remove(); a.appendChild(t); };
-      if (window.MutationObserver) new MutationObserver(stand).observe(ab, { attributes: true, attributeFilter: ['hidden'] });
-      stand(); setTimeout(stand, 1500);
-      if (!window.customElements || !customElements.get('apple-pay-button')) load('https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js');
-      var g = document.createElement('div'); g.className = 'order-wallet-google'; box.appendChild(g);
-      var draw = function () { try { var c = new google.payments.api.PaymentsClient({ environment: 'TEST' });
-        g.appendChild(c.createButton({ onClick: function (e) { if (e && e.preventDefault) e.preventDefault(); go(); },
-          buttonColor: light ? 'black' : 'white', buttonType: 'plain', buttonSizeMode: 'fill', buttonRadius: 16, buttonLocale: uk ? 'uk' : 'en' })); } catch (e) { g.remove(); } };
-      if (window.google && google.payments) draw(); else load('https://pay.google.com/gp/p/js/pay.js', draw);
+      [['apple-pay', 'Apple Pay'], ['google-pay', 'Google Pay']].forEach(function (w) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'btn order-wallet-btn'; b.setAttribute('aria-label', w[1]);
+        b.innerHTML = '<img class="is-dark" src="' + base + w[0] + '-light.svg" alt=""><img class="is-light" src="' + base + w[0] + '-dark.svg" alt="">';
+        b.addEventListener('click', go); box.appendChild(b); });
     });
 
     /* CODE (2026-10-26): [data-code-open] gives its place to the row with the field; × puts it back

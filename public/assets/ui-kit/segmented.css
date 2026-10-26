@@ -58,6 +58,13 @@
 [data-theme="light"] .segment-logo > .is-light { display: block; }
 .segment-btn:not(.is-active) .segment-logo { opacity: .48; }
 .segment-btn:not(.is-active):hover .segment-logo { opacity: 1; }
+/* BRAND (2026-10-26): `.segmented.is-brand` (order.js, from data-tab-color / data-logo-on) — the chosen
+   plate is the brand's own colour (monobank black, PrivatBank green) and the chosen logo its one-colour
+   white file (.is-on); the plate changes colour as it slides. The others stay as TALL draws them. */
+.segmented.is-brand .segmented-thumb { transition: transform var(--duration-base) var(--ease-standard), background var(--duration-base) var(--ease-standard); box-shadow: none; }
+.segment-logo > .is-on { display: none; }
+.segment-btn.is-active .segment-logo > .is-on { display: block; }
+.segment-btn.is-active .segment-logo:has(> .is-on) > :not(.is-on) { display: none; }
 /* Many options — Kit.segmented(…, { scroll: true }). Segments take their label's width and
    scroll sideways with no visible bar; the thumb is sized by script.
 
