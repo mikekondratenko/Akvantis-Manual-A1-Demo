@@ -150,10 +150,12 @@
         if (l.hasAttribute('data-price')) { var p = l.dataset.price; if (p === '') open = true; else { sum += +p; if (+p < 0) off += +p; } }
         else if (i.type === 'radio' && l.closest('[data-priced]')) open = true;
       });
+      var codeOff = +form.dataset.codeOff || 0;   /* a code taken (CODE below): € off the total */
+      if (codeOff) { sum -= codeOff; off -= codeOff; }
       $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return; kg += (+c.dataset.kg || 0) * +c.querySelector('input').value; var p = c.dataset.price; if (p === undefined || p === '') open = true; else sum += +p * +c.querySelector('input').value; });
       var sumTxt = open ? eur(null) : eur(sum);
       /* what the parcel is, for a carrier's quote (np.js): its weight and its worth without the delivery, € */
-      form.dataset.kg = Math.round(kg * 10) / 10; form.dataset.goods = open ? '' : sum - ship;
+      form.dataset.kg = Math.round(kg * 10) / 10; form.dataset.goods = open ? '' : sum + codeOff - ship;
       var plan = valOf('payment'), inParts = plan && plan !== 'full';
       var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) pay.textContent = inParts ? T('Apply for {n} payments', { n: plan }) : chosen ? T('Pay {sum}', { sum: sumTxt }) : T('Pay');
       /* [data-per-month="10"]: the total over that many parts (2026-10-26 — was typed by hand) */
@@ -161,7 +163,8 @@
         el.textContent = chosen && !open ? T('{sum} / month · {n} × with monobank', { sum: eur(Math.round(sum / n * 100) / 100), n: n }) : T('monobank «Покупка частинами»'); });
       var dl = form.querySelector('[data-summary]'), dt = form.querySelector('[data-summary-total]');   /* the total in a list of its own when there is one (the code stands between) */
       var rowsHtml = steps().slice(0, -1).map(function (s) { var v = stepVal(s, true);
-          return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('');
+          return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('')
+        + (codeOff ? '<dt>' + esc(T('Code {code}', { code: form.dataset.code || '' })) + '</dt><dd>−' + eur(codeOff) + '</dd>' : '');
       var totalHtml = '<dt class="is-total">' + T('Total') + '</dt><dd class="is-total">' + (off && !open ? '<s class="choice-was">' + eur(sum - off) + '</s>' : '') + sumTxt + '</dd>'
         /* form[data-uah-rate]: in Ukraine the invoice is in hryvnia — the sum the bank will show, said here first */
         + (form.dataset.uahRate && cur !== 'UAH' && valOf('country') === 'UA' && !open && chosen ? '<dt>' + T('Charged in hryvnia') + '</dt><dd>≈ ' + new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(sum * form.dataset.uahRate) + '</dd>' : '');
@@ -314,19 +317,41 @@
     });
 
     /* CODE (2026-10-26): [data-code-open] gives its place to the row with the field; × puts it back
-       (the code cleared); Apply turns busy while the code is checked — not connected yet, it says so. */
+       (the code cleared). Apply (inside the field, field.css .input-action) turns busy while the code is
+       checked, then the field says how it went: .is-success (the check; the field read-only until ×)
+       or .is-error, and a line under it. Typing again clears it. Taken, the code's € come off the
+       total (form[data-code-off]; the old total struck over the new). Codes are not connected yet:
+       form[data-demo-codes] «CODE:€ CODE:€» (default AKVANTIS20:20 FRIEND20:20 — the worker knows the
+       same) pass; any other is not found. */
     $$(form, '.order-code').forEach(function (box) {
       var open = box.querySelector('[data-code-open]'), row = box.querySelector('.order-code-row'), f = row && row.querySelector('input:not([type=hidden])'),
-          apply = box.querySelector('[data-code]'), close = box.querySelector('[data-code-close]'), step = box.closest('.order-step');
-      if (!open || !row) return;
+          apply = box.querySelector('[data-code]'), close = box.querySelector('[data-code-close]'), field = box.querySelector('.input-action'),
+          word = apply && apply.querySelector('span'), line = null;
+      if (!open || !row || !field) return;
+      var DEMO = {}; (form.dataset.demoCodes || 'AKVANTIS20:20 FRIEND20:20').toUpperCase().split(/\s+/).forEach(function (c) { var k = c.split(':'); DEMO[k[0]] = +k[1] || 0; });
+      var kept = box.querySelector('[data-code-value]');   /* only a code taken is sent (name="code") — not one typed and left */
+      var take = function (code, eurOff) { if (kept) kept.value = code || ''; if (code) { form.dataset.code = code; form.dataset.codeOff = String(eurOff); } else { delete form.dataset.code; delete form.dataset.codeOff; }
+        form.dispatchEvent(new Event('change', { bubbles: true })); };   /* order.js recounts: the line, the struck total */
+      var state = function (kind, msg) {
+        field.classList.toggle('is-success', kind === 'success'); field.classList.toggle('is-error', kind === 'error');
+        if (kind === 'error') f.setAttribute('aria-invalid', 'true'); else f.removeAttribute('aria-invalid');
+        f.readOnly = kind === 'success'; apply.setAttribute('aria-label', kind === 'success' ? T('Applied') : T('Apply'));
+        if (line) { line.remove(); line = null; }
+        if (msg) { line = document.createElement('p'); line.className = kind === 'success' ? 'field-success' : 'field-error'; line.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+          line.innerHTML = '<i data-icon="' + (kind === 'success' ? 'circle-check' : 'circle-alert') + '" data-size="13"></i>' + esc(msg); box.appendChild(line);
+          if (window.KitIcons && KitIcons.render) KitIcons.render(line); }
+      };
       open.addEventListener('click', function () { open.hidden = true; row.hidden = false; f.focus(); });
-      close.addEventListener('click', function () { row.hidden = true; open.hidden = false; f.value = ''; hint(step, ''); open.focus(); });
+      close.addEventListener('click', function () { row.hidden = true; open.hidden = false; f.value = ''; state(''); take(''); open.focus(); });
       f.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); apply.click(); } });
+      f.addEventListener('input', function () { if (field.classList.contains('is-error')) state(''); });
       apply.addEventListener('click', function () {
-        if (!f.value.trim()) { hint(step, T('Type the code first')); f.focus(); return; }
-        hint(step, ''); apply.classList.add('is-loading'); apply.setAttribute('aria-busy', 'true'); apply.textContent = T('Checking');
-        setTimeout(function () { apply.classList.remove('is-loading'); apply.removeAttribute('aria-busy'); apply.textContent = T('Apply');
-          hint(step, T('Codes are not connected yet — the discount shows here once they are.')); }, 1200);
+        if (!f.value.trim()) { state('error', T('Type the code first')); f.focus(); return; }
+        state(''); apply.classList.add('is-loading'); apply.setAttribute('aria-busy', 'true'); word.textContent = T('Checking');
+        setTimeout(function () { apply.classList.remove('is-loading'); apply.removeAttribute('aria-busy'); word.textContent = T('Apply');
+          var c = f.value.trim().toUpperCase();
+          if (c in DEMO) { f.value = c; take(c, DEMO[c]); state('success', T('Code applied — {sum} off', { sum: eur(DEMO[c]) })); }
+          else state('error', T('We could not find this code')); }, 1200);
       });
     });
 

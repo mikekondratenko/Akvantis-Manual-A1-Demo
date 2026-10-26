@@ -103,6 +103,9 @@ textarea.dark-input {
 }
 .field-hint { color: var(--ink-faint); }
 .field-error { color: var(--danger); font-weight: var(--weight-medium); }
+.field-success { display: flex; align-items: center; gap: var(--space-8); font-size: var(--text-11); line-height: var(--leading-normal);
+  color: var(--success); font-weight: var(--weight-medium); }   /* the line when it worked (a code taken; 2026-10-26) */
+:not(.field) > .field-success { margin-top: var(--space-8); }
 .field-error svg, .field-hint svg { flex-shrink: 0; }
 /* Not stacked by .field's gap — a message sits 8 under the control, like the label above it. */
 :not(.field) > .field-hint, :not(.field) > .field-error { margin-top: var(--space-8); }
@@ -351,9 +354,14 @@ textarea.dark-input {
 /* ══════════════ A FIELD WITH ITS BUTTON INSIDE (2026-10-26) ══════════════
    <div class="input-action"><input class="dark-input">  <button class="btn btn-secondary">Apply</button></div>
    The box is the holder: the field's edge, hover, the 1.8 px active edge and the error, all on it;
-   the field inside gives up its own. The button stands 4 in from the edge on every side, so the
-   whole is one field's height (4 + 38 + 4 + the edge); its corners are the box's less those 4 —
-   the two curves run parallel. Its words set its width; the field takes the rest. */
+   the field inside gives up its own. The button is the kit's own .btn, its own radius and levels —
+   only shorter, 4 in from the edge on every side, so the whole is one field's height (4 + 38 + 4 +
+   the edge). Its words set its width; the field takes the rest.
+   LEVELS  any of the kit's: a filled one, or .btn-text — the word alone (or .btn-text.btn-round, an
+           icon alone), when a second box inside the box is one too many.
+   STATES  .is-success — the edge and the button turn the success green, the button's words give way
+           to a check (.input-action-done, shown); .is-error — the danger edge. The line under it is
+           .field-success / .field-error. Typing again clears the state (the page's script). */
 .input-action { display: flex; align-items: center; gap: var(--space-4); height: var(--field-h); padding: var(--space-4);
   border: 1px solid var(--field-edge); border-radius: var(--field-radius); background-color: transparent;
   transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
@@ -362,5 +370,13 @@ textarea.dark-input {
 .input-action:has(> [aria-invalid="true"]) { border-color: var(--danger-edge); }
 .input-action > .dark-input { flex: 1; min-width: 0; height: 100%; border: 0; box-shadow: none; background: none;
   padding: 0 var(--space-12) 0 calc(var(--field-pad) - var(--space-4)); }
-.input-action > .btn { flex: none; width: auto; height: 100%; padding: 0 var(--space-16); border-radius: calc(var(--field-radius) - var(--space-4)); }
+.input-action > .btn { flex: none; width: auto; height: 100%; padding: 0 var(--space-16); }   /* the kit's button, 38 tall */
+.input-action.is-success { border-color: var(--success); box-shadow: inset 0 0 0 0.8px var(--success); }
+.input-action.is-error, .input-action.is-error:focus-within { border-color: var(--danger-edge); box-shadow: inset 0 0 0 0.8px var(--danger-edge); }
+.input-action.is-success > .btn { --btn: var(--success); --btn-hover: var(--success); --btn-ink: var(--page); --btn-edge: none; pointer-events: none; }
+/* A text (.btn-text) or icon action stays without a plate in every state: done, the check is drawn in
+   the success green; the 16 of padding is the word's own room (an icon takes the square). */
+.input-action.is-success > .btn-text { --btn: transparent; --btn-hover: transparent; --btn-ink: var(--success); }
+.input-action > .btn-text.btn-round { width: calc(var(--field-h) - var(--space-8) - 2px); padding: 0; }
+.input-action.is-success > .btn > :not(.input-action-done), .input-action:not(.is-success) > .btn > .input-action-done { display: none; }
 [data-theme="light"] .input-action { background-color: var(--page); }

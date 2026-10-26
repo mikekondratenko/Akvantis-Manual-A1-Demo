@@ -127,6 +127,11 @@
                --btn-edge: inset 0 0 0 1px var(--black-350); --btn-edge-hover: inset 0 0 0 1px var(--field-edge-hover); }
 .btn-ghost:hover:not(:disabled) { --btn-edge: var(--btn-edge-hover); }
 .btn-ghost { transition: background var(--duration-fast), color var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-instant); }
+/* TEXT (2026-10-26) — the word alone: no plate, no edge; under the cursor it steps down to the muted
+   ink. For an action that sits inside something that is already a box — a field's Apply
+   (field.css .input-action) — where a second box would be one too many. */
+.btn-text { --btn: transparent; --btn-hover: transparent; --btn-ink: var(--ink); --btn-edge: none; }
+.btn-text:hover:not(:disabled) { color: var(--ink-muted); }
 
 /* Frost — a button floating over a page or a scene: the frosted plate the header wears,
    from the --frost-* tokens. `.is-on` still turns it to the accent. */
