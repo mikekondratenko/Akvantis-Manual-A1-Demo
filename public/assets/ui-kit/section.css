@@ -62,6 +62,9 @@
      .sec-gallery      the same cards (.plate.card) in a carousel, about half a screen wide, arrows (kit/slider.js)
      .sec-stories      tall 9:16 cards in a carousel: picture to the edges, words on top, a + or a play
                        at the foot on the right (`.story`, see «STORIES»); arrows
+     .sec-specs        Specifications: parameter | value rows on hairlines; stacked on a phone (`.specs`)
+     .sec-compare      a comparison table (`table.compare`): products across, parameters down; on a phone
+                       each row is the parameter, then the values side by side, ours on a tile
      .sec-reviews      reviews three a row, each on a plate (`.is-bare` without), the words and,
                        at the foot, an avatar and a name; arrows
        .slider · .slider-track · .slide · .slider-ctrl (built by the script)
@@ -472,6 +475,61 @@ div.sec-info-pic { display: grid; place-items: center; }
 @media (min-width: 1024px) {
   .sec-info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-48); }
   .sec-infographic.is-flip .sec-info-pic { order: 1; }
+}
+
+/* ── SPECIFICATIONS (2026-10-26) ── a list of parameters: the name on the left half, the value on
+   the right half, a hairline between rows (Apple / Bluewater «Technical specifications»). On a
+   phone the name stands over its value.
+     <section class="sec sec-specs"><header class="sec-head"><h2 class="t-h1">Specifications</h2></header>
+       <dl class="specs">
+         <div class="specs-row"><dt>Installation (W×D×H)</dt><dd>126 × … mm</dd></div> …
+       </dl></section>
+   The name 14 muted, the value 16 in ink; rows 20 above and below the words. The two halves are
+   the grid's halves (12 and 8 columns are even, the gutter the same), so the value starts where
+   a half-width block would. */
+.specs { margin: 0; border-bottom: 1px solid var(--rule); }
+.specs-row { display: grid; gap: var(--space-4); padding-block: calc(var(--space-16) + var(--space-4)); border-top: 1px solid var(--rule); }
+.specs-row > dt { font-size: var(--text-14); line-height: var(--leading-relaxed); color: var(--ink-muted); }
+.specs-row > dd { margin: 0; font-size: var(--text-16); line-height: var(--leading-relaxed); color: var(--ink); }
+@media (min-width: 768px) { .specs-row { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--grid-gutter); align-items: baseline; } }
+
+/* ── COMPARE (2026-10-26) ── a comparison table: the products across the top (a small picture in a
+   tile and the name), the parameters down the side. It is a real <table> — a screen reader reads
+   it as one — and changes shape below 768:
+     from 768   three equal columns — the parameter, then each product; the rows on hairlines
+     a phone    the products' heads side by side; each row is the parameter on its own line, then
+                the values side by side under the heads — ours (the first product) on a tile
+   The first product is ours: its name and values in ink; the others muted. Two products by default;
+   for three, style="--compare-n: 3" on the table.
+     <table class="compare">
+       <thead><tr><td></td>
+         <th scope="col"><span class="compare-pic"><img …></span>A1</th>
+         <th scope="col"><span class="compare-pic"><img …></span>Other RO systems</th></tr></thead>
+       <tbody><tr><th scope="row">Flow rate</th><td>…</td><td>…</td></tr> …</tbody>
+     </table> */
+.compare { --compare-n: 2; width: 100%; border-collapse: collapse; table-layout: fixed; text-align: left; }
+.compare th, .compare td { padding: 0; font-weight: var(--weight-regular); vertical-align: baseline; }
+.compare thead th { padding-bottom: var(--space-40); font-size: var(--text-16); line-height: var(--leading-snug); font-weight: var(--weight-semibold); color: var(--ink); vertical-align: bottom; }
+.compare thead th ~ th { color: var(--ink-muted); }
+.compare-pic { display: block; width: var(--number-64); height: var(--number-64); margin-bottom: var(--space-16); overflow: hidden;
+  border-radius: var(--radius-16); background: var(--tile); }
+.compare-pic > img, .compare-pic > .sec-ph { display: block; width: 100%; height: 100%; padding: 0; border-radius: inherit; object-fit: contain; }
+.compare tbody tr { border-top: 1px solid var(--rule); }
+.compare tbody tr:last-child { border-bottom: 1px solid var(--rule); }
+.compare tbody th, .compare tbody td { padding-block: calc(var(--space-16) + var(--space-4)); font-size: var(--text-16); line-height: var(--leading-relaxed); }
+.compare tbody th { font-size: var(--text-14); color: var(--ink-muted); }
+.compare tbody td { color: var(--ink); }
+.compare tbody td ~ td { color: var(--ink-muted); }
+.compare tbody td + td, .compare tbody th + td { padding-right: var(--grid-gutter); }
+@media (max-width: 767px) {
+  .compare, .compare thead, .compare tbody { display: block; }
+  .compare tr { display: grid; grid-template-columns: repeat(var(--compare-n), minmax(0, 1fr)); column-gap: var(--grid-gutter); }
+  .compare thead td { display: none; }
+  .compare thead th { display: grid; justify-items: center; padding-bottom: var(--space-32); text-align: center; }
+  .compare tbody tr { padding-block: var(--space-16) var(--space-16); align-items: center; }
+  .compare tbody th { grid-column: 1 / -1; padding: 0 0 var(--space-12); }
+  .compare tbody td { padding: var(--space-12) var(--space-16); }
+  .compare tbody th + td { padding-right: var(--space-16); border-radius: var(--radius-16); background: var(--tile); }
 }
 
 /* ── FAQ ── the kit's accordion (panel.css + accordion.js), centred title, at a reading measure.
