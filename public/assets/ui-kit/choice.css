@@ -147,7 +147,7 @@
 .choice-mark { flex: none; display: grid; place-items: center; width: var(--number-32); height: var(--number-32); color: var(--ink); }
 .choice-mark > img, .choice-mark > svg { display: block; width: 100%; height: 100%; object-fit: contain; }
 .choice-mark.is-akvantis > svg { width: 28px; height: 28px; }   /* the AKVANTIS wave in its ring — drawn in the ink, a hair under the carriers' signs so the ring reads at their weight */
-.choice.is-row.is-mark > .choice-price { margin-left: auto; padding-left: var(--space-16); font-size: var(--text-16); white-space: nowrap; }
+.choice.is-row > .choice-price { margin-left: auto; padding-left: var(--space-16); font-size: var(--text-16); white-space: nowrap; }
 /* A PICK — the mark option and what it asks next on one plate: chosen, the plate takes the edge
    (not the row) and under the words it asks the question — a branch, an address. */
 .choice-group.is-pick:has(> .choice > input:checked) { background: var(--choice-on, var(--choice)); border-color: var(--choice-edge-on); box-shadow: inset 0 0 0 0.8px var(--choice-edge-on); }
