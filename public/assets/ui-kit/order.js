@@ -199,10 +199,16 @@
     $$(form, '.order-seg').forEach(function (g) {
       var rs = $$(g, 'input[type=radio]'), host = document.createElement('div'); g.appendChild(host);
       if (!window.Kit || !Kit.segmented) return;
-      Kit.segmented(host, rs.map(function (r) { var ic = r.parentNode.dataset.icon;   /* <label data-icon="truck"> → the tab's icon (icons.js) */
-          return { label: r.parentNode.textContent.trim(), value: r.value, icon: ic && window.KitIcons ? KitIcons.svg(ic, { size: 20 }) : null }; }),
+      /* <label data-logo="../logos/monobank" data-logo-h="20"> → the tab is that logo (-dark / -light .svg), no words,
+         and the track is the tall one (segmented.css TALL) — the bank of a plan in parts (2026-10-26) */
+      var logos = rs.some(function (r) { return r.parentNode.dataset.logo; });
+      var btns = Kit.segmented(host, rs.map(function (r) { var l = r.parentNode, ic = l.dataset.icon, lg = l.dataset.logo;   /* <label data-icon="truck"> → the tab's icon (icons.js) */
+          return { label: lg ? '' : l.textContent.trim(), value: r.value,
+            icon: lg ? '<span class="segment-logo"' + (l.dataset.logoH ? ' style="--logo-h:' + l.dataset.logoH + 'px"' : '') + '><img class="is-dark" src="' + lg + '-dark.svg" alt=""><img class="is-light" src="' + lg + '-light.svg" alt=""></span>'
+              : ic && window.KitIcons ? KitIcons.svg(ic, { size: 20 }) : null }; }),
         Math.max(0, rs.findIndex(function (r) { return r.checked; })),
         function (v, i) { rs[i].checked = true; rs[i].dispatchEvent(new Event('change', { bubbles: true })); });
+      if (logos) { host.classList.add('is-tall'); btns.forEach(function (b, i) { b.setAttribute('aria-label', rs[i].parentNode.textContent.trim()); }); }
     });
 
     /* counts: kit/choice.js steps them and fires `input`, which recounts here. */

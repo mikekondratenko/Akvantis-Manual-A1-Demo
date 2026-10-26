@@ -46,6 +46,18 @@
    The thumb stays the one thing that ever fills a segment (see below). */
 .segment-btn:not(.is-active):not(:disabled):hover { color: var(--ink); }
 .segment-btn.is-active { color: var(--ink); }
+/* TALL (2026-10-26): `.segmented.is-tall` — 64, the icon toggle's height (kit.css .iconseg), for
+   segments that are pictures rather than words: a brand's logo (.segment-logo — the -dark file on the
+   dark ground, the -light on paper, --logo-h tall, 20 by default). Off the choice a logo is at half
+   strength, full under the cursor. A segment with a logo and no words carries its name in aria-label. */
+.segmented.is-tall { height: var(--number-64); }
+.segment-btn > span:empty { display: none; }
+.segment-logo { display: flex; align-items: center; height: var(--logo-h, var(--number-20)); transition: opacity var(--duration-fast); }
+.segment-logo img { display: block; height: 100%; width: auto; }
+.segment-logo > .is-light, [data-theme="light"] .segment-logo > .is-dark { display: none; }
+[data-theme="light"] .segment-logo > .is-light { display: block; }
+.segment-btn:not(.is-active) .segment-logo { opacity: .48; }
+.segment-btn:not(.is-active):hover .segment-logo { opacity: 1; }
 /* Many options — Kit.segmented(…, { scroll: true }). Segments take their label's width and
    scroll sideways with no visible bar; the thumb is sized by script.
 
