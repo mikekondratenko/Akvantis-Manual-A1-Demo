@@ -90,6 +90,7 @@
    swaps the label ("Send request" → "Sending"). 800ms a turn is a loop, not a transition, so
    it is not a duration token; with less motion the ring turns at a third of the speed. */
 .btn.is-loading { pointer-events: none; }
+.btn.is-loading > svg { display: none; }   /* busy, the ring takes the icon's place (2026-10-26) */
 .btn.is-loading::before {
   content: ''; flex: none; width: var(--number-16); height: var(--number-16); border-radius: 50%;
   border: 2px solid currentColor; border-right-color: transparent;

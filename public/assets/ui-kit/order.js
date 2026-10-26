@@ -68,6 +68,8 @@
 
   function init(form) {
     var lang = document.documentElement.lang || 'en';
+    /* a button's words: its <span> when it has an icon beside them (Pay with the bag, 2026-10-26), else the button */
+    var word = function (b) { return b.querySelector(':scope > span') || b; };
     /* The prices are written in € (data-price). form[data-currency="UAH"][data-rate="48"] shows them in
        hryvnia — times the rate, whole, «23 760 грн» (2026-10-26: the Ukrainian version). */
     var cur = form.dataset.currency || 'EUR', rate = +form.dataset.rate || 1;
@@ -169,7 +171,7 @@
       form.dataset.kg = Math.round(kg * 10) / 10; form.dataset.goods = open ? '' : sum + codeOff - ship;
       form.dataset.sum = open || !chosen ? '' : sum;   /* the total in €, for the Google Pay sheet (WALLET) */
       var plan = valOf('payment'), inParts = plan && plan !== 'full';
-      var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) pay.textContent = inParts ? T('Apply for {n} payments', { n: plan }) : chosen ? T('Pay {sum}', { sum: sumTxt }) : T('Pay');
+      var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) word(pay).textContent = inParts ? T('Apply for {n} payments', { n: plan }) : chosen ? T('Pay {sum}', { sum: sumTxt }) : T('Pay');
       /* [data-per-month="10"]: the total over that many parts (2026-10-26 — was typed by hand) */
       $$(form, '[data-per-month]').forEach(function (el) { var n = +el.dataset.perMonth;
         el.textContent = chosen && !open ? T('{sum} / month · {n} × with ' + (valOf('bank') === 'privat' ? 'PrivatBank' : 'monobank'), { sum: eur(Math.round(sum / n * 100) / 100), n: n }) : T('monobank or PrivatBank, interest-free'); });
@@ -266,7 +268,7 @@
     update(); lock();
 
     /* send */
-    var send = form.querySelector('[type=submit]'), notice = form.querySelector('.notice'), sendTxt = send ? send.textContent : '';
+    var send = form.querySelector('[type=submit]'), notice = form.querySelector('.notice'), sendTxt = send ? word(send).textContent : '';
     var mark = function (el, msg) {
       var box = el.closest('.field') || el.parentElement, line = box.querySelector('.field-error');
       if (!msg) { el.removeAttribute('aria-invalid'); if (line) line.remove(); return; }
@@ -279,7 +281,7 @@
       notice.className = 'notice' + (kind ? ' is-' + kind : ''); notice.setAttribute('role', kind === 'error' ? 'alert' : 'status');
       notice.querySelector('span').textContent = text; notice.hidden = false; };
     var busy = function (on) { if (!send) return; send.classList.toggle('is-loading', on); send.setAttribute('aria-busy', on);
-      send.textContent = on ? T('Sending') : sendTxt; if (!on) update(); };
+      word(send).textContent = on ? T('Sending') : sendTxt; if (!on) update(); };
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -306,7 +308,7 @@
       /* PRIVAT (2026-10-26): the plan with PrivatBank — the worker opens a payment there and answers the
          bank's page; the buyer logs in to Privat24 and confirms it on that page. */
       if (plan && plan !== 'full' && valOf('bank') === 'privat' && form.dataset.privatUrl) {
-        busy(true); send.textContent = T('Opening PrivatBank');
+        busy(true); word(send).textContent = T('Opening PrivatBank');
         fetch(form.dataset.privatUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
           .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.url) throw new Error(j.error || r.status); return j; }); })
           .then(function (j) { location.assign(j.url); })
@@ -318,9 +320,9 @@
         var WHY = { EXCEEDED_SUM_LIMIT: 'the sum is over your limit', NOT_ENOUGH_MONEY_FOR_INIT_DEBIT: 'not enough money for the first payment',
           CLIENT_NOT_FOUND: 'no monobank client with this number', REJECTED_BY_CLIENT: 'you declined it in the app', CLIENT_PUSH_TIMEOUT: 'it was not confirmed in time',
           EXISTS_OTHER_OPEN_ORDER: 'another purchase in parts is still open', PAY_PARTS_ARE_NOT_ACCEPTABLE: 'this number of payments is not available' };
-        busy(true); send.textContent = T('Sending to monobank');
+        busy(true); word(send).textContent = T('Sending to monobank');
         var wait = function (order) {
-          send.textContent = T('Waiting for monobank');
+          word(send).textContent = T('Waiting for monobank');
           tell('', T('Confirm the purchase in the monobank app — we are waiting for the bank.'));
           fetch(base + '/state', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
             if (j.state === 'SUCCESS' || (j.state === 'IN_PROCESS' && j.sub === 'WAITING_FOR_STORE_CONFIRM'))
@@ -337,7 +339,7 @@
         return;
       }
       if (form.dataset.payUrl) {
-        busy(true); send.textContent = T('Opening payment');
+        busy(true); word(send).textContent = T('Opening payment');
         fetch(form.dataset.payUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
           .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.pageUrl) throw new Error(j.error || r.status); return j; }); })
           .then(function (j) { location.assign(j.pageUrl); })
@@ -377,7 +379,7 @@
             parameters: { gateway: 'example', gatewayMerchantId: 'exampleGatewayMerchantId' } } })],   /* TEST: Google's example gateway */
           transactionInfo: { totalPriceStatus: 'FINAL', totalPrice: total.toFixed(2), currencyCode: uah ? 'UAH' : 'EUR', countryCode: uah ? 'UA' : 'DE' } };
         client.loadPaymentData(req).then(function (pd) {
-          busy(true); send.textContent = T('Sending');
+          busy(true); word(send).textContent = T('Sending');
           lead.gpay = { token: pd.paymentMethodData.tokenizationData.token, card: pd.paymentMethodData.info || {}, description: pd.paymentMethodData.description || '' };
           if (!form.dataset.gpayUrl) { busy(false); return tell('', T('Preview: Google Pay gave a test token — the form is not connected here.')); }
           return fetch(form.dataset.gpayUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
