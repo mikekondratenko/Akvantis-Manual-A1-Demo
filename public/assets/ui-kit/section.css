@@ -15,7 +15,7 @@
      .sec-actions      a row of buttons (and a price) under it — buttons 8 apart (--btn-gap)
      .sec-banner       the picture of a hero or a CTA — an object over the text by default,
                        a photograph behind it on `.is-cover`
-     .sec-ph           a picture slot until the picture exists — always transparent (no fill)
+     .sec-ph           a picture slot until the picture exists — --black-900, nothing drawn in it
      .sec-lockup       a product's lockup in a title, from the catalogue (data-device)
 
    ── THE SET (2026-10-25) — what a landing is built from, in this order on the specimen:
@@ -135,11 +135,10 @@ img.sec-banner { object-fit: contain; }
 .sec-ph {
   display: grid; place-items: center; padding: var(--space-16); text-align: center;
   border-radius: var(--sec-card-radius); color: var(--ink-faint); font-size: var(--text-12);
-  /* A picture that is not there yet is not drawn (2026-10-25, a rule of the kit): a stand-in is
-     always transparent — no fill, no hatch. The product's photographs come cut out, on the
-     ground they sit on, so a grey square would be a shape the real thing never has. The slot
-     keeps its size; what holds it (a card's plate, a slide, a hero's frame) keeps its own fill. */
-  background: none;
+  /* RULE (2026-10-26, was «transparent» since 10-25): where there is no picture yet, the slot is
+     --black-900 — the size and the place of the picture are seen, nothing is drawn in it (no
+     photograph in a specimen, no hatch). On paper the token is the light grey of the same step. */
+  background: var(--black-900);
 }
 
 /* ── HERO ──
