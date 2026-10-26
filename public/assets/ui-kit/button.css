@@ -151,14 +151,14 @@
 .btn-frost { --btn-edge-hover: inset 0 0 0 1px var(--white-14); }
 
 /* ── WALLET (2026-10-26) ── Apple Pay / Google Pay: the kit's button with the wallet's mark (ui-kit/logos,
-   24 tall) and no words, 160 wide. Two plates, pure white or pure black (--wallet-white / --wallet-black,
+   24 tall) and no words — as wide as any .btn (the whole row; a row of actions sets its own width). Two plates, pure white or pure black (--wallet-white / --wallet-black,
    which do not swap with the theme):
      .btn-wallet            by the theme — white on the dark ground, black on paper
      .btn-wallet.is-white   always white (on paper it takes a 1px edge, or it would vanish)
      .btn-wallet.is-black   always black (on the dark ground a faint 1px edge)
    Each carries both marks — <img class="on-white" src="…-light.svg"> and <img class="on-black"
    src="…-dark.svg"> — and shows the one its plate needs. aria-label names the wallet. */
-.btn-wallet { --btn: var(--wallet-white); --btn-hover: var(--wallet-white); --btn-edge: none; width: calc(var(--number-72) * 2 + var(--space-16)); padding: 0 var(--space-16); }
+.btn-wallet { --btn: var(--wallet-white); --btn-hover: var(--wallet-white); --btn-edge: none; padding: 0 var(--space-16); }
 .btn-wallet:hover:not(:disabled) { opacity: .88; }
 .btn-wallet > img { display: block; height: var(--number-24); width: auto; }
 .btn-wallet > .on-black { display: none; }
