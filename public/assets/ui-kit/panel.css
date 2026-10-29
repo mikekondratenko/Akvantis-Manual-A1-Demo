@@ -36,7 +36,7 @@
    stopped being loud has to be legible. The collapsible variant lifts to white on
    hover. */
 .panel-title {
-  font-size: var(--text-14); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-normal);
+  font-size: var(--type-small); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-normal);
   color: var(--black-100);
 }
 

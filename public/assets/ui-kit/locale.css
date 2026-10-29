@@ -33,7 +33,7 @@ a.lang-mark { width: var(--number-40); height: var(--number-40); border-radius: 
    rows in the sheet say them. A pill so the hover plate has a shape. */
 a.lang-mark.locale { width: auto; gap: var(--space-8); padding: 0 var(--space-8) 0 var(--space-12);
   margin-right: calc(var(--space-8) * -1); border-radius: var(--radius-pill); text-decoration: none; }
-.locale-txt { font-size: var(--text-14); line-height: var(--leading-none); white-space: nowrap; }
+.locale-txt { font-size: var(--type-small); line-height: var(--leading-none); white-space: nowrap; }
 .locale-txt b { font-weight: var(--weight-semibold); color: var(--ink); }
 .locale-sub { color: var(--ink-muted); }
 /* One form at every width (2026-09-28): `Germany • De`. The long form stays in the
@@ -123,7 +123,7 @@ a.lang-mark.locale.locale-lang { gap: var(--space-4); padding: 0 var(--space-8) 
 .regions-head { display: flex; align-items: center; justify-content: space-between;
   gap: var(--space-16); max-width: var(--bar-w); margin: 0 auto var(--space-16);
   min-height: var(--number-40); }
-.regions-head h2 { margin: 0; font-size: var(--text-24); font-weight: var(--weight-semibold); color: var(--ink); }
+.regions-head h2 { margin: 0; font-size: var(--type-h3); font-weight: var(--weight-semibold); color: var(--ink); }
 .regions-x { display: flex; align-items: center; justify-content: center; flex: none;
   width: var(--number-40); height: var(--number-40); border-radius: 50%;
   background: var(--tile); color: var(--ink); }
@@ -140,8 +140,8 @@ a.lang-mark.locale.locale-lang { gap: var(--space-4); padding: 0 var(--space-8) 
 .region-ico { display: flex; flex: none; color: var(--ink); }
 .region-ico svg { width: calc(var(--number-16) + var(--space-4)); height: calc(var(--number-16) + var(--space-4)); display: block; }
 .region-txt { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-.region-txt b { font-size: var(--text-16); font-weight: var(--weight-semibold); }
-.region-txt span { font-size: var(--text-14); color: var(--ink-muted); }
+.region-txt b { font-size: var(--type-title); font-weight: var(--weight-semibold); }
+.region-txt span { font-size: var(--type-small); color: var(--ink-muted); }
 .region-on { display: flex; flex: none; color: currentColor; }
 .region:not([aria-current="true"]) .region-on { visibility: hidden; }
 .region[aria-current="true"], .region[aria-current="true"]:hover { background: var(--tile-hover); }

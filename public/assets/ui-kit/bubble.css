@@ -30,7 +30,7 @@
   max-width: min(calc(var(--number-288) - var(--space-8)), calc(100vw - 2 * var(--space-16)));
   padding: var(--space-12) var(--space-16); border-radius: var(--radius-12);
   background: var(--white); color: var(--black-1000); box-shadow: var(--shadow-md);
-  font-family: var(--font-primary); font-size: var(--text-14); line-height: var(--leading-normal); font-weight: var(--weight-regular);
+  font-family: var(--font-primary); font-size: var(--type-small); line-height: var(--leading-normal); font-weight: var(--weight-regular);
   text-align: left; text-wrap: pretty;
   opacity: 0; transform: translateY(var(--bubble-shift, 4px)); pointer-events: none;
   transition: opacity var(--duration-fast), transform var(--duration-fast);

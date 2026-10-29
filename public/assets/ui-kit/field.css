@@ -349,10 +349,10 @@ textarea.dark-input {
   background: var(--black-800); border: 1px solid var(--field-edge); border-radius: var(--field-radius); box-shadow: var(--shadow-md); }
 .suggest-list[hidden] { display: none; }
 .suggest-opt { display: grid; gap: var(--space-2); padding: var(--space-8) var(--space-12); border-radius: var(--radius-4); cursor: pointer; color: var(--ink); }
-.suggest-opt > b { font-size: var(--text-14); font-weight: var(--weight-medium); line-height: var(--leading-snug); }
-.suggest-opt > small { font-size: var(--text-12); color: var(--ink-faint); line-height: var(--leading-normal); }
+.suggest-opt > b { font-size: var(--type-small); font-weight: var(--weight-medium); line-height: var(--leading-snug); }
+.suggest-opt > small { font-size: var(--type-caption); color: var(--ink-faint); line-height: var(--leading-normal); }
 .suggest-opt:hover, .suggest-opt.is-active { background: var(--black-700); }
-.suggest-empty { padding: var(--space-8) var(--space-12); font-size: var(--text-14); color: var(--ink-faint); }
+.suggest-empty { padding: var(--space-8) var(--space-12); font-size: var(--type-small); color: var(--ink-faint); }
 .suggest.is-busy > .dark-input { background-image: linear-gradient(90deg, transparent, var(--white-10), transparent); background-size: 200% 100%; animation: suggest-busy 1s linear infinite; }
 @keyframes suggest-busy { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 [data-theme="light"] .suggest-list { background: #FFFFFF; }

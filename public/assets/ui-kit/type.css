@@ -9,13 +9,13 @@
      .t-display   40 → 72 → 80 → 96 / 1 / 600 / -.02em (96 from 1460)   a landing's object — a name, a price as a picture
      .t-h1        32 → 48 → 56 / 1 / 600            a page or a screen's title
      .t-h2        24 → 32      / 1.1 / 600          a section's title, a price
-     .t-h3        24 / 1.25 / 600            a group inside a section
-     .t-title     16 / 1.25 / 600            a card's name, a row's name, a question
-     .t-lead      16 / 1.5  / muted          the sentence under a title
-     .t-body      16 / 1.5                   running text on a page
-     .t-small     14 / 1.5                   running text in a plate, a row's second line
-     .t-caption   12 / 1.4  / faint          a note under something
-     .t-note      14 / 1.5  / faint          what something is: a caption, a tile's name, a column head
+     .t-h3        20 → 24 / 1.25 / 600       a group inside a section
+     .t-title     14 → 16 / 1.25 / 600       a card's name, a row's name, a question
+     .t-lead      14 → 16 / 1.5  / muted      the sentence under a title
+     .t-body      14 → 16 / 1.5               running text on a page
+     .t-small     13 → 14 / 1.5               running text in a plate, a row's second line
+     .t-caption   11 → 12 / 1.4  / faint      a note under something
+     .t-note      13 → 14 / 1.5  / faint      what something is: a caption, a tile's name, a column head
      .t-label     10 / 700  / caps / .08em   the small heading over a group
      .link        a text link: a 1px line at 32 % of its ink at rest, 2px under the text; under
                   the cursor a full-ink line draws over it left to right and back when it leaves;
@@ -25,7 +25,8 @@
    ── THE TOP THREE STEP DOWN ON A SMALL SCREEN (2026-10-11) ──
    Sizes are mobile first and change at the grid's own breakpoints, 768 and 1024, so a title
    changes size where the columns do. Every step is on the type scale — no clamp(), no vw:
-   a size that slides with the window is a size nobody chose. h3 and down hold at every width.
+   a size that slides with the window is a size nobody chose. Since 2026-10-29 h3 and down step
+   too, one size each under 768 (the roles --type-h3 … --type-caption); only the label holds.
 
    Tools set their chrome at 10–14 inside their own components and do not need these; the
    roles are for pages that read. Every value is a token, so the docs table in DESIGN.md
@@ -40,8 +41,20 @@
   --type-display: var(--text-40);
   --type-h1:      var(--text-32);
   --type-h2:      var(--text-24);
+  /* ── AND EVERYTHING ELSE A STEP DOWN TOO (2026-10-29) ── on a 375 screen the 16s of an option's name,
+     a price, a paragraph read a size too large next to the titles that had already stepped down.
+     Mobile first like the titles; from 768 the sizes they always had. One step on the scale each:
+     24 → 20, 16 → 14, 14 → 13, 12 → 11. The 10 of a label and the 14 of a control (a field, a
+     button — iOS zooms a field under 16 already) stay at every width. Components that read on a
+     page take these roles, not a --text-* of their own; a tool's chrome (kit.css) keeps its sizes. */
+  --type-h3:      var(--text-20);
+  --type-title:   var(--text-14);
+  --type-body:    var(--text-14);
+  --type-small:   var(--text-13);
+  --type-caption: var(--text-11);
 }
-@media (min-width: 768px)  { :root { --type-display: var(--text-72); --type-h1: var(--text-48); --type-h2: var(--text-32); } }
+@media (min-width: 768px)  { :root { --type-display: var(--text-72); --type-h1: var(--text-48); --type-h2: var(--text-32);
+  --type-h3: var(--text-24); --type-title: var(--text-16); --type-body: var(--text-16); --type-small: var(--text-14); --type-caption: var(--text-12); } }
 @media (min-width: 1024px) { :root { --type-display: var(--text-80); --type-h1: var(--text-56); } }
 /* The display's 96 only from 1460 (2026-10-26): at 1440 a 96 title read a step too large. */
 @media (min-width: 1460px) { :root { --type-display: var(--text-96); } }
@@ -49,16 +62,16 @@
 .t-display { font-size: var(--type-display); line-height: var(--leading-none);    font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); }
 .t-h1      { font-size: var(--type-h1); line-height: var(--leading-none);    font-weight: var(--weight-semibold); }
 .t-h2      { font-size: var(--type-h2); line-height: var(--leading-tight);   font-weight: var(--weight-semibold); }
-.t-h3      { font-size: var(--text-24); line-height: var(--leading-snug);    font-weight: var(--weight-semibold); }
-.t-title   { font-size: var(--text-16); line-height: var(--leading-snug);    font-weight: var(--weight-semibold); }
-.t-lead    { font-size: var(--text-16); line-height: var(--leading-relaxed); color: var(--ink-muted); }
-.t-body    { font-size: var(--text-16); line-height: var(--leading-relaxed); }
-.t-small   { font-size: var(--text-14); line-height: var(--leading-relaxed); }
-.t-caption { font-size: var(--text-12); line-height: var(--leading-normal);  color: var(--ink-faint); }
+.t-h3      { font-size: var(--type-h3); line-height: var(--leading-snug);    font-weight: var(--weight-semibold); }
+.t-title   { font-size: var(--type-title); line-height: var(--leading-snug);    font-weight: var(--weight-semibold); }
+.t-lead    { font-size: var(--type-body); line-height: var(--leading-relaxed); color: var(--ink-muted); }
+.t-body    { font-size: var(--type-body); line-height: var(--leading-relaxed); }
+.t-small   { font-size: var(--type-small); line-height: var(--leading-relaxed); }
+.t-caption { font-size: var(--type-caption); line-height: var(--leading-normal);  color: var(--ink-faint); }
 /* A quiet line that says what something is — the caption over a specimen, a name under a tile,
    a column's head (2026-10-21). 14 / 1.5 in --ink-faint, sentence case: caps at 10 read as a
    code, not a sentence. */
-.t-note    { font-size: var(--text-14); line-height: var(--leading-relaxed); font-weight: var(--weight-regular); color: var(--ink-faint); }
+.t-note    { font-size: var(--type-small); line-height: var(--leading-relaxed); font-weight: var(--weight-regular); color: var(--ink-faint); }
 .t-label   { font-size: var(--text-10); line-height: var(--leading-snug);    font-weight: var(--weight-bold);
              letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--ink-faint); }
 

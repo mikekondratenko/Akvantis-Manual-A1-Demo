@@ -335,6 +335,8 @@
   --text-13  : 13px;
   --text-14  : 14px;
   --text-16  : 16px;
+  /* 20 (2026-10-29): h3 one step down on a phone — the step between 16 and 24 that had no size */
+  --text-20  : 20px;
   --text-24  : 24px;
   --text-26  : 26px;
   --text-28  : 28px;

@@ -131,7 +131,7 @@
 .sec-actions .btn { width: auto; }
 /* A price said loud: the figure at h1, what follows it («/ month») small and muted. */
 .sec-price { font-size: var(--type-h1); line-height: var(--leading-none); font-weight: var(--weight-semibold); }
-.sec-price small { font-size: var(--text-16); font-weight: var(--weight-regular); color: var(--ink-muted); margin-left: var(--space-4); }
+.sec-price small { font-size: var(--type-body); font-weight: var(--weight-regular); color: var(--ink-muted); margin-left: var(--space-4); }
 
 /* A product's lockup in a title (2026-10-25): the device's own mark from the catalogue
    (ui-kit/devices/devices.js) set at the size of the line — cap height, on the baseline. The
@@ -277,7 +277,7 @@ img.sec-banner { object-fit: contain; }
 .sec-quote.is-filled > .sec-quote-by { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .sec-quote-fill { --fill: 100% !important; }
   .sec-quote:has(.sec-quote-fill) > .sec-quote-by { opacity: 1; transform: none; transition: none; } }
-.sec-quote-by { font-size: var(--text-16); color: var(--black-300); }   /* a step under the muted ink (2026-10-25) */
+.sec-quote-by { font-size: var(--type-body); color: var(--black-300); }   /* a step under the muted ink (2026-10-25) */
 .sec-quote.is-center { justify-items: center; text-align: center; }
 .sec-quote.is-center > * { grid-column: 1 / -1; max-width: 22ch; }
 .sec-quote.is-center > .sec-quote-by, .sec-quote.is-center > .sec-actions { max-width: none; justify-content: center; }
@@ -292,8 +292,8 @@ img.sec-banner { object-fit: contain; }
 .sec-footer-brand { display: grid; gap: var(--space-16); justify-items: start; align-content: start; color: var(--ink-muted); }
 .sec-footer-brand > svg, .sec-footer-brand > a > svg { width: var(--number-32); height: var(--number-32); color: var(--ink); display: block; }
 .sec-footer-col { display: grid; gap: var(--space-12); align-content: start; justify-items: start; }
-.sec-footer-col > b { font-size: var(--text-14); font-weight: var(--weight-semibold); color: var(--ink); }
-.sec-footer-col a { color: var(--ink-muted); text-decoration: none; font-size: var(--text-14); transition: color var(--duration-fast); }
+.sec-footer-col > b { font-size: var(--type-small); font-weight: var(--weight-semibold); color: var(--ink); }
+.sec-footer-col a { color: var(--ink-muted); text-decoration: none; font-size: var(--type-small); transition: color var(--duration-fast); }
 .sec-footer-col a:hover { color: var(--ink); }
 .sec-footer-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-16) var(--space-24);
   padding-top: var(--space-24); border-top: 1px solid var(--rule); font-size: var(--text-12); color: var(--ink-quiet, var(--ink-faint)); }
@@ -346,9 +346,7 @@ img.sec-banner { object-fit: contain; }
   .sec-split-text { gap: var(--space-12); }
   .sec-split-text .sec-actions { margin-top: var(--space-8); }
 }
-@media (max-width: 767px) {
-  .sec-split-text > .t-lead { font-size: var(--text-14); }
-}
+/* (2026-10-29) the lead's phone step is the type roles' now (type.css) */
 @media (min-width: 1024px) {
   /* The picture takes its half. The text is three columns in the other half, two empty columns from
      the picture, centred on the picture's height. */
@@ -404,12 +402,11 @@ img.card-pic { background: var(--black-800); }
 .card > .sec-actions { margin-top: auto; padding-top: var(--space-12); }
 /* Every part of a card is optional (2026-10-25): with no picture it starts at the words' inset. */
 .card:not(:has(> .card-pic)) { padding-top: var(--space-24); }
-/* A phone (2026-10-25): smaller corners, the words 20 in, the description 14. */
+/* A phone (2026-10-25): smaller corners, the words 20 in; the description's step is the type roles' (2026-10-29). */
 @media (max-width: 767px) {
   .card { border-radius: var(--radius-24); }
   .card-pic { border-radius: var(--radius-16); }
   .card > :not(.card-pic) { margin-inline: var(--space-12); }
-  .card > .t-small { font-size: var(--text-14); }
 }
 /* From 1440 the words sit 32 from the card's edge instead of 24 (2026-10-26): sides, bottom, and the
    top of a card with no picture. The picture keeps its 8. */
@@ -489,8 +486,8 @@ div.sec-info-pic { display: grid; place-items: center; }
    a half-width block would. */
 .specs { margin: 0; border-bottom: 1px solid var(--rule-soft); }
 .specs-row { display: grid; gap: var(--space-4); padding-block: calc(var(--space-16) + var(--space-4)); border-top: 1px solid var(--rule-soft); }
-.specs-row > dt { font-size: var(--text-14); line-height: var(--leading-relaxed); color: var(--ink-muted); }
-.specs-row > dd { margin: 0; font-size: var(--text-16); line-height: var(--leading-relaxed); color: var(--ink); }
+.specs-row > dt { font-size: var(--type-small); line-height: var(--leading-relaxed); color: var(--ink-muted); }
+.specs-row > dd { margin: 0; font-size: var(--type-body); line-height: var(--leading-relaxed); color: var(--ink); }
 @media (min-width: 768px) { .specs-row { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--grid-gutter); align-items: baseline; } }
 
 /* ── COMPARE (2026-10-26) ── a comparison table: the products across the top (a small picture in a
@@ -509,15 +506,15 @@ div.sec-info-pic { display: grid; place-items: center; }
      </table> */
 .compare { --compare-n: 2; width: 100%; border-collapse: collapse; table-layout: fixed; text-align: left; }
 .compare th, .compare td { padding: 0; font-weight: var(--weight-regular); vertical-align: baseline; }
-.compare thead th { padding-bottom: var(--space-40); font-size: var(--text-16); line-height: var(--leading-snug); font-weight: var(--weight-semibold); color: var(--ink); vertical-align: bottom; }
+.compare thead th { padding-bottom: var(--space-40); font-size: var(--type-title); line-height: var(--leading-snug); font-weight: var(--weight-semibold); color: var(--ink); vertical-align: bottom; }
 .compare thead th ~ th { color: var(--ink-muted); }
 .compare-pic { display: block; width: var(--number-64); height: var(--number-64); margin-bottom: var(--space-16); overflow: hidden;
   border-radius: var(--radius-16); background: var(--tile); }
 .compare-pic > img, .compare-pic > .sec-ph { display: block; width: 100%; height: 100%; padding: 0; border-radius: inherit; object-fit: contain; }
 .compare tbody tr { border-top: 1px solid var(--rule-soft); }
 .compare tbody tr:last-child { border-bottom: 1px solid var(--rule-soft); }
-.compare tbody th, .compare tbody td { padding-block: calc(var(--space-16) + var(--space-4)); font-size: var(--text-16); line-height: var(--leading-relaxed); }
-.compare tbody th { font-size: var(--text-14); color: var(--ink-muted); }
+.compare tbody th, .compare tbody td { padding-block: calc(var(--space-16) + var(--space-4)); font-size: var(--type-body); line-height: var(--leading-relaxed); }
+.compare tbody th { font-size: var(--type-small); color: var(--ink-muted); }
 .compare tbody td { color: var(--ink); }
 .compare tbody td ~ td { color: var(--ink-muted); }
 .compare tbody td + td, .compare tbody th + td { padding-right: var(--grid-gutter); }
@@ -547,14 +544,14 @@ div.sec-info-pic { display: grid; place-items: center; }
 button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg); color: var(--ink); }
 /* The FAQ's type a step up from the plate's (2026-10-26): the question 16 (was 14), the answer 14 (was
    12); 24 from the question to the answer, ≈ 56 from one question (or its answer) to the next. */
-.sec-faq .panel-title > span { font-size: var(--text-16); }
-.sec-faq .panel-body { font-size: var(--text-14); }
+.sec-faq .panel-title > span { font-size: var(--type-title); }
+.sec-faq .panel-body { font-size: var(--type-small); }
 .sec-faq .panel-fold > * > :first-child { margin-top: var(--space-2); }   /* + the strip's 22 under the words = 24 from the question to the answer */
 .sec-faq .panel-fold > * > :last-child { margin-bottom: calc(var(--space-24) - var(--space-2)); }   /* + the list's 12 + the next strip's 22 ≈ 56 from an answer to the next question — as from one closed question to the next */
 .sec-faq .panel-body p + p { margin-top: var(--space-8); }
 
 /* ── KICKER ── the small line over a title. Never caps: muted, semibold, a size up from body. */
-.sec-kicker { font-size: var(--text-16); font-weight: var(--weight-semibold); color: var(--ink-muted); }
+.sec-kicker { font-size: var(--type-title); font-weight: var(--weight-semibold); color: var(--ink-muted); }
 @media (min-width: 1024px) { .sec-kicker { font-size: var(--text-24); } }
 
 /* ── STATEMENT ── one thought, as large as the type goes: 48 → 72 → 96 → 128. */
@@ -565,7 +562,7 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 
 /* ── BAR ── over a slider: the title left, one link right, on the title's baseline. */
 .sec-bar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-16) var(--space-24); }
-.sec-bar > .link { color: var(--accent-text); font-size: var(--text-16); white-space: nowrap; }
+.sec-bar > .link { color: var(--accent-text); font-size: var(--type-body); white-space: nowrap; }
 
 /* ══════════════ SLIDERS ══════════════
    One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the
@@ -647,9 +644,9 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 @media (max-width: 767px) { .story { --story-inset: calc(var(--space-16) + var(--space-4)); border-radius: var(--radius-24); } }
 @media (min-width: 1440px) { .story { --story-inset: var(--space-32); } }
 .story-pic { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; border-radius: 0; object-fit: cover; }
-.story-label { margin: 0; font-size: var(--text-14); line-height: var(--leading-snug); font-weight: var(--weight-medium);
+.story-label { margin: 0; font-size: var(--type-small); line-height: var(--leading-snug); font-weight: var(--weight-medium);
   color: color-mix(in srgb, currentColor 50%, transparent); }   /* the story's ink at 50 % (2026-10-26) — follows .on-dark / .on-light */
-.story-title { margin: 0; font-size: var(--text-24); line-height: var(--leading-tight); font-weight: var(--weight-semibold); text-wrap: balance; }
+.story-title { margin: 0; font-size: var(--type-h3); line-height: var(--leading-tight); font-weight: var(--weight-semibold); text-wrap: balance; }
 @media (min-width: 1024px) { .story-title { font-size: var(--text-28); } }
 .story-btn { position: absolute; right: var(--story-inset); bottom: var(--story-inset); }
 .story.on-dark  { color: var(--white); }
@@ -665,18 +662,17 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .review { display: flex; flex-direction: column; gap: var(--space-32); padding: var(--space-32);
   border-radius: var(--sec-card-radius); background: var(--tile); }
 .sec-reviews.is-bare .review { background: none; padding-inline: 0; }
-.review-text { flex: 1; margin: 0; font-size: var(--text-16); line-height: var(--leading-relaxed); text-wrap: pretty; }
+.review-text { flex: 1; margin: 0; font-size: var(--type-body); line-height: var(--leading-relaxed); text-wrap: pretty; }
 .review-who { display: flex; align-items: center; gap: var(--space-12); }
 .review-avatar { display: grid; place-items: center; flex: none; width: var(--number-48); height: var(--number-48); border-radius: 50%;
   overflow: hidden; background: var(--avatar, var(--black-700)); color: var(--avatar-ink, var(--ink-muted)); font-size: var(--text-14); font-weight: var(--weight-semibold); }
 /* An avatar without a photograph: initials on a tint — set --avatar / --avatar-ink on the element. */
 .review-avatar img, .review-avatar svg { width: 100%; height: 100%; object-fit: cover; display: block; }
 .review-name { display: grid; gap: var(--space-2); }
-.review-name small { font-size: var(--text-12); color: var(--ink-muted); }
-/* On a phone the words a step down (16 → 14), the plate tighter (32 → 24), the avatar 40. */
+.review-name small { font-size: var(--type-caption); color: var(--ink-muted); }
+/* On a phone the plate tighter (32 → 24), the avatar 40; the words' step is the type roles' (2026-10-29). */
 @media (max-width: 767px) {
   .review { gap: var(--space-24); padding: var(--space-24); border-radius: var(--radius-24); }
-  .review-text, .review-name b { font-size: var(--text-14); }
   .review-avatar { width: var(--number-40); height: var(--number-40); }
 }
 
@@ -734,11 +730,11 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-step.is-locked .order-step-val { visibility: hidden; }
 .order-step .num { --num-paper: var(--ink); --num-ink: var(--page); }
 .order-step-head { display: flex; align-items: center; gap: var(--space-12); flex: 1; min-width: 0; text-align: left; }
-.order-step-name { font-size: var(--text-16); }
+.order-step-name { font-size: var(--type-title); }
 .order-step-val { margin-left: auto; padding-left: var(--space-16); color: var(--ink-muted); font-weight: var(--weight-regular);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .order-step .panel-title[aria-expanded="true"] .order-step-val { display: none; }
-.order-step .panel-body { color: var(--ink); font-size: var(--text-14); gap: var(--space-16); }
+.order-step .panel-body { color: var(--ink); font-size: var(--type-small); gap: var(--space-16); }
 .order-step .panel-body > :first-child { margin-top: var(--space-8); }
 .order-step .sec-actions { justify-content: flex-end; margin-top: var(--space-8); }
 .order-hint { justify-content: flex-end; }
@@ -746,7 +742,7 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
    way): the bank of a plan in parts (with the monobank phone), Trade-in (the choice itself is the plate), the
    summary, the code, the total with Pay. Shown while
    Payment is open; markup `.order-step#step-6 + .order-islands > .order-island`. */
-.order-islands { display: none; gap: var(--space-8); margin-top: calc(var(--space-8) - var(--space-12)); font-size: var(--text-14); }
+.order-islands { display: none; gap: var(--space-8); margin-top: calc(var(--space-8) - var(--space-12)); font-size: var(--type-small); }
 .order-step:has(> .panel-title[aria-expanded="true"]) + .order-islands { display: grid; }
 .order-islands > * { margin: 0; }
 .order-islands > [data-alt-off].is-off { display: none; }   /* Trade-in with filters only: gone, with its gap (an island does not fold) */
@@ -797,8 +793,8 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
    under the others, instead of running the plate's width. The total keeps its full row (its rule). */
 @media (min-width: 1024px) { .order-summary dd:not(.is-total) { justify-self: end; max-width: calc(3 * var(--grid-col) + 2 * var(--grid-gutter)); text-wrap: pretty; } }
 .order-summary .is-total { padding-top: var(--space-12); border-top: var(--hairline) solid var(--rule); font-weight: var(--weight-medium); color: var(--ink); font-size: var(--text-16); display: flex; align-items: center; gap: var(--space-8); }
-.order-summary dd.is-total { font-size: var(--text-24); justify-content: flex-end; }   /* the sum a step up from its name (2026-10-26) */
-.order-summary dd.is-total .choice-was { font-size: var(--text-16); margin-right: 0; }   /* before it, struck, what it was without the discount (trade-in) */
+.order-summary dd.is-total { font-size: var(--type-h3); justify-content: flex-end; }   /* the sum a step up from its name (2026-10-26) */
+.order-summary dd.is-total .choice-was { font-size: var(--type-title); margin-right: 0; }   /* before it, struck, what it was without the discount (trade-in) */
 /* A code (promo or a friend's): folded until asked for. */
 /* The code (2026-10-26): a link «I have a referral code» between the lines and the total — the
    code changes the total, so it stands before it; pressed, the field takes its place on the same
@@ -847,6 +843,6 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-dock-txt > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .order-dock-txt .t-small, .order-dock-price .t-small { color: var(--ink-muted); }
 .order-dock-price { display: flex; flex-direction: row-reverse; align-items: baseline; gap: var(--space-8); flex: none; text-align: right; }   /* one row: the struck price left of the total (2026-10-29) */
-.order-dock-price .choice-was { margin: 0; font-size: var(--text-14); }
+.order-dock-price .choice-was { margin: 0; font-size: var(--type-small); }
 body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--number-96) + env(safe-area-inset-bottom)); }
 body.has-dock .btn.grid-fab { bottom: calc(var(--number-96) + var(--space-8)); }
