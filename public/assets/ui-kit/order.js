@@ -79,6 +79,8 @@
       if (cur === 'EUR') return (v < 0 ? '−' : '') + '€' + Math.abs(v).toFixed(2);   /* «€627.00» in every language, as the cards are written (2026-10-29: Ukrainian gave «627,00 €») */
       return new Intl.NumberFormat(lang, { style: 'currency', currency: cur, currencyDisplay: cur === 'EUR' ? 'narrowSymbol' : 'symbol',   /* «395 €», not «395 EUR» */
         minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(whole ? Math.round(v) : v); };
+    /* RULE (2026-10-29): a struck price is just the number — never € or грн; the price beside it says the currency. */
+    var num = function (n) { var v = n * rate; return cur === 'EUR' ? v.toFixed(2) : new Intl.NumberFormat(lang, { maximumFractionDigits: 0 }).format(Math.round(v)); };
     var dock = document.getElementById(form.id + '-dock');
     var alt = form.querySelector('input[data-alt]');
     var steps = function () { return $$(form, '.order-step:not([hidden])'); };
@@ -181,7 +183,7 @@
       var rowsHtml = steps().slice(0, -1).map(function (s) { var v = stepVal(s, true);
           return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('')
         + (codeOff ? '<dt>' + esc(T('Code {code}', { code: form.dataset.code || '' })) + '</dt><dd>−' + eur(codeOff) + '</dd>' : '');
-      var totalHtml = '<dt class="is-total">' + T('Total') + '</dt><dd class="is-total">' + (off && !open ? '<s class="choice-was">' + eur(sum - off) + '</s>' : '') + sumTxt + '</dd>'
+      var totalHtml = '<dt class="is-total">' + T('Total') + '</dt><dd class="is-total">' + (off && !open ? '<s class="choice-was">' + num(sum - off) + '</s>' : '') + sumTxt + '</dd>'
         /* form[data-uah-rate]: in Ukraine the invoice is in hryvnia — the sum the bank will show, said here first */
         + (form.dataset.uahRate && cur !== 'UAH' && valOf('country') === 'UA' && !open && chosen ? '<dt>' + T('Charged in hryvnia') + '</dt><dd>≈ ' + new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(sum * form.dataset.uahRate) + '</dd>' : '');
       if (dl && dt) { dl.innerHTML = rowsHtml; dt.innerHTML = totalHtml; } else if (dl) dl.innerHTML = rowsHtml + totalHtml;
@@ -192,7 +194,7 @@
          been (the struck prices of the cards, the trade-in and a code put back) struck small over it.
          No words: the steps and the summary say them. Each picture names itself (alt) for a reader. */
       var items = [], was = 0;
-      var wasOf = function (el) { var w = el && el.querySelector('.choice-was'); return w ? +w.textContent.replace(/[^\d.,]/g, '').replace(',', '.') || 0 : 0; };
+      var wasOf = function (el) { var w = el && el.querySelector('.choice-was'); return w ? +(w.dataset.was || w.textContent.replace(/[^\d.]/g, '')) || 0 : 0; };   /* data-was: the struck price in € */
       if (!on && pick) { var card = pick.closest('.choice');
         if (card) { items.push({ pics: $$(card, '.choice-pic'), n: 1, name: label(pick) }); var w0 = wasOf(card); if (w0) was += w0 - (+card.dataset.price || 0); } }
       $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return;
@@ -212,7 +214,7 @@
       var before = sum - off + was;   /* off is negative: the trade-in, a code */
       var tsub = dock.querySelector('[data-dock="total-sub"]');
       if (open) tsub.textContent = T('price on request');
-      else if (before > sum + 0.004) tsub.innerHTML = '<s class="choice-was">' + eur(before) + '</s>';
+      else if (before > sum + 0.004) tsub.innerHTML = '<s class="choice-was">' + num(before) + '</s>';
       else tsub.textContent = '';
     }
 

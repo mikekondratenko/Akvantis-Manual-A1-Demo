@@ -55,8 +55,10 @@
    dark plate (a hair under AA's 4.5 for 12px), 4.5:1 on paper. */
 .choice-sub, .choice > small, .choice > span > small { font-size: var(--text-12); line-height: var(--leading-normal); color: var(--ink-faint); }
 .choice-price { font-weight: var(--weight-semibold); }
-/* A price that was (2026-10-25): <s class="choice-was">€590</s> before the price, inside
-   .choice-price — muted, struck, a step lighter, 8 before the price that is. */
+/* A price that was (2026-10-25): <s class="choice-was" data-was="590">590.00</s> before the price, inside
+   .choice-price — muted, struck, a step lighter, 8 before the price that is.
+   RULE (2026-10-29): a struck price is only the number — no €, no грн; the price beside it says
+   the currency. data-was keeps it in € for the scripts (order.js counts the saving from it). */
 .choice-was { margin-right: var(--space-8); color: var(--ink-faint); font-weight: var(--weight-regular); text-decoration-thickness: 1px; }
 /* In a row of cards the prices stand on one line (2026-10-25): the price goes to the card's foot,
    whatever is above it (a finish row or none). A counted card keeps its words together. */

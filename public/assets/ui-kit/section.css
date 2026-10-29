@@ -839,14 +839,13 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-dock-item > :first-child { display: block; width: var(--number-48); height: var(--number-48); object-fit: contain; max-height: none;
   padding: 0; background: none; }   /* the picture alone, no plate (2026-10-29) */
 .order-dock-item > .sec-ph { padding: 0; background: none; }
-.order-dock-n { position: absolute; top: calc(-1 * var(--space-4)); right: calc(-1 * var(--space-8)); min-width: var(--number-20, 20px); padding: 0 var(--space-4);
-  border-radius: var(--radius-pill); background: var(--btn-solid); color: var(--btn-solid-ink);
-  font-size: var(--text-11); line-height: 18px; font-weight: var(--weight-semibold); text-align: center; }
+.order-dock-n { position: absolute; top: calc(-1 * var(--space-4)); right: calc(-1 * var(--space-8));
+  color: var(--ink); font-size: var(--text-11); line-height: 1; font-weight: var(--weight-semibold); }   /* just the words, no plate (2026-10-29) — white on the dark bar, the ink on paper */
 
 .order-dock-txt { display: none; }   /* no words in the bar (2026-10-29) — kept in the markup for older pages */
 .order-dock-txt > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .order-dock-txt .t-small, .order-dock-price .t-small { color: var(--ink-muted); }
-.order-dock-price { display: grid; justify-items: end; flex: none; text-align: right; }
-.order-dock-price .choice-was { margin: 0; font-size: var(--text-12); }
+.order-dock-price { display: flex; flex-direction: row-reverse; align-items: baseline; gap: var(--space-8); flex: none; text-align: right; }   /* one row: the struck price left of the total (2026-10-29) */
+.order-dock-price .choice-was { margin: 0; font-size: var(--text-14); }
 body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--number-96) + env(safe-area-inset-bottom)); }
 body.has-dock .btn.grid-fab { bottom: calc(var(--number-96) + var(--space-8)); }
