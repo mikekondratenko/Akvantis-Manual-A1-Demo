@@ -90,6 +90,8 @@
       var i = $$(form, 'input[name="' + n + '"]:checked').filter(live)[0]; return i ? i.value : ''; };
     var cond = function (c) { return c.split('&').every(function (t) { var k = t.split('='); return valOf(k[0]) === k.slice(1).join('='); }); };   /* «a=b&c=d»: all of them */
     var reached = 0;
+    /* a GIFT code taken and still in the order (its field not put away by a condition — CODE below) */
+    var giftOn = function () { var k = form.querySelector('[data-code-value]'); return !!(form.dataset.code && form.dataset.codeGift && k && live(k)); };
 
     /* What a choice is called: its .choice-name (lockups and all) or its <b>. `text` reads a
        lockup as its code; `html` keeps the lockup's drawing (the strips and the bar show it). */
@@ -183,7 +185,8 @@
       var dl = form.querySelector('[data-summary]'), dt = form.querySelector('[data-summary-total]');   /* the total in a list of its own when there is one (the code stands between) */
       var rowsHtml = steps().slice(0, -1).map(function (s) { var v = stepVal(s, true);
           return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('')
-        + (codeOff ? '<dt>' + esc(T('Code {code}', { code: form.dataset.code || '' })) + '</dt><dd>−' + eur(codeOff) + '</dd>' : '');
+        + (codeOff ? '<dt>' + esc(T('Code {code}', { code: form.dataset.code || '' })) + '</dt><dd>−' + eur(codeOff) + '</dd>' : '')
+        + (giftOn() ? '<dt>' + esc(T('Gift')) + '</dt><dd>' + esc(T(form.dataset.codeGift)) + ' · ' + esc(T('Free')) + '</dd>' : '');
       var totalHtml = '<dt class="is-total">' + T('Total') + '</dt><dd class="is-total">' + (off && !open ? '<s class="choice-was">' + num(sum - off) + '</s>' : '') + sumTxt + '</dd>'
         /* form[data-uah-rate]: in Ukraine the invoice is in hryvnia — the sum the bank will show, said here first */
         + (form.dataset.uahRate && cur !== 'UAH' && valOf('country') === 'UA' && !open && chosen ? '<dt>' + T('Charged in hryvnia') + '</dt><dd>≈ ' + new Intl.NumberFormat('uk-UA', { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(sum * form.dataset.uahRate) + '</dd>' : '');
@@ -430,7 +433,11 @@
        or .is-error, and a line under it. Typing again clears it. Taken, the code's € come off the
        total (form[data-code-off]; the old total struck over the new). Codes are not connected yet:
        form[data-demo-codes] «CODE:€ CODE:€» (default AKVANTIS20:20 FRIEND20:20 — the worker knows the
-       same) pass; any other is not found. */
+       same) pass; any other is not found.
+       GIFT (2026-10-29: the A1 referral is cartridges, not money): .order-code[data-code-gift="Prefilter I × 1"] —
+       a code taken takes nothing off; the summary gets a line «Gift · Prefilter I × 1 · Free» and the
+       message says so, with [data-code-note] after it (what the friend gets). The € in data-demo-codes
+       are then not read («FRIEND AKVANTIS» is enough). */
     $$(form, '.order-code').forEach(function (box) {
       var open = box.querySelector('[data-code-open]'), row = box.querySelector('.order-code-row'), f = row && row.querySelector('input:not([type=hidden])'),
           apply = box.querySelector('[data-code]'), close = box.querySelector('[data-code-close]'), field = box.querySelector('.input-action'),
@@ -438,7 +445,8 @@
       if (!open || !row || !field) return;
       var DEMO = {}; (form.dataset.demoCodes || 'AKVANTIS20:20 FRIEND20:20').toUpperCase().split(/\s+/).forEach(function (c) { var k = c.split(':'); DEMO[k[0]] = +k[1] || 0; });
       var kept = box.querySelector('[data-code-value]');   /* only a code taken is sent (name="code") — not one typed and left */
-      var take = function (code, eurOff) { if (kept) kept.value = code || ''; if (code) { form.dataset.code = code; form.dataset.codeOff = String(eurOff); } else { delete form.dataset.code; delete form.dataset.codeOff; }
+      var gift = box.dataset.codeGift || '';
+      var take = function (code, eurOff) { if (kept) kept.value = code || ''; if (code) { form.dataset.code = code; if (gift) { form.dataset.codeGift = gift; delete form.dataset.codeOff; } else form.dataset.codeOff = String(eurOff); } else { delete form.dataset.code; delete form.dataset.codeOff; delete form.dataset.codeGift; }
         form.dispatchEvent(new Event('change', { bubbles: true })); };   /* order.js recounts: the line, the struck total */
       var state = function (kind, msg) {
         field.classList.toggle('is-success', kind === 'success'); field.classList.toggle('is-error', kind === 'error');
@@ -458,7 +466,8 @@
         state(''); apply.style.minWidth = apply.offsetWidth + 'px'; apply.classList.add('is-loading'); apply.setAttribute('aria-busy', 'true'); apply.setAttribute('aria-label', T('Checking'));   /* the ring alone, no word (field.css) */
         setTimeout(function () { apply.classList.remove('is-loading'); apply.removeAttribute('aria-busy'); apply.removeAttribute('aria-label'); apply.style.minWidth = '';
           var c = f.value.trim().toUpperCase();
-          if (c in DEMO) { f.value = c; take(c, DEMO[c]); state('success', T('Code applied — {sum} off', { sum: eur(DEMO[c]) })); }
+          if (c in DEMO) { f.value = c; take(c, DEMO[c]);
+            state('success', gift ? T('Code applied — {gift} is a gift', { gift: T(gift) }) + (box.dataset.codeNote ? ' ' + T(box.dataset.codeNote) : '') : T('Code applied — {sum} off', { sum: eur(DEMO[c]) })); }
           else state('error', T('We could not find this code')); }, 1200);
       });
     });
