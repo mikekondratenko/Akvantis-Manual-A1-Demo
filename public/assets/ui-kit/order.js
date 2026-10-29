@@ -37,7 +37,8 @@
            out) goes to that address; the answer's pageUrl (monobank's payment page) is opened.
    SKIP    [data-skip] in an optional step: the counts back to 0, then Next (2026-10-29).
    GATE    [data-next] is disabled until its step is complete: the choice (data-need) and the
-           required fields in use. Nothing required → open (Akvantis Club).
+           required fields in use. Nothing required → open (Akvantis Club). [data-pay] is disabled
+           until every step's data-need is met (2026-10-29 — an option can be let go, choice.js TOGGLE).
    PARCEL  form[data-kg] (Σ data-kg of what is chosen) and form[data-goods] (the sum less the delivery, €)
            — what np.js asks Nova Poshta a price for.
    CODE    .order-code: [data-code-open] → .order-code-row (field · [data-code] Apply · [data-code-close] ×).
@@ -85,7 +86,7 @@
     var alt = form.querySelector('input[data-alt]');
     var steps = function () { return $$(form, '.order-step:not([hidden])'); };
     var live = function (i) { return !i.disabled && !i.closest('[hidden]'); };
-    var valOf = function (n) { var sel = form.querySelector('select[name="' + n + '"]'); if (sel && live(sel)) return sel.value;   /* a select answers too: data-when="country=UA" */
+    var valOf = function (n) { var sel = $$(form, 'select[name="' + n + '"]').filter(live)[0]; if (sel) return sel.value;   /* a select answers too: data-when="country=UA" — the one in use, when several share a name (2026-10-29: a pickup point per city) */
       var i = $$(form, 'input[name="' + n + '"]:checked').filter(live)[0]; return i ? i.value : ''; };
     var cond = function (c) { return c.split('&').every(function (t) { var k = t.split('='); return valOf(k[0]) === k.slice(1).join('='); }); };   /* «a=b&c=d»: all of them */
     var reached = 0;
@@ -149,7 +150,7 @@
         else if ('whenOff' in i.dataset) { delete i.dataset.whenOff; if (!('hold' in i.dataset)) i.disabled = false; } });   /* data-hold: another script keeps it off (np.js until a city) */   /* only what it turned off itself — a field another script holds stays held */
       /* [data-pick-one]: a list down to one choice takes it — the only courier of a country */
       $$(form, '[data-pick-one]').forEach(function (l) { var rs = $$(l, 'input[type=radio]').filter(live);
-        if (rs.length === 1 && !rs[0].checked) { rs[0].checked = true; again = true; } });
+        if (rs.length === 1 && !rs[0].checked && !('unpicked' in l.dataset)) { rs[0].checked = true; again = true; } });   /* not after the visitor let it go (choice.js TOGGLE) */
       };
       whens(); whens();   /* twice: what one pass turns on (a field enabled again, a choice taken by [data-pick-one]) is what the next pass reads — a row's question shows at once (2026-10-26: the courier's address stayed hidden after Pickup → Courier) */
       steps().forEach(function (s, i) { var n = s.querySelector('.num'); if (n) n.textContent = i + 1; });
@@ -256,6 +257,10 @@
         var ok = passes(s) && $$(s, 'input[required], select[required], textarea[required]').every(function (f) {
           return f.disabled || f.closest('[hidden]') || f.validity.valid; });
         b.disabled = !ok; b.setAttribute('aria-disabled', String(!ok)); });
+      /* Pay too (2026-10-29): with every option able to be let go (choice.js TOGGLE), a step's choice
+         can be empty again — Pay waits until every step's data-need is met (the payment plan too). */
+      var pay = form.querySelector('[data-pay]');
+      if (pay && !pay.classList.contains('is-loading')) { var all = steps().every(passes); pay.disabled = !all; pay.setAttribute('aria-disabled', String(!all)); }
     }
     var passes = function (s) { var n = s.dataset.need; if (!n) return true;
       if (altOn(s)) return counted(s).length > 0;

@@ -17,6 +17,8 @@
                                 + <img class="is-light">, the theme shows its own; a <picture> per
                                 theme with a phone <source> for the stacked file. 32 high
                                 (--choice-logo-h)
+     .choice-logo.is-start      the logo IS the option's name: at the left edge, the words kept as
+                                <b class="sr-only"> for the strip and the bar (2026-10-29)
      label.choice.is-row.is-mark  an option with a MARK (2026-10-26): no marker — a 32 mark on the left
                                 (.choice-mark: a carrier's sign, a kit icon), the words, the price
                                 at the right edge; chosen, the edge says so, as on a card
@@ -77,6 +79,9 @@
 .choice-logo { --choice-logo-h: var(--number-32); display: flex; align-items: center; flex: none; margin-left: auto; padding-left: var(--space-16); }
 .choice-logo > img, .choice-logo > svg, .choice-logo > picture > img { display: block; height: var(--choice-logo-h); width: auto; }
 .choice-logo > picture { display: block; }
+/* A logo that IS the option's name (2026-10-29: AKVANTIS Service / Service Partner as ways of delivery): at the
+   left edge, where the mark and the words were — the words stay for the strip as <b class="sr-only">. */
+.choice-logo.is-start { margin-left: 0; margin-right: auto; padding-left: 0; padding-right: var(--space-16); }
 /* A compact logo on a phone (2026-10-25): a <picture> with a <source media="(max-width: 767px)">
    for the stacked file — the words in two lines, so the row keeps its width for the words. */
 .choice-logo > .is-light, [data-theme="light"] .choice-logo > .is-dark { display: none; }

@@ -46,6 +46,14 @@
    The thumb stays the one thing that ever fills a segment (see below). */
 .segment-btn:not(.is-active):not(:disabled):hover { color: var(--ink); }
 .segment-btn.is-active { color: var(--ink); }
+/* THREE ON A PHONE (2026-10-29: the order form's Pickup | Courier | With installation ran off a 390 screen):
+   `flex: 1` alone lets a long word widen its segment past a third while the thumb stays a third. Under
+   768, with three segments or more, each takes exactly its share (min-width 0), the icons step aside and
+   a long label wraps to a second line instead of pushing the control past the screen. */
+@media (max-width: 767px) {
+  .segmented:has(> .segment-btn:nth-of-type(3)) > .segment-btn { flex: 1 1 0; min-width: 0; padding: 0 var(--space-8); line-height: 1.1; }
+  .segmented:has(> .segment-btn:nth-of-type(3)) > .segment-btn .segment-icon { display: none; }
+}
 /* TALL (2026-10-26): `.segmented.is-tall` — 64, the icon toggle's height (kit.css .iconseg), for
    segments that are pictures rather than words: a brand's logo (.segment-logo — the -dark file on the
    dark ground, the -light on paper, --logo-h tall, 20 by default). Off the choice a logo is at half

@@ -19,6 +19,12 @@
        Not in the catalogue: data-swatches='[{id, label, hex, img}, …]' on the row (2026-10-29 —
        the accessories' colours); the same discs, the same picture swap.
 
+     TOGGLE (2026-10-29)  every option is taken AND put back: a radio in a label.choice that is
+       already chosen, tapped again, is let go — nothing chosen in its group, `change` fires (it
+       bubbles), so a form recounts. Not the segmented tabs (.order-seg — a view, not an option)
+       and not a group marked [data-keep] (one must always stay chosen). A list with
+       [data-pick-one] that the visitor emptied this way is not refilled by order.js (data-unpicked).
+
    Runs itself on DOMContentLoaded; no dependency. */
 (function () {
   'use strict';
@@ -194,6 +200,21 @@
       paint();
     });
   }
+
+  /* TOGGLE — see the head. The radio's state is read on pointerdown, before the label's click
+     has chosen it; a click on a button inside the card (a finish disc, an info bubble) is not a
+     click on the radio and changes nothing here. */
+  var toggleable = function (r) { return r && r.type === 'radio' && r.closest('label.choice') && !r.closest('.order-seg, [data-keep]'); };
+  document.addEventListener('pointerdown', function (e) {
+    var l = e.target.closest && e.target.closest('label.choice'); if (!l || e.target.closest('button')) return;
+    var r = l.querySelector('input[type=radio]'); if (toggleable(r)) r.__was = r.checked; }, true);
+  document.addEventListener('click', function (e) {
+    var r = e.target; if (!(r instanceof HTMLInputElement) || !toggleable(r)) return;
+    if (!r.__was) return; r.__was = false; r.checked = false;
+    var one = r.closest('[data-pick-one]'); if (one) one.dataset.unpicked = '';
+    r.dispatchEvent(new Event('change', { bubbles: true })); });
+  document.addEventListener('change', function (e) {   /* chosen again: the list may fill itself once more */
+    var r = e.target; if (r && r.type === 'radio' && r.checked) { var one = r.closest('[data-pick-one]'); if (one) delete one.dataset.unpicked; } });
 
   window.Choice = { bind: bind, sync: sync, finishes: finishes, customs: customs, art: art };
   var go = function () { finishes(); customs(); bind(); };
