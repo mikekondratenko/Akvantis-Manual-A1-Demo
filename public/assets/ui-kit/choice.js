@@ -115,7 +115,7 @@
     el.innerHTML = '<img src="' + src + '" alt=""><div class="custom-print"><span class="custom-mark">' + MARK() + '</span><span class="custom-name"></span></div>';
     var name = el.querySelector('.custom-name'), text = '';
     var fit = function () {   /* the name as large as fits: one line from 6.4 down to 4.2 % of the art; then two lines (name / surname) from 5.2 down to 2.8 % */
-      var W = el.clientWidth; if (!W) return; var max = W * .509, words = text.split(' ');
+      var W = el.clientWidth; if (!W) return; var max = W * .484, words = text.split(' ');
       var at = function (pc, two) { name.style.fontSize = (W * pc / 100) + 'px';
         name.innerHTML = two ? esc(words[0]) + '<br>' + esc(words.slice(1).join(' ')) : esc(text); return name.scrollWidth <= max + 0.5; };
       for (var pc = 6.4; pc >= 4.2; pc -= .2) if (at(pc, false)) return;
@@ -129,20 +129,16 @@
   function editor(o) {   /* o: { title, note, max, art, inks, name, ink, done(name|null, ink) } */
     if (!pop) {
       pop = document.createElement('div'); pop.className = 'popup-overlay'; pop.hidden = true;
-      pop.innerHTML = '<div class="popup is-start custom-pop" role="dialog" aria-modal="true" aria-labelledby="custom-t">'
-        + '<button class="icon-btn popup-close" type="button" data-x></button>'
-        + '<div class="popup-header"><div class="popup-title" id="custom-t"></div><div class="popup-text"></div></div>'
+      pop.innerHTML = '<div class="popup custom-pop" role="dialog" aria-modal="true">'
         + '<div class="custom-stage"></div>'
         + '<label class="field"><input class="dark-input" type="text" autocomplete="off" spellcheck="false"></label>'
         + '<div class="custom-inks"><div class="pair-row"></div><span class="pair-name"></span></div>'
         + '<div class="popup-actions"><button class="btn btn-tertiary" type="button" data-x></button><button class="btn btn-secondary" type="button" data-ok></button></div></div>';
       document.body.appendChild(pop);
-      pop.querySelector('.popup-close').innerHTML = window.KitIcons ? KitIcons.svg('x', { size: 16 }) : '×';
     }
     var input = pop.querySelector('input'), back = document.activeElement, ink = o.ink, a = art(o.art);
     var stage = pop.querySelector('.custom-stage'); stage.innerHTML = ''; stage.appendChild(a.el);
-    pop.querySelector('.popup-title').textContent = o.title; pop.querySelector('.popup-text').textContent = o.note || '';
-    pop.querySelector('.popup-close').setAttribute('aria-label', L('Close'));
+    pop.querySelector('.popup').setAttribute('aria-label', o.title);
     pop.querySelector('[data-ok]').textContent = L('Save'); pop.querySelector('.popup-actions [data-x]').textContent = L('Cancel');
     input.maxLength = o.max || 28; input.value = o.name || ''; input.placeholder = L('Your name'); input.setAttribute('aria-label', L('Your name'));
     var hexOf = function (id) { return (o.inks.filter(function (k) { return k.id === id; })[0] || o.inks[0]).hex; };

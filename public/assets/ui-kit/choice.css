@@ -202,17 +202,18 @@
 .custom-art { position: relative; container-type: inline-size; aspect-ratio: 1; width: 100%; }
 .custom-art[hidden] { display: none; }
 .custom-art > img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.custom-print { position: absolute; left: 16.57%; top: 43.5%; transform: translateY(-50%); display: flex; align-items: center; gap: 6.13cqw;
+.custom-print { position: absolute; left: 18.6%; top: 43.65%; transform: translateY(-50%); display: flex; align-items: center; gap: 5.75cqw;
   color: var(--custom-ink, #2F55BE); pointer-events: none; }
-.custom-mark { flex: none; width: 8.7cqw; height: 8.7cqw; }
+.custom-mark { flex: none; width: 8.25cqw; height: 8.25cqw; }
 .custom-mark > svg { display: block; width: 100%; height: 100%; }
-.custom-name { display: block; max-width: 50.9cqw; white-space: nowrap; text-align: left; font-family: var(--font-primary); font-weight: var(--weight-medium);
+.custom-name { display: block; max-width: 48.4cqw; white-space: nowrap; text-align: left; font-family: var(--font-primary); font-weight: var(--weight-medium);
   line-height: 1.05; letter-spacing: 0; }
 .custom-art.is-empty .custom-name { opacity: .45; }
 .choice-pics > .custom-art { width: var(--choice-pic); height: var(--choice-pic); }
-/* the popup: the art large on a tile, then the name, the colours, Save */
+/* the popup: no title, no ✕ — the towel large, then the name, the colours, Cancel / Save on the right */
 .custom-pop { width: 480px; }
-.custom-stage { border-radius: var(--radius-16); background: var(--tile); overflow: hidden; }
+.custom-stage { overflow: hidden; aspect-ratio: 1 / .64; }   /* the towel alone, no plate, cut to it (2026-10-29): the art's 18 %…82 % band */
+.custom-stage > .custom-art { margin-top: -18%; }
 .custom-inks { display: flex; align-items: center; gap: var(--space-12); }
 .custom-inks .pair-name { font-size: var(--text-14); color: var(--ink-muted); }
 .custom-pop .dark-input.is-error { box-shadow: inset 0 0 0 1px var(--danger); }
