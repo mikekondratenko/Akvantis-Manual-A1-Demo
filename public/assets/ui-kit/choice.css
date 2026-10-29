@@ -159,15 +159,16 @@
 .choice-group.is-pick:not(:has(> .choice > input:checked)) > .choice-more { display: none; }   /* asks only once chosen */
 
 /* A COUNTED CARD (2026-10-25): a card with a .stepper at its foot. */
-/* The layout (2026-10-29): 24 inside; the picture 116 at the top; everything else — the name,
-   the finishes, the price — at the foot, 24 from the card's edge whatever the card's height. No
+/* The layout (2026-10-29): 24 inside; the picture 116 at the top; the name right under it — the
+   names of a row start on one line, however many lines they take — and the finishes under the
+   name; the price block at the foot, 24 from the card's edge whatever the card's height. No
    second line in a counted card: the name says it. The price and the count stand in the last block
    (.choice-foot): the price always the last row, the counter over it once the card is taken; the
    block keeps the room for both from the start (the card is that much taller), so nothing moves. */
 .choice.is-count { --choice-pic: var(--number-116, 116px); padding: var(--space-24); }
-.choice.is-count > .choice-pics { margin-bottom: auto; padding-bottom: var(--space-16); }
+.choice.is-count > .choice-pics { padding-bottom: var(--space-16); }
 .choice.is-count > .choice-foot { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: var(--space-4);
-  min-height: calc(var(--number-24) + var(--space-4) + var(--number-48)); margin-top: var(--space-8); }   /* the counter (48), the price under it; the room is kept, so nothing moves */
+  min-height: calc(var(--number-24) + var(--space-4) + var(--number-48)); margin-top: auto; padding-top: var(--space-8); }   /* the counter (48), the price under it; the room is kept, so nothing moves */
 .choice.is-count > .choice-foot > .stepper { order: -1; }   /* the price is always the card's last row */
 /* The count is the kit's counter, `.stepper.is-bare` (field.css): no box, the number close to
    its − / +. Here it only sits at the card's foot. */
