@@ -35,6 +35,7 @@
            data-rate: the € prices shown in another currency, e.g. UAH × 48.
    PAY     form[data-pay-url="/api/pay"]: on send the order (FormData — hidden rows are disabled, so left
            out) goes to that address; the answer's pageUrl (monobank's payment page) is opened.
+   SKIP    [data-skip] in an optional step: the counts back to 0, then Next (2026-10-29).
    GATE    [data-next] is disabled until its step is complete: the choice (data-need) and the
            required fields in use. Nothing required → open (Akvantis Club).
    PARCEL  form[data-kg] (Σ data-kg of what is chosen) and form[data-goods] (the sum less the delivery, €)
@@ -100,7 +101,7 @@
       if (n && n.querySelector('[data-bubble]')) { n = n.cloneNode(true); $$(n, '[data-bubble]').forEach(function (b) { b.remove(); }); }   /* the (i) of bubble.js stays in the card */
       return (n ? n.innerHTML.trim() : esc(i.value)) + esc(fin(i)); };
     var counted = function (root, html) { return $$(root, '.choice.is-count').map(function (c) {
-      var i = c.querySelector('input'), n = +i.value; return n > 0 ? n + ' × ' + (html ? labelHtml(i) : label(i)) : ''; }).filter(Boolean); };
+      var i = c.querySelector('input[type=number]'), n = +i.value; return n > 0 ? n + ' × ' + (html ? labelHtml(i) : label(i)) : ''; }).filter(Boolean); };
     var stepVal = function (s, html) {
       var bits = $$(s, 'input:checked:not(:disabled):not([data-alt])').filter(function (i) { return live(i) && !i.closest('.order-seg'); }).map(html ? labelHtml : label).concat(counted(s, html));
       $$(s, '[data-say]').forEach(function (e) { if (!e.closest('[hidden]')) bits.push(esc(e.dataset.say)); });   /* a note that is the step's value */
@@ -122,7 +123,7 @@
       };
       $$(form, '[data-alt-off]').forEach(function (g) { fold(g, !on, 'is-off'); $$(g, 'input').forEach(function (i) { i.disabled = on; }); });
       $$(form, '[data-alt-show]').forEach(function (g) { fold(g, on, 'is-shown');
-        if (!on) $$(g, '.choice.is-count input').forEach(function (i) { i.value = 0; }); });   /* put away, its counts go back to 0 — they are not in the order */
+        if (!on) $$(g, '.choice.is-count input[type=number]').forEach(function (i) { i.value = 0; }); });   /* put away, its counts go back to 0 — they are not in the order */
       $$(form, '[data-alt-skip]').forEach(function (s) { s.hidden = on; });
       var land = form.querySelector('select[name="country"]');
       if (land) $$(form, '[data-country]').forEach(function (g) {
@@ -165,7 +166,7 @@
       });
       var codeOff = +form.dataset.codeOff || 0;   /* a code taken (CODE below): € off the total */
       if (codeOff) { sum -= codeOff; off -= codeOff; }
-      $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return; kg += (+c.dataset.kg || 0) * +c.querySelector('input').value; var p = c.dataset.price; if (p === undefined || p === '') open = true; else sum += +p * +c.querySelector('input').value; });
+      $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return; kg += (+c.dataset.kg || 0) * +c.querySelector('input[type=number]').value; var p = c.dataset.price; if (p === undefined || p === '') open = true; else sum += +p * +c.querySelector('input[type=number]').value; });
       var sumTxt = open ? eur(null) : eur(sum);
       /* what the parcel is, for a carrier's quote (np.js): its weight and its worth without the delivery, € */
       form.dataset.kg = Math.round(kg * 10) / 10; form.dataset.goods = open ? '' : sum + codeOff - ship;
@@ -256,6 +257,13 @@
         s.querySelector('.panel-body > .sec-actions').before(h); }
       h.textContent = msg;
     };
+    /* SKIP (2026-10-29): an optional step's «Skip» puts its counts back to 0 and goes on, as Next. */
+    $$(form, '[data-skip]').forEach(function (b) { b.addEventListener('click', function () {
+      var s = b.closest('.order-step');
+      $$(s, '.choice.is-count input[type=number]').forEach(function (i) { if (+i.value) { i.value = 0; i.dispatchEvent(new Event('input', { bubbles: true })); } });
+      if (window.Choice) Choice.sync(s);
+      var n = s.querySelector('[data-next]'); if (n) n.click();
+    }); });
     $$(form, '[data-next]').forEach(function (b) { b.addEventListener('click', function () {
       var all = steps(), s = b.closest('.order-step'), i = all.indexOf(s);
       if (!passes(s)) { hint(s, hintOf(s)); return; }

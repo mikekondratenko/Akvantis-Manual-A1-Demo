@@ -157,15 +157,20 @@
 .choice-group.is-pick:not(:has(> .choice > input:checked)) > .choice-more { display: none; }   /* asks only once chosen */
 
 /* A COUNTED CARD (2026-10-25): a card with a .stepper at its foot. */
-/* The words and the count sit together at the card's foot (2026-10-25): the air goes between
-   the picture and the name, the counter follows the price 8 below. */
-.choice.is-count > .choice-pics + * { margin-top: auto; }
+/* The layout (2026-10-29): 24 inside; the picture 116 at the top; everything else — the name,
+   the finishes, the price — at the foot, 24 from the card's edge whatever the card's height. No
+   second line in a counted card: the name says it. The price and the count share the last row
+   (.choice-foot): the counter comes in beside the price once the card is taken; the row is the
+   counter's height from the start, so nothing moves. */
+.choice.is-count { --choice-pic: var(--number-116, 116px); padding: var(--space-24); }
+.choice.is-count > .choice-pics { margin-bottom: auto; padding-bottom: var(--space-16); }
+.choice.is-count > .choice-foot { display: flex; align-items: center; justify-content: center; gap: var(--space-12); min-height: var(--number-48); margin-top: var(--space-8); }   /* the counter is 48 tall */
 /* The count is the kit's counter, `.stepper.is-bare` (field.css): no box, the number close to
    its − / +. Here it only sits at the card's foot. */
-.choice.is-count .stepper { margin-top: var(--space-8); align-self: center; cursor: default; }
+.choice.is-count .stepper { align-self: center; cursor: default; }
 /* Hidden until the card is taken (2026-10-25): at 0 the counter keeps its place but is not
    shown — a tap on the card (or Enter / Space on it) takes one and brings it in. */
-.choice.is-count:not(.is-on) .stepper { visibility: hidden; opacity: 0; }
+.choice.is-count:not(.is-on) .stepper { display: none; }
 .choice.is-count .stepper { transition: opacity var(--duration-fast); }
 .choice.is-count:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
 
@@ -173,4 +178,6 @@
    above so the discs read as part of the card, not of its price. */
 .choice-finish { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); margin-block: var(--space-8) var(--space-4); }
 .choice-finish .pair-row { justify-content: center; }
+/* Five finishes and more (the accessories' colours, 2026-10-29): a smaller disc, so they stay one row in a card. */
+.choice-finish .pair-row:has(> :nth-child(5)) { --swatch-size: var(--swatch-24); flex-wrap: nowrap; }   /* the kit's small swatch, swatch.css .is-24 */
 .choice-finish .pair-name { font-size: var(--text-12); color: var(--ink-faint); }

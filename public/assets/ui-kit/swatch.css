@@ -20,6 +20,10 @@
 /* 4, not 8: each button carries 2px of room for its ring on every side, so 4 between boxes
    is 8 between discs — a 40 pitch for the 32 disc. */
 .pair-row { display: flex; gap: var(--space-4); flex-wrap: wrap; }
+/* SMALL — 24 (2026-10-29): when the 32s do not fit (five finishes in a card), `.pair-row.is-24`
+   or --swatch-size: var(--swatch-24) on any row. The ring and its gap stay as they are. */
+:root { --swatch-24: 24px; }
+.pair-row.is-24 { --swatch-size: var(--swatch-24); }
 
 /* ── SOURCE OF TRUTH: FIGMA — Akvantis Design Library, V2 → `Color/Swatch` (700:6224) ──
    Synced 2026-10-21. Selected: a 2px `brand/default` (= --accent) ring sits OUTSIDE the

@@ -147,7 +147,7 @@
     var url = form.dataset.npEndpoint || API, from = form.dataset.npSender || KYIV, lang = document.documentElement.lang || 'en';
     var money = function (uah) { return form.dataset.currency === 'UAH'
       ? new Intl.NumberFormat(lang, { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(Math.round(uah))
-      : new Intl.NumberFormat(lang, { style: 'currency', currency: 'EUR', currencyDisplay: 'narrowSymbol', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(uah / rate); };
+      : '€' + (uah / rate).toFixed(2); };   /* the euro as the form writes it, «€5.29», in every language (2026-10-29: was «5,29 €» in Ukrainian) */
     var doc = function (method, svc) { return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apiKey: '',
       modelName: 'InternetDocument', calledMethod: method, methodProperties: { CitySender: from, CityRecipient: to, ServiceType: svc, Weight: String(kg),
         Cost: String(worth), CargoType: 'Parcel', SeatsAmount: '1' } }) }).then(function (r) { return r.json(); })

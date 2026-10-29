@@ -16,6 +16,8 @@
        [data-device-pic="K1"] in the card, if there is one, turns to that finish (data-src="…/{img}.png", the
        catalogue's image name), a hidden input inside the row gets the finish's id, the card's
        own radio is chosen, and the card gets data-finish-label (the strip and the bar read it).
+       Not in the catalogue: data-swatches='[{id, label, hex, img}, …]' on the row (2026-10-29 —
+       the accessories' colours); the same discs, the same picture swap.
 
    Runs itself on DOMContentLoaded; no dependency. */
 (function () {
@@ -56,7 +58,13 @@
     (window.COLOURS || []).forEach(function (c) { COL[c.id] = c; });
     $$(root || document, '.choice-finish[data-device]').forEach(function (row) {
       if (row.__finish) return; row.__finish = true;
-      var d = DEV[row.dataset.device]; if (!d) return;
+      var d = DEV[row.dataset.device], cols = COL;
+      /* A thing not in the catalogue (an accessory, 2026-10-29) brings its finishes along:
+         data-swatches='[{"id":"black","label":"Black","hex":"#2A2A2B","img":"club-go500-bk"}, …]' */
+      if (!d && row.dataset.swatches) { try { var sw = JSON.parse(row.dataset.swatches); d = { code: row.dataset.device, colours: [], imgs: {} };
+        cols = Object.assign({}, COL);
+        sw.forEach(function (c) { d.colours.push(c.id); d.imgs[c.id] = c.img; cols[c.id] = c; });   /* this row's own — the catalogue's «black» stays the taps' */ } catch (e) { d = null; } }
+      if (!d) return;
       var card = row.closest('.choice'), field = row.querySelector('input[type=hidden]');
       var list = row.dataset.colours ? row.dataset.colours.split(/\s+/) : (d.colours || []);
       var discs = document.createElement('div'); discs.className = 'pair-row';
@@ -64,7 +72,7 @@
       var name = document.createElement('span'); name.className = 'pair-name';
       var pick = function (fid, quiet) {
         $$(discs, '.swatch-btn').forEach(function (b) { var on = b.dataset.id === fid; b.classList.toggle('is-active', on); b.setAttribute('aria-checked', on); });
-        var label = (COL[fid] || {}).label || fid; label = (window.KitLang && KitLang.t && KitLang.t(label)) || label; name.textContent = label;   /* a finish name through the page's language, if it has one (2026-10-29) */
+        var label = (cols[fid] || {}).label || fid; label = (window.KitLang && KitLang.t && KitLang.t(label)) || label; name.textContent = label;   /* a finish name through the page's language, if it has one (2026-10-29) */
         if (field) field.value = fid;
         if (card) card.dataset.finishLabel = label;
         var img = card && card.querySelector('[data-device-pic="' + d.code + '"]'), file = d.imgs && d.imgs[fid];
@@ -75,7 +83,7 @@
         (radio || field || row).dispatchEvent(new Event('change', { bubbles: true }));
       };
       list.forEach(function (fid) {
-        var c = COL[fid] || {}, b = document.createElement('button');
+        var c = cols[fid] || {}, b = document.createElement('button');
         b.type = 'button'; b.className = 'swatch-btn' + (c.hex2 ? ' swatch-split' : ''); b.dataset.id = fid;
         b.setAttribute('role', 'radio'); b.setAttribute('aria-label', (window.KitLang && KitLang.t && KitLang.t(c.label || fid)) || c.label || fid);
         if (c.hex2) { b.style.setProperty('--swatch-a', c.hex); b.style.setProperty('--swatch-b', c.hex2); } else b.style.background = c.hex || 'transparent';
