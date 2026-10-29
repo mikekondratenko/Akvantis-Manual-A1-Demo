@@ -186,10 +186,34 @@
 .choice-finish .pair-row { --swatch-size: var(--swatch-24); flex-wrap: nowrap; }   /* every card's finishes are the kit's small swatch, 24 (swatch.css .is-24) — 2026-10-29 */
 .choice-finish .pair-name { font-size: var(--text-12); color: var(--ink-faint); }
 
-/* TEXT (2026-10-29) — words of the buyer's on a card (a towel's name; choice.js): under the name,
-   the words saved, with «Edit». */
-.choice-text { display: grid; width: 100%; margin-top: var(--space-4); cursor: default; }
+/* CUSTOM (2026-10-29) — a name on the thing (the towel; choice.js): a switch under the card's name,
+   the name saved under it with «Edit», and the art — the plain picture with the mark and the name
+   printed on it, laid out in % of the art and sized in cqw, so it is the same piece at 116 in the
+   card and at 420 in the popup. Positions measured on the embroidered sample (Figma, Type=Name). */
+.choice-custom { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: var(--space-8); width: 100%; min-width: 0; margin-top: var(--space-8); cursor: default; }
+.choice-custom > .toggle-row { gap: var(--space-8); }
+.choice-custom .toggle-row-label { font-size: var(--text-12); font-weight: var(--weight-regular); color: var(--ink-muted); }
 .choice-text-line { display: flex; justify-content: center; align-items: baseline; gap: var(--space-8); min-height: 18px; font-size: var(--text-14); color: var(--ink); }
 .choice-text-line:empty { display: none; }
+.choice-text-line { max-width: 100%; }
+.choice-text-line > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }   /* a long name in one line, cut; the art shows it whole */
+.choice-text-line > .btn-link { flex: none; }
 .choice-text-line .btn-link { padding: 0; border: 0; background: none; color: var(--accent-text); font: inherit; font-size: var(--text-12); cursor: pointer; }
+.custom-art { position: relative; container-type: inline-size; aspect-ratio: 1; width: 100%; }
+.custom-art[hidden] { display: none; }
+.custom-art > img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.custom-print { position: absolute; left: 16.57%; top: 43.5%; transform: translateY(-50%); display: flex; align-items: center; gap: 6.13cqw;
+  color: var(--custom-ink, #2F55BE); pointer-events: none; }
+.custom-mark { flex: none; width: 8.7cqw; height: 8.7cqw; }
+.custom-mark > svg { display: block; width: 100%; height: 100%; }
+.custom-name { display: block; max-width: 50.9cqw; white-space: nowrap; text-align: left; font-family: var(--font-primary); font-weight: var(--weight-medium);
+  line-height: 1.05; letter-spacing: 0; }
+.custom-art.is-empty .custom-name { opacity: .45; }
+.choice-pics > .custom-art { width: var(--choice-pic); height: var(--choice-pic); }
+/* the popup: the art large on a tile, then the name, the colours, Save */
+.custom-pop { width: 480px; }
+.custom-stage { border-radius: var(--radius-16); background: var(--tile); overflow: hidden; }
+.custom-inks { display: flex; align-items: center; gap: var(--space-12); }
+.custom-inks .pair-name { font-size: var(--text-14); color: var(--ink-muted); }
+.custom-pop .dark-input.is-error { box-shadow: inset 0 0 0 1px var(--danger); }
 

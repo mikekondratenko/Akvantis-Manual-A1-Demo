@@ -1,0 +1,41 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Toggle switch (moved out of kit.css 2026-10-29, so a page that cannot take kit.css — the
+   landing — can have one: «Your name on it» on the towel card, choice.js). kit.css @imports this
+   file, so every tool keeps it unchanged. Requires tokens.css.
+     <button class="toggle-switch" role="switch" aria-checked="false"><span class="toggle-knob"></span></button>
+   ───────────────────────────────────────────────────────────────────────────── */
+/* ══════════════ TOGGLE SWITCH ══════════════ */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); }
+.toggle-row-label { font-size: var(--text-13); font-weight: var(--weight-semibold); color: inherit; }
+/* Switch first, label beside it — for a page, where a row is not stretched across a rail and
+   the space between label and switch would only separate two halves of one control. The
+   switch comes first in the markup; nothing is reordered by CSS, so focus order matches. */
+.toggle-row.is-lead { justify-content: flex-start; }
+/* Laid out as the checkbox list is: 12 between switch and label, 12 between rows, and a
+   disabled row dims its label with it. */
+.toggle-group { display: flex; flex-direction: column; gap: var(--space-12); }
+.toggle-row.is-lead:has(.toggle-switch:disabled) .toggle-row-label { opacity: .4; }
+/* Icon + label pairing — both inherit color from this wrapper, so toggling .is-disabled
+   dims the icon and text together in one place. */
+.toggle-row-label-group { display: flex; align-items: center; gap: var(--space-8); color: var(--white); transition: color var(--duration-fast) var(--ease-standard); }
+.toggle-row-label-group.is-disabled { color: var(--black-350); }
+.toggle-row-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: inherit; }
+.toggle-row-icon svg { display: block; }
+.toggle-switch {
+  position: relative; width: 38px; height: 22px; border-radius: var(--radius-pill);
+  background: var(--black-700); border: none; padding: 0; cursor: pointer; flex-shrink: 0;
+  transition: background var(--duration-base) var(--ease-standard);
+}
+.toggle-switch[disabled] { opacity: .4; pointer-events: none; }
+.toggle-knob {
+  position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: var(--radius-pill);
+  background: var(--white); transition: transform var(--duration-base) var(--ease-standard);
+}
+.toggle-switch[aria-checked="true"] { background: var(--accent); }
+.toggle-switch[aria-checked="true"] .toggle-knob { background: var(--white); transform: translateX(16px); }
+
+/* The switch: a grey track the white knob shows against; the accent when on. */
+[data-theme="light"] .toggle-switch { background: var(--black-450); }
+[data-theme="light"] .toggle-switch[aria-checked="true"] { background: var(--accent); }
+[data-theme="light"] .toggle-knob,
+[data-theme="light"] .toggle-switch[aria-checked="true"] .toggle-knob { background: #FFFFFF; box-shadow: var(--shadow-sm); }

@@ -28,6 +28,7 @@
   background: var(--frost-900);
   backdrop-filter: var(--frost-blur); -webkit-backdrop-filter: var(--frost-blur);
   box-shadow: var(--frost-edge);
+  max-height: calc(100dvh - var(--space-48, 48px)); overflow-y: auto;   /* a tall one scrolls inside, on a phone too (2026-10-29) */
 }
 /* ── POPUP OVERLAY ──
    The kit had a popup and no way to show one. `.popup` is a plate, and a plate on its own
