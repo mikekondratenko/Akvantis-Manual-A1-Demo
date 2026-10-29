@@ -64,7 +64,7 @@
       var name = document.createElement('span'); name.className = 'pair-name';
       var pick = function (fid, quiet) {
         $$(discs, '.swatch-btn').forEach(function (b) { var on = b.dataset.id === fid; b.classList.toggle('is-active', on); b.setAttribute('aria-checked', on); });
-        var label = (COL[fid] || {}).label || fid; name.textContent = label;
+        var label = (COL[fid] || {}).label || fid; label = (window.KitLang && KitLang.t && KitLang.t(label)) || label; name.textContent = label;   /* a finish name through the page's language, if it has one (2026-10-29) */
         if (field) field.value = fid;
         if (card) card.dataset.finishLabel = label;
         var img = card && card.querySelector('[data-device-pic="' + d.code + '"]'), file = d.imgs && d.imgs[fid];
@@ -77,7 +77,7 @@
       list.forEach(function (fid) {
         var c = COL[fid] || {}, b = document.createElement('button');
         b.type = 'button'; b.className = 'swatch-btn' + (c.hex2 ? ' swatch-split' : ''); b.dataset.id = fid;
-        b.setAttribute('role', 'radio'); b.setAttribute('aria-label', c.label || fid);
+        b.setAttribute('role', 'radio'); b.setAttribute('aria-label', (window.KitLang && KitLang.t && KitLang.t(c.label || fid)) || c.label || fid);
         if (c.hex2) { b.style.setProperty('--swatch-a', c.hex); b.style.setProperty('--swatch-b', c.hex2); } else b.style.background = c.hex || 'transparent';
         b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); pick(fid); });
         discs.appendChild(b);
