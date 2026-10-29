@@ -774,6 +774,7 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 /* Counted cards: the kit's `.choice.is-count` (choice.css). */
 
 .order-row2 { display: grid; gap: var(--space-12); }
+.np-pick { display: grid; gap: var(--space-12); }   /* np.js: the city, then the branch / the street — the fields' own rhythm (2026-10-29) */
 @media (min-width: 768px) { .order-row2 { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-16); } }
 
 /* The skeleton of the full order (2026-10-25): country → bundle → installation → Akvantis Club →

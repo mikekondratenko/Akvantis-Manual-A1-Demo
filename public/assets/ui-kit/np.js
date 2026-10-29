@@ -17,7 +17,8 @@
    VALUE   the point's line goes in the visible field (the order reads it), its Ref in the
            hidden one. Typed over and not taken from the list, the field says «Choose from the
            list» (a custom validity — order.js shows it on send).
-   CITY    data-np="city": the place alone (the courier's city, before the street).
+   CITY    data-np="city": the place alone (the courier's city), then its street from the list
+           (input[data-np-street], see STREET), the house and the flat by hand.
    QUOTE   label[data-np-quote] — Nova Poshta's price and date for the place, see QUOTE below.
    KEY     no API key: searchSettlements and getWarehouses answer without one. The endpoint is
            Nova Poshta's by default; a page with a worker points data-np-endpoint at its own
@@ -112,20 +113,29 @@
     }, function (it) { ref.value = it ? it.value : ''; }, { min: 0, empty: kind === 'locker' ? T('No parcel locker here takes this parcel — try a branch') : T('Nothing found — try the number or the street') });
     /* Held until a city is taken: disabled, and data-hold tells order.js (which turns hidden
        fields off and back on) to leave it off when the row opens. */
-    var hold = function (on) { if (!point) return; point.disabled = on; if (on) point.dataset.hold = ''; else delete point.dataset.hold; };
+    var street = root.querySelector('[data-np-street]'), sref = root.querySelector('[data-np-street-ref]');
+    var hold = function (on) { [point, street].forEach(function (f) { if (!f) return; f.disabled = on; if (on) f.dataset.hold = ''; else delete f.dataset.hold; }); };
+    /* STREET (2026-10-29): data-np="city" with an input[data-np-street] — the courier's street, from
+       Nova Poshta's own list of the place's streets (Address.searchSettlementStreets, no key); its Ref
+       in [data-np-street-ref]. The house and the flat are plain fields beside it. */
+    var streetBox = street && combo(street, street.parentNode.querySelector('.suggest-list'), function (q, signal) {
+      if (!place) return Promise.resolve([]);
+      return call(url, 'searchSettlementStreets', { StreetName: q, SettlementRef: place.Ref, Limit: '50' }, signal).then(function (d) {
+        return ((d[0] && d[0].Addresses) || []).map(function (a) { return { line: a.Present, value: a.SettlementStreetRef }; }); });
+    }, function (it) { if (sref) sref.value = it ? it.value : ''; }, { min: 2, empty: T('No such street in this place — check the spelling') });
     hold(true);
     if (form) form.addEventListener('np-city', function (e) {   /* another row named the place: take it if this one has none */
       var p = e.detail.place; if (e.detail.from === root || !p || place) return;
-      place = p; city.value = p.Present; city.setCustomValidity(''); hold(false); if (point) point.required = true;
+      place = p; city.value = p.Present; city.setCustomValidity(''); hold(false); if (point) point.required = true; if (street) street.required = true;
     });
     var cityBox = combo(city, city.parentNode.querySelector('.suggest-list'), function (q, signal) {
       return call(url, 'searchSettlements', { CityName: q, Limit: '20', Page: '1' }, signal).then(function (d) {
         return ((d[0] && d[0].Addresses) || []).filter(function (a) { return a.Warehouses > 0; })
           .map(function (a) { return { line: a.Present, value: a }; }); });
     }, function (it) {
-      place = it ? it.value : null; if (pointBox) { pointBox.reset(); ref.value = ''; }
+      place = it ? it.value : null; if (pointBox) { pointBox.reset(); ref.value = ''; } if (streetBox) { streetBox.reset(); if (sref) sref.value = ''; }
       hold(!place); if (point) point.required = true;
-      if (place && point) setTimeout(function () { point.focus(); }, 0);
+      if (place && (point || street)) setTimeout(function () { (point || street).focus(); }, 0);
       tell(place);
     }, { min: 2, empty: T('No such place with a Nova Poshta branch — type it in Ukrainian: Київ, Львів…') });
   }
