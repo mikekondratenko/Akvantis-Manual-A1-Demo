@@ -185,3 +185,11 @@
 .choice-finish .pair-row { justify-content: center; }
 .choice-finish .pair-row { --swatch-size: var(--swatch-24); flex-wrap: nowrap; }   /* every card's finishes are the kit's small swatch, 24 (swatch.css .is-24) — 2026-10-29 */
 .choice-finish .pair-name { font-size: var(--text-12); color: var(--ink-faint); }
+
+/* TEXT (2026-10-29) — words of the buyer's on a card (a towel's name; choice.js): under the name,
+   the words saved, with «Edit». */
+.choice-text { display: grid; width: 100%; margin-top: var(--space-4); cursor: default; }
+.choice-text-line { display: flex; justify-content: center; align-items: baseline; gap: var(--space-8); min-height: 18px; font-size: var(--text-14); color: var(--ink); }
+.choice-text-line:empty { display: none; }
+.choice-text-line .btn-link { padding: 0; border: 0; background: none; color: var(--accent-text); font: inherit; font-size: var(--text-12); cursor: pointer; }
+

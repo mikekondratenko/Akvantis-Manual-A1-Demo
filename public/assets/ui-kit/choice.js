@@ -95,7 +95,67 @@
     });
   }
 
-  window.Choice = { bind: bind, sync: sync, finishes: finishes };
-  var go = function () { finishes(); bind(); };
+  /* TEXT (2026-10-29) — a card that can carry words of the buyer's (a towel with a name):
+       <div class="choice-text" data-off="Plain" data-on="With name" data-ask="Name on the towel"
+            data-note="…" data-max="16"><input type="hidden" name="towel_name"></div>
+     A counted card of its own (the plain thing is another card): taken (0 → 1), it asks for the words
+     in a popup (popup.css); saved, they show under the name with «Edit» and the card gets
+     data-finish-label «Karl» (the strip and the bar read it); cancelled with nothing saved, the card
+     goes back to 0. Put back to 0, the words go. The words go in the hidden input. */
+  var L = function (t) { return (window.KitLang && KitLang.t && KitLang.t(t)) || t; };
+  var esc = function (t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
+  var pop = null;
+  function ask(o) {   /* o: { title, note, max, value, done(value|null) } */
+    if (!pop) {
+      pop = document.createElement('div'); pop.className = 'popup-overlay'; pop.hidden = true;
+      pop.innerHTML = '<div class="popup is-start" role="dialog" aria-modal="true" aria-labelledby="choice-ask-t">'
+        + '<button class="icon-btn popup-close" type="button" data-x></button>'
+        + '<div class="popup-header"><div class="popup-title" id="choice-ask-t"></div><div class="popup-text"></div></div>'
+        + '<label class="field"><input class="dark-input" type="text" autocomplete="off" spellcheck="false"></label>'
+        + '<div class="popup-actions"><button class="btn btn-tertiary" type="button" data-x></button><button class="btn btn-secondary" type="button" data-ok></button></div></div>';
+      document.body.appendChild(pop);
+      var xb = pop.querySelector('.popup-close'); xb.innerHTML = window.KitIcons ? KitIcons.svg('x', { size: 16 }) : '×';
+    }
+    var input = pop.querySelector('input'), back = document.activeElement;
+    pop.querySelector('.popup-title').textContent = o.title; pop.querySelector('.popup-text').textContent = o.note || '';
+    pop.querySelector('.popup-close').setAttribute('aria-label', L('Close'));
+    pop.querySelector('[data-ok]').textContent = L('Save'); pop.querySelector('.popup-actions [data-x]').textContent = L('Cancel');
+    input.maxLength = o.max || 40; input.value = o.value || ''; input.setAttribute('aria-label', o.title);
+    var end = function (v) { pop.hidden = true; document.removeEventListener('keydown', key, true); pop.onclick = null; if (back && back.focus) back.focus(); o.done(v); };
+    var save = function () { var v = input.value.replace(/\s+/g, ' ').trim(); end(v || null); };
+    var key = function (e) { if (e.key === 'Escape') { e.preventDefault(); end(null); } else if (e.key === 'Enter') { e.preventDefault(); save(); } };
+    pop.onclick = function (e) { if (e.target === pop || e.target.closest('[data-x]')) end(null); else if (e.target.closest('[data-ok]')) save(); };
+    document.addEventListener('keydown', key, true);
+    pop.hidden = false; setTimeout(function () { input.focus(); input.select(); }, 0);
+  }
+  function texts(root) {
+    $$(root || document, '.choice-text').forEach(function (row) {
+      if (row.__text) return; row.__text = true;
+      var card = row.closest('.choice'), field = row.querySelector('input[type=hidden]');
+      var count = card && card.querySelector('input[type=number]'), asking = false;
+      var line = document.createElement('div'); line.className = 'choice-text-line'; row.appendChild(line);
+      row.addEventListener('click', function (e) { e.stopPropagation(); });   /* not a tap on the card */
+      var paint = function () { var v = field.value;
+        line.innerHTML = v ? '<span>«' + esc(v) + '»</span><button class="btn-link" type="button">' + esc(L('Edit')) + '</button>' : '';
+        if (card) { if (v) card.dataset.finishLabel = '«' + v + '»'; else delete card.dataset.finishLabel; }
+        field.dispatchEvent(new Event('change', { bubbles: true })); };
+      var setCount = function (n) { if (!count) return; count.value = n; count.dispatchEvent(new Event('input', { bubbles: true })); sync(card); };
+      var open = function () { if (asking) return; asking = true;
+        ask({ title: L(row.dataset.ask), note: L(row.dataset.note || ''), max: +row.dataset.max || 20, value: field.value, done: function (v) {
+          asking = false;
+          if (v) field.value = v;
+          else if (!field.value) setCount(0);   /* taken and no words given: not taken */
+          paint(); } }); };
+      line.addEventListener('click', function (e) { if (e.target.closest('button')) open(); });
+      /* Taken (0 → 1) with no words yet: ask for them. Put back to 0: the words go. */
+      if (count) count.addEventListener('input', function () {
+        if (+count.value > 0 && !field.value) open();
+        else if (!(+count.value) && field.value) { field.value = ''; paint(); } });
+      paint();
+    });
+  }
+
+  window.Choice = { bind: bind, sync: sync, finishes: finishes, texts: texts, ask: ask };
+  var go = function () { finishes(); texts(); bind(); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();

@@ -21,6 +21,8 @@
 @import url('progress.css');
 /* Status pills and alert banners (2026-10-21) — status.css, for the same reason. */
 @import url('status.css');
+/* The popup and its overlay (2026-10-29) — popup.css, for the same reason. */
+@import url('popup.css');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -823,60 +825,7 @@ a { color: inherit; }
 .field-row .field-label { margin-bottom: 0; }
 .is-frosted .field-value-input { background-color: var(--frost-700); }
 
-/* ══════════════ POPUP ══════════════
-   A panel that happens to float: 24px inset, 16px between blocks, the confirming action
-   rightmost, closest to the corner the cursor leaves from.
-
-   ── FROST, ALWAYS (2026-10-21) ── every popup is the frost the location sheet and the bar
-   wear: --frost-900 with the blur, the frost's 1px edge, no drop shadow. It was a solid
-   --black-900 plate, frosted only inside an `.is-frosted` surface; one surface for every
-   floating thing now. Inside it the tiles follow the frost rule — white at low alpha, not
-   a grey step — so a row or a field on a popup takes whatever shows through. */
-.popup {
-  position: relative; width: 468px; max-width: 100%;
-  display: flex; flex-direction: column; gap: var(--space-16);
-  padding: var(--space-24);
-  border-radius: var(--radius-16);
-  --tile: var(--on-frost); --tile-hover: var(--on-frost-hover);
-  background: var(--frost-900);
-  backdrop-filter: var(--frost-blur); -webkit-backdrop-filter: var(--frost-blur);
-  box-shadow: var(--frost-edge);
-}
-/* ── POPUP OVERLAY ──
-   The kit had a popup and no way to show one. `.popup` is a plate, and a plate on its own
-   is a panel that happens to float — it needed the thing that makes it modal: a scrim that
-   dims what is behind, centres the plate and swallows clicks aimed past it.
-
-   `hidden` rather than a class, so the subtree leaves the accessibility tree instead of
-   merely going invisible, and `display: flex` has to be overridden explicitly — the same
-   note `.btn[hidden]` carries, for the same reason.
-
-   0.64 on black rather than a blur: a blurred backdrop competes with `.is-frosted`, which
-   already blurs, and two blurs stacked read as a rendering fault rather than a hierarchy. */
-.popup-overlay {
-  position: fixed; inset: 0; z-index: 90;
-  display: flex; align-items: center; justify-content: center;
-  padding: var(--space-24);
-  background: var(--scrim-64);
-}
-.popup-overlay[hidden] { display: none; }
-
-/* 16px in from the corner, overlapping the 24px content inset rather than pushing the
-   title inward. */
-.popup-close { position: absolute; top: var(--space-16); right: var(--space-16); }
-.popup-header { display: flex; flex-direction: column; gap: var(--space-12); padding-bottom: var(--space-24); }
-.popup-title { font-size: var(--text-24); font-weight: var(--weight-semibold); line-height: var(--leading-snug); color: var(--white); }
-.popup-text { font-size: var(--text-14); font-weight: var(--weight-regular); line-height: var(--leading-relaxed); color: var(--black-200); }
-.popup-actions { display: flex; gap: var(--btn-gap); justify-content: flex-end; }
-.popup-actions .btn { width: 124px; }
-/* ── ALIGNMENT (2026-10-25) ── three, by a class on `.popup`:
-     (none)       the text on the left, the actions on the right — a question with an answer
-     .is-start    everything on the left edge — the actions under the line that asks for them
-     .is-center   everything on the axis — a short notice, a confirmation with one or two words
-   Centered, the header keeps 40 clear on both sides, so the title never runs under the ✕. */
-.popup.is-start  .popup-actions { justify-content: flex-start; }
-.popup.is-center .popup-header  { text-align: center; align-items: center; padding-inline: var(--space-40); }
-.popup.is-center .popup-actions { justify-content: center; }
+/* POPUP — in popup.css since 2026-10-29 (the landing's order form asks a towel's name in one). */
 
 /* ══════════════ STATIC STATES ══════════════
    `data-state` paints a control in a state it is not actually in. This exists for the
