@@ -826,21 +826,27 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
    the full width less the gutter. Comes up with the first choice. */
 .order-dock { position: fixed; z-index: 19; left: 50%; bottom: max(var(--space-12), env(safe-area-inset-bottom));
   width: var(--bar-w, calc(var(--number-288) * 2)); max-width: calc(100% - var(--space-24));
-  display: flex; align-items: center; gap: var(--space-16); padding: var(--space-8) var(--space-24) var(--space-8) var(--space-8);
-  border-radius: var(--radius-24); background: var(--frost-900); box-shadow: var(--frost-edge);
+  display: flex; align-items: center; gap: var(--space-16); padding: var(--space-8) var(--space-32) var(--space-8) var(--space-24);
+  border-radius: var(--radius-pill); background: var(--frost-900); box-shadow: var(--frost-edge);   /* fully round ends (2026-10-29) */
   -webkit-backdrop-filter: var(--frost-blur); backdrop-filter: var(--frost-blur);
   transform: translate(-50%, calc(100% + var(--space-24))); opacity: 0; pointer-events: none;
   transition: transform var(--duration-slow) var(--ease-emphasized), opacity var(--duration-base); }
 .order-dock.is-on { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
-.order-dock-pics { display: flex; gap: var(--space-4); flex: none; }
-.order-dock-pics > * { width: var(--number-48); height: var(--number-48); object-fit: contain; max-height: none;
-  border-radius: var(--radius-16); background: var(--on-frost); padding: var(--space-4); }
-.order-dock-pics > .sec-ph { padding: 0; background: none; }
+/* The pictures of what is taken (2026-10-29: no words beside them any more) — as many as fit,
+   «2×» small at a picture's top right when there are more than one. */
+.order-dock-pics { display: flex; gap: var(--space-8); flex: 1; min-width: 0; overflow: hidden; padding: var(--space-4) var(--space-8) 0 0; }
+.order-dock-item { position: relative; flex: none; }
+.order-dock-item > :first-child { display: block; width: var(--number-48); height: var(--number-48); object-fit: contain; max-height: none;
+  padding: 0; background: none; }   /* the picture alone, no plate (2026-10-29) */
+.order-dock-item > .sec-ph { padding: 0; background: none; }
+.order-dock-n { position: absolute; top: calc(-1 * var(--space-4)); right: calc(-1 * var(--space-8)); min-width: var(--number-20, 20px); padding: 0 var(--space-4);
+  border-radius: var(--radius-pill); background: var(--btn-solid); color: var(--btn-solid-ink);
+  font-size: var(--text-11); line-height: 18px; font-weight: var(--weight-semibold); text-align: center; }
 
-.order-dock-txt { display: grid; gap: var(--space-2); min-width: 0; flex: 1; }
+.order-dock-txt { display: none; }   /* no words in the bar (2026-10-29) — kept in the markup for older pages */
 .order-dock-txt > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .order-dock-txt .t-small, .order-dock-price .t-small { color: var(--ink-muted); }
 .order-dock-price { display: grid; justify-items: end; flex: none; text-align: right; }
-@media (max-width: 767px) { .order-dock-pics > :nth-child(n + 2) { display: none; } }
+.order-dock-price .choice-was { margin: 0; font-size: var(--text-12); }
 body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--number-96) + env(safe-area-inset-bottom)); }
 body.has-dock .btn.grid-fab { bottom: calc(var(--number-96) + var(--space-8)); }

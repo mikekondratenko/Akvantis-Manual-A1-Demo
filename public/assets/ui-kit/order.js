@@ -76,6 +76,7 @@
     var cur = form.dataset.currency || 'EUR', rate = +form.dataset.rate || 1;
     var eur = function (n) { if (n == null) return cur === 'EUR' ? '€ ···' : '··· ' + cur;
       var v = n * rate, whole = cur !== 'EUR';   /* € always with its cents — «€495.00» (2026-10-26); hryvnia whole */
+      if (cur === 'EUR') return (v < 0 ? '−' : '') + '€' + Math.abs(v).toFixed(2);   /* «€627.00» in every language, as the cards are written (2026-10-29: Ukrainian gave «627,00 €») */
       return new Intl.NumberFormat(lang, { style: 'currency', currency: cur, currencyDisplay: cur === 'EUR' ? 'narrowSymbol' : 'symbol',   /* «395 €», not «395 EUR» */
         minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(whole ? Math.round(v) : v); };
     var dock = document.getElementById(form.id + '-dock');
@@ -186,16 +187,33 @@
       if (dl && dt) { dl.innerHTML = rowsHtml; dt.innerHTML = totalHtml; } else if (dl) dl.innerHTML = rowsHtml + totalHtml;
       gate();
       if (!dock || !chosen) return;
-      var card = on ? null : pick.closest('.choice');
-      var pics = card ? $$(card, '.choice-pic') : $$(form, '.choice.is-count.is-on .choice-pic').slice(0, 3);
+      /* THE BAR (2026-10-29): the pictures of everything taken — the bundle's, then each counted card's,
+         «2×» on a picture when there are more than one — and the total, with the price it would have
+         been (the struck prices of the cards, the trade-in and a code put back) struck small over it.
+         No words: the steps and the summary say them. Each picture names itself (alt) for a reader. */
+      var items = [], was = 0;
+      var wasOf = function (el) { var w = el && el.querySelector('.choice-was'); return w ? +w.textContent.replace(/[^\d.,]/g, '').replace(',', '.') || 0 : 0; };
+      if (!on && pick) { var card = pick.closest('.choice');
+        if (card) { items.push({ pics: $$(card, '.choice-pic'), n: 1, name: label(pick) }); var w0 = wasOf(card); if (w0) was += w0 - (+card.dataset.price || 0); } }
+      $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return;
+        var i = c.querySelector('input[type=number]'), n = +i.value || 0; if (!n) return;
+        items.push({ pics: $$(c, '.choice-pic').slice(0, 1), n: n, name: label(i) });
+        var w = wasOf(c); if (w) was += (w - (+c.dataset.price || 0)) * n; });
       var holder = dock.querySelector('.order-dock-pics'); holder.innerHTML = '';
-      pics.forEach(function (p) { var c = p.cloneNode(true); c.removeAttribute('id'); holder.appendChild(c); });
-      dock.querySelector('[data-dock="name"]').innerHTML = on ? labelHtml(alt) : labelHtml(pick);
-      dock.querySelector('[data-dock="sub"]').textContent = on ? counted(first).join(', ')
-        : steps().slice(1, -1).map(stepVal).filter(Boolean).join(' · ');
+      items.forEach(function (it) { it.pics.forEach(function (p, k) {
+        var box = document.createElement('span'); box.className = 'order-dock-item';
+        var c = p.cloneNode(true); c.removeAttribute('id'); if (c.tagName === 'IMG') c.alt = it.name; box.appendChild(c);
+        if (it.n > 1 && k === 0) { var b = document.createElement('b'); b.className = 'order-dock-n'; b.textContent = it.n + '×'; box.appendChild(b); }
+        holder.appendChild(box); }); });
+      var nameEl2 = dock.querySelector('[data-dock="name"]'), subEl = dock.querySelector('[data-dock="sub"]');
+      if (nameEl2) nameEl2.textContent = ''; if (subEl) subEl.textContent = '';
       var total = dock.querySelector('[data-dock="total"]');
       total.textContent = open ? eur(null) : eur(sum); total.classList.toggle('order-tbd', open);
-      dock.querySelector('[data-dock="total-sub"]').textContent = open ? T('price on request') : '';
+      var before = sum - off + was;   /* off is negative: the trade-in, a code */
+      var tsub = dock.querySelector('[data-dock="total-sub"]');
+      if (open) tsub.textContent = T('price on request');
+      else if (before > sum + 0.004) tsub.innerHTML = '<s class="choice-was">' + eur(before) + '</s>';
+      else tsub.textContent = '';
     }
 
     /* SEGMENTS: .order-seg holds a radio group (sr-only); the kit's segmented tabs are drawn
