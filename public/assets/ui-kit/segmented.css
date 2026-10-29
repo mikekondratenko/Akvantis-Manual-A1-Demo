@@ -65,6 +65,12 @@
 .segment-logo > .is-on { display: none; }
 .segment-btn.is-active .segment-logo > .is-on { display: block; }
 .segment-btn.is-active .segment-logo:has(> .is-on) > :not(.is-on) { display: none; }
+/* Every logo as it is when chosen (2026-10-29): full strength, and on the dark ground the one-colour
+   white file even on a tab not chosen — only the plate under it says which one is. On paper a white
+   logo would vanish on the light track, so there the others keep their own colours (at full strength). */
+.segmented.is-brand .segment-btn:not(.is-active) .segment-logo { opacity: 1; }
+:root:not([data-theme="light"]) .segmented.is-brand .segment-logo > .is-on { display: block; }
+:root:not([data-theme="light"]) .segmented.is-brand .segment-logo:has(> .is-on) > :not(.is-on) { display: none; }
 /* Many options — Kit.segmented(…, { scroll: true }). Segments take their label's width and
    scroll sideways with no visible bar; the thumb is sized by script.
 
