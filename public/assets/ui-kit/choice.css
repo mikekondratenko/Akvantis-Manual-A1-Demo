@@ -152,6 +152,13 @@
 .choice-mark { flex: none; display: grid; place-items: center; width: var(--number-32); height: var(--number-32); color: var(--ink); }
 .choice-mark > img, .choice-mark > svg { display: block; width: 100%; height: 100%; object-fit: contain; }
 .choice-mark.is-akvantis > svg { width: 28px; height: 28px; }   /* the AKVANTIS wave in its ring — drawn in the ink, a hair under the carriers' signs so the ring reads at their weight */
+/* A sign or a name in two files, one per theme (2026-10-30: the service marks): <img class="is-dark"> +
+   <img class="is-light">, the theme shows its own. */
+.choice img.is-light, [data-theme="light"] .choice img.is-dark { display: none; }
+[data-theme="light"] .choice img.is-light { display: block; }
+/* A NAME DRAWN AS A WORDMARK (2026-10-30): <img class="choice-word"> where the <b> would be (the <b> stays,
+   .sr-only, for the strip and the bar) — the letters' caps at the caps of the names in the rows beside it. */
+.choice-word { display: block; height: calc(var(--type-title) * .72); width: auto; max-width: 100%; margin-block: calc(var(--type-title) * .14); }
 .choice.is-row > .choice-price { margin-left: auto; padding-left: var(--space-16); font-size: var(--type-title); white-space: nowrap; }
 /* A row with a MARK on a phone (2026-10-29, 375 is the reference): the description steps aside — the
    mark, the name and the price are the choice; what the description said is asked for once the row is
