@@ -64,5 +64,18 @@
    exactly grid.css's. */
 .grid-overlay i { box-shadow: inset 0 0 0 1px var(--ink); opacity: .2; }
 .grid-overlay i:nth-child(n + 21) { display: none; }
-.btn.grid-fab { position: fixed; right: var(--space-24); bottom: max(var(--space-24), env(safe-area-inset-bottom)); z-index: 91; }
-.btn.grid-fab { width: var(--number-48); }   /* .btn.: button.css loads after this file and sets position: relative */
+/* ── THE FAB ROW (2026-10-30) ── the preview's own controls — Dark | Light, EN | UA, the grid — in ONE
+   row in the bottom right, on the line of the order bar (section.css .order-dock: 12 up, 68 tall, so
+   the row is 68 tall at 12 and its 48s sit on the bar's middle). One look for all of them: a 48
+   frosted plate, radius 16, the frost's own edge on either theme (was: the grid an outlined button,
+   the language a frosted tab — two kits in one corner). Each script puts its control into the row
+   (`.fab-row`, made by the first one there) and CSS `order` keeps them in place: theme 1, language
+   2, grid 3. Where the order bar takes the bottom (the bar is centred, 576 wide; under 1184 they meet)
+   the row stands on top of it instead. */
+.fab-row { position: fixed; z-index: 91; right: var(--space-24); bottom: max(var(--space-12), env(safe-area-inset-bottom));
+  height: var(--number-68, 68px); display: flex; align-items: center; gap: var(--space-8); }
+.fab-row > * { flex: none; height: var(--number-48); border-radius: var(--radius-16); background: var(--frost-900); box-shadow: var(--frost-edge);
+  -webkit-backdrop-filter: var(--frost-blur); backdrop-filter: var(--frost-blur); }
+.fab-row > .fab-theme { order: 1; } .fab-row > .lang-fab { order: 2; } .fab-row > .grid-fab { order: 3; }
+.fab-row > .btn.grid-fab { position: relative; width: var(--number-48); --btn: var(--frost-900); --btn-edge: var(--frost-edge); --btn-edge-hover: var(--frost-edge); }
+@media (max-width: 1183px) { body.has-dock .fab-row { bottom: calc(max(var(--space-12), env(safe-area-inset-bottom)) + 68px + var(--space-8)); } }

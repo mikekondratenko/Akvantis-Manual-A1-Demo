@@ -3,7 +3,7 @@
 
    One <script src="…/ui-kit/grid-overlay.js" defer> and nothing else: it adds the overlay
    (`.grid-overlay`, one cell per grid.css column at the current width) and a frosted round
-   button in the bottom-right corner (`.btn.btn-frost.btn-round.grid-fab`). The choice is
+   button in the bottom-right corner (`.btn.btn-frost.btn-round.grid-fab`, in the shared `.fab-row` — grid.css). The choice is
    kept in this browser only (localStorage `akv-kit-grid`, the preview's key, so the kit's
    preview and a page agree). Styles: grid.css. Requires tokens, grid, button.
    For a preview or a prototype; take the script tag out before a page goes live.
@@ -17,7 +17,10 @@
     for (var i = 0; i < 20; i++) o.appendChild(document.createElement('i'));
     var b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-frost btn-round grid-fab';
     b.innerHTML = '<i data-icon="columns-3" data-size="16"></i>';   /* the kit's icon (icons.js) */
-    document.body.append(o, b);
+    document.body.append(o);
+    /* the row in the bottom right that the page's other controls share (grid.css FAB ROW) */
+    var row = document.querySelector('.fab-row'); if (!row) { row = document.createElement('div'); row.className = 'fab-row'; document.body.appendChild(row); }
+    row.appendChild(b);
     var fill = function () {
       var n = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--grid-cols'), 10) || 12;
       [].forEach.call(o.children, function (c, i) { c.style.display = i < n ? '' : 'none'; });

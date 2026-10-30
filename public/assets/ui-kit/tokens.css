@@ -694,9 +694,11 @@
   --btn-primary             : #111211;
   --btn-primary-hover       : #323434;
   --btn-primary-ink         : #FFFFFF;
-  --btn-secondary           : var(--cyan-500);
-  --btn-secondary-hover     : var(--cyan-400);
-  --btn-secondary-ink       : #111211;
+  /* 2026-10-30: on paper every filled button is black — the dark ground's white (secondary) turns
+     over to black as its cyan (primary) does; the accent stays for what is chosen and for links. */
+  --btn-secondary           : #111211;
+  --btn-secondary-hover     : #323434;
+  --btn-secondary-ink       : #FFFFFF;
   --btn-solid               : #111211;
   --btn-solid-hover         : #323434;
   --btn-solid-ink           : #FFFFFF;

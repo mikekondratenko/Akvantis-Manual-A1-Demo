@@ -845,4 +845,4 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-dock-price { display: flex; flex-direction: row-reverse; align-items: baseline; gap: var(--space-8); flex: none; text-align: right; }   /* one row: the struck price left of the total (2026-10-29) */
 .order-dock-price .choice-was { margin: 0; font-size: var(--type-small); }
 body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--number-96) + env(safe-area-inset-bottom)); }
-body.has-dock .btn.grid-fab { bottom: calc(var(--number-96) + var(--space-8)); }
+/* the preview's controls over the bar: grid.css FAB ROW (2026-10-30) */
