@@ -809,7 +809,6 @@ a { color: inherit; }
    behaviour, and these only mirror them. */
 /* The field states mirror the field's own roles (2026-10-21): a hard-coded --black-200 / --white
    painted near-black edges on paper — heavier than anything a real field ever shows. */
-[data-state="hover"].choice { background: var(--choice-hover); }
 [data-state="hover"].btn-ghost { --btn-edge: var(--btn-edge-hover); }
 [data-state="hover"].dark-input,
 [data-state="hover"].select,
