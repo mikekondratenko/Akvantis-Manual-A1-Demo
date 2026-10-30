@@ -105,8 +105,8 @@
 /* ── THE STACK AND THE SHEET ── */
 .sec-stack { --stack-gap: var(--space-2); display: grid; gap: var(--stack-gap); padding: var(--space-2); background: var(--page); }
 /* Dark (2026-10-25): the ground is the sheets' own black — one black from top to bottom, the
-   sections told apart by what is in them. On paper the grey ground stays under the white sheets. */
-[data-theme="light"] .sec-stack { background: var(--page-sunk); }
+   sections told apart by what is in them. On paper the same (2026-10-30, was the grey --page-sunk
+   under the white sheets): the ground is white too — the grey showed as a seam and in the corners. */
 
 .sec {
   position: relative; overflow: hidden;
