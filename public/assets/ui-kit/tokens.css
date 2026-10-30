@@ -741,8 +741,11 @@
   --choice-plate     : var(--black-900);
   --on-frost       : rgba(17, 18, 17, .05);
   --on-frost-hover : rgba(17, 18, 17, .09);
-  --frost-900   : rgba(252, 255, 254, .86);
-  --frost-700   : rgba(252, 255, 254, .72);
+  /* 2026-10-30: on paper the frost was .86 — near opaque, the header and the order bar read as white
+     plates with nothing behind them. .56 / .44 lets the page through the blur, as .72 does on dark
+     (white on a light page needs less alpha to read as glass than black on a dark one). */
+  --frost-900   : rgba(252, 255, 254, .56);
+  --frost-700   : rgba(252, 255, 254, .44);
   --scrim-32    : rgba(17, 18, 17, .16);
   --scrim-50    : rgba(17, 18, 17, .32);
   --scrim-60    : rgba(17, 18, 17, .20);
