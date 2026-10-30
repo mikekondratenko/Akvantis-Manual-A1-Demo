@@ -731,12 +731,15 @@
   --field-edge-hover : var(--control-edge-hover);
   --field-edge-focus : var(--cyan-600);
   --choice-edge-on   : var(--cyan-600);   /* the focused field's edge on paper */
-  /* A choice on paper (2026-10-30, was --black-800 grey): WHITE at rest — a grey option on the
-     step's grey tile hardly showed; white is the one ground that stands off the tile. A step into
-     the page under the cursor; chosen, it stays white and takes the accent edge (the edge alone
-     says chosen, as on the dark ground). */
-  --choice           : #FFFFFF;
-  --choice-hover     : var(--black-900);
+  /* A choice on paper (2026-10-30, second pass): the other way round — the step's PLATE is white
+     with a light edge (--plate-edge, section.css ORDER), a CARD (bundle, cartridge) is white with the
+     same light edge (--choice-card / --choice-card-edge, choice.css), a ROW (delivery, payment) is
+     the light grey it was (--black-800). Chosen: white with the accent edge, as before. */
+  --choice           : var(--black-800);
+  --choice-hover     : var(--black-700);
+  --choice-card      : #FFFFFF;
+  --choice-card-edge : rgba(17, 18, 17, .10);
+  --plate-edge       : rgba(17, 18, 17, .10);
   --choice-on        : #FFFFFF;
   --choice-plate     : var(--black-900);
   --on-frost       : rgba(17, 18, 17, .05);

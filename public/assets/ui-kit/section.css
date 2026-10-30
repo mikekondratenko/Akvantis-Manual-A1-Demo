@@ -724,6 +724,11 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-steps { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-12); }
 .order-step { --choice-bleed: var(--space-16); scroll-margin-top: calc(var(--bar-max, 0px) + var(--bar-top, 0px) + var(--space-16)); }
 .order-step[hidden] { display: none; }
+/* On paper (2026-10-30) the step plates and the payment islands are white with a light edge (--plate-edge),
+   so the grey rows and the white cards inside read against them; on dark --plate-edge is not set. */
+[data-theme="light"] .order-steps { --tile: #FFFFFF; }
+[data-theme="light"] .order-step, [data-theme="light"] .order-islands > .plate { box-shadow: inset 0 0 0 1px var(--plate-edge); }
+[data-theme="light"] .order-islands > .choice:not(:has(> input:checked)) { border-color: var(--plate-edge); }
 .order-step.is-locked { opacity: .4; }
 .order-step.is-locked button.panel-title { cursor: default; }
 .order-step.is-locked button.panel-title:hover { background: none; }
