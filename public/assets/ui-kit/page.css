@@ -64,6 +64,7 @@ body {
   background: var(--tile);
 }
 .plate + .plate { margin-top: var(--space-12); }
+:where([data-theme="light"]) .plate:where(:not(.is-line)) { box-shadow: inset 0 0 0 1px var(--tile-edge); }   /* the grey plate's edge on paper (2026-10-31); a plate that sets its own edge keeps it */
 
 /* ══════════════ THE COLLAPSIBLE SECTION ══════════════
    Not defined here. `panel.css` owns `button.panel-title`, `.panel-chevron` and

@@ -705,7 +705,7 @@
   --btn-tertiary            : var(--white-08);
   --btn-tertiary-hover      : var(--white-14);
   --btn-tertiary-ink        : var(--ink);
-  --btn-tertiary-edge       : none;
+  --btn-tertiary-edge       : inset 0 0 0 1px var(--tile-edge);   /* the grey plate's edge (2026-10-31) */
   --btn-outline             : #FFFFFF;
   --btn-outline-hover       : var(--black-700);
   --btn-outline-ink         : var(--ink);
@@ -727,7 +727,7 @@
      lines read thinner than the dark theme's at the same 1px. Hover: --black-300 (#6A6D6C). */
   --control-edge       : #848786;
   --control-edge-hover : var(--black-300);
-  --field-edge       : var(--control-edge);
+  --field-edge       : var(--black-350);   /* a field at rest a step lighter than the controls' edge (2026-10-31; was --control-edge #848786): #989B9A, 2.8:1 on white */
   --field-edge-hover : var(--control-edge-hover);
   --field-edge-focus : var(--cyan-600);
   --choice-edge-on   : var(--cyan-600);   /* the focused field's edge on paper */
@@ -740,6 +740,11 @@
   --choice-hover     : var(--black-700);
   --choice-card      : #FFFFFF;
   --choice-card-edge : rgba(17, 18, 17, .10);
+  /* A LIGHT GREY FILL HAS AN EDGE (2026-10-31): every surface on --tile / --black-900 on paper — a row to
+     choose, the tabs' track, the tertiary button, a plate, a section's card — is drawn with a 1px line a
+     step darker than itself, so it holds against the white page. */
+  --tile-edge        : var(--black-800);
+  --choice-edge      : var(--tile-edge);
   --plate-edge       : rgba(17, 18, 17, .10);
   --choice-on        : #FFFFFF;
   --choice-plate     : var(--black-900);

@@ -56,20 +56,28 @@
     };
     var take = function (i) { var it = items[i]; if (!it) return; picked = it; input.value = it.line; input.setCustomValidity(''); open(false); onPick(it);
       input.dispatchEvent(new Event('input', { bubbles: true })); };
-    var run = function () {
-      var q = input.value.trim(); if (ctl) ctl.abort();
-      if (q.length < (opts.min || 0)) { items = []; open(false); return; }
+    /* all: the whole list, as a dropdown — a click into the field, before a letter is typed or
+       after one was taken (2026-10-31). A source that has nothing to show for no words
+       (opts.blank false — the streets) still waits for its letters. */
+    var run = function (all) {
+      var q = all ? '' : input.value.trim(); if (ctl) ctl.abort();
+      if (all ? opts.blank === false : q.length < (opts.min || 0)) { items = []; open(false); return; }
       ctl = new AbortController(); box.classList.add('is-busy');
       Promise.resolve().then(function () { return source(q, ctl.signal); }).then(function (r) { items = r; draw(); })
+        .then(function () { if (picked) items.forEach(function (it, i) { if (it.line === picked.line) mark(i); }); })   /* the one taken, marked in the full list */
         .catch(function (e) { if (e.name !== 'AbortError') { items = []; list.innerHTML = '<li class="suggest-empty">' + esc(T('Nova Poshta does not answer — try again in a minute')) + '</li>'; open(true); } })
         .then(function () { box.classList.remove('is-busy'); });
     };
     input.addEventListener('input', function (e) { if (!e.isTrusted) return;   /* our own event after a pick */
       picked = null; input.setCustomValidity(input.value.trim() ? T('Choose from the list') : ''); onPick(null);
       clearTimeout(timer); timer = setTimeout(run, 250); });
-    input.addEventListener('focus', function () { if (!picked && (opts.min === 0 || input.value.trim().length >= opts.min)) run(); });
+    /* A click or the focus opens the list (2026-10-31): the whole one when the field is empty or
+       holds a choice, the matches when something was typed and not taken. */
+    var show = function () { if (input.disabled || !list.hidden) return; run(!!picked || !input.value.trim()); };
+    input.addEventListener('focus', show);
+    input.addEventListener('click', show);
     input.addEventListener('keydown', function (e) {
-      if (list.hidden) { if (e.key === 'ArrowDown') { run(); e.preventDefault(); } return; }
+      if (list.hidden) { if (e.key === 'ArrowDown') { run(!!picked || !input.value.trim()); e.preventDefault(); } return; }
       if (e.key === 'ArrowDown') { mark(Math.min(items.length - 1, active + 1)); e.preventDefault(); }
       else if (e.key === 'ArrowUp') { mark(Math.max(0, active - 1)); e.preventDefault(); }
       else if (e.key === 'Enter') { if (active >= 0) { take(active); e.preventDefault(); } }
@@ -79,6 +87,17 @@
     list.addEventListener('click', function (e) { var li = e.target.closest('.suggest-opt'); if (li) take([].indexOf.call(list.children, li)); });
     input.addEventListener('blur', function () { setTimeout(function () { open(false); }, 120); });
     return { reset: function () { picked = null; items = []; input.value = ''; input.setCustomValidity(''); open(false); } };
+  }
+
+  /* POPULAR (2026-10-31) — what the city field lists before a letter is typed: the largest places,
+     each asked for once by its name (searchSettlements has no «all») and kept for the page. */
+  var BIG = ['Київ', 'Харків', 'Одеса', 'Дніпро', 'Львів', 'Запоріжжя', 'Вінниця', 'Полтава', 'Івано-Франківськ', 'Чернівці'], big;
+  function popular(url) {
+    if (!big) big = Promise.all(BIG.map(function (n) {
+      return call(url, 'searchSettlements', { CityName: n, Limit: '5', Page: '1' }).then(function (d) {
+        return ((d[0] && d[0].Addresses) || []).filter(function (a) { return a.MainDescription === n && a.Warehouses > 0; })[0]; }).catch(function () { return null; }); }))
+      .then(function (r) { r = r.filter(Boolean); if (!r.length) big = null; return r; });
+    return big.then(function (r) { return r.map(function (a) { return { line: a.Present, value: a }; }); });
   }
 
   function init(root) {
@@ -122,13 +141,14 @@
       if (!place) return Promise.resolve([]);
       return call(url, 'searchSettlementStreets', { StreetName: q, SettlementRef: place.Ref, Limit: '50' }, signal).then(function (d) {
         return ((d[0] && d[0].Addresses) || []).map(function (a) { return { line: a.Present, value: a.SettlementStreetRef }; }); });
-    }, function (it) { if (sref) sref.value = it ? it.value : ''; }, { min: 2, empty: T('No such street in this place — check the spelling') });
+    }, function (it) { if (sref) sref.value = it ? it.value : ''; }, { min: 2, blank: false, empty: T('No such street in this place — check the spelling') });
     hold(true);
     if (form) form.addEventListener('np-city', function (e) {   /* another row named the place: take it if this one has none */
       var p = e.detail.place; if (e.detail.from === root || !p || place) return;
       place = p; city.value = p.Present; city.setCustomValidity(''); hold(false); if (point) point.required = true; if (street) street.required = true;
     });
     var cityBox = combo(city, city.parentNode.querySelector('.suggest-list'), function (q, signal) {
+      if (!q) return popular(url);   /* nothing typed yet: the largest places, to pick with one tap */
       return call(url, 'searchSettlements', { CityName: q, Limit: '20', Page: '1' }, signal).then(function (d) {
         return ((d[0] && d[0].Addresses) || []).filter(function (a) { return a.Warehouses > 0; })
           .map(function (a) { return { line: a.Present, value: a }; }); });

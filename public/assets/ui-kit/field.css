@@ -348,6 +348,19 @@ textarea.dark-input {
   max-height: 280px; overflow-y: auto; overscroll-behavior: contain; margin: 0; padding: var(--space-4); list-style: none;
   background: var(--black-800); border: 1px solid var(--field-edge); border-radius: var(--field-radius); box-shadow: var(--shadow-md); }
 .suggest-list[hidden] { display: none; }
+[data-theme="light"] .suggest-list { border-color: var(--black-400); }   /* on paper the open list two steps lighter than a field — its shadow lifts it (2026-10-31) */
+/* THE KIT'S DROPDOWN (2026-10-31, select.js): a <select class="select"> opens this list, not the
+   browser's. The select stays in the field for the form (.select-native — focusable, not drawn);
+   button.select.select-btn is the box, the same .select with its chevron; the list is the
+   suggest list above. The empty first option is the placeholder — the faint ink, as a field's. */
+.select-native { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden; }
+.select-btn { display: flex; align-items: center; text-align: left; }
+.select-value { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.select-btn.is-placeholder { color: var(--ink-faint); }
+.select-dd.is-open .select-btn { border-color: var(--field-edge-focus); }
+.select-list .suggest-opt[aria-selected="true"] > b { font-weight: var(--weight-semibold); }
+.suggest-opt.is-disabled { opacity: .4; cursor: default; }
+.suggest-opt.is-disabled:hover { background: none; }
 .suggest-opt { display: grid; gap: var(--space-2); padding: var(--space-8) var(--space-12); border-radius: var(--radius-4); cursor: pointer; color: var(--ink); }
 .suggest-opt > b { font-size: var(--type-small); font-weight: var(--weight-medium); line-height: var(--leading-snug); }
 .suggest-opt > small { font-size: var(--type-caption); color: var(--ink-faint); line-height: var(--leading-normal); }

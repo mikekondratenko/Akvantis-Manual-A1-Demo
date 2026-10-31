@@ -722,11 +722,18 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 
 /* The stepper. */
 .order-steps { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-12); }
-.order-step { --choice-bleed: var(--space-16); scroll-margin-top: calc(var(--bar-max, 0px) + var(--bar-top, 0px) + var(--space-16)); }
+.order-step { --choice-bleed: calc(var(--space-16) - var(--hairline));   /* a row runs out to the plate's edge but stops 1px short, so the plate's own edge line stays drawn (2026-10-31) */
+   scroll-margin-top: calc(var(--bar-max, 0px) + var(--bar-top, 0px) + var(--space-16)); }
 .order-step[hidden] { display: none; }
+/* An open step lets a list out (2026-10-31): the fold clips while it moves (panel.css), and once it is
+   down a dropdown or a Nova Poshta list under a field near the step's foot drops past it, not cut. */
+.order-step .panel-fold[data-open="true"] > * { animation: order-unclip 0s linear var(--duration-slow) forwards; }
+@keyframes order-unclip { to { overflow: visible; } }
 /* On paper (2026-10-30) the step plates and the payment islands are white with a light edge (--plate-edge),
    so the grey rows and the white cards inside read against them; on dark --plate-edge is not set. */
 [data-theme="light"] .order-steps { --tile: #FFFFFF; }
+/* …but the tabs' track keeps the paper grey (2026-10-31): it reads --tile, and white on the white plate it was gone. */
+[data-theme="light"] .order-steps .segmented { --seg-track: var(--black-900); }
 [data-theme="light"] .order-step, [data-theme="light"] .order-islands > .plate { box-shadow: inset 0 0 0 1px var(--plate-edge); }
 [data-theme="light"] .order-islands > .choice:not(:has(> input:checked)) { border-color: var(--plate-edge); }
 .order-step.is-locked { opacity: .4; }
@@ -768,20 +775,24 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
    bundles close up smoothly, the cartridges open under the row that asked for them. Height,
    fade and the gap after it move together; order.js sets the height to fold from. */
 [data-alt-off], [data-alt-show] { overflow-y: clip;
+  animation: alt-unclip 0s linear var(--duration-slow) forwards;   /* clips only while it moves: down, a dropdown under a field drops out of it (2026-10-31) */
   transition: max-height var(--duration-slow) var(--ease-standard), opacity var(--duration-base), margin var(--duration-slow) var(--ease-standard), padding var(--duration-slow) var(--ease-standard); }
+@keyframes alt-unclip { to { overflow-y: visible; } }
+[data-alt-off].is-off, [data-alt-show]:not(.is-shown) { animation: none; }
 [data-alt-off].is-off { max-height: 0 !important; opacity: 0; margin-bottom: calc(-1 * var(--space-12)); padding-block: 0 !important; pointer-events: none; }
 [data-alt-show]:not(.is-shown) { max-height: 0 !important; opacity: 0; padding-bottom: 0 !important; margin-top: 0 !important; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { [data-alt-off], [data-alt-show] { transition: none; } }
 /* Counted cards: the kit's `.choice.is-count` (choice.css). */
 
 .order-row2 { display: grid; gap: var(--space-12); }
+.order-stack { display: grid; gap: var(--space-12); }   /* one field a row (2026-10-31: the pickup's city and showroom) */
 .np-pick { display: grid; gap: var(--space-12); }   /* np.js: the city, then the branch / the street — the fields' own rhythm (2026-10-29) */
 @media (min-width: 768px) { .order-row2 { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-16); } }
 
 /* The skeleton of the full order (2026-10-25): country → bundle → installation → Akvantis Club →
    delivery → contacts → payment. order.js hides what the country or a choice leaves out
    (data-country, data-when, data-when-not) — hidden is gone, whatever the element's display. */
-.order-form [hidden] { display: none !important; }
+.order-form [hidden]:not([data-leaving]) { display: none !important; }   /* [data-leaving]: a block closing as a fold, drawn until it has shut (order.js SLIDE, 2026-10-31) */
 .order-country { width: 100%; }   /* the whole width of the step, as the tabs under it (2026-10-26) */
 .order-note { margin: 0; color: var(--ink-muted); }
 .order-note > b { color: var(--ink); }
@@ -851,3 +862,8 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-dock-price .choice-was { margin: 0; font-size: var(--type-small); }
 body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--number-96) + env(safe-area-inset-bottom)); }
 /* the preview's controls over the bar: grid.css FAB ROW (2026-10-30) */
+
+/* A LIGHT GREY FILL HAS AN EDGE (2026-10-31, tokens.css --tile-edge): the section cards on paper. An
+   outline drawn inside, so a picture filling the card does not cover it. */
+[data-theme="light"] :is(.tile, .compare-pic, .sec-slides .slide, .story, .sec-reviews:not(.is-bare) .review) { outline: 1px solid var(--tile-edge); outline-offset: -1px; }
+[data-theme="light"] :is(.sec-hero, .sec-cover)::before { box-shadow: inset 0 0 0 1px var(--tile-edge); }   /* the hero's and the cover's grey sheet, too */

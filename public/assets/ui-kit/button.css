@@ -46,7 +46,7 @@
 .btn {
   position: relative;
   display: flex; align-items: center; justify-content: center; gap: calc(var(--space-8) + var(--space-2));
-  width: 100%; height: var(--control-h); padding: 0 var(--space-24);
+  width: 100%; height: var(--control-h); padding: 0 var(--space-16);   /* 16 a side (2026-10-31; was 24) */
   border-radius: var(--radius-xl); border: none;
   background: var(--btn); color: var(--btn-ink); box-shadow: var(--btn-edge, none);
   font-size: var(--control-text); font-weight: var(--weight-medium); font-family: var(--font-primary);
@@ -62,7 +62,7 @@
 .btn > svg { flex: none; width: calc(var(--number-16) + var(--space-4)); height: calc(var(--number-16) + var(--space-4)); }
 /* A chevron is drawn in the middle third of its 24 grid, so at 20 it carries ~7 px of air on each
    side: «Next ›» read 17 from the word and 31 from the edge against 24 on the other (2026-10-26).
-   It gives 6 back on both sides — 11 from the word, 25 from the edge. */
+   It gives 6 back on both sides — 11 from the word, 17 from the edge at the 16 a side (2026-10-31). */
 .btn > svg[data-icon^="chevron"] { margin-inline: calc(-1 * (var(--space-4) + var(--space-2))); }
 .btn:hover  { background: var(--btn-hover); }
 .btn:active { transform: scale(.98); }
@@ -187,12 +187,20 @@
      <button class="btn btn-circle btn-circle-md" aria-label="Next"><i data-icon="chevron-right" data-size="20"></i></button> */
 .btn.btn-circle { width: var(--number-32); height: var(--number-32); padding: 0; flex: none; border-radius: var(--radius-pill);
   --btn: var(--btn-outline); --btn-hover: var(--btn-solid); --btn-ink: var(--btn-outline-ink); --btn-edge: var(--btn-outline-edge); }
+/* FROST AT REST (2026-10-31): the circle and the round button's tertiary are the frosted plate at
+   rest and switched off — --frost-900 under a blur, the frost's hairline on the dark ground, the
+   control edge on paper (as .btn-frost) — not the outline; hover and pressed stay the solid ink. */
+.btn.btn-circle, .round-btn:not(.btn-primary, .btn-secondary) {
+  --btn: var(--frost-900); --btn-ink: var(--ink); --btn-edge: var(--frost-edge);
+  -webkit-backdrop-filter: var(--frost-blur); backdrop-filter: var(--frost-blur); }
+/* on paper the frost's own hairline, as the header wears it (2026-10-31; was the control edge — it read as the old outline) */
+[data-theme="light"] .btn.btn-circle, [data-theme="light"] .round-btn:not(.btn-primary, .btn-secondary) { --btn-edge: var(--frost-edge); }
 .btn.btn-circle.btn-circle-md { width: var(--number-40); height: var(--number-40); }
 .btn.btn-circle > svg { width: var(--number-16); height: var(--number-16); margin: 0; }
 .btn.btn-circle.btn-circle-md > svg { width: calc(var(--number-16) + var(--space-4)); height: calc(var(--number-16) + var(--space-4)); }
 /* Over a picture — `.btn-frost` on the circle: the frosted plate at rest (a story's + / play). */
 .btn.btn-circle.btn-frost { --btn: var(--frost-900); --btn-ink: var(--white); --btn-edge: var(--frost-edge); }
-[data-theme="light"] .btn.btn-circle.btn-frost { --btn-edge: inset 0 0 0 1px var(--control-edge); }
+[data-theme="light"] .btn.btn-circle.btn-frost { --btn-edge: var(--frost-edge); }
 .btn.btn-circle:hover:not(:disabled), .btn.btn-circle[data-state="hover"] { background: var(--btn-solid); color: var(--btn-solid-ink); box-shadow: none; }
 .btn.btn-circle:active:not(:disabled), .btn.btn-circle[data-state="active"] { background: var(--btn-solid); color: var(--btn-solid-ink); box-shadow: none; transform: scale(.94); }
 

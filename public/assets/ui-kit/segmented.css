@@ -30,14 +30,14 @@
 }
 .segmented-thumb {
   position: absolute; top: var(--space-4); left: var(--space-4); bottom: var(--space-4);
-  background: var(--seg-thumb); border-radius: var(--radius-16);
+  background: var(--seg-thumb); border-radius: calc(var(--radius-16) - var(--space-4));   /* the inner radius: the track's 16 less its 4 inset = 12, concentric (2026-10-31; was 16) */
   transition: transform var(--duration-base) var(--ease-standard);
   z-index: 1;
 }
 .segment-btn {
   position: relative; z-index: 2; flex: 1;
   display: flex; align-items: center; justify-content: center; gap: var(--space-8);
-  border: none; background: transparent; border-radius: var(--radius-16);
+  border: none; background: transparent; border-radius: calc(var(--radius-16) - var(--space-4));
   color: var(--ink-muted); cursor: pointer;
   font-size: var(--control-text); font-weight: var(--weight-medium); font-family: var(--font-primary);
   transition: color var(--duration-fast); padding: 0 var(--space-16); text-align: center;
@@ -69,7 +69,7 @@
 /* BRAND (2026-10-26): `.segmented.is-brand` (order.js, from data-tab-color / data-logo-on) — the chosen
    plate is the brand's own colour (monobank black, PrivatBank green) and the chosen logo its one-colour
    white file (.is-on); the plate changes colour as it slides. The others stay as TALL draws them. */
-.segmented.is-brand .segmented-thumb { transition: transform var(--duration-base) var(--ease-standard), background var(--duration-base) var(--ease-standard); box-shadow: none; }
+.segmented.is-brand .segmented-thumb { transition: transform var(--duration-base) var(--ease-standard), background var(--duration-base) var(--ease-standard); }   /* keeps the light theme's shadow (2026-10-31; it had none) */
 .segment-logo > .is-on { display: none; }
 .segment-btn.is-active .segment-logo > .is-on { display: block; }
 .segment-btn.is-active .segment-logo:has(> .is-on) > :not(.is-on) { display: none; }
@@ -131,3 +131,4 @@
   --seg-thumb: var(--page);
 }
 [data-theme="light"] .segmented-thumb { box-shadow: var(--shadow-sm); }
+[data-theme="light"] .segmented:not(:where(.fab-row *)) { box-shadow: inset 0 0 0 1px var(--tile-edge); }   /* the track's edge on paper (2026-10-31); not in the corner row, which is its own frosted plate */

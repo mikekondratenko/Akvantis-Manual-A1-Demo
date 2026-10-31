@@ -4,7 +4,7 @@
      .choice.is-count > … .stepper > [data-step="-1"] · input[type=number] · [data-step="1"]
        − / + step the count within the input's min…max (0…20 if unset); the end of the range
        dims its button; a tap on the card (not on the stepper), or Enter / Space on it, takes
-       one or puts it back; the counter shows only while the count is over 0;
+       one or puts it back; untaken, the counter shows a dimmed 1 and is off (2026-10-31);
        the card is `.is-on` while the count is over 0. Each change fires `input` on the field
        (it bubbles), so a form listening for input recounts.
      Choice.sync(root)   re-reads the counts after a script set a value itself.
@@ -37,7 +37,13 @@
       var i = c.querySelector('input[type=number]'); if (!i) return;
       var v = +i.value || 0, m = lim(i);
       c.classList.toggle('is-on', v > 0);
-      $$(c, '[data-step]').forEach(function (b) { b.disabled = +b.dataset.step < 0 ? v <= m[0] : v >= m[1]; });
+      /* Not taken (2026-10-31): the counter shows a dimmed 1 — what a tap brings — and is off:
+         the field empty with «1» as its placeholder (an empty count is 0 to the form and the
+         server), read-only, out of the Tab order, both buttons off; the card takes the tap. */
+      if (!v && i.value !== '') i.value = '';
+      if (!i.placeholder) i.placeholder = '1';
+      i.readOnly = !v; i.tabIndex = v ? 0 : -1;
+      $$(c, '[data-step]').forEach(function (b) { b.disabled = !v || (+b.dataset.step < 0 ? v <= m[0] : v >= m[1]); });
     });
   }
   function set(i, v) { var m = lim(i); i.value = Math.max(m[0], Math.min(m[1], v)); i.dispatchEvent(new Event('input', { bubbles: true })); sync(i.closest('.choice')); }
@@ -45,8 +51,8 @@
     cards(root).forEach(function (c) {
       if (c.__choice) return; c.__choice = true;
       var i = c.querySelector('input[type=number]'); if (!i) return;
-      c.addEventListener('click', function (e) { if (e.target.closest('.stepper')) return; set(i, +i.value > 0 ? 0 : 1); });
-      /* The counter is hidden at 0, so the card itself takes the keyboard: Enter / Space = a tap. */
+      c.addEventListener('click', function (e) { if (e.target.closest('.stepper') && c.classList.contains('is-on')) return; set(i, +i.value > 0 ? 0 : 1); });
+      /* The counter is off at 0, so the card itself takes the keyboard: Enter / Space = a tap. */
       if (!c.hasAttribute('tabindex')) c.setAttribute('tabindex', '0');
       c.setAttribute('role', 'button');
       c.addEventListener('keydown', function (e) {

@@ -92,23 +92,24 @@
 .choice > :is(.ui-radio, .ui-checkbox):not(:checked):not(:indeterminate) { border-color: var(--field-edge); background-color: transparent; }
 
 .choice-pics { display: flex; justify-content: center; align-items: flex-end; gap: var(--space-8); width: 100%; margin-bottom: var(--space-8); }
-/* A picture is a square of --choice-pic (80 by default, 2026-10-25), the product drawn whole
+/* A picture is a square of --choice-pic (116 everywhere, 2026-10-31; was 80), the product drawn whole
    inside it (contain) — the same size in every card, two or three side by side. */
-.choice { --choice-pic: var(--number-80); }
+.choice { --choice-pic: 116px; }
 .choice-pic { display: block; flex: none; width: var(--choice-pic); height: var(--choice-pic); object-fit: contain; border-radius: var(--radius-12); }
 
 .choice-grid, .choice-list { display: grid; gap: var(--space-12); min-width: 0; }
+.choice-grid { --choice-gap: var(--space-8); gap: var(--choice-gap); }   /* cards stand 8 apart (2026-10-31; rows keep 12) */
 .choice-grid.is-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .choice-grid.is-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 /* A row that scrolls sideways (2026-10-25, mobile first): one whole card and 60 % of the next —
    width = (row − gap) / 1.6. `.choice-scroll` always; a `.choice-grid` becomes one on a phone.
-   From 768 a `.choice-scroll` shows three and a peek of the fourth. */
+   From 768 a `.choice-scroll` shows three, the width of a `.choice-grid.is-3` card (2026-10-31). */
 /* Never narrower than --choice-min (224, 2026-10-25): the longest cartridge name, «I · Sediment +
    Carbon», is 179 at 16 — with the card's 16 + 16 and its edge it needs 213, so every name sits
    on one line; on a phone that leaves a little over half of the next card in view. */
 .choice-scroll { --choice-min: var(--number-224); grid-auto-flow: column; grid-auto-columns: max(var(--choice-min), calc((100% - var(--space-12)) / 1.6)); }
-@media (min-width: 768px) { .choice-scroll { grid-auto-columns: max(var(--choice-min), calc((100% - var(--space-12) * 2) / 3 - var(--space-16))); } }
+@media (min-width: 768px) { .choice-scroll { grid-auto-columns: max(var(--choice-min), calc((100% - var(--choice-gap) * 2) / 3)); } }   /* three, as .choice-grid.is-3 — one width for every card (2026-10-31); the rest is a scroll away */
 /* On a phone a card is exactly 3 of the page's 6 modules (2026-10-25) — measured on the page's
    grid (the viewport), not on its holder, so a card lines up with the columns: 179 at 390. */
 @media (max-width: 767px) {
@@ -123,7 +124,7 @@
 /* `--choice-bleed`: how far the row runs out past its column on a phone — set it to the
    holder's inner padding and the cards slide out to the holder's edge, not clipped short of it
    (the order form's step: 16). The first card still starts on the column. */
-.choice-scroll { display: grid; gap: var(--space-12); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.choice-scroll { --choice-gap: var(--space-8); display: grid; gap: var(--choice-gap); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .choice-scroll::-webkit-scrollbar { display: none; }
 /* Not cut by the holder (2026-10-26): a scrolling row runs out to the holder's edge on every width,
    --choice-bleed past its column (the order step: 16), its first card still on the column. */
@@ -142,8 +143,8 @@
 .choice-group:not(.is-pick) > :not(.choice) { margin-top: var(--space-12); }
 .choice-group.is-pick > .choice.is-row { background: none; border: 0; box-shadow: none; }
 /* A card inside the group shows its own choice like any card (2026-10-25: several can be taken
-   at once, so each says so) — the accent edge, white on paper; the rest plain. */
-.choice-group .choice:not(.is-row):not(.is-on) { border-color: transparent; box-shadow: none; }
+   at once, so each says so) — the accent edge; untaken, the card's own light edge, as everywhere. */
+/* (2026-10-31) every card keeps its edge, in a group too — the rule that took it off is gone. */
 
 /* AN OPTION WITH A MARK (2026-10-26) — a delivery: the carrier's sign, what and when, the price.
    The input is hidden like a card's; the chosen edge is the choice. */
@@ -169,7 +170,22 @@
 .choice-group.is-pick:has(> .choice > input:checked) { background: var(--choice-on, var(--choice)); border-color: var(--choice-edge-on); box-shadow: inset 0 0 0 0.8px var(--choice-edge-on); }
 .choice-group.is-pick > .choice-more { display: grid; gap: var(--space-12); margin: 0; padding: 0 var(--space-16) var(--space-16); }   /* no inset plate (2026-10-26): the fields sit on the chosen plate itself */
 [data-theme="light"] .choice-group.is-pick > .choice-more :is(.dark-input, .select) { background-color: #FFFFFF; }
-.choice-group.is-pick:not(:has(> .choice > input:checked)) > .choice-more { display: none; }   /* asks only once chosen */
+/* It OPENS LIKE THE ACCORDION (2026-10-31): the plate's second row goes 0fr → 1fr on the fold's
+   duration and curve (panel.css .panel-fold) — not shown at once. Closed, the question is there but
+   0 high, unseen and out of the Tab order (visibility, flipped once the fold has shut); its
+   [hidden] (order.js data-when) only collapses it here, so it can animate both ways. Open, once
+   the fold is down, it stops clipping — the Nova Poshta city list drops out under its field. */
+.choice-group.is-pick { grid-template-rows: auto 0fr;
+  transition: grid-template-rows var(--duration-slow) var(--ease-standard), background var(--duration-fast), border-color var(--duration-fast); }
+.choice-group.is-pick:has(> .choice > input:checked) { grid-template-rows: auto 1fr; }
+.choice-group.is-pick > .choice-more, .choice-group.is-pick > .choice-more[hidden] { display: grid; align-content: start; min-height: 0; overflow: hidden;
+  padding-bottom: 0; visibility: hidden;
+  transition: padding-bottom var(--duration-slow) var(--ease-standard), visibility 0s linear var(--duration-slow); }
+.choice-group.is-pick:has(> .choice > input:checked) > .choice-more { padding-bottom: var(--space-16); visibility: visible;
+  transition: padding-bottom var(--duration-slow) var(--ease-standard), visibility 0s;
+  animation: choice-unclip 0s linear var(--duration-slow) forwards; }
+@keyframes choice-unclip { to { overflow: visible; } }
+@media (prefers-reduced-motion: reduce) { .choice-group.is-pick, .choice-group.is-pick > .choice-more { transition: none; } .choice-group.is-pick:has(> .choice > input:checked) > .choice-more { animation: none; overflow: visible; } }
 
 /* A COUNTED CARD (2026-10-25): a card with a .stepper at its foot. */
 /* The layout (2026-10-29): 24 inside; the picture 116 at the top; the name right under it — the
@@ -178,17 +194,22 @@
    second line in a counted card: the name says it. The price and the count stand in the last block
    (.choice-foot): the price always the last row, the counter over it once the card is taken; the
    block keeps the room for both from the start (the card is that much taller), so nothing moves. */
-.choice.is-count { --choice-pic: var(--number-116, 116px); padding: var(--space-24); }
-.choice.is-count > .choice-pics { padding-bottom: var(--space-16); }
+/* ONE CARD, ONE SIZE (2026-10-31): a set card and a counted card are the same box — 24 inside, the
+   picture 116 with 16 under it, the same width in a grid and in a row that scrolls. */
+.choice:not(.is-row) { padding: var(--space-24); }
+.choice:not(.is-row) > .choice-pics { padding-bottom: var(--space-16); }
 .choice.is-count > .choice-foot { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: var(--space-4);
   min-height: calc(var(--number-24) + var(--space-4) + var(--number-48)); margin-top: auto; padding-top: var(--space-8); }   /* the counter (48), the price under it; the room is kept, so nothing moves */
 .choice.is-count > .choice-foot > .stepper { order: -1; }   /* the price is always the card's last row */
 /* The count is the kit's counter, `.stepper.is-bare` (field.css): no box, the number close to
    its − / +. Here it only sits at the card's foot. */
 .choice.is-count .stepper { align-self: center; cursor: default; }
-/* Hidden until the card is taken (2026-10-25): at 0 the counter keeps its place but is not
-   shown — a tap on the card (or Enter / Space on it) takes one and brings it in. */
-.choice.is-count:not(.is-on) .stepper { display: none; }
+/* Shown from the start, off until the card is taken (2026-10-31; was hidden): it shows a 1 —
+   the placeholder, what a tap brings (choice.js) — at the disabled .4, and lets the tap through
+   to the card. Taken, it is the plain counter at 1. */
+.choice.is-count:not(.is-on) .stepper { opacity: .4; pointer-events: none; }
+.choice.is-count .stepper .dark-input::placeholder { color: var(--ink); opacity: 1; }
+.choice.is-count:not(.is-on) .stepper-btn:disabled { opacity: 1; }   /* one dimming, the stepper's — not the button's on top of it */
 .choice.is-count .stepper { transition: opacity var(--duration-fast); }
 .choice.is-count:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
 
@@ -231,3 +252,22 @@
 .custom-inks .pair-name { font-size: var(--type-small); color: var(--ink-muted); }
 .custom-pop .dark-input.is-error { box-shadow: inset 0 0 0 1px var(--danger); }
 
+/* ══ A ROW OF CARDS ON A PHONE (2026-10-31, mobile first — 375 is the reference) ══
+   Two cards and a piece of the third in view: a card is the row's width (its holder + the bleed it
+   runs out into) over 2.3 — 142 at 375 in the order form. The cards stand flush, one strip: no gap,
+   no rounding between them, a 1px divider where two meet (the shared edge — each card laps the one
+   before by 1px), the strip's ends rounded. 12 inside instead of 24, so the picture keeps its 116.
+   A card taken lifts over its neighbours, so its accent edge is whole. */
+@media (max-width: 767px) {
+  .choice-grid.is-3, .choice-grid.is-2, .choice-scroll { --choice-gap: 0px; gap: 0;
+    grid-auto-columns: calc((100% + var(--choice-bleed, 0px)) / 2.3); }
+  :is(.choice-grid, .choice-scroll) > .choice { --choice-pic: 116px; padding: var(--space-12); border-radius: 0;
+    border-color: var(--choice-card-edge, var(--rule)); }
+  :is(.choice-grid, .choice-scroll) > .choice + .choice { margin-left: -1px; }
+  :is(.choice-grid, .choice-scroll) > .choice:first-child { border-radius: var(--radius-16) 0 0 var(--radius-16); }
+  :is(.choice-grid, .choice-scroll) > .choice:last-child { border-radius: 0 var(--radius-16) var(--radius-16) 0; }
+  :is(.choice-grid, .choice-scroll) > .choice:is(.is-on, :has(> input:checked)) { position: relative; z-index: 1; border-color: var(--choice-edge-on); }
+  .choice.is-count { padding: var(--space-12); }
+  .choice-pic { max-width: 100%; }
+  .choice-finish .pair-row { flex-wrap: wrap; justify-content: center; row-gap: var(--space-8); }   /* five finishes in a 144 card: two lines, not out over the next card */
+}

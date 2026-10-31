@@ -456,7 +456,7 @@ a { color: inherit; }
 }
 .iconseg-thumb {
   position: absolute; top: var(--space-4); left: var(--space-4); bottom: var(--space-4);
-  background: var(--seg-thumb); border-radius: var(--radius-16);
+  background: var(--seg-thumb); border-radius: calc(var(--radius-16) - var(--space-4));   /* concentric: 16 less the 4 inset (2026-10-31) */
   transition: transform var(--duration-base) var(--ease-standard);
   z-index: 1;
 }
@@ -714,8 +714,8 @@ a { color: inherit; }
   cursor: pointer;
   transition: background var(--duration-fast), color var(--duration-fast), transform var(--duration-instant);
 }
-/* Its tertiary is the outline: white with the control edge on paper (2026-10-25). */
-.round-btn:not(.btn-primary, .btn-secondary) { --btn: var(--btn-outline); --btn-hover: var(--btn-outline-hover); --btn-ink: var(--btn-outline-ink); --btn-edge: var(--btn-outline-edge); }
+/* Its tertiary is frost at rest (2026-10-31; was the outline) — the rule is button.css «FROST AT REST»,
+   with the circle's, so the two read as one. */
 .round-btn[hidden] { display: none; }
 .round-btn svg { display: block; }
 /* Under the cursor it is simply the solid ink (2026-10-25) — black on paper, white on the dark

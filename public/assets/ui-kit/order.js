@@ -67,6 +67,32 @@
   var ICON = '<i data-icon="circle-alert" data-size="13"></i>';
   var $$ = function (r, s) { return [].slice.call(r.querySelectorAll(s)); };
   var acc = function (b, on) { if (window.Accordion) Accordion.set(b, on); };
+  /* SLIDE (2026-10-31) — a block the form shows or hides opens and closes as the accordion does
+     (panel.css .panel-fold: --duration-slow on --ease-standard): its height, its padding and the
+     gap it holds in its grid run from nothing to what they are, and back. [hidden] is set at once —
+     the rest of this file reads it the same moment — and a block on its way out is kept drawn by
+     an inline display until it has shut. Not animated: an inline thing (a span in a line), a row's
+     question (choice.css animates .choice-more itself), anything not on screen, reduced motion. */
+  var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var slide = function (el, show, now) {
+    if (el.hidden === !show) return;
+    if (el.__slide) el.__slide.cancel();
+    var parent = el.parentElement, was = !el.hidden && el.getClientRects().length ? getComputedStyle(el).display : '';
+    el.hidden = !show;
+    if (now || still || !parent || !parent.getClientRects().length || el.matches('.choice-group.is-pick > .choice-more')) return;
+    if (!show && !was) return;   /* it was not on screen: nothing to close */
+    if (!show) { el.style.display = was; el.setAttribute('data-leaving', ''); }   /* drawn while it shuts */
+    var cs = getComputedStyle(el); if (/^(inline|contents|none|table-row)/.test(cs.display)) { el.style.display = ''; el.removeAttribute('data-leaving'); return; }
+    var pcs = getComputedStyle(parent), gap = /grid|flex/.test(pcs.display) ? parseFloat(pcs.rowGap) || 0 : 0;
+    var full = { height: el.offsetHeight + 'px', paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, marginBottom: cs.marginBottom, opacity: 1 };
+    var none = { height: '0px', paddingTop: '0px', paddingBottom: '0px', marginBottom: 'calc(' + cs.marginBottom + ' - ' + gap + 'px)', opacity: 0 };
+    var root = getComputedStyle(document.documentElement);
+    var ms = parseFloat(root.getPropertyValue('--duration-slow')) || 280, ease = root.getPropertyValue('--ease-standard').trim() || 'cubic-bezier(.4, 0, .2, 1)';
+    el.style.overflow = 'hidden';
+    var a = el.__slide = el.animate(show ? [none, full] : [full, none], { duration: ms, easing: ease });
+    var end = function () { el.style.overflow = ''; if (!show) { el.style.display = ''; el.removeAttribute('data-leaving'); } if (el.__slide === a) el.__slide = null; };
+    a.onfinish = end; a.oncancel = end;
+  };
 
   function init(form) {
     var lang = document.documentElement.lang || 'en';
@@ -117,6 +143,7 @@
       return bits.join(' · ');
     };
 
+    var ready = false;   /* the first pass draws the form as it is — nothing slides in on load */
     function update() {
       var on = !!(alt && alt.checked);
       /* Fold / unfold: the height is set from the content, the class runs the transition
@@ -138,14 +165,14 @@
           if (off && i.checked && i.type === 'radio') { i.checked = false;
             var to = $$(form, 'input[name="' + i.name + '"]').filter(live)[0]; if (to) to.checked = true; } }); });
       var again = false, whens = function () {
-      $$(form, '[data-when]').forEach(function (g) { g.hidden = !cond(g.dataset.when); });
+      $$(form, '[data-when]').forEach(function (g) { slide(g, cond(g.dataset.when), !ready); });
       /* an option a choice rules out: disabled; taken, the select moves to the first one left */
       $$(form, 'option[data-off-when]').forEach(function (o) { o.disabled = cond(o.dataset.offWhen);
         if (o.dataset.base == null) o.dataset.base = o.textContent;   /* data-off-note follows the name only while it is off */
         o.textContent = o.dataset.base + (o.disabled && o.dataset.offNote ? ' — ' + o.dataset.offNote : '');
         var sel = o.parentNode.closest('select') || o.parentNode;
         if (o.disabled && o.selected) { var to = [].filter.call(sel.options, function (x) { return !x.disabled; })[0]; if (to) sel.value = to.value; } });
-      $$(form, '[data-when-not]').forEach(function (g) { g.hidden = cond(g.dataset.whenNot); });
+      $$(form, '[data-when-not]').forEach(function (g) { slide(g, !cond(g.dataset.whenNot), !ready); });
       /* what is hidden so is not sent either: its fields go disabled (out of the FormData) */
       $$(form, '[data-when] :is(input, select, textarea), [data-when-not] :is(input, select, textarea)').forEach(function (i) {
         if (i.closest('[hidden]')) { if (!i.disabled) { i.disabled = true; i.dataset.whenOff = ''; } }
@@ -228,7 +255,8 @@
       var rs = $$(g, 'input[type=radio]'), host = document.createElement('div'); g.appendChild(host);
       if (!window.Kit || !Kit.segmented) return;
       /* <label data-logo="../logos/monobank" data-logo-h="20"> → the tab is that logo (-dark / -light .svg), no words,
-         and the track is the tall one (segmented.css TALL) — the bank of a plan in parts (2026-10-26) */
+         on the standard 48 track (2026-10-31; was always the tall one) — the bank of a plan in parts; .order-seg[data-tall]
+         asks for the 64 (segmented.css TALL) */
       var logos = rs.some(function (r) { return r.parentNode.dataset.logo; });
       var btns = Kit.segmented(host, rs.map(function (r) { var l = r.parentNode, ic = l.dataset.icon, lg = l.dataset.logo;   /* <label data-icon="truck"> → the tab's icon (icons.js) */
           return { label: lg ? '' : l.textContent.trim(), value: r.value,
@@ -237,7 +265,7 @@
               : ic && window.KitIcons ? KitIcons.svg(ic, { size: 20 }) : null }; }),
         Math.max(0, rs.findIndex(function (r) { return r.checked; })),
         function (v, i) { rs[i].checked = true; rs[i].dispatchEvent(new Event('change', { bubbles: true })); });
-      if (logos) { host.classList.add('is-tall'); btns.forEach(function (b, i) { b.setAttribute('aria-label', rs[i].parentNode.textContent.trim()); }); }
+      if (logos) { if ('tall' in g.dataset) host.classList.add('is-tall'); btns.forEach(function (b, i) { b.setAttribute('aria-label', rs[i].parentNode.textContent.trim()); }); }
       /* BRAND TABS (2026-10-26): <label data-tab-color="#000000" data-logo-on="…-white.svg"> — chosen, the plate
          under the tab takes the brand's colour and the logo its one-colour version (segmented.css BRAND) */
       if (rs.some(function (r) { return r.parentNode.dataset.tabColor; })) {
@@ -301,7 +329,7 @@
 
     form.addEventListener('change', function () { steps().forEach(function (s) { if (passes(s)) hint(s, ''); }); update(); lock(); });
     form.addEventListener('input', function () { steps().forEach(function (s) { if (passes(s)) hint(s, ''); }); update(); });
-    update(); lock();
+    update(); lock(); ready = true;
 
     /* send */
     var send = form.querySelector('[type=submit]'), notice = form.querySelector('.notice'), sendTxt = send ? word(send).textContent : '';
@@ -457,8 +485,8 @@
           line.innerHTML = '<i data-icon="' + (kind === 'success' ? 'circle-check' : 'circle-alert') + '" data-size="13"></i>' + esc(msg); box.appendChild(line);
           if (window.KitIcons && KitIcons.render) KitIcons.render(line); }
       };
-      open.addEventListener('click', function () { open.hidden = true; row.hidden = false; f.focus(); });
-      close.addEventListener('click', function () { row.hidden = true; open.hidden = false; f.value = ''; state(''); take(''); open.focus(); });
+      open.addEventListener('click', function () { slide(open, false); slide(row, true); f.focus(); });   /* the link gives way to the field, as a fold (2026-10-31) */
+      close.addEventListener('click', function () { slide(row, false); slide(open, true); f.value = ''; state(''); take(''); open.focus(); });
       f.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); apply.click(); } });
       f.addEventListener('input', function () { if (field.classList.contains('is-error')) state(''); });
       apply.addEventListener('click', function () {
