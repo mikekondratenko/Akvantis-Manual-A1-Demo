@@ -170,10 +170,11 @@ window.MANUAL_TEXTS = {
     "service": [
       { "en": "Close inlet valve", "de": "Zulaufventil schließen", "uk": "Закрийте вхідний клапан" },
       { "en": "Open faucet until water stops", "de": "Hahn öffnen, bis kein Wasser mehr fließt", "uk": "Відкрийте кран, доки не стече вода" },
+      { "en": "Press Power to turn off", "de": "Power drücken zum Ausschalten", "uk": "Натисніть Power, щоб вимкнути" },
       { "en": "Release old filter", "de": "Alte Kartusche entriegeln", "uk": "Вивільніть старий картридж" },
       { "en": "Insert new filter until click", "de": "Neue Kartusche einsetzen, bis sie einrastet", "uk": "Вставте новий картридж до клацання" },
-      { "en": "Open valve & faucet", "de": "Ventil & Wasserhahn öffnen", "uk": "Відкрийте клапан і кран" },
-      { "en": "Hold 3 s to reset", "de": "Zum Zurücksetzen 3 s halten", "uk": "Утримуйте 3 с для скидання" }
+      { "en": "Press Power to turn on", "de": "Power drücken zum Einschalten", "uk": "Натисніть Power, щоб увімкнути" },
+      { "en": "Hold I / II 3 s to reset", "de": "I / II 3 s halten zum Zurücksetzen", "uk": "Утримуйте I / II 3 с для скидання" }
     ],
     "troubleshooting": [
       { "en": "Issue", "de": "Problem", "uk": "Проблема" },

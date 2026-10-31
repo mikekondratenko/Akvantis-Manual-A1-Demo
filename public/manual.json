@@ -1349,9 +1349,18 @@
               "art": "assets/art/cards/p16-3.webp",
               "x": 0,
               "y": 519,
-              "w": 736,
+              "w": 299,
               "h": 507,
               "n": 3,
+              "caption": "Press Power to turn off"
+            },
+            {
+              "art": "assets/art/cards/p16-4.webp",
+              "x": 312,
+              "y": 519,
+              "w": 424,
+              "h": 507,
+              "n": 4,
               "caption": "Release old filter"
             }
           ]
@@ -1368,27 +1377,45 @@
               "x": 0,
               "y": 0,
               "w": 736,
-              "h": 506,
-              "n": 4,
+              "h": 333,
+              "n": 5,
               "caption": "Insert new filter until click"
             },
             {
               "art": "assets/art/cards/p17-2.webp",
               "x": 0,
-              "y": 519,
+              "y": 347,
               "w": 362,
-              "h": 507,
-              "n": 5,
-              "caption": "Open valve & faucet"
+              "h": 333,
+              "n": 6,
+              "caption": "Open inlet valve"
             },
             {
               "art": "assets/art/cards/p17-3.webp",
               "x": 374,
-              "y": 519,
+              "y": 346,
               "w": 362,
-              "h": 507,
-              "n": 6,
-              "caption": "Hold 3 s to reset"
+              "h": 334,
+              "n": 7,
+              "caption": "Press Power to turn on"
+            },
+            {
+              "art": "assets/art/cards/p17-4.webp",
+              "x": 0,
+              "y": 693,
+              "w": 486,
+              "h": 333,
+              "n": 8,
+              "caption": "Open faucet"
+            },
+            {
+              "art": "assets/art/cards/p17-5.webp",
+              "x": 499,
+              "y": 692,
+              "w": 237,
+              "h": 334,
+              "n": 9,
+              "caption": "Hold I / II 3 s to reset"
             }
           ]
         }
