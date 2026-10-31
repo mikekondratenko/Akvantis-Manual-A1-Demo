@@ -2,6 +2,9 @@
    Foot — the last lines of a page: social marks and the legal line (2026-10-10)
 
    Moved out of passport.css so the landing can use it alone. Requires tokens.css.
+
+   RULE — THE COPYRIGHT ENDS ON THE CURRENT YEAR (2026-10-31): `© Akvantis 2001 — <span data-year>2026</span>`,
+   the year set by the page to `new Date().getFullYear()`, never typed and left. docs/DESIGN.md «Copyright».
    ───────────────────────────────────────────────────────────────────────────── */
 
 /* ── FOOT ── */

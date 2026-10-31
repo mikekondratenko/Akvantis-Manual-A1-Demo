@@ -1283,3 +1283,53 @@ html.anim .wrap > .geo-note { opacity: 1; transform: none; transition-delay: 0s;
   .geo-note .alert { flex-wrap: nowrap; border-radius: var(--radius-24); }
   .geo-note .alert:has(.alert-action) .alert-action.btn { width: auto; }
 }
+
+/* ══════════════ OFFERS — THE ROWS THAT OPEN (2026-10-31) ══════════════
+   Purchase Filters, Faucets, Accessories and Service open, as the warranty does (the kit's collapsible
+   plate), onto the A1 form's own cards (choice.css). Open, the row comes apart into ISLANDS 8 apart —
+   the strip, the filter, the cards; the strip, the services, the form — each its own plate. The cards
+   fill their island edge to edge, two a row, no gap and no corners, a hairline between them (each
+   card's own); a lone last card stays on the left — never centred, never widened. */
+.plate.pp-fold { padding: 0; background: none; overflow: visible; }
+.pp-fold > button.panel-title.card {
+  width: 100%; margin: 0; min-height: var(--number-64); padding: var(--space-12) var(--space-16);
+  justify-content: flex-start; border-radius: var(--radius-16); background: var(--tile); color: inherit;
+  font-size: inherit; font-weight: inherit; letter-spacing: inherit; overflow: hidden;
+}
+.pp-fold > button.panel-title.card[aria-expanded="true"] { border-radius: var(--radius-16); }
+.pp-fold > button.panel-title.card:hover { background: var(--tile-hover); }
+.pp-fold > button.panel-title .card-body { flex: 1; min-width: 0; }
+.pp-fold > button.panel-title .panel-chevron { flex: none; margin-left: auto; }
+.pp-fold .panel-body { gap: var(--space-8); padding: var(--space-8) 0 0; }   /* islands 8 apart (2026-10-31, settled)*/
+.pp-fold .panel-fold > * > :first-child { margin-top: 0; }
+/* an island */
+.pp-chips, .pp-offers, .pp-fold .choice-list, .pp-svc { border-radius: var(--radius-16); background: var(--tile); overflow: hidden; }
+/* the cards are the kit's FLUSH grid (choice.css .choice-grid.is-flush) on the page's island colour */
+.pp-fold .choice-grid.is-flush { background: var(--tile); box-shadow: none; }
+.pp-fold .choice-grid.is-flush > a.choice:hover { background: var(--tile-hover); }
+.pp-offers > .pp-offer > b:not(.choice-name) { font-size: var(--text-14); }
+.pp-offers > .pp-offer > .choice-name { font-size: var(--text-28); }   /* the lockup at ~20 (.72em), as in the A1 form — the page has no type.css, so --type-h3 is not there */
+/* the filter over the accessories */
+.pp-chips { display: flex; gap: var(--space-8); padding: var(--space-12); overflow-x: auto; scrollbar-width: none; }
+.pp-chips::-webkit-scrollbar { display: none; }
+.pp-chip { flex: none; height: var(--number-32); padding: 0 var(--space-12); border: 0; border-radius: var(--radius-pill);
+  background: var(--white-08); color: var(--ink-muted); font: inherit; font-size: var(--text-12); font-weight: var(--weight-medium); cursor: pointer; }
+.pp-chip[aria-pressed="true"] { background: var(--ink); color: var(--page); }
+/* SERVICE — two options as the A1 form's delivery (choice.css PICK), each its own island; chosen, it opens
+   onto its city, the reader's phone, «Call me back» and «Call». */
+.pp-fold .choice-group.is-pick.pp-svc { background: var(--tile); }
+/* The request form (2026-10-31): the fields one under another, 12 apart, as the kit's .choice-more;
+   sent, it gives way to a short thank-you on the same plate. */
+.pp-svc-form { display: grid; gap: var(--space-12); margin: 0; }
+.pp-svc-form textarea.dark-input { min-height: calc(var(--number-48) * 2); resize: vertical; }
+.pp-svc-form .pp-cb[aria-busy="true"] { opacity: .6; }
+.pp-svc-done { display: grid; gap: var(--space-4); padding: var(--space-4) 0; }
+.pp-svc-form[hidden], .pp-svc-done[hidden] { display: none; }
+.pp-svc-done > b { font-size: var(--text-16); font-weight: 500; color: var(--ink); }
+.pp-svc-done > p { margin: 0; font-size: var(--text-14); color: var(--ink-muted); }
+.pp-svc-act { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-8); }
+.pp-svc-act > .btn { width: 100%; }
+.pp-call[aria-disabled="true"] { opacity: .25; pointer-events: none; }
+.pp-svc-note { margin: 0; font-size: var(--text-12); color: var(--ink-muted); }
+.pp-svc-note.is-ok { color: var(--success, var(--ink)); }
+.pp-svc-note.is-err { color: var(--danger, var(--ink)); }
