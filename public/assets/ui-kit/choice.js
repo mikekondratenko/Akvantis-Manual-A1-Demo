@@ -28,6 +28,8 @@
        row the buyer can change. data-finish-of="<row's data-device>" on any picture in the page,
        with data-finish-tpl="…/a1-pcb-i{f}-front.webp": the row writes its finish's img into {f}
        ("" or "-bk") — pictures that are not in the row's card (the cartridge cards).
+       data-by="<radio name>" on a row: it draws nothing and takes its finish from that radio group —
+       the order form's own Colour step (the A1's, before the bundle) sets every card's A1 at once.
        A counter card may carry a row too (the cartridges: White · Black, data-follows="A1") — its
        picture is the card's [data-device-pic], its label goes on the card, the count stays as it is.
 
@@ -124,12 +126,16 @@
       discs.setAttribute('role', 'radiogroup'); discs.setAttribute('aria-label', d.code + ' finish');
       var name = document.createElement('span'); name.className = 'pair-name';
       var single = list.length < 2;
-      if (single) row.classList.add('is-single');
+      /* data-by="a1_colour" (2026-11-03): the row is set from a radio group elsewhere in the form (a step of
+         its own — the machine's colour first), so it draws nothing; it still turns the card's picture, writes
+         its field and leads the rows that follow it */
+      var by = row.dataset.by;
+      if (single || by) row.classList.add('is-single');
       var pick = function (fid, quiet) {
         $$(discs, '.swatch-btn').forEach(function (b) { var on = b.dataset.id === fid; b.classList.toggle('is-active', on); b.setAttribute('aria-checked', on); });
         var label = (cols[fid] || {}).label || fid; name.textContent = label;   /* a finish's name is its own, English on every version (2026-11-03) — not through the page's language */
         if (field) field.value = fid;
-        row.__label = single ? '' : label;
+        row.__label = single || by ? '' : label;   /* a row set from elsewhere (data-by) says nothing: its step says it */
         if (card) card.dataset.finishLabel = $$(card, '.choice-finish').map(function (r) { return r.__label || ''; }).filter(Boolean).join(' · ');
         var img = card && card.querySelector('[data-device-pic="' + d.code + '"]'), file = d.imgs && d.imgs[fid];
         if (img && file && row.dataset.src) img.src = row.dataset.src.replace('{img}', file);
@@ -157,6 +163,9 @@
       if (!single) { row.appendChild(discs); row.appendChild(name); }
       row.__pick = function (fid, quiet) { if (list.indexOf(fid) >= 0) pick(fid, quiet); };
       pick(list.indexOf(row.dataset.default) >= 0 ? row.dataset.default : list[0], true);
+      if (by) { var form = row.closest('form') || document;
+        var sync = function () { var r = form.querySelector('input[name="' + by + '"]:checked'); if (r) pick(r.value, true); };
+        form.addEventListener('change', function (e) { if (e.target && e.target.name === by) sync(); }); sync(); }
     });
   }
 
