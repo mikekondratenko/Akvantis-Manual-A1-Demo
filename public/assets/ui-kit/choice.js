@@ -96,7 +96,7 @@
       if (single) row.classList.add('is-single');
       var pick = function (fid, quiet) {
         $$(discs, '.swatch-btn').forEach(function (b) { var on = b.dataset.id === fid; b.classList.toggle('is-active', on); b.setAttribute('aria-checked', on); });
-        var label = (cols[fid] || {}).label || fid; label = (window.KitLang && KitLang.t && KitLang.t(label)) || label; name.textContent = label;   /* a finish name through the page's language, if it has one (2026-10-29) */
+        var label = (cols[fid] || {}).label || fid; name.textContent = label;   /* a finish's name is its own, English on every version (2026-11-03) — not through the page's language */
         if (field) field.value = fid;
         row.__label = single ? '' : label;
         if (card) card.dataset.finishLabel = $$(card, '.choice-finish').map(function (r) { return r.__label || ''; }).filter(Boolean).join(' · ');
@@ -118,7 +118,7 @@
       list.forEach(function (fid) {
         var c = cols[fid] || {}, b = document.createElement('button');
         b.type = 'button'; b.className = 'swatch-btn' + (c.hex2 ? ' swatch-split' : ''); b.dataset.id = fid;
-        b.setAttribute('role', 'radio'); b.setAttribute('aria-label', (window.KitLang && KitLang.t && KitLang.t(c.label || fid)) || c.label || fid);
+        b.setAttribute('role', 'radio'); b.setAttribute('aria-label', c.label || fid);
         if (c.hex2) { b.style.setProperty('--swatch-a', c.hex); b.style.setProperty('--swatch-b', c.hex2); } else b.style.background = c.hex || 'transparent';
         b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); pick(fid); });
         discs.appendChild(b);
