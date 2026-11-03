@@ -28,6 +28,8 @@
        row the buyer can change. data-finish-of="<row's data-device>" on any picture in the page,
        with data-finish-tpl="…/a1-pcb-i{f}-front.webp": the row writes its finish's img into {f}
        ("" or "-bk") — pictures that are not in the row's card (the cartridge cards).
+       A counter card may carry a row too (the cartridges: White · Black, data-follows="A1") — its
+       picture is the card's [data-device-pic], its label goes on the card, the count stays as it is.
 
      TOGGLE (2026-10-29)  every option is taken AND put back: a radio in a label.choice that is
        already chosen, tapped again, is let go — nothing chosen in its group, `change` fires (it
