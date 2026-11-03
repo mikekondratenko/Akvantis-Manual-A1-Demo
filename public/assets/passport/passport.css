@@ -1306,7 +1306,7 @@ html.anim .wrap > .geo-note { opacity: 1; transform: none; transition-delay: 0s;
 .pp-chips, .pp-offers, .pp-fold .choice-list, .pp-svc { border-radius: var(--radius-16); background: var(--tile); overflow: hidden; }
 /* the cards are the kit's FLUSH grid (choice.css .choice-grid.is-flush) on the page's island colour */
 .pp-fold .choice-grid.is-flush { background: var(--tile); box-shadow: none; }
-.pp-fold .choice-grid.is-flush > a.choice:hover { background: var(--tile-hover); }
+.pp-fold .choice-grid.is-flush > .choice:hover { background: var(--tile-hover); }
 .pp-offers > .pp-offer > b:not(.choice-name) { font-size: var(--text-14); }
 .pp-offers > .pp-offer > .choice-name { font-size: var(--text-28); }   /* the lockup at ~20 (.72em), as in the A1 form — the page has no type.css, so --type-h3 is not there */
 /* the filter over the accessories */
@@ -1315,6 +1315,9 @@ html.anim .wrap > .geo-note { opacity: 1; transform: none; transition-delay: 0s;
 .pp-chip { flex: none; height: var(--number-32); padding: 0 var(--space-12); border: 0; border-radius: var(--radius-pill);
   background: var(--white-08); color: var(--ink-muted); font: inherit; font-size: var(--text-12); font-weight: var(--weight-medium); cursor: pointer; }
 .pp-chip[aria-pressed="true"] { background: var(--ink); color: var(--page); }
+/* the finish filter over the cartridges and the faucets (2026-11-03): the kit's .choice-filter on the page's tile */
+.pp-filter { background: var(--tile); box-shadow: none; }
+.pp-filter + .choice-grid.is-flush { margin-top: 0; }
 /* SERVICE — two options as the A1 form's delivery (choice.css PICK), each its own island; chosen, it opens
    onto its city, the reader's phone, «Call me back» and «Call». */
 .pp-fold .choice-group.is-pick.pp-svc { background: var(--tile); }

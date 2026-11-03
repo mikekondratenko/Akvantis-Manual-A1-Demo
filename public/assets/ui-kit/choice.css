@@ -36,7 +36,8 @@
                                 .choice-list a column of rows
 
    Rest: --choice, a shade under the controls (black-800; on paper a step under the tile).
-   No hover (2026-10-30): a card or a row does not change under the cursor — only chosen does. Chosen: a 1.8px edge in the accent (--choice-edge-on) — the width of a
+   No hover (2026-10-30): a card or a row does not change under the cursor — only chosen does; the one
+   exception is the FLUSH plate's cards (shop cards: the passport's cartridges, faucets, accessories). Chosen: a 1.8px edge in the accent (--choice-edge-on) — the width of a
    field's edge, so the chosen card and the focused input draw one line. Focus by keyboard:
    the kit's focus ring. Disabled: .4. A picture not there yet is not drawn (.sec-ph is
    transparent). Requires tokens.css; field.css for the row's marker.
@@ -295,8 +296,21 @@
 .choice-grid.is-flush > .choice:not(:last-child):not(:nth-last-child(2):nth-child(odd)) { box-shadow: inset 0 -1px 0 var(--rule); }
 .choice-grid.is-flush > .choice:nth-child(odd):not(:last-child):not(:nth-last-child(2)) { box-shadow: inset -1px -1px 0 var(--rule); }
 .choice-grid.is-flush > .choice:nth-child(odd):is(:last-child, :nth-last-child(2)) { box-shadow: inset -1px 0 0 var(--rule); }
-.choice-grid.is-flush > a.choice:hover { background: var(--choice-hover, var(--tile-hover)); }
+.choice-grid.is-flush > .choice:hover { background: var(--choice-hover, var(--tile-hover)); }   /* every card on the plate, a link or not (2026-11-03 — the faucets have no shop yet) */
 .choice-grid.is-flush > .choice:is(.is-on, :has(> input:checked)) { box-shadow: inset 0 0 0 1.8px var(--choice-edge-on); }
 .choice-grid.is-flush > .choice > .choice-price { margin-top: auto; padding-top: var(--space-8); }
 .choice-grid.is-flush .choice-pic { max-width: 100%; }
+
+/* ══ FILTER BY FINISH — DISCS OVER A FLUSH PLATE (2026-11-03; the passport's cartridges and faucets) ══
+   `.choice-filter` on its own plate above a `.choice-grid.is-flush`: the kit's swatches (swatch.css, 32)
+   and the chosen finish's name beside them, in English on every version. One finish is shown at a time —
+   no «All»: the cards in it (data-group="steel"; a card in two, data-group="white black"). choice.js
+   builds the discs from the catalogue (data-finishes="steel black chrome gold", COLOURS in devices.js;
+   data-start the first shown) and takes the other cards out of the plate, so the hairlines stay right.
+   The cards keep the flush card's hover. */
+.choice-filter { display: flex; align-items: center; gap: var(--space-12); min-width: 0; padding: var(--space-12) var(--space-16);
+  border-radius: var(--radius-16); background: var(--choice-card, var(--choice)); box-shadow: inset 0 0 0 1px var(--choice-card-edge, transparent); }
+.choice-filter + .choice-grid.is-flush { margin-top: var(--space-8); }
+.choice-filter .pair-row { display: flex; flex: none; gap: var(--space-4); }
+.choice-filter .pair-name { font-size: var(--text-14); color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 

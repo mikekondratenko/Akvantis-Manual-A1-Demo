@@ -35,6 +35,10 @@
        and not a group marked [data-keep] (one must always stay chosen). A list with
        [data-pick-one] that the visitor emptied this way is not refilled by order.js (data-unpicked).
 
+     .choice-filter[data-finishes="steel black chrome gold"]   discs over the flush plate that follows it
+       (2026-11-03): one finish shown, its cards (data-group) on the plate, the rest taken out; the name
+       beside the discs. data-start — the first shown. Choice.filter(root) builds any added later.
+
    Runs itself on DOMContentLoaded; no dependency. */
 (function () {
   'use strict';
@@ -73,6 +77,31 @@
     });
     sync(root);
   }
+  /* FILTER BY FINISH (2026-11-03) */
+  function filters(root) {
+    var COL = {}; (window.COLOURS || []).forEach(function (c) { COL[c.id] = c; });
+    $$(root || document, '.choice-filter[data-finishes]').forEach(function (row) {
+      if (row.__filter) return; row.__filter = true;
+      var grid = row.nextElementSibling; if (!grid) return;
+      var all = [].slice.call(grid.children), list = row.dataset.finishes.split(/\s+/).filter(function (id) {
+        return all.some(function (c) { return (' ' + (c.dataset.group || '') + ' ').indexOf(' ' + id + ' ') >= 0; }); });
+      var discs = document.createElement('div'); discs.className = 'pair-row'; discs.setAttribute('role', 'radiogroup');
+      var name = document.createElement('span'); name.className = 'pair-name';
+      var show = function (id) {
+        $$(discs, '.swatch-btn').forEach(function (b) { var on = b.dataset.id === id; b.classList.toggle('is-active', on); b.setAttribute('aria-checked', on); });
+        name.textContent = (COL[id] || {}).label || id;
+        while (grid.firstChild) grid.removeChild(grid.firstChild);
+        all.forEach(function (c) { if ((' ' + (c.dataset.group || '') + ' ').indexOf(' ' + id + ' ') >= 0) grid.appendChild(c); });
+      };
+      list.forEach(function (id) { var c = COL[id] || { label: id, hex: '#888' }, b = document.createElement('button');
+        b.type = 'button'; b.className = 'swatch-btn'; b.dataset.id = id; b.setAttribute('role', 'radio'); b.setAttribute('aria-label', c.label);
+        b.setAttribute('style', window.swatchStyle ? window.swatchStyle(c) : 'background:' + c.hex);
+        b.addEventListener('click', function (e) { e.preventDefault(); show(id); }); discs.appendChild(b); });
+      row.appendChild(discs); row.appendChild(name);
+      show(list.indexOf(row.dataset.start) >= 0 ? row.dataset.start : list[0]);
+    });
+  }
+
   /* FINISHES */
   function finishes(root) {
     var DEV = {}, COL = {};
@@ -245,7 +274,7 @@
   document.addEventListener('change', function (e) {   /* chosen again: the list may fill itself once more */
     var r = e.target; if (r && r.type === 'radio' && r.checked) { var one = r.closest('[data-pick-one]'); if (one) delete one.dataset.unpicked; } });
 
-  window.Choice = { bind: bind, sync: sync, finishes: finishes, customs: customs, art: art };
-  var go = function () { finishes(); customs(); bind(); };
+  window.Choice = { bind: bind, sync: sync, finishes: finishes, filter: filters, customs: customs, art: art };
+  var go = function () { finishes(); customs(); bind(); filters(); };   /* filters last: the cards it takes out are bound already */
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();
