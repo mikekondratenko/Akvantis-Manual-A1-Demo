@@ -15,7 +15,7 @@
    OFF     option[data-off-when="name=value"]: that option is disabled while the radio is taken —
            Ukraine while AKVANTIS service is (Germany and Poland only); data-off-note
            is added to its words while it is off.
-   WHEN    [data-when="name=value"] (or «a=b&c=d», all of them; a select answers as a radio does) is there only while that radio is taken; [data-when-not] only
+   WHEN    [data-when="name=value"] (or «a=b&c=d», all of them; «name=x|y», either value — 2026-11-03, trade-in with the two installers; a select answers as a radio does) is there only while that radio is taken; [data-when-not] only
            while it is not — the delivery that the installer brings, the address a pickup does not
            need. A field hidden so is not checked and not sent.
    ONE     [data-pick-one] around a radio list: when only one is left to choose, it is chosen.
@@ -54,6 +54,10 @@
            visitor's own card and grew over Pay, Apple's hid itself off Safari). A PROTOTYPE: not wired to the wallets — a
            press sends the form as Pay does, to monobank's page, which offers Apple Pay / Google Pay
            itself. Paying in the button needs merchant certificates (docs/order-form-questions.md 5.7).
+   PHOTO   input[type=file][data-photo="<name>"] in a .photo-pick (2026-11-03, the trade-in's old system): the picture
+           is made small here — its long side to 1280 px, JPEG — and goes into input[type=hidden][name=<name>]
+           as a data: URL, so the order (JSON) carries it; the file input has no name of its own. The thumbnail
+           [data-photo-thumb] and the × [data-photo-clear] show once one is taken; required, it is checked as a field is.
    SEND    checked here, not by the browser's bubbles: a wrong field gets aria-invalid and a
            .field-error line, cleared as it is typed in; the button turns .is-loading; the
            answer is the .notice. No data-endpoint → nothing is sent, and the notice says so. */
@@ -114,7 +118,7 @@
     var live = function (i) { return !i.disabled && !i.closest('[hidden]'); };
     var valOf = function (n) { var sel = $$(form, 'select[name="' + n + '"]').filter(live)[0]; if (sel) return sel.value;   /* a select answers too: data-when="country=UA" — the one in use, when several share a name (2026-10-29: a pickup point per city) */
       var i = $$(form, 'input[name="' + n + '"]:checked').filter(live)[0]; return i ? i.value : ''; };
-    var cond = function (c) { return c.split('&').every(function (t) { var k = t.split('='); return valOf(k[0]) === k.slice(1).join('='); }); };   /* «a=b&c=d»: all of them */
+    var cond = function (c) { return c.split('&').every(function (t) { var k = t.split('='); return k.slice(1).join('=').split('|').indexOf(valOf(k[0])) >= 0; }); };   /* «a=b&c=d»: all of them; «a=b|c»: either (2026-11-03) */
     var reached = 0;
     /* a GIFT code taken and still in the order (its field not put away by a condition — CODE below) */
     var giftOn = function () { var k = form.querySelector('[data-code-value]'); return !!(form.dataset.code && form.dataset.codeGift && k && live(k)); };
@@ -341,6 +345,25 @@
       line.innerHTML = ICON + msg; el.setAttribute('aria-describedby', line.id);
     };
     $$(form, 'input, textarea').forEach(function (el) { el.addEventListener('input', function () { if (el.validity.valid) mark(el); }); });
+    /* PHOTO (2026-11-03) */
+    $$(form, 'input[type=file][data-photo]').forEach(function (f) {
+      var box = f.closest('.photo-pick') || f.parentElement, out = form.querySelector('input[name="' + f.dataset.photo + '"]');
+      var thumb = box.querySelector('[data-photo-thumb]'), clear = box.querySelector('[data-photo-clear]'), say = box.querySelector('[data-photo-word]'), base = say ? say.textContent : '';
+      var set = function (url) { if (out) out.value = url || ''; if (!url) f.value = '';
+        if (thumb) { thumb.hidden = !url; if (url) thumb.src = url; else thumb.removeAttribute('src'); }
+        if (clear) clear.hidden = !url; if (say) say.textContent = url ? T('Another photo') : base;
+        box.classList.toggle('is-on', !!url); if (url) mark(f);
+        form.dispatchEvent(new Event('change', { bubbles: true })); };
+      f.addEventListener('change', function () { var file = f.files && f.files[0];
+        if (!file || !/^image\//.test(file.type)) return set('');
+        var img = new Image(), src = URL.createObjectURL(file);
+        img.onload = function () { var k = Math.min(1, 1280 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
+          c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(src); set(c.toDataURL('image/jpeg', 0.82)); };
+        img.onerror = function () { URL.revokeObjectURL(src); set(''); };
+        img.src = src; });
+      if (clear) clear.addEventListener('click', function () { set(''); f.focus(); });
+    });
     var tell = function (kind, text) { if (!notice) return;
       notice.className = 'notice' + (kind ? ' is-' + kind : ''); notice.setAttribute('role', kind === 'error' ? 'alert' : 'status');
       notice.querySelector('span').textContent = text; notice.hidden = false; };
@@ -355,7 +378,7 @@
       $$(form, 'input:not([type=radio]):not([type=checkbox]):not([type=hidden]), textarea').forEach(function (el) {
         if (el.closest('[hidden]')) return;
         var v = el.validity, why = Object.keys(SAY).filter(function (k) { return v[k]; })[0];
-        var msg = why ? SAY[why] : v.customError ? el.validationMessage : '';   /* a script's own word: «Choose from the list» */
+        var msg = why ? (el.type === 'file' && why === 'valueMissing' ? T('Add a photo of your system') : SAY[why]) : v.customError ? el.validationMessage : '';   /* a script's own word: «Choose from the list» */
         mark(el, msg); if (msg && !first) first = el; });
       reached = all.length - 1; lock();
       if (first) { var s = first.closest('.order-step');

@@ -165,7 +165,8 @@
      weight (form[data-kg]) and worth (form[data-goods], €, declared in hryvnia): the price in
      its .choice-price and in its data-price (€, the form's rate back), the day in [data-np-term].
      From form[data-np-sender] (a city Ref) — Kyiv until the client says (docs 4.4). Asked again
-     only when the place, the weight or the worth changes. */
+     only when the place, the weight or the worth changes. data-np-free (2026-11-03: the courier on the
+     company): only the day is asked for — the price stays the row's own. */
   var KYIV = '8d5a980d-391c-11dd-90d9-001a92567626';
   function quotes(form) {
     var rows = [].slice.call(form.querySelectorAll('[data-np-quote]')); if (!rows.length) return;
@@ -187,8 +188,8 @@
       row.classList.add('is-quoting');
       Promise.all([doc('getDocumentPrice', svc), doc('getDocumentDeliveryDate', svc).catch(function () { return null; })]).then(function (r) {
         if (form.dataset.npQuoted !== key) return;   /* asked again since */
-        var uah = +r[0].Cost; row.dataset.price = String(Math.round(uah / rate * 100) / 100);
-        if (price) { price.textContent = money(uah); price.classList.remove('order-tbd'); }
+        var uah = +r[0].Cost; if (!row.hasAttribute('data-np-free')) { row.dataset.price = String(Math.round(uah / rate * 100) / 100);
+        if (price) { price.textContent = money(uah); price.classList.remove('order-tbd'); } }
         var d = r[1] && r[1].DeliveryDate && r[1].DeliveryDate.date;
         if (term && d) term.textContent = T('Delivery {date}').replace('{date}', new Date(d.slice(0, 10) + 'T12:00:00').toLocaleDateString(lang, { day: 'numeric', month: 'long' }));
         form.dispatchEvent(new Event('change', { bubbles: true }));   /* order.js recounts */

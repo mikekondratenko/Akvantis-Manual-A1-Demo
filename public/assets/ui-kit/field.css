@@ -402,3 +402,14 @@ textarea.dark-input {
 .input-action > .btn-text.btn-round { width: calc(var(--field-h) - var(--space-8) - 2px); padding: 0; }
 .input-action.is-success > .btn > :not(.input-action-done), .input-action:not(.is-success) > .btn > .input-action-done { display: none; }
 [data-theme="light"] .input-action { background-color: var(--page); }
+
+/* PHOTO (2026-11-03): a picture to attach (order.js PHOTO — the trade-in's old system). The kit's
+   secondary button holds the file input out of sight; once one is taken, its thumbnail and the
+   kit's × stand beside it. */
+.photo-pick { display: flex; align-items: center; gap: var(--space-8); }   /* one row: thumbnail · button · × */
+.photo-pick > .btn { position: relative; flex: 1 1 auto; min-width: 0; }
+.photo-pick > .photo-pick-thumb { order: -1; flex: none; }
+.photo-pick > .btn:focus-within { box-shadow: var(--focus-halo); }
+.photo-pick input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.photo-pick-thumb { width: 48px; height: 48px; border-radius: var(--radius-8, 8px); object-fit: cover; display: block; }
+.photo-pick-thumb[hidden], .photo-pick [data-photo-clear][hidden] { display: none; }
