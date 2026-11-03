@@ -1,0 +1,43 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Photo drop — the kit's «import photo» (2026-11-03), behaviour in photo.js.
+
+   The place to drop: a dashed outline (--field-edge, the fields' own edge) round an icon, a line
+   and the formats taken; pressed, the file dialog; a file dragged over it, the edge goes --ink and
+   the ground --tile. Above it the pictures taken, 72 px squares, each with a round × in its corner.
+   No hover (the kit's cards have none, 2026-10-29) — only the drop and the keyboard's focus show.
+   ───────────────────────────────────────────────────────────────────────────── */
+.photo-drop { display: grid; gap: var(--space-12); }
+.photo-drop-zone { position: relative; display: grid; justify-items: center; gap: var(--space-4);
+  padding: var(--space-24) var(--space-16); border: 1.5px dashed var(--field-edge); border-radius: var(--radius-16);
+  text-align: center; color: var(--ink-muted); cursor: pointer;
+  transition: border-color var(--duration-fast, 120ms) ease, background-color var(--duration-fast, 120ms) ease; }
+.photo-drop-zone > svg, .photo-drop-zone > i { color: var(--ink); margin-bottom: var(--space-4); }
+.photo-drop-zone.is-over { border-color: var(--ink); border-style: solid; background-color: var(--tile); }
+.photo-drop-zone:has(input:focus-visible) { box-shadow: var(--focus-halo); }
+.photo-drop-zone input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.photo-drop-zone[hidden] { display: none; }
+.photo-drop-title { font-size: var(--type-body, 16px); color: var(--ink); }
+.photo-drop-link { text-decoration: underline; text-underline-offset: var(--link-offset, 3px); }
+.photo-drop-note { font-size: var(--type-caption, 12px); color: var(--ink-faint); }
+/* with pictures taken the place to drop is smaller — the pictures are what is looked at then */
+.photo-drop.has-photos .photo-drop-zone { grid-auto-flow: column; justify-content: center; align-items: center; gap: var(--space-8); padding: var(--space-12) var(--space-16); }
+.photo-drop.has-photos .photo-drop-zone > svg, .photo-drop.has-photos .photo-drop-zone > i { margin: 0; }
+.photo-drop.has-photos .photo-drop-note { display: none; }
+
+.photo-drop-list { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+.photo-drop-list[hidden] { display: none; }
+.photo-drop-item { position: relative; margin: 0; width: 72px; height: 72px; border-radius: var(--radius-12); overflow: hidden;
+  background: var(--tile); box-shadow: inset 0 0 0 1px var(--plate-edge, rgba(127,127,127,.2)); }
+.photo-drop-item > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.photo-drop-item.is-busy::before { content: ''; position: absolute; inset: 0; margin: auto; width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--ink-faint); border-right-color: transparent; animation: btn-spin 800ms linear infinite; }
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+.photo-drop-remove { position: absolute; top: 4px; right: 4px; display: grid; place-items: center; width: 24px; height: 24px; padding: 0;
+  border: 0; border-radius: 50%; background: rgba(17, 18, 17, .72); color: #fff; cursor: pointer; }
+.photo-drop-remove svg { display: block; width: 14px; height: 14px; }
+.photo-drop-remove:focus-visible { outline: none; box-shadow: var(--focus-halo); }
+.photo-drop-msg { margin: 0; font-size: var(--type-caption, 12px); color: var(--danger); }
+.photo-drop-msg[hidden] { display: none; }
+/* words: «Drop photos here or choose files» where there is a mouse, «Add photos» on a touch screen */
+.photo-drop-touch { display: none; }
+@media (hover: none) and (pointer: coarse) { .photo-drop-touch { display: inline; } .photo-drop-drag { display: none; } }

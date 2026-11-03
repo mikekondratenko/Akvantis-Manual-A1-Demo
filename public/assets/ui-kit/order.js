@@ -54,10 +54,8 @@
            visitor's own card and grew over Pay, Apple's hid itself off Safari). A PROTOTYPE: not wired to the wallets — a
            press sends the form as Pay does, to monobank's page, which offers Apple Pay / Google Pay
            itself. Paying in the button needs merchant certificates (docs/order-form-questions.md 5.7).
-   PHOTO   input[type=file][data-photo="<name>"] in a .photo-pick (2026-11-03, the trade-in's old system): the picture
-           is made small here — its long side to 1280 px, JPEG — and goes into input[type=hidden][name=<name>]
-           as a data: URL, so the order (JSON) carries it; the file input has no name of its own. The thumbnail
-           [data-photo-thumb] and the × [data-photo-clear] show once one is taken; required, it is checked as a field is.
+   PHOTOS  a picture to attach is the kit's photo.js (.photo-drop): its error is the file input's own
+           (setCustomValidity), shown here as any field's (2026-11-03).
    SEND    checked here, not by the browser's bubbles: a wrong field gets aria-invalid and a
            .field-error line, cleared as it is typed in; the button turns .is-loading; the
            answer is the .notice. No data-endpoint → nothing is sent, and the notice says so. */
@@ -345,25 +343,6 @@
       line.innerHTML = ICON + msg; el.setAttribute('aria-describedby', line.id);
     };
     $$(form, 'input, textarea').forEach(function (el) { el.addEventListener('input', function () { if (el.validity.valid) mark(el); }); });
-    /* PHOTO (2026-11-03) */
-    $$(form, 'input[type=file][data-photo]').forEach(function (f) {
-      var box = f.closest('.photo-pick') || f.parentElement, out = form.querySelector('input[name="' + f.dataset.photo + '"]');
-      var thumb = box.querySelector('[data-photo-thumb]'), clear = box.querySelector('[data-photo-clear]'), say = box.querySelector('[data-photo-word]'), base = say ? say.textContent : '';
-      var set = function (url) { if (out) out.value = url || ''; if (!url) f.value = '';
-        if (thumb) { thumb.hidden = !url; if (url) thumb.src = url; else thumb.removeAttribute('src'); }
-        if (clear) clear.hidden = !url; if (say) say.textContent = url ? T('Another photo') : base;
-        box.classList.toggle('is-on', !!url); if (url) mark(f);
-        form.dispatchEvent(new Event('change', { bubbles: true })); };
-      f.addEventListener('change', function () { var file = f.files && f.files[0];
-        if (!file || !/^image\//.test(file.type)) return set('');
-        var img = new Image(), src = URL.createObjectURL(file);
-        img.onload = function () { var k = Math.min(1, 1280 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
-          c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
-          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(src); set(c.toDataURL('image/jpeg', 0.82)); };
-        img.onerror = function () { URL.revokeObjectURL(src); set(''); };
-        img.src = src; });
-      if (clear) clear.addEventListener('click', function () { set(''); f.focus(); });
-    });
     var tell = function (kind, text) { if (!notice) return;
       notice.className = 'notice' + (kind ? ' is-' + kind : ''); notice.setAttribute('role', kind === 'error' ? 'alert' : 'status');
       notice.querySelector('span').textContent = text; notice.hidden = false; };
@@ -378,7 +357,7 @@
       $$(form, 'input:not([type=radio]):not([type=checkbox]):not([type=hidden]), textarea').forEach(function (el) {
         if (el.closest('[hidden]')) return;
         var v = el.validity, why = Object.keys(SAY).filter(function (k) { return v[k]; })[0];
-        var msg = why ? (el.type === 'file' && why === 'valueMissing' ? T('Add a photo of your system') : SAY[why]) : v.customError ? el.validationMessage : '';   /* a script's own word: «Choose from the list» */
+        var msg = why ? SAY[why] : v.customError ? el.validationMessage : '';   /* a script's own word: «Choose from the list» */
         mark(el, msg); if (msg && !first) first = el; });
       reached = all.length - 1; lock();
       if (first) { var s = first.closest('.order-step');

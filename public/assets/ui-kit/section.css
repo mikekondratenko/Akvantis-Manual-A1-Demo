@@ -759,12 +759,8 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-islands > * { margin: 0; }
 .order-islands > [data-alt-off].is-off { display: none; }   /* Trade-in with filters only: gone, with its gap (an island does not fold) */
 .order-island.plate { padding: var(--space-16); }
-.order-islands > .choice { --choice: var(--tile); }
+.order-islands > :is(.choice, .choice-group.is-pick) { --choice: var(--tile); }   /* Trade-in: a pick — the choice and, taken, its photos in one card (2026-11-03) */
 .order-island.order-code { margin: 0; }
-/* Trade-in (2026-11-03): a plate — the choice, and under it, once taken, the photo of the old system
-   (field.css PHOTO). Only with installation (order.js WHEN «delivery=AKVANTIS service|Service partner»). */
-.order-trade { display: grid; gap: var(--space-16); }
-.order-trade > .choice { --choice: var(--tile); margin: 0; }
 .order-island .order-seg { margin: 0; }   /* the bank's tabs: the island's own 16 around them */
 .order-island-pay { display: grid; gap: var(--space-16); }
 .order-island-pay .order-total .is-total { border-top: 0; padding-top: 0; }
