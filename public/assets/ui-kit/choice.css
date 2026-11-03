@@ -96,6 +96,13 @@
    inside it (contain) — the same size in every card, two or three side by side. */
 .choice { --choice-pic: 116px; }
 .choice-pic { display: block; flex: none; width: var(--choice-pic); height: var(--choice-pic); object-fit: contain; border-radius: var(--radius-12); }
+/* A bundle (2026-11-03): each thing in it as its own picture (the A1 alone uses it too, so it is drawn
+   at the size it has beside a tap) — the A1 and the tap side by side in the
+   card's one square, standing on one line; the tap at 80 % of the machine's height. Pictures cut to
+   the object (photos/trimmed), so their widths are their own. */
+.choice-pics.is-pair { height: var(--choice-pic); gap: var(--space-8); }
+.choice-pics.is-pair > .choice-pic { width: auto; max-width: calc(50% - var(--space-4)); height: 100%; border-radius: 0; object-position: bottom; }
+.choice-pics.is-pair > .choice-pic + .choice-pic { height: 80%; }
 
 .choice-grid, .choice-list { display: grid; gap: var(--space-12); min-width: 0; }
 .choice-grid { --choice-gap: var(--space-8); gap: var(--choice-gap); }   /* cards stand 8 apart (2026-10-31; rows keep 12) */
@@ -219,6 +226,7 @@
 .choice-finish .pair-row { justify-content: center; }
 .choice-finish .pair-row { --swatch-size: var(--swatch-24); flex-wrap: nowrap; }   /* every card's finishes are the kit's small swatch, 24 (swatch.css .is-24) — 2026-10-29 */
 .choice-finish .pair-name { font-size: var(--type-caption); color: var(--ink-faint); }
+.choice-finish.is-single { display: none; }   /* one finish is not a choice (2026-11-03 — the A1 until Black is sold) */
 
 /* CUSTOM (2026-10-29) — a name on the thing (the towel; choice.js): a switch under the card's name,
    the name saved under it with «Edit», and the art — the plain picture with the mark and the name

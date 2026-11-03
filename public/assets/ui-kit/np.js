@@ -165,8 +165,9 @@
      weight (form[data-kg]) and worth (form[data-goods], €, declared in hryvnia): the price in
      its .choice-price and in its data-price (€, the form's rate back), the day in [data-np-term].
      From form[data-np-sender] (a city Ref) — Kyiv until the client says (docs 4.4). Asked again
-     only when the place, the weight or the worth changes. data-np-free (2026-11-03: the courier on the
-     company): only the day is asked for — the price stays the row's own. */
+     only when the place, the weight or the worth changes. data-np-free: only the day is asked for —
+     the price stays the row's own (2026-11-03: the branch and the parcel locker, free — on the company;
+     the courier is paid, Nova Poshta's tariff, «Nova Poshta tariff» until the city is chosen). */
   var KYIV = '8d5a980d-391c-11dd-90d9-001a92567626';
   function quotes(form) {
     var rows = [].slice.call(form.querySelectorAll('[data-np-quote]')); if (!rows.length) return;

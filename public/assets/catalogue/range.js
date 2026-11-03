@@ -80,23 +80,30 @@ window.RANGE = {
       "Nickel",
       "NI",
       "#BFC4C8"
+    ],
+    "gd": [
+      "Gold",
+      "GD",
+      "#C9A55C"
     ]
   },
-  finOrder: ["bk","nb","sb","st","ni","cr","wg","wh","aw"],
+  finOrder: ["bk","nb","sb","gd","st","ni","cr","wg","wh","aw"],
   tiers: {"1":"entry","2":"variant","3":"plus","4":"variant","5":"pro","7":"max"},
   storage: "Keep in a dry place",
 
   current: [
     { letter: "A", mark: "series-a", title: "Drinking systems", items: [
-      { code: "A1", name: "AKVANTIS A1", display: "AKVANTIS A1 Direct Flow Drinking System", fins: ["bk","wg"] },
+      { code: "A1", name: "AKVANTIS A1", display: "AKVANTIS A1 Direct Flow Drinking System", fins: ["bk","wg"], finProposed: ["bk"] },
       { code: "A2", name: "AKVANTIS A2", display: "AKVANTIS A2 Direct Flow Drinking System", fins: ["bk","wg"] },
       { code: "A3", name: "AKVANTIS A3", display: "AKVANTIS A3 Direct Flow Drinking System" },
       { code: "A5", name: "AKVANTIS A5", display: "AKVANTIS A5 Direct Flow Drinking System" },
       { code: "A7", name: "AKVANTIS A7", display: "AKVANTIS A7 Direct Flow Drinking System" }
     ] },
     { letter: "K", mark: "series-k", title: "Drinking faucets", sheetIs: "code", items: [
-      { code: "K1", name: "AKVANTIS K1", display: "AKVANTIS K1 Drinking Water Faucet", sheet: "X1", fins: ["bk","cr","st","ni"], finProposed: ["ni"] },
-      { code: "K3", name: "AKVANTIS K3", display: "AKVANTIS K3 Drinking Water Faucet", sheet: "X3", fins: ["st","cr","bk"], finProposed: ["cr","bk"] }
+      { code: "K1", name: "AKVANTIS K1", display: "AKVANTIS K1 Drinking Water Faucet", fins: ["bk","cr","gd","st"], finProposed: ["gd"] },
+      { code: "K2", name: "AKVANTIS K2", display: "AKVANTIS K2 Drinking Water Faucet", sheet: "X1", fins: ["bk","cr","st"] },
+      { code: "K3", name: "AKVANTIS K3", display: "AKVANTIS K3 Drinking Water Faucet", fins: ["bk","st"] },
+      { code: "K4", name: "AKVANTIS K4", display: "AKVANTIS K4 Drinking Water Faucet", sheet: "X3", fins: ["bk","st"] }
     ] },
     { letter: "F", title: "Mechanical filters", items: [
       { code: "F1", name: "AKVANTIS F1", display: "AKVANTIS F1 Backwash Sediment Filter" },
@@ -199,8 +206,10 @@ window.RANGE = {
       { code: "A7G2", name: "AKVANTIS A7", display: "AKVANTIS A7 Direct Flow Drinking System", hRel: 140 }
     ] },
     { letter: "K", use: "drink", mark: "series-k", title: "Drinking faucets", items: [
-      { code: "K1", name: "AKVANTIS K1", display: "AKVANTIS K1 Drinking Water Faucet", fins: ["bk","cr","st"] },
-      { code: "K3", name: "AKVANTIS K3", display: "AKVANTIS K3 Drinking Water Faucet" },
+      { code: "K1", name: "AKVANTIS K1", display: "AKVANTIS K1 Drinking Water Faucet", fins: ["bk","cr","gd","st"], finProposed: ["gd"] },
+      { code: "K2", name: "AKVANTIS K2", display: "AKVANTIS K2 Drinking Water Faucet", fins: ["bk","cr","st"] },
+      { code: "K3", name: "AKVANTIS K3", display: "AKVANTIS K3 Drinking Water Faucet", fins: ["bk","st"] },
+      { code: "K4", name: "AKVANTIS K4", display: "AKVANTIS K4 Drinking Water Faucet", fins: ["bk","st"] },
       { code: "K5", name: "AKVANTIS K5", display: "AKVANTIS K5 Electronic Drinking Water Faucet", fins: ["st","bk"] },
       { code: "K7", name: "AKVANTIS K7", display: "AKVANTIS K7 Electronic Drinking Water Faucet" }
     ] },
@@ -438,6 +447,17 @@ window.RANGE = {
    enough to stop a faucet rendering the height of a cabinet; to be replaced with real
    heights in millimetres when the range is dimensioned. K is not in that lineup, so the
    faucets carry no measurement yet and fill their box as before. */
+
+/* ── Four faucet lines, K1–K4 (2026-11-03) ──
+   From the faucet table of 2026-11-02 («Линейка кранов AKVANTIS») and the studio renders of
+   2026-11-03 (Figma → Main Assets). K1 is a new budget tap (China); K2 is the former K1 with the
+   indicator (Taiwan, NSF) and takes the sheet's X1; K3 is a new budget 3:1 mixer; K4 the premium one
+   (Germany), probably the former K3, so it takes X3. Finishes are the renders': the silver render
+   («Nickel» in Figma) is stainless steel, `st`; gold on K1 since 2026-11-03 (Michael) — the client asked for it
+   to be rendered for later, so it is a drafted finish (`finProposed`), not one on sale; the
+   three that sell are `bk cr st`. K3 and K4 are
+   rendered in black too, and the renders are the source of truth (Michael, 2026-11-03): a finish
+   that is rendered exists, whatever the table says — so `bk` is settled on both. */
 
 /* K1's finishes are named for the surface, not the colour: `bk` black, `cr` polished
    chrome, `st` brushed steel. Two letters each, the same shape as `bk`/`wh`/`nb`

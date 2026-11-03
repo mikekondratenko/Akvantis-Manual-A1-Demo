@@ -33,6 +33,10 @@
            name, the other steps' values, and the sum of data-price of everything chosen (a
            choice without a price makes it «price on request»). data-currency (default EUR) and
            data-rate: the € prices shown in another currency, e.g. UAH × 48.
+   CANCEL  the bar's × (2026-11-03; made here when the dock has no [data-dock-cancel]): a popup asks
+           (popup.css, .btn-danger) — «Keep» is the default and Esc, a click past the plate; «Cancel order»
+           resets the form (form.reset: choices, counts, fields, the code, the photos, the name on the
+           towel), locks the steps after the first and opens the first. The bar goes down with nothing chosen.
    PAY     form[data-pay-url="/api/pay"]: on send the order (FormData — hidden rows are disabled, so left
            out) goes to that address; the answer's pageUrl (monobank's payment page) is opened.
    SKIP    [data-skip] in an optional step: the counts back to 0, then Next (2026-10-29).
@@ -44,7 +48,8 @@
    CODE    .order-code: [data-code-open] → .order-code-row (field · [data-code] Apply · [data-code-close] ×).
    PARTS   form[data-parts-url="/api/parts"]: a payment of N parts (not «full») is applied for there
            instead (monobank «Покупка частинами»); the form waits on <url>/state, then thanks.html.
-           [data-per-month="N"] shows the total over N; the button reads «Apply for N payments».
+           [data-per-month="N"] (the row's .choice-price) shows the total over N, «€49.50 / month»; [data-pay-total]
+           the whole sum in the «Pay in full» row; the button reads «Apply for N payments».
    PRIVAT  form[data-privat-url="/api/privat"]: the same plan with name="bank" value="privat" (the
            .order-seg monobank | PrivatBank) goes there instead (PrivatBank «Оплата частинами») — the
            answer's url is the bank's own page; the bank sends the buyer back to thanks.html.
@@ -208,9 +213,12 @@
       form.dataset.sum = open || !chosen ? '' : sum;   /* the total in €, for the Google Pay sheet (WALLET) */
       var plan = valOf('payment'), inParts = plan && plan !== 'full';
       var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) word(pay).textContent = inParts ? T('Apply for {n} payments', { n: plan }) : chosen ? T('Pay {sum}', { sum: sumTxt }) : T('Pay');
-      /* [data-per-month="10"]: the total over that many parts (2026-10-26 — was typed by hand) */
+      /* [data-per-month="10"]: the total over that many parts, «408 грн / міс.» — the row's price on the right, as a
+         delivery's (2026-11-03: was a line under the name with «· 10 × with monobank»; the name already says how many).
+         [data-pay-total]: the whole sum, in the «Pay in full» row. Nothing chosen or a price on request: empty. */
       $$(form, '[data-per-month]').forEach(function (el) { var n = +el.dataset.perMonth;
-        el.textContent = chosen && !open ? T('{sum} / month · {n} × with ' + (valOf('bank') === 'privat' ? 'PrivatBank' : 'monobank'), { sum: eur(Math.round(sum / n * 100) / 100), n: n }) : T('monobank or PrivatBank, interest-free'); });
+        el.textContent = chosen && !open ? eur(Math.round(sum / n * 100) / 100) + ' ' + T('/ month') : ''; });
+      $$(form, '[data-pay-total]').forEach(function (el) { el.textContent = chosen && !open ? sumTxt : ''; });
       var dl = form.querySelector('[data-summary]'), dt = form.querySelector('[data-summary-total]');   /* the total in a list of its own when there is one (the code stands between) */
       var rowsHtml = steps().slice(0, -1).map(function (s) { var v = stepVal(s, true);
           return v ? '<dt>' + esc(text(s.querySelector('.order-step-name'))) + '</dt><dd>' + v + '</dd>' : ''; }).join('')
@@ -267,6 +275,8 @@
               : ic && window.KitIcons ? KitIcons.svg(ic, { size: 20 }) : null }; }),
         Math.max(0, rs.findIndex(function (r) { return r.checked; })),
         function (v, i) { rs[i].checked = true; rs[i].dispatchEvent(new Event('change', { bubbles: true })); });
+      /* a form reset puts the radios back; the tabs follow (2026-11-03, CANCEL) */
+      form.addEventListener('reset', function () { setTimeout(function () { var k = rs.findIndex(function (r) { return r.checked; }); if (k >= 0 && btns[k]) btns[k].click(); }, 0); });
       if (logos) { if ('tall' in g.dataset) host.classList.add('is-tall'); btns.forEach(function (b, i) { b.setAttribute('aria-label', rs[i].parentNode.textContent.trim()); }); }
       /* BRAND TABS (2026-10-26): <label data-tab-color="#000000" data-logo-on="…-white.svg"> — chosen, the plate
          under the tab takes the brand's colour and the logo its one-colour version (segmented.css BRAND) */
@@ -457,6 +467,53 @@
       };
     });
 
+    /* RESET (2026-11-03): whatever empties the form — the bar's × (CANCEL), a request sent — leaves no
+       old error, hint or «chosen by itself» behind; then everything recounts. */
+    form.addEventListener('reset', function () { setTimeout(function () {
+      $$(form, '[data-pick-one]').forEach(function (o) { delete o.dataset.unpicked; });
+      $$(form, '[aria-invalid]').forEach(function (el) { if (el.name) mark(el); });
+      steps().forEach(function (s) { hint(s, ''); });
+      update(); }, 0); });
+
+    /* CANCEL (2026-11-03): see the head of this file. */
+    if (dock) (function () {
+      var x = dock.querySelector('[data-dock-cancel]');
+      if (!x) { x = document.createElement('button'); x.type = 'button'; x.className = 'icon-btn icon-btn-md order-dock-x'; x.setAttribute('data-dock-cancel', ''); dock.appendChild(x); }
+      if (!x.innerHTML.trim()) x.innerHTML = window.KitIcons ? KitIcons.svg('x', { size: 20 }) : '×';
+      x.setAttribute('aria-label', T('Cancel the order'));
+      var pop = null, id = (form.id || 'order') + '-cancel';
+      var drop = function () {
+        if (notice) notice.hidden = true;
+        form.reset();
+        setTimeout(function () {   /* after the reset's own listeners: back to the first step */
+          reached = 0; lock();
+          var first = steps()[0]; if (!first) return;
+          var t = first.querySelector('.panel-title'); acc(t, true); if (t && t.focus) t.focus({ preventScroll: true });
+        }, 0);
+      };
+      x.addEventListener('click', function () {
+        if (!pop) {
+          pop = document.createElement('div'); pop.className = 'popup-overlay'; pop.hidden = true;
+          pop.innerHTML = '<div class="popup is-center order-cancel-pop" role="alertdialog" aria-modal="true" aria-labelledby="' + id + '-t" aria-describedby="' + id + '-d">'
+            + '<div class="popup-header"><div class="popup-title" id="' + id + '-t"></div><div class="popup-text" id="' + id + '-d"></div></div>'
+            + '<div class="popup-actions"><button class="btn btn-tertiary" type="button" data-keep></button><button class="btn btn-danger" type="button" data-drop></button></div></div>';
+          document.body.appendChild(pop);
+        }
+        pop.querySelector('.popup-title').textContent = T('Cancel the order?');
+        pop.querySelector('.popup-text').textContent = T('Everything you have chosen and filled in will be cleared.');
+        var keep = pop.querySelector('[data-keep]'), go = pop.querySelector('[data-drop]'), back = document.activeElement;
+        keep.textContent = T('Keep'); go.textContent = T('Cancel order');
+        var end = function (yes) { pop.hidden = true; pop.onclick = null; document.removeEventListener('keydown', key, true);
+          if (yes) drop(); else if (back && back.focus) back.focus(); };
+        var key = function (e) {
+          if (e.key === 'Escape') { e.preventDefault(); end(false); }
+          else if (e.key === 'Tab') { e.preventDefault(); (document.activeElement === keep ? go : keep).focus(); } };   /* the focus stays in the popup */
+        pop.onclick = function (e) { if (e.target === pop || e.target.closest('[data-keep]')) end(false); else if (e.target.closest('[data-drop]')) end(true); };
+        document.addEventListener('keydown', key, true);
+        pop.hidden = false; setTimeout(function () { keep.focus(); }, 0);
+      });
+    })();
+
     /* CODE (2026-10-26): [data-code-open] gives its place to the row with the field; × puts it back
        (the code cleared). Apply (inside the field, field.css .input-action) turns busy while the code is
        checked, then the field says how it went: .is-success (the check; the field read-only until ×)
@@ -489,6 +546,7 @@
       };
       open.addEventListener('click', function () { slide(open, false); slide(row, true); f.focus(); });   /* the link gives way to the field, as a fold (2026-10-31) */
       close.addEventListener('click', function () { slide(row, false); slide(open, true); f.value = ''; state(''); take(''); open.focus(); });
+      form.addEventListener('reset', function () { setTimeout(function () { if (form.dataset.code || !row.hidden) { slide(row, false); slide(open, true); f.value = ''; state(''); take(''); } }, 0); });   /* CANCEL: the code put back */
       f.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); apply.click(); } });
       f.addEventListener('input', function () { if (field.classList.contains('is-error')) state(''); });
       apply.addEventListener('click', function () {

@@ -99,6 +99,7 @@
       say(bad.filter(function (b, i) { return bad.indexOf(b) === i; }).join(' · ')); update();
     };
     input.addEventListener('change', function () { take(input.files); input.value = ''; });
+    if (input.form) input.form.addEventListener('reset', function () { setTimeout(function () { items = []; say(''); update(); }, 0); });   /* the form emptied (order.js CANCEL, a request sent): no photos (2026-11-03) */
     /* drag and drop: the whole box takes it, the place to drop lights up */
     var depth = 0, over = function (on) { zone.classList.toggle('is-over', on); };
     box.addEventListener('dragenter', function (e) { if (!e.dataTransfer || [].indexOf.call(e.dataTransfer.types, 'Files') < 0) return; e.preventDefault(); depth++; over(true); });

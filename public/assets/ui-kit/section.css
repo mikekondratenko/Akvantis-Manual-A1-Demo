@@ -860,6 +860,11 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-dock-txt .t-small, .order-dock-price .t-small { color: var(--ink-muted); }
 .order-dock-price { display: flex; flex-direction: row-reverse; align-items: baseline; gap: var(--space-8); flex: none; text-align: right; }   /* one row: the struck price left of the total (2026-10-29) */
 .order-dock-price .choice-was { margin: 0; font-size: var(--type-small); }
+/* CANCEL (2026-11-03): the × at the bar's end, after the total — the order thrown away, after a question
+   (order.js CANCEL). 40 round, on the bar's frost; it eats into the 32 end padding so the bar keeps its height. */
+.order-dock-x { flex: none; margin-right: calc(var(--space-16) * -1); margin-left: calc(var(--space-8) * -1); color: var(--ink-muted); }
+.order-dock-x:hover { color: var(--ink); }
+.order-cancel-pop .popup-actions .btn { width: auto; min-width: 124px; }   /* «Скасувати замовлення» does not fit 124 */
 body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--number-96) + env(safe-area-inset-bottom)); }
 /* the preview's controls over the bar: grid.css FAB ROW (2026-10-30) */
 

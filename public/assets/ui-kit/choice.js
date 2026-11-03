@@ -18,6 +18,16 @@
        own radio is chosen, and the card gets data-finish-label (the strip and the bar read it).
        Not in the catalogue: data-swatches='[{id, label, hex, img}, …]' on the row (2026-10-29 —
        the accessories' colours); the same discs, the same picture swap.
+       2026-11-03 — a bundle card shows each thing in it apart (.choice-pics.is-pair: the A1 and
+       the tap, two pictures) and may have a row for each; the card's data-finish-label is then
+       every row's finish, «White & Grey · Chrome». A row with ONE finish draws no discs and adds
+       nothing to the label — the A1 is White & Grey only for now; its row is in the card already
+       (data-colours="whitegrey"), so Black is one word in data-colours when it is sold.
+       data-follows="A1" + data-follow='{"black":"black","whitegrey":"white"}' on a row: it takes
+       the finish an A1 row was last set to (the cartridges follow the machine), and is still a
+       row the buyer can change. data-finish-of="<row's data-device>" on any picture in the page,
+       with data-finish-tpl="…/a1-pcb-i{f}-front.webp": the row writes its finish's img into {f}
+       ("" or "-bk") — pictures that are not in the row's card (the cartridge cards).
 
      TOGGLE (2026-10-29)  every option is taken AND put back: a radio in a label.choice that is
        already chosen, tapped again, is let go — nothing chosen in its group, `change` fires (it
@@ -82,13 +92,24 @@
       var discs = document.createElement('div'); discs.className = 'pair-row';
       discs.setAttribute('role', 'radiogroup'); discs.setAttribute('aria-label', d.code + ' finish');
       var name = document.createElement('span'); name.className = 'pair-name';
+      var single = list.length < 2;
+      if (single) row.classList.add('is-single');
       var pick = function (fid, quiet) {
         $$(discs, '.swatch-btn').forEach(function (b) { var on = b.dataset.id === fid; b.classList.toggle('is-active', on); b.setAttribute('aria-checked', on); });
         var label = (cols[fid] || {}).label || fid; label = (window.KitLang && KitLang.t && KitLang.t(label)) || label; name.textContent = label;   /* a finish name through the page's language, if it has one (2026-10-29) */
         if (field) field.value = fid;
-        if (card) card.dataset.finishLabel = label;
+        row.__label = single ? '' : label;
+        if (card) card.dataset.finishLabel = $$(card, '.choice-finish').map(function (r) { return r.__label || ''; }).filter(Boolean).join(' · ');
         var img = card && card.querySelector('[data-device-pic="' + d.code + '"]'), file = d.imgs && d.imgs[fid];
         if (img && file && row.dataset.src) img.src = row.dataset.src.replace('{img}', file);
+        /* pictures elsewhere in the page that wear this row's finish (2026-11-03 — the cartridges) */
+        if (file != null) $$(document, '[data-finish-of="' + d.code + '"]').forEach(function (p) {
+          if (p.dataset.finishTpl) p.src = p.dataset.finishTpl.replace('{f}', file);
+          var c = p.closest('.choice'); if (c && !single) c.dataset.finishLabel = label; });
+        /* rows that follow this one (the cartridges follow the A1) */
+        $$(document, '.choice-finish[data-follows="' + d.code + '"]').forEach(function (f) {
+          if (!f.__pick) return; var map = {}; try { map = JSON.parse(f.dataset.follow || '{}'); } catch (e) {}
+          if (map[fid]) f.__pick(map[fid], true); });
         if (quiet) return;
         var radio = card && card.querySelector('input[type=radio]');
         if (radio && !radio.checked) radio.checked = true;
@@ -102,7 +123,8 @@
         b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); pick(fid); });
         discs.appendChild(b);
       });
-      row.appendChild(discs); row.appendChild(name);
+      if (!single) { row.appendChild(discs); row.appendChild(name); }
+      row.__pick = function (fid, quiet) { if (list.indexOf(fid) >= 0) pick(fid, quiet); };
       pick(list.indexOf(row.dataset.default) >= 0 ? row.dataset.default : list[0], true);
     });
   }
@@ -203,6 +225,7 @@
         done: function (v, ink) { if (v) { nameF.value = v; inkF.value = ink; if (count && !(+count.value)) setCount(1); } paint(); } }); };
       sw.addEventListener('click', function () { if (nameF.value) { nameF.value = ''; paint(); } else open(); });
       line.addEventListener('click', function (e) { if (e.target.closest('button')) open(); });
+      if (form) form.addEventListener('reset', function () { setTimeout(function () { nameF.value = ''; if (inkF) inkF.value = (inks[0] || {}).id || ''; paint(); }, 0); });   /* the form emptied (order.js CANCEL): the plain thing again (2026-11-03) */
       paint();
     });
   }
