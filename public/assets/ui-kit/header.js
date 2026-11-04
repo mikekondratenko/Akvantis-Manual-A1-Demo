@@ -46,6 +46,11 @@
       was = cur;
     }
     addEventListener('scroll', place, { passive: true }); addEventListener('resize', place); place();
+    /* EDGE FADE (2026-11-04): the side that has more links fades (header.css) */
+    function edges() { var max = nav.scrollWidth - nav.clientWidth, x = Math.abs(nav.scrollLeft);
+      nav.classList.toggle('has-more-start', max > 1 && x > 1); nav.classList.toggle('has-more-end', max > 1 && x < max - 1); }
+    nav.addEventListener('scroll', edges, { passive: true }); addEventListener('resize', edges); edges();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(edges);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();

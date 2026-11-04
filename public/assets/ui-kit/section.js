@@ -122,8 +122,8 @@
     });
     var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     var drifts = still ? [] : [].slice.call(document.querySelectorAll('.sec-drift-text'));
-    /* WORDS (2026-11-04): the line is cut into words (.drift-w); on a scroll each word trails the one before it,
-       a little more down the line, so the gaps open while the page moves and close as it stops. */
+    /* WORDS (2026-11-04): the line is cut into words (.drift-w); on a scroll each word trails the line, a little
+       more down the line, so the gaps open while the page moves and close smoothly as it stops. */
     drifts.forEach(function (d) {
       if (!d.querySelector('.drift-w')) {
         if (!d.hasAttribute('aria-label')) d.setAttribute('aria-label', d.textContent.trim());
@@ -131,13 +131,14 @@
           return '<span class="drift-w" aria-hidden="true">' + w.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }) + '</span>';
         }).join(' ');
       }
-      d.__w = [].slice.call(d.querySelectorAll('.drift-w')); d.__o = d.__w.map(function () { return 0; });
+      d.__w = [].slice.call(d.querySelectorAll('.drift-w'));
     });
     if (!fills.length && !drifts.length) return;
     var ticking = false;
     function paint() {
       ticking = false;
-      var vh = innerHeight, moving = false;
+      var vh = innerHeight, moving = false, now = performance.now();
+      var dt = Math.min(0.05, (now - (paint.t || now)) / 1000) || 0.016; paint.t = now;   // seconds since the last frame
       drifts.forEach(function (d) {
         var sec = d.closest('.sec-drift') || d.parentNode, w = sec.clientWidth;
         var m = parseFloat(getComputedStyle(sec).getPropertyValue('--grid-margin')) || 24;
@@ -145,20 +146,24 @@
            section comes up, so its first word is read in full; it ends with its last letter a margin in from the
            right. Its whole way is the line's width, at one pixel per pixel scrolled — a screen of it while the
            section comes up, the rest pinned. */
-        var sw = d.scrollWidth, x0 = w - m, way = sw;
+        var sw = d.offsetWidth, x0 = w - m, way = sw;   // offsetWidth: the words' own shifts don't count (scrollWidth did — the line jerked back)
         var run = Math.max(0, way - vh);
         if (sec.__run !== run) { sec.__run = run; sec.style.setProperty('--drift-run', run + 'px'); }
         var r = sec.getBoundingClientRect();
         var t = Math.max(0, Math.min(1, (vh - r.top) / way));   // top at the window's foot → −run (pinned)
-        var x = x0 - way * t, dx = d.__x == null ? 0 : x - d.__x; d.__x = x;
+        var x = x0 - way * t;
         d.style.setProperty('--drift', x.toFixed(1) + 'px');
+        /* each word eases to the line on its own clock (no chain, so no spring-back): the first a little
+           (a wheel's steps smoothed), each next 0.14 s later — 0.06, 0.20, 0.34 s… */
+        if (!d.__p) d.__p = d.__w.map(function () { return x; });
         var cap = w * 0.8;
-        for (var i = 1; i < d.__w.length; i++) {
-          var o = d.__o[i] - dx;                                  // stays where it was…
-          o += (d.__o[i - 1] - o) * (0.046 + 0.04 / i);           // …then catches up with the word before it (3.5× the first try's lag)
-          o = Math.max(-cap, Math.min(cap, o));
-          if (Math.abs(o) < 0.3) o = 0; else moving = true;
-          if (o !== d.__o[i]) { d.__o[i] = o; d.__w[i].style.transform = o ? 'translate3d(' + o.toFixed(1) + 'px,0,0)' : ''; }
+        for (var i = 0; i < d.__w.length; i++) {
+          var p = d.__p[i] + (x - d.__p[i]) * (1 - Math.exp(-dt / (0.06 + 0.14 * i)));
+          p = Math.max(x - cap, Math.min(x + cap, p));
+          if (Math.abs(p - x) < 0.3) p = x; else moving = true;
+          d.__p[i] = p;
+          var o = p - x, css = o ? 'translate3d(' + o.toFixed(1) + 'px,0,0)' : '';
+          if (d.__w[i].__css !== css) { d.__w[i].__css = css; d.__w[i].style.transform = css; }
         }
       });
       fills.forEach(function (p) {

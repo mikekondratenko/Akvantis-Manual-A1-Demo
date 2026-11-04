@@ -120,6 +120,16 @@ body.bar-away .header { transform: translate(-50%, calc(-100% - var(--bar-top)))
               -webkit-overflow-scrolling: touch;
               scrollbar-width: none; }
 .header-nav::-webkit-scrollbar { display: none; }
+/* EDGE FADE (2026-11-04): where the row runs on past an edge, its links go into transparency over 40 px —
+   only on the side that has more (header.js sets .has-more-start / .has-more-end as the row scrolls). */
+@property --nav-fade-s { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --nav-fade-e { syntax: '<length>'; inherits: false; initial-value: 0px; }
+.header-nav { --nav-fade: var(--space-40, 40px);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--nav-fade-s), #000 calc(100% - var(--nav-fade-e)), transparent);
+          mask-image: linear-gradient(to right, transparent, #000 var(--nav-fade-s), #000 calc(100% - var(--nav-fade-e)), transparent);
+  transition: --nav-fade-s var(--duration-fast, .2s), --nav-fade-e var(--duration-fast, .2s); }
+.header-nav.has-more-start { --nav-fade-s: var(--nav-fade); }
+.header-nav.has-more-end   { --nav-fade-e: var(--nav-fade); }
 
 /* ── Centred once the row fits, ranged left while it does not ──
    Only from 768 up. On a phone the row is longer than the screen by design and centring
