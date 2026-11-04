@@ -55,6 +55,8 @@
        .sec-info-grid · .sec-info-pic · .sec-info-stats · .stat · .stat-value
      .sec-statement    a kicker and one huge line, centred — «Best battery life.» (apple.com)
      .sec-text         words alone, centred: a kicker in caps, a title, a body, a link or buttons (2026-11-04)
+     .sec-drift        one huge line that runs left to right as the page scrolls (2026-11-04)
+     .sec-callout      two figures in an outlined frame, 8 modules — Apple's battery band (2026-11-04)
      .sec-figures      cards with large figures, a picture or a film on any of them, bento sizes (2026-11-04)
      .sec-numbers      a centred title and figures alone in 2 or 3 columns, Apple's «Strength in numbers.» (2026-11-04)
      .sec-bar          a title on the left (`.t-h1`, as every cards section — 2026-10-26) and a link or
@@ -593,6 +595,21 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .sec-bar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-16) var(--space-24); }
 .sec-bar > .link { color: var(--accent-text); font-size: var(--type-body); white-space: nowrap; }
 
+/* ── DRIFT (2026-11-04) ── `.sec-drift`: one line of words three times the quote's size (84 · 144 · 192 · 240)
+   that runs from left to right as the page is scrolled down, and back as it goes up (section.js DRIFT). The
+   line never wraps; the section clips it. It starts with its beginning off the left edge and ends with it
+   in from the left — the scroll reads it. Under prefers-reduced-motion it stands still and wraps.
+     <section class="sec sec-drift"><p class="sec-drift-text">Easier than ever.</p></section> */
+.sec-drift { padding-inline: 0; }
+.sec-drift-text { grid-column: 1 / -1; justify-self: start; width: max-content; margin: 0; white-space: nowrap;
+  font-size: calc(var(--type-quote) * 3); line-height: var(--leading-none); font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight); color: var(--ink);
+  transform: translate3d(var(--drift, 0px), 0, 0); will-change: transform; }
+@media (prefers-reduced-motion: reduce) {
+  .sec-drift { padding-inline: var(--grid-margin); }
+  .sec-drift-text { width: auto; white-space: normal; transform: none; }
+}
+
 /* ══════════════ FIGURES (2026-11-04) ══════════════
    `.sec-figures`: cards with large figures (Bluewater's SuperiorOsmosis board). A card is a kicker, an «Up to»,
    the figure and a line — each optional; a card may carry a picture or a film filling it (`.has-pic` +
@@ -664,6 +681,24 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .num-value small { position: absolute; left: 100%; top: .12em; margin-left: .1em; font-size: .36em; line-height: 1;
   font-weight: var(--weight-medium); letter-spacing: 0; white-space: nowrap; color: var(--ink); }
 .num-text { font-size: var(--type-small); line-height: var(--leading-snug); color: var(--ink-muted); text-wrap: balance; }
+
+/* ══════════════ CALLOUT (2026-11-04) ══════════════
+   `.sec-callout`: Apple's «Up to 13 more hours | Fast charge up to 50%» — two figures in an outlined frame
+   (no fill, a clear line), 8 page modules wide from 1024 (12 of 20 from 1920), the figures side by side from
+   768 and set from the left, as a pair in the frame's middle; one over the other on a phone. The items are
+   `.sec-numbers`' (`.num-item`, the same RULE: digits large, a unit raised, words in the «Up to» and the line).
+     <section class="sec sec-callout"><ul class="num-grid callout">
+       <li class="num-item"><p class="num-pre">Up to</p><p class="num-value">2.0 <small>L/min</small></p><p class="num-text">…</p></li>
+       <li class="num-item">…</li></ul></section> */
+.sec-callout > .callout { grid-column: 1 / -1; padding: var(--space-40) var(--space-24); border-radius: var(--sec-card-radius);
+  box-shadow: inset 0 0 0 var(--hairline) var(--white-22); }
+.callout .num-item { justify-items: start; text-align: start; }
+@media (min-width: 768px) {
+  .sec-callout > .callout { grid-template-columns: repeat(2, max-content); justify-content: center; column-gap: var(--space-96);
+    padding: var(--space-96) var(--space-48); }
+}
+@media (min-width: 1024px) { .sec-callout > .callout { grid-column: 3 / span 8; } }
+@media (min-width: 1920px) { .sec-callout > .callout { grid-column: 5 / span 12; } }
 
 /* ══════════════ SLIDERS ══════════════
    One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the
