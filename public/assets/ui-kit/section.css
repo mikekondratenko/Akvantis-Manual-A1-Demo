@@ -861,6 +861,10 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 /* Under Pay: how one can pay, in words — no bank or card logos (monobank's brandbook: one acquiring
    on the site → the button's words only, Apple Pay / Google Pay may be named; 2026-10-26). */
 .order-pay-note { margin: 0; text-align: center; color: var(--ink-faint); }
+/* CONSENT (2026-11-04): under Pay, the line that accepts the public offer — paying is the acceptance, no tick box.
+   The link opens the offer in a new tab, so the form stays as it is. */
+.order-legal { margin: 0; text-align: center; color: var(--ink-faint); text-wrap: balance; }
+.order-legal a { color: var(--ink-muted); }
 /* WALLET (2026-10-26, prototype — order.js): Apple Pay and Google Pay — the kit's .btn-wallet (button.css) —
    before Pay; on a phone they share a row, Pay under them. */
 .order-wallet { display: flex; gap: var(--btn-gap); }

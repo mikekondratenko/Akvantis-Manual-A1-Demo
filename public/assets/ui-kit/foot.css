@@ -38,6 +38,14 @@
   transition: color var(--duration-fast); }
 .foot-link:hover { color: var(--ink); }
 .foot-link:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset, 2px); border-radius: var(--radius-4); }
+/* LEGAL (2026-11-04): the public offer, the privacy policy, returns — a row of quiet links over the © line;
+   the documents are the seller's (ФОП Ванжа), in the shop: docs/A1-specifications.md §2.5. In a `.sec-footer-bottom`
+   the row stands on the left. */
+.legal-links { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-4) var(--space-16); margin: 0 0 var(--space-8); }
+.legal-links a { font-size: var(--type-caption); color: var(--ink-muted); text-decoration: none; transition: color var(--duration-fast); }
+.legal-links a:hover { color: var(--ink); }
+.legal-links a:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset, 2px); border-radius: var(--radius-4); }
+.sec-footer-bottom .legal-links { margin: 0; justify-content: flex-start; }
 .foot-mark { display: block; width: var(--number-72); margin: 0 auto var(--space-12); color: var(--ink-quiet); }
 .foot-mark svg { display: block; width: 100%; height: auto; }
 
