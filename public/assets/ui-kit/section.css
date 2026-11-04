@@ -54,6 +54,7 @@
                        `.is-flip` puts the picture right
        .sec-info-grid · .sec-info-pic · .sec-info-stats · .stat · .stat-value
      .sec-statement    a kicker and one huge line, centred — «Best battery life.» (apple.com)
+     .sec-text         words alone, centred: a kicker in caps, a title, a body, a link or buttons (2026-11-04)
      .sec-bar          a title on the left (`.t-h1`, as every cards section — 2026-10-26) and a link or
                        the arrows on the right, over a slider
      .sec-kicker       the small line over a title — muted, semibold, never in caps
@@ -253,6 +254,32 @@ img.sec-banner { object-fit: contain; }
 @media (min-width: 1024px) { :root { --type-quote: var(--text-64); --quote-span: 1 / span 10; } }
 @media (min-width: 1440px) { :root { --type-quote: var(--text-80); } }
 @media (min-width: 1920px) { :root { --quote-span: 1 / span 16; } }
+/* ── TEXT (2026-11-04) ── `.sec-text`: a section of words alone, centred (apple.com, «Brilliance within
+   reach.»): a kicker in caps, a title, a body at a reading measure and — each optional — a link (↗ when it
+   leaves the page) or buttons.
+     <section class="sec sec-text">
+       <p class="sec-text-kicker">A1 · Direct Flow</p>
+       <h2 class="t-display">Clean water within reach.</h2>
+       <p class="sec-text-body">…</p>
+       <a class="link sec-text-link" href="…">Open the A1 guide <i data-icon="arrow-up-right" data-size="20"></i></a>
+         or <div class="sec-actions"><a class="btn btn-primary" href="…">…</a> …</div>
+     </section>
+   The caps are this kicker's own (asked for 2026-11-04); `.sec-kicker` elsewhere stays in sentence case. */
+.sec-text { justify-items: center; text-align: center; row-gap: var(--space-16); padding-block: calc(var(--sec-pad) * 1.5); }
+.sec-text > * { grid-column: 1 / -1; margin: 0; }
+.sec-text-kicker { font-size: var(--text-14); line-height: var(--leading-snug); font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--ink); }
+.sec-text-body { max-width: calc(var(--number-288) * 3); margin-top: var(--space-8); font-size: var(--type-body);
+  line-height: var(--leading-relaxed); color: var(--ink-muted); text-wrap: pretty; }
+.sec-text > :is(.sec-text-link, .sec-actions) { margin-top: var(--space-16); }
+.sec-text .sec-actions { justify-content: center; }
+.sec-text-link { color: var(--accent-text); font-size: var(--type-body); }
+.sec-text-link > svg, .sec-text-link > i { display: inline-block; vertical-align: -.15em; margin-left: var(--space-4); }
+@media (min-width: 1024px) {
+  .sec-text-kicker { font-size: var(--text-16); }
+  .sec-text-body, .sec-text-link { font-size: var(--text-24); }
+}
+
 .sec-quote { row-gap: var(--space-24); padding-block: calc(var(--sec-pad) * 1.5); }
 .sec-quote > * { grid-column: var(--quote-span); }
 .sec-quote-text { margin: 0; font-size: var(--type-quote); line-height: var(--leading-tight); font-weight: var(--weight-semibold);
