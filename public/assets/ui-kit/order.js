@@ -34,7 +34,7 @@
            choice without a price makes it «price on request»). data-currency (default EUR) and
            data-rate: the € prices shown in another currency, e.g. UAH × 48.
    CANCEL  the bar's × (2026-11-03; made here when the dock has no [data-dock-cancel]): a popup asks
-           (popup.css, .btn-danger) — «Keep» is the default and Esc, a click past the plate; «Cancel order»
+           (popup.css, .btn-danger) — «Keep» is the default and Esc, a click past the plate; «Yes, cancel»
            resets the form (form.reset: choices, counts, fields, the code, the photos, the name on the
            towel), locks the steps after the first and opens the first. The bar goes down with nothing chosen.
    PAY     form[data-pay-url="/api/pay"]: on send the order (FormData — hidden rows are disabled, so left
@@ -503,7 +503,7 @@
         pop.querySelector('.popup-title').textContent = T('Cancel the order?');
         pop.querySelector('.popup-text').textContent = T('Everything you have chosen and filled in will be cleared.');
         var keep = pop.querySelector('.popup-actions [data-keep]'), go = pop.querySelector('[data-drop]'), back = document.activeElement;
-        keep.textContent = T('Keep'); go.textContent = T('Cancel order'); pop.querySelector('.popup-close').setAttribute('aria-label', T('Close'));
+        keep.textContent = T('Keep'); go.textContent = T('Yes, cancel');   /* «Так, скасувати» (2026-11-04; was «Cancel order») */ pop.querySelector('.popup-close').setAttribute('aria-label', T('Close'));
         var end = function (yes) { pop.hidden = true; pop.onclick = null; document.removeEventListener('keydown', key, true);
           if (yes) drop(); else if (back && back.focus) back.focus(); };
         var key = function (e) {
