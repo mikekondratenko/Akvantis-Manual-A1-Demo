@@ -145,6 +145,11 @@ body.bar-away .header { transform: translate(-50%, calc(-100% - var(--bar-top)))
                 transition: color var(--duration-fast); }
 .header-nav a:hover { color: var(--white); }
 .header-nav a.is-here { color: var(--white); }
+/* The language in the head («En ⌄», locale.css) reads as one more section link (2026-11-04): their size, weight and
+   grey, white under the cursor. */
+.header .lang-mark.locale-lang { font-size: var(--text-12); font-weight: var(--weight-semibold); color: var(--black-250); transition: color var(--duration-fast); }
+.header .lang-mark.locale-lang .locale-code { font: inherit; color: inherit; }
+.header .lang-mark.locale-lang:hover { color: var(--white); background: none; }
 
 /* ── One rule that travels, not one per link ──
    The position marker is a rule on the bar's bottom edge, not a plate behind the word: a
