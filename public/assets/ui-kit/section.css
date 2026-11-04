@@ -820,6 +820,15 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
   transition-delay: calc(var(--rv-r, 0) * 70ms + 120ms); }
 .rv:not(.is-in) :is(.specs > .specs-row, .compare thead tr, .compare tbody tr, .sec-faq-list > *) { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 4), 0); }
 .rv.is-done :is(.specs > .specs-row, .compare thead tr, .compare tbody tr, .sec-faq-list > *) { transition: background var(--duration-fast); }
+/* MARK (2026-11-04): the Akvantis mark in the header and the footer — on a hover the ring stays and the wave
+   rises out through the ring's inside as the same wave comes up from below (section.js MARK builds the mask). */
+.mark-wave { transition: transform calc(var(--reveal-ms) * .7) var(--reveal-ease); }
+.mark-wave.is-next { transform: translateY(34px); }
+.mark-host:hover .mark-wave, .mark-host:focus-visible .mark-wave { transform: translateY(-34px); }
+.mark-host:hover .mark-wave.is-next, .mark-host:focus-visible .mark-wave.is-next { transform: none; }
+@media (prefers-reduced-motion: reduce) { .mark-wave { transition: none; } }
+@media (hover: none) { .mark-host:hover .mark-wave { transform: none; } .mark-host:hover .mark-wave.is-next { transform: translateY(34px); } }
+
 /* SLIDES (2026-11-04): on the reveal they rise like the cards — the ones in view 0.3 s apart (--rv-d), the rest
    at once. No offset on a swipe (the lag was taken out the same day): a swiped track moves as one. */
 .slider-track > .is-peek { cursor: pointer; }   /* a click scrolls it in (slider.js) */

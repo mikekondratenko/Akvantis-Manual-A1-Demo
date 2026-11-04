@@ -96,6 +96,33 @@
       secs.forEach(function (s) { s.classList.remove('rv-init'); });
       heroes.forEach(function (s) { s.classList.add('is-in'); setTimeout(function () { s.classList.add('is-done'); }, 2000); }); }); });
   })();
+  /* MARK (2026-11-04) — the Akvantis mark in the header and the footer: on a hover (or a key's focus) the ring
+     stays and the wave rises out through the ring's inside while the same wave comes up from below, through a
+     round mask (section.css MARK). The header's mark takes the page to its top. */
+  (function mark() {
+    var n = 0, NS = 'http://www.w3.org/2000/svg';
+    [].forEach.call(document.querySelectorAll('.header-mark > svg, .sec-footer-brand svg'), function (svg) {
+      var ps = svg.querySelectorAll(':scope > path'); if (ps.length !== 3 || svg.querySelector('.mark-waves')) return;
+      var id = 'mark-clip-' + (++n), defs = document.createElementNS(NS, 'defs'), cp = document.createElementNS(NS, 'clipPath'), c = document.createElementNS(NS, 'circle');
+      cp.setAttribute('id', id); c.setAttribute('cx', '24.02'); c.setAttribute('cy', '24.18'); c.setAttribute('r', '21.1');   // the ring's inside
+      cp.appendChild(c); defs.appendChild(cp); svg.insertBefore(defs, svg.firstChild);
+      var mask = document.createElementNS(NS, 'g'), a = document.createElementNS(NS, 'g');
+      mask.setAttribute('clip-path', 'url(#' + id + ')'); mask.setAttribute('class', 'mark-waves');
+      a.setAttribute('class', 'mark-wave'); a.appendChild(ps[1]); a.appendChild(ps[2]);
+      var b = a.cloneNode(true); b.setAttribute('class', 'mark-wave is-next');
+      mask.appendChild(a); mask.appendChild(b); svg.appendChild(mask);
+      var host = svg.closest('a, button') || svg; host.classList.add('mark-host');
+    });
+    [].forEach.call(document.querySelectorAll('a.header-mark'), function (a) {
+      a.addEventListener('click', function (e) {
+        var h = a.getAttribute('href') || '';
+        if (h !== '#top' && h !== '#' && document.querySelector(h)) { var t = document.querySelector(h); if (t.getBoundingClientRect().top + scrollY > 4) return; }
+        e.preventDefault();
+        scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+      });
+    });
+  })();
   /* EXPAND (2026-11-04) — .xp-row: one card open; from 768 on a pointer the card under it opens,
      a tap or Enter on its button opens it anywhere. The closed cards' words are inert. */
   (function expand() {
