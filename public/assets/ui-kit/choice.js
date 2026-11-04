@@ -120,7 +120,8 @@
         cols = Object.assign({}, COL);
         sw.forEach(function (c) { d.colours.push(c.id); d.imgs[c.id] = c.img; cols[c.id] = c; });   /* this row's own — the catalogue's «black» stays the taps' */ } catch (e) { d = null; } }
       if (!d) return;
-      var card = row.closest('.choice'), field = row.querySelector('input[type=hidden]');
+      /* a row also works on a page's card outside a form (2026-11-04 — the landing's taps: the discs turn the picture) */
+      var card = row.closest('.choice') || row.closest('.card'), field = row.querySelector('input[type=hidden]');
       var list = row.dataset.colours ? row.dataset.colours.split(/\s+/) : (d.colours || []);
       var discs = document.createElement('div'); discs.className = 'pair-row';
       discs.setAttribute('role', 'radiogroup'); var nameOf = card && card.querySelector('.choice-name, b');
