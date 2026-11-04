@@ -106,7 +106,7 @@
 @media (min-width: 1920px) { :root { --sec-head: 1 / span 10; --sec-half: 10; --split-text-at: 6; --split-text-at-flip: 13; --sec-narrow: 7 / 15; } }
 
 /* ── THE STACK AND THE SHEET ── */
-:root { --card-gap: var(--space-12); }   /* CARDS AND SHEETS STAND 12 APART (2026-11-04): card grids, bento, every carousel,
+:root { --card-gap: var(--space-12); --sheet-gap: var(--space-24); }   /* CARDS STAND 12 APART, SHEETS (hero / cover) 24 (2026-11-04): card grids, bento, every carousel,
    the highlights' slides and two frames in a row (hero, banners) — one gap; the grid's own gutter stays 8 */
 .sec-stack { --stack-gap: var(--space-2); display: grid; gap: var(--stack-gap); padding: var(--space-2); background: var(--page); }
 /* Dark (2026-10-25): the ground is the sheets' own black — one black from top to bottom, the
@@ -191,7 +191,7 @@ img.sec-banner { object-fit: contain; }
 }
 /* Two frames in a row are one inset apart, not two (2026-10-25): the second sheet is drawn over
    the first's bottom inset. The frames keep their size — the hero stays exactly a screen. */
-:is(.sec-hero, .sec-cover) + :is(.sec-hero, .sec-cover) { background: transparent; margin-top: calc(var(--card-gap) - 2 * var(--hero-inset) - var(--stack-gap, 0px)); }   /* the two sheets --card-gap apart (2026-11-04; was one inset) */
+:is(.sec-hero, .sec-cover) + :is(.sec-hero, .sec-cover) { background: transparent; margin-top: calc(var(--sheet-gap) - 2 * var(--hero-inset) - var(--stack-gap, 0px)); }   /* the two sheets --sheet-gap apart: 24 (2026-11-04; was --card-gap 12, before that one inset) */
 .sec-hero > .sec-head, .sec-cta > .sec-head { grid-column: 1 / -1; justify-items: center; }
 .sec-hero .sec-actions, .sec-cta .sec-actions { justify-content: center; }
 /* Centred lines are balanced, caption included: two near-equal lines, never a word alone. */
