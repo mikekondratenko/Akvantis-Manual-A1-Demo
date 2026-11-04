@@ -806,21 +806,18 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
   transition-delay: calc(var(--rv-d, 0ms) + 120ms); }
 .rv:is(.sec-split, .sec-text):not(.is-in) > * { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }
 .rv:is(.sec-split, .sec-text).is-done > * { transition: none; }
-/* TABLES (2026-11-04): the rows of the specifications and of the comparison come in one after another,
+/* TABLES AND FAQ (2026-11-04): the rows of the specifications, of the comparison and the FAQ's questions come in one after another,
    0.07 s apart (eight steps at most; was 0.5) — section.js sets --rv-r. */
-.rv :is(.specs > .specs-row, .compare thead tr, .compare tbody tr) { transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease), transform calc(var(--reveal-ms) * .9) var(--reveal-ease);
+.rv :is(.specs > .specs-row, .compare thead tr, .compare tbody tr, .sec-faq-list > *) { transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease), transform calc(var(--reveal-ms) * .9) var(--reveal-ease), background var(--duration-fast);
   transition-delay: calc(var(--rv-r, 0) * 70ms + 120ms); }
-.rv:not(.is-in) :is(.specs > .specs-row, .compare thead tr, .compare tbody tr) { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 4), 0); }
-.rv.is-done :is(.specs > .specs-row, .compare thead tr, .compare tbody tr) { transition: none; }
+.rv:not(.is-in) :is(.specs > .specs-row, .compare thead tr, .compare tbody tr, .sec-faq-list > *) { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 4), 0); }
+.rv.is-done :is(.specs > .specs-row, .compare thead tr, .compare tbody tr, .sec-faq-list > *) { transition: background var(--duration-fast); }
 /* SLIDES (2026-11-04): on the reveal they rise like the cards — the ones in view 0.3 s apart (--rv-d), the rest
-   at once; when the track is swiped, LAG: each slide trails the motion a little (--lag on `translate`, more the
-   further right it stands) and eases back — section.js SLIDER LAG. */
-.slider-track > * { translate: var(--lag, 0px) 0; transition: translate 520ms var(--reveal-ease); }
+   at once. No offset on a swipe (the lag was taken out the same day): a swiped track moves as one. */
 .slider-track > .is-peek { cursor: pointer; }   /* a click scrolls it in (slider.js) */
 .slider-track > .rv-x { transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease) var(--rv-d, 0ms),
-  transform calc(var(--reveal-ms) * .9) var(--reveal-ease) var(--rv-d, 0ms), translate 520ms var(--reveal-ease); }
+  transform calc(var(--reveal-ms) * .9) var(--reveal-ease) var(--rv-d, 0ms); }
 .slider-track > .rv-x:not(.is-in) { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }
-@media (prefers-reduced-motion: reduce) { .slider-track > * { translate: none; } }
 
 /* ══════════════ SLIDERS ══════════════
    One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the

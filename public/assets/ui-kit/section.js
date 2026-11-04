@@ -54,13 +54,13 @@
       tracks.push({ sec: sec, run: run });   /* run once the sections are marked (below) */
     });
     var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (!e.isIntersecting) return;
-      var s = e.target; s.classList.add('is-in'); io.unobserve(s);
+      var s = e.target.__rvSec || e.target; s.classList.add('is-in'); io.unobserve(e.target);
       tracks.forEach(function (t) { if (t.sec === s) t.run(); });
       setTimeout(function () { s.classList.add('is-done'); }, 3600);   /* after the longest stagger (cards: 6 × 0.3 s) */ }); }, { rootMargin: '0px 0px -12% 0px' });
     secs.forEach(function (s) {
-      if (s.getBoundingClientRect().top < vh * 0.88) return;   // on the first screen: in, no motion
+      if (s.getBoundingClientRect().top < vh * 0.88 && !(s.classList.contains('sec-split') && [].every.call(s.children, function (c) { return c.getBoundingClientRect().top > vh * 0.88; }))) return;   // on the first screen: in, no motion
       [].forEach.call(s.querySelectorAll(CARDS), function (c, i) { c.style.setProperty('--rv-i', Math.min(i, 6)); });
-      [].forEach.call(s.querySelectorAll('.specs > .specs-row, .compare thead tr, .compare tbody tr'), function (r, i) { r.style.setProperty('--rv-r', Math.min(i, 8)); });   /* table rows: 0.07 s apart */
+      [].forEach.call(s.querySelectorAll('.specs > .specs-row, .compare thead tr, .compare tbody tr, .sec-faq-list > *'), function (r, i) { r.style.setProperty('--rv-r', Math.min(i, 8)); });   /* table rows: 0.07 s apart */
       if (s.classList.contains('sec-text')) [].forEach.call(s.children, function (c, k) { c.style.setProperty('--rv-d', (k * 70) + 'ms'); });   /* top down, 0.07 s apart (2026-11-04; was 0.7) */
       if (s.classList.contains('sec-split')) {   /* the halves: left first, 0.07 s apart (by where they stand) */
         var halves = [].slice.call(s.children).map(function (c) { var r = c.getBoundingClientRect(); return [c, r.left, r.top]; });
@@ -68,27 +68,17 @@
         halves.sort(function (a, b) { return side ? a[1] - b[1] : a[2] - b[2]; })
           .forEach(function (p, k) { p[0].style.setProperty('--rv-d', (k * 70) + 'ms'); });   /* 0.07 s (was 0.7) */
       }
-      s.classList.add('rv', 'rv-init'); io.observe(s);
+      /* a tall section whose content stands on its middle (image + text, a screen high) is watched by its
+         content, not its top — or it would be over before the picture is in view (2026-11-04) */
+      var watch = s;
+      if (s.classList.contains('sec-split')) { var top = null;
+        [].forEach.call(s.children, function (c) { var r = c.getBoundingClientRect(); if (!top || r.top < top.getBoundingClientRect().top) top = c; });
+        if (top) { watch = top; top.__rvSec = s; } }
+      s.classList.add('rv', 'rv-init'); io.observe(watch);
     });
     tracks.forEach(function (t) { if (sectionIn(t.sec)) t.run(); });   /* a slider on the first screen: its slides now */
     requestAnimationFrame(function () { requestAnimationFrame(function () {   /* the hidden state is drawn with no transition */
       secs.forEach(function (s) { s.classList.remove('rv-init'); }); }); });
-  })();
-  /* SLIDER LAG (2026-11-04) — while a track is swiped, each slide trails the motion a little and eases back
-     (section.css SLIDES, --lag on `translate`): the offset is the scroll's step × where the slide stands in
-     the track (0 at its left edge, more to the right, 60 px at most). Not under reduced motion. */
-  (function lag() {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    [].forEach.call(document.querySelectorAll('.slider-track'), function (t) {
-      var last = t.scrollLeft, rest = 0, slides = [].slice.call(t.children);
-      t.addEventListener('scroll', function () {
-        var dx = t.scrollLeft - last; last = t.scrollLeft; if (!dx) return;
-        var tr = t.getBoundingClientRect(), W = tr.width || 1;
-        slides.forEach(function (sl) { var r = sl.getBoundingClientRect(), p = Math.max(0, Math.min(1.3, (r.left - tr.left) / W));
-          sl.style.setProperty('--lag', Math.max(-60, Math.min(60, dx * p * 2.4)).toFixed(1) + 'px'); });
-        clearTimeout(rest); rest = setTimeout(function () { slides.forEach(function (sl) { sl.style.setProperty('--lag', '0px'); }); }, 80);
-      }, { passive: true });
-    });
   })();
   /* EXPAND (2026-11-04) — .xp-row: one card open; from 768 on a pointer the card under it opens,
      a tap or Enter on its button opens it anywhere. The closed cards' words are inert. */
