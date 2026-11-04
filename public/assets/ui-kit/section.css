@@ -27,7 +27,7 @@
      a picture — and `.sec-actions` (buttons 8 apart) may stand in any of them.
      .sec-cover        a banner: a picture filling the frame, the words on it; full screen, or
                        `.is-fixed` / `--cover-h` for a height; the words centred or `.is-start`,
-                       at the foot or `.is-middle`; `.is-narrow` — 8 modules wide from 1024
+                       at the foot or `.is-middle`; `.is-narrow` — 10 modules wide from 1024
      .sec-order        the order form (from the A1 landing, 2026-10-25): a stepper of accordions —
                        choice → … → contacts — then Send, and a frosted bar at the window's foot
                        with what is chosen and its price. Behaviour: kit/order.js. See «ORDER».
@@ -242,17 +242,17 @@ img.sec-banner { object-fit: contain; }
 }
 .sec-cover > :not(.sec-media) { position: relative; z-index: 1; }
 .sec-cover > .sec-head { grid-column: 1 / -1; justify-items: center; }
-/* NARROW (2026-11-04) — `.sec-cover.is-narrow`: from 1024 the sheet and its picture take 8 of the page's 12
-   modules, centred (12 of 20 from 1920), the words on the sheet's own middle; full width below. With
-   `.is-fixed.is-middle` it is the centred banner of 8. */
+/* NARROW (2026-11-04) — `.sec-cover.is-narrow`: from 1024 the sheet and its picture take 10 of the page's 12
+   modules, centred (14 of 20 from 1920; was 8 / 12), the words on the sheet's own middle; full width below.
+   With `.is-fixed.is-middle` it is the centred narrow banner. */
 @media (min-width: 1024px) {
-  .sec-cover.is-narrow { --narrow: calc(var(--grid-margin) + 2 * (var(--grid-col) + var(--grid-gutter))); }
+  .sec-cover.is-narrow { --narrow: calc(var(--grid-margin) + 1 * (var(--grid-col) + var(--grid-gutter))); }
   .sec-cover.is-narrow::before, .sec-cover.is-narrow > .sec-media { left: var(--narrow); right: var(--narrow); }
-  .sec-cover.is-narrow > :not(.sec-media) { grid-column: 3 / span 8; }
+  .sec-cover.is-narrow > :not(.sec-media) { grid-column: 2 / span 10; }
 }
 @media (min-width: 1920px) {
-  .sec-cover.is-narrow { --narrow: calc(var(--grid-margin) + 4 * (var(--grid-col) + var(--grid-gutter))); }
-  .sec-cover.is-narrow > :not(.sec-media) { grid-column: 5 / span 12; }
+  .sec-cover.is-narrow { --narrow: calc(var(--grid-margin) + 3 * (var(--grid-col) + var(--grid-gutter))); }
+  .sec-cover.is-narrow > :not(.sec-media) { grid-column: 4 / span 14; }
 }
 .sec-cover .sec-actions { justify-content: center; }
 .sec-cover .sec-head > * { text-wrap: balance; }
@@ -786,7 +786,14 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .rv { transition: opacity calc(var(--reveal-ms) * .8) var(--reveal-ease), transform var(--reveal-ms) var(--reveal-ease); }
 .rv:not(.is-in) { opacity: 0; transform: translate3d(0, var(--reveal-y), 0); }
 .rv.is-in { transform: none; }
-.rv-init, .rv-init * { transition: none !important; }   /* hidden at once when marked, not faded out */
+.rv-init, .rv-init * { transition: none !important; }
+/* BANNERS GROW IN (2026-11-04): a `.sec-cover` does not rise — its sheet and its picture grow from 70 % to their
+   size (1.2 s), and the words come in after them (0.4 s later). */
+.rv.sec-cover:not(.is-in) { opacity: 1; transform: none; }
+.rv.sec-cover::before, .rv.sec-cover > .sec-media { transition: transform calc(var(--reveal-ms) * 1.35) var(--reveal-ease), opacity var(--reveal-ms) var(--reveal-ease); }
+.rv.sec-cover:not(.is-in)::before, .rv.sec-cover:not(.is-in) > .sec-media { opacity: 0; transform: scale(.7); }
+.rv.sec-cover > :not(.sec-media) { transition: opacity calc(var(--reveal-ms) * .8) var(--reveal-ease), transform var(--reveal-ms) var(--reveal-ease); transition-delay: 400ms; }
+.rv.sec-cover:not(.is-in) > :not(.sec-media) { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }   /* hidden at once when marked, not faded out */
 .rv :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid) > * {
   transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease), transform calc(var(--reveal-ms) * .9) var(--reveal-ease);
   transition-delay: calc(var(--rv-i, 0) * var(--reveal-step) + 120ms); }
