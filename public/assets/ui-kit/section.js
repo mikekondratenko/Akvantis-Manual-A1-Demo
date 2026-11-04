@@ -8,10 +8,11 @@
                   once its foot passes 45 %. At 100 % the section gets `.is-filled`, and the
                   line under the words (`.sec-quote-by`) comes in. A quote with `.is-muted`
                   parts is left as it is.
-     DRIFT        `.sec-drift-text` (2026-11-04) runs from left to right as its section crosses the window:
-                  --drift goes from −(what does not fit + 12 % of the width) while the section's top is at
-                  the window's foot, to +12 % of the width once its foot reaches the window's top.
-                  Nothing under prefers-reduced-motion.
+     DRIFT        `.sec-drift` (2026-11-04) pins and runs its line from right to left: --drift-run on the
+                  section is the line's run (its width less the window's, plus a margin either end) — the
+                  section is a screen plus that tall, its .drift-pin sticks — and --drift on the line goes
+                  from +margin (its first letter in from the left) to −run+margin (its last in from the right)
+                  as the section's top goes from the window's top to −run. Nothing under reduced motion.
      LOCKUPS      `.sec-lockup[data-device="A1"]` gets the product's own mark from the catalogue
                   (ui-kit/devices/devices.js → window.DEVICES), at once, as this file runs —
                   so scripts after it (order.js) find the drawing. The text and aria-label stay
@@ -61,10 +62,13 @@
       ticking = false;
       var vh = innerHeight;
       drifts.forEach(function (d) {
-        var sec = d.closest('.sec') || d.parentNode, r = sec.getBoundingClientRect(), w = r.width;
-        var t = Math.max(0, Math.min(1, (vh - r.top) / (vh + r.height)));   // top at the window's foot → foot at its top
-        var over = Math.max(0, d.scrollWidth - w), from = -(over + w * 0.12), to = w * 0.12;
-        d.style.setProperty('--drift', (from + (to - from) * t).toFixed(1) + 'px');
+        var sec = d.closest('.sec-drift') || d.parentNode, w = sec.clientWidth;
+        var m = parseFloat(getComputedStyle(sec).getPropertyValue('--grid-margin')) || 24;
+        var run = Math.max(0, d.scrollWidth - w + m * 2);
+        if (sec.__run !== run) { sec.__run = run; sec.style.setProperty('--drift-run', run + 'px'); }
+        var r = sec.getBoundingClientRect();
+        var t = run ? Math.max(0, Math.min(1, -r.top / run)) : 0;   // pinned: top at the window's top → −run
+        d.style.setProperty('--drift', (m - run * t).toFixed(1) + 'px');
       });
       fills.forEach(function (p) {
         var r = p[0].getBoundingClientRect();
@@ -78,6 +82,7 @@
     }
     function ask() { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }
     addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); paint();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(ask);   /* the line's width is known once the face is in */
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

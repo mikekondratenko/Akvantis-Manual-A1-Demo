@@ -55,7 +55,7 @@
        .sec-info-grid · .sec-info-pic · .sec-info-stats · .stat · .stat-value
      .sec-statement    a kicker and one huge line, centred — «Best battery life.» (apple.com)
      .sec-text         words alone, centred: a kicker in caps, a title, a body, a link or buttons (2026-11-04)
-     .sec-drift        one huge line that runs left to right as the page scrolls (2026-11-04)
+     .sec-drift        one huge line that runs right to left, the section pinned until it has passed (2026-11-04)
      .sec-callout      two figures in an outlined frame, 8 modules — Apple's battery band (2026-11-04)
      .sec-expand       a row of cards, one open wide, the rest strips that open on hover / tap (2026-11-04)
      .sec-figures      cards with large figures, a picture or a film on any of them, bento sizes (2026-11-04)
@@ -597,17 +597,20 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .sec-bar > .link { color: var(--accent-text); font-size: var(--type-body); white-space: nowrap; }
 
 /* ── DRIFT (2026-11-04) ── `.sec-drift`: one line of words three times the quote's size (84 · 144 · 192 · 240)
-   that runs from left to right as the page is scrolled down, and back as it goes up (section.js DRIFT). The
-   line never wraps; the section clips it. It starts with its beginning off the left edge and ends with it
-   in from the left — the scroll reads it. Under prefers-reduced-motion it stands still and wraps.
-     <section class="sec sec-drift"><p class="sec-drift-text">Easier than ever.</p></section> */
-.sec-drift { padding-inline: 0; }
-.sec-drift-text { grid-column: 1 / -1; justify-self: start; width: max-content; margin: 0; white-space: nowrap;
+   that runs from RIGHT to LEFT as the page is scrolled down (back as it goes up). The section PINS: it is as tall
+   as a screen plus the line's run, its `.drift-pin` sticks to the window, and the page goes on only once the
+   whole line has passed — from its first letter in from the left to its last letter in from the right
+   (section.js DRIFT sets --drift-run and --drift). Under prefers-reduced-motion it neither pins nor moves, and wraps.
+     <section class="sec sec-drift"><div class="drift-pin"><p class="sec-drift-text">Easier than ever.</p></div></section> */
+.sec-drift { display: block; min-width: 0; padding: 0; overflow: clip; min-height: calc(100svh + var(--drift-run, 0px)); }   /* clip, not hidden: hidden would make it the sticky's scroller */
+.drift-pin { position: sticky; top: 0; min-width: 0; height: 100svh; display: flex; align-items: center; overflow: clip; }
+.sec-drift-text { flex: none; width: max-content; margin: 0; white-space: nowrap;
   font-size: calc(var(--type-quote) * 3); line-height: var(--leading-none); font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-tight); color: var(--ink);
   transform: translate3d(var(--drift, 0px), 0, 0); will-change: transform; }
 @media (prefers-reduced-motion: reduce) {
-  .sec-drift { padding-inline: var(--grid-margin); }
+  .sec-drift { min-height: 0; padding: var(--sec-pad) var(--grid-margin); }
+  .drift-pin { position: static; height: auto; }
   .sec-drift-text { width: auto; white-space: normal; transform: none; }
 }
 
@@ -753,6 +756,10 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
   .xp-toggle { padding: var(--space-32); }
 }
 @media (prefers-reduced-motion: reduce) { .xp-card, .xp-pic, .xp-body { transition: none; } }
+
+/* CENTRED TITLES (2026-11-04): the highlights' bar (the link under the title) and the expanding cards. */
+.sec-slides > .sec-bar { flex-direction: column; align-items: center; text-align: center; gap: var(--space-12); }
+.sec-expand > .sec-head { grid-column: 1 / -1; justify-items: center; text-align: center; }
 
 /* ══════════════ SLIDERS ══════════════
    One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the
