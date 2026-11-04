@@ -19,8 +19,8 @@
   var ICON = {
     prev: '<i data-icon="chevron-left" data-size="20"></i>',
     next: '<i data-icon="chevron-right" data-size="20"></i>',
-    pause: '<i data-icon="pause" data-size="14" data-fill></i>',
-    play: '<i data-icon="play" data-size="14" data-fill></i>'
+    pause: '<i data-icon="pause" data-size="20" data-fill></i>',
+    play: '<i data-icon="play" data-size="20" data-fill></i>'   /* as the stories' play (2026-11-04) */
   };
   var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -49,7 +49,7 @@
         b.setAttribute('aria-label', 'Slide ' + (i + 1)); b.addEventListener('click', function () { go(i); restart(); });
         dots.appendChild(b);
       });
-      var pp = document.createElement('button'); pp.type = 'button'; pp.className = 'btn btn-frost btn-round';
+      var pp = document.createElement('button'); pp.type = 'button'; pp.className = 'btn btn-circle btn-circle-md btn-frost';   /* the stories' round frost button (2026-11-04) */
       ctrl.append(dots, pp);
       var timer = null, visible = false, paused = still;
       var mark = function () {
