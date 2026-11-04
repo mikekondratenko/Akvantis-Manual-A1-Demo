@@ -9,10 +9,10 @@
                   line under the words (`.sec-quote-by`) comes in. A quote with `.is-muted`
                   parts is left as it is.
      DRIFT        `.sec-drift` (2026-11-04) pins and runs its line from right to left: --drift-run on the
-                  section is the line's run (its width less the window's, plus a margin either end) — the
+                  section is the pinned part of the line's way (its width less a screen) — the
                   section is a screen plus that tall, its .drift-pin sticks — and --drift on the line goes
-                  from +margin (its first letter in from the left) to −run+margin (its last in from the right)
-                  as the section's top goes from the window's top to −run. Nothing under reduced motion.
+                  from the window's right edge (a lead before the first letter) to its last letter a margin
+                  in from the right, as the section's top goes from the window's foot to −run. Nothing under reduced motion.
      REVEAL       every section comes in as it enters the window (2026-11-04) — section.css REVEAL
      LOCKUPS      `.sec-lockup[data-device="A1"]` gets the product's own mark from the catalogue
                   (ui-kit/devices/devices.js → window.DEVICES), at once, as this file runs —
@@ -106,19 +106,44 @@
     });
     var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     var drifts = still ? [] : [].slice.call(document.querySelectorAll('.sec-drift-text'));
+    /* WORDS (2026-11-04): the line is cut into words (.drift-w); on a scroll each word trails the one before it,
+       a little more down the line, so the gaps open while the page moves and close as it stops. */
+    drifts.forEach(function (d) {
+      if (!d.querySelector('.drift-w')) {
+        if (!d.hasAttribute('aria-label')) d.setAttribute('aria-label', d.textContent.trim());
+        d.innerHTML = d.textContent.trim().split(/\s+/).map(function (w) {
+          return '<span class="drift-w" aria-hidden="true">' + w.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }) + '</span>';
+        }).join(' ');
+      }
+      d.__w = [].slice.call(d.querySelectorAll('.drift-w')); d.__o = d.__w.map(function () { return 0; });
+    });
     if (!fills.length && !drifts.length) return;
     var ticking = false;
     function paint() {
       ticking = false;
-      var vh = innerHeight;
+      var vh = innerHeight, moving = false;
       drifts.forEach(function (d) {
         var sec = d.closest('.sec-drift') || d.parentNode, w = sec.clientWidth;
         var m = parseFloat(getComputedStyle(sec).getPropertyValue('--grid-margin')) || 24;
-        var run = Math.max(0, d.scrollWidth - w + m * 2);
+        /* a lead before the first letter (2026-11-04): the line starts at the window's right edge and runs as the
+           section comes up, so its first word is read in full; it ends with its last letter a margin in from the
+           right. Its whole way is the line's width, at one pixel per pixel scrolled — a screen of it while the
+           section comes up, the rest pinned. */
+        var sw = d.scrollWidth, x0 = w - m, way = sw;
+        var run = Math.max(0, way - vh);
         if (sec.__run !== run) { sec.__run = run; sec.style.setProperty('--drift-run', run + 'px'); }
         var r = sec.getBoundingClientRect();
-        var t = run ? Math.max(0, Math.min(1, -r.top / run)) : 0;   // pinned: top at the window's top → −run
-        d.style.setProperty('--drift', (m - run * t).toFixed(1) + 'px');
+        var t = Math.max(0, Math.min(1, (vh - r.top) / way));   // top at the window's foot → −run (pinned)
+        var x = x0 - way * t, dx = d.__x == null ? 0 : x - d.__x; d.__x = x;
+        d.style.setProperty('--drift', x.toFixed(1) + 'px');
+        var cap = w * 0.25;
+        for (var i = 1; i < d.__w.length; i++) {
+          var o = d.__o[i] - dx;                                  // stays where it was…
+          o += (d.__o[i - 1] - o) * (0.16 + 0.14 / i);            // …then catches up with the word before it
+          o = Math.max(-cap, Math.min(cap, o));
+          if (Math.abs(o) < 0.3) o = 0; else moving = true;
+          if (o !== d.__o[i]) { d.__o[i] = o; d.__w[i].style.transform = o ? 'translate3d(' + o.toFixed(1) + 'px,0,0)' : ''; }
+        }
       });
       fills.forEach(function (p) {
         var r = p[0].getBoundingClientRect();
@@ -129,6 +154,7 @@
         /* who said it comes in once the words are white */
         var sec = p[0].closest('.sec-quote'); if (sec) sec.classList.toggle('is-filled', t >= 0.995);
       });
+      if (moving) ask();   /* the words still settling */
     }
     function ask() { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }
     addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); paint();

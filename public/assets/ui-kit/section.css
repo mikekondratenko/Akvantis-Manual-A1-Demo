@@ -620,10 +620,12 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
   font-size: calc(var(--type-quote) * 3); line-height: var(--leading-none); font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-tight); color: var(--ink);
   transform: translate3d(var(--drift, 0px), 0, 0); will-change: transform; }
+.drift-w { display: inline-block; will-change: transform; }   /* each word trails the one before it on a scroll (section.js) */
 @media (prefers-reduced-motion: reduce) {
   .sec-drift { min-height: 0; padding: var(--sec-pad) var(--grid-margin); }
   .drift-pin { position: static; height: auto; }
   .sec-drift-text { width: auto; white-space: normal; transform: none; }
+  .drift-w { transform: none !important; }
 }
 
 /* ══════════════ FIGURES (2026-11-04) ══════════════
