@@ -55,6 +55,8 @@
        .sec-info-grid · .sec-info-pic · .sec-info-stats · .stat · .stat-value
      .sec-statement    a kicker and one huge line, centred — «Best battery life.» (apple.com)
      .sec-text         words alone, centred: a kicker in caps, a title, a body, a link or buttons (2026-11-04)
+     .sec-figures      cards with large figures, a picture or a film on any of them, bento sizes (2026-11-04)
+     .sec-numbers      a centred title and figures alone in 2 or 3 columns, Apple's «Strength in numbers.» (2026-11-04)
      .sec-bar          a title on the left (`.t-h1`, as every cards section — 2026-10-26) and a link or
                        the arrows on the right, over a slider
      .sec-kicker       the small line over a title — muted, semibold, never in caps
@@ -591,6 +593,65 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .sec-bar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-16) var(--space-24); }
 .sec-bar > .link { color: var(--accent-text); font-size: var(--type-body); white-space: nowrap; }
 
+/* ══════════════ FIGURES (2026-11-04) ══════════════
+   `.sec-figures`: cards with large figures (Bluewater's SuperiorOsmosis board). A card is a kicker, an «Up to»,
+   the figure and a line — each optional; a card may carry a picture or a film filling it (`.has-pic` +
+   `.fig-pic`, an <img>, a <video> or a `.sec-ph`), the words then at its foot over the picture.
+   Sizes as the bento: 4 of 12 · `.is-half` 6 · `.is-wide` 8 · `.is-full` 12 · `.is-tall` rows (--rows, 2);
+   two columns on a tablet, one on a phone.
+     <section class="sec sec-figures"><header class="sec-head"><h2 class="t-h1">…</h2></header>
+       <ul class="fig-grid">
+         <li class="fig-card"><p class="fig-kicker">A1 technology</p><p class="fig-value is-accent">Direct Flow RO</p><p class="fig-text">…</p></li>
+         <li class="fig-card"><p class="fig-pre">Up to</p><p class="fig-value">2.0 <small>L/min</small></p><p class="fig-text">…</p></li>
+         <li class="fig-card is-wide is-tall has-pic" style="--rows: 3"><img class="fig-pic" src="…" alt=""><p class="fig-kicker">…</p><p class="fig-value">2:1</p></li>
+       </ul></section> */
+.fig-grid { display: grid; gap: var(--card-gap); grid-auto-flow: dense; list-style: none; margin: 0; padding: 0; grid-column: 1 / -1; }
+@media (min-width: 768px)  { .fig-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+                             .fig-card:is(.is-wide, .is-full) { grid-column: span 2; } }
+@media (min-width: 1024px) { .fig-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+                             .fig-card { grid-column: span 4; } .fig-card.is-half { grid-column: span 6; }
+                             .fig-card.is-wide { grid-column: span 8; } .fig-card.is-full { grid-column: span 12; }
+                             .fig-card.is-tall { grid-row: span var(--rows, 2); } }
+.fig-card { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: flex-start; gap: var(--space-8);
+  min-width: 0; padding: var(--space-24); border-radius: var(--sec-card-radius); background: var(--tile); overflow: hidden; }
+@media (min-width: 1024px) { .fig-card { padding: var(--space-32); } }
+.fig-card::after { content: ''; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 var(--hairline) var(--tile-edge); }   /* the fill's edge, over a picture too */
+.fig-card > * { margin: 0; position: relative; z-index: 1; }
+.fig-card.has-pic { justify-content: flex-end; min-height: calc(var(--number-288) * 1.5); }
+.fig-card > .fig-pic { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; padding: 0; }
+.fig-kicker { font-size: var(--type-title); line-height: var(--leading-snug); font-weight: var(--weight-semibold); color: var(--ink); }
+.fig-kicker + .fig-value, .fig-kicker + .fig-pre { margin-top: var(--space-16); }
+.fig-pre { font-size: var(--type-small); line-height: var(--leading-snug); color: var(--ink-muted); }
+.fig-value { font-size: var(--type-h1); line-height: var(--leading-none); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); color: var(--ink); }
+.fig-value small { font-size: .6em; font-weight: var(--weight-medium); letter-spacing: 0; }
+.fig-value.is-accent { color: var(--accent-text); }
+.fig-text { margin-top: var(--space-8) !important; max-width: calc(var(--number-288) * 1.5); font-size: var(--type-body); line-height: var(--leading-relaxed); color: var(--ink-muted); text-wrap: pretty; }
+
+/* ══════════════ NUMBERS (2026-11-04) ══════════════
+   `.sec-numbers`: Apple's «Strength in numbers.» — a centred title and figures alone, no cards, in two
+   (`.is-2`) or three (`.is-3`, the default) columns from 768; one column on a phone. A figure is an «Up to»
+   over it (optional), the figure, a line under it — all centred.
+     <section class="sec sec-numbers is-3"><header class="sec-head"><h2 class="t-h1">A1 in numbers.</h2></header>
+       <ul class="num-grid"><li class="num-item"><p class="num-pre">Up to</p><p class="num-value">2.0 L/min</p><p class="num-text">…</p></li> …</ul></section> */
+.sec-numbers > .sec-head { grid-column: 1 / -1; justify-items: center; text-align: center; }
+.num-grid { grid-column: 1 / -1; display: grid; gap: var(--space-48) var(--grid-gutter); list-style: none; margin: 0; padding: 0; }
+@media (min-width: 768px) { .sec-numbers .num-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--space-64); }
+                            .sec-numbers.is-2 .num-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.num-item { display: grid; gap: var(--space-4); justify-items: center; align-content: start; text-align: center; }
+/* One line for the figures of a row, with an «Up to» over one of them or not (Apple's): every item is three rows
+   of the grid (subgrid) — the «Up to», the figure, the line — so the rows are shared across the row. */
+@supports (grid-template-rows: subgrid) {
+  .num-item { grid-row: span 3; grid-template-rows: subgrid; row-gap: var(--space-4); }
+  .num-pre { grid-row: 1; align-self: end; } .num-value { grid-row: 2; } .num-text { grid-row: 3; }
+}
+.num-item > * { margin: 0; }
+.num-pre { font-size: var(--type-small); color: var(--ink-muted); }
+.num-value { font-size: var(--text-40); line-height: var(--leading-tight); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); color: var(--ink); }
+@media (min-width: 1024px) { .num-value { font-size: var(--text-56); } }
+@media (min-width: 1440px) { .num-value { font-size: var(--text-64); } }
+.num-text { font-size: var(--type-small); line-height: var(--leading-snug); color: var(--ink-muted); text-wrap: balance; }
+
 /* ══════════════ SLIDERS ══════════════
    One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the
    sheet's content by the grid margin either side, so the next slide shows in the margin and
@@ -927,6 +988,6 @@ body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--numb
   box-shadow: inset 0 0 0 var(--hairline) var(--tile-edge); }
 .ph-fill .slide-media.sec-ph { box-shadow: none; }
 /* A slot INSIDE a card already has the card's edge round it: no second line (2026-11-04). */
-.ph-fill :is(.plate, .tile, .story, .slide, .review, .compare-pic, .choice) .sec-ph { box-shadow: none; }
+.ph-fill :is(.plate, .tile, .story, .slide, .review, .compare-pic, .choice, .fig-card) .sec-ph { box-shadow: none; }
 
 :is(.sec-hero, .sec-cover)::before { box-shadow: inset 0 0 0 var(--hairline) var(--tile-edge); }   /* the hero's and the cover's grey sheet, too */
