@@ -495,14 +495,15 @@
         if (!pop) {
           pop = document.createElement('div'); pop.className = 'popup-overlay'; pop.hidden = true;
           pop.innerHTML = '<div class="popup is-start order-cancel-pop" role="alertdialog" aria-modal="true" aria-labelledby="' + id + '-t" aria-describedby="' + id + '-d">'
+            + '<button class="icon-btn popup-close" type="button" data-keep>' + (window.KitIcons ? KitIcons.svg('x', { size: 16 }) : '×') + '</button>'   /* the ✕ = Keep (2026-11-04) */
             + '<div class="popup-header"><div class="popup-title" id="' + id + '-t"></div><div class="popup-text" id="' + id + '-d"></div></div>'
             + '<div class="popup-actions"><button class="btn btn-tertiary" type="button" data-keep></button><button class="btn btn-danger" type="button" data-drop></button></div></div>';
           document.body.appendChild(pop);
         }
         pop.querySelector('.popup-title').textContent = T('Cancel the order?');
         pop.querySelector('.popup-text').textContent = T('Everything you have chosen and filled in will be cleared.');
-        var keep = pop.querySelector('[data-keep]'), go = pop.querySelector('[data-drop]'), back = document.activeElement;
-        keep.textContent = T('Keep'); go.textContent = T('Cancel order');
+        var keep = pop.querySelector('.popup-actions [data-keep]'), go = pop.querySelector('[data-drop]'), back = document.activeElement;
+        keep.textContent = T('Keep'); go.textContent = T('Cancel order'); pop.querySelector('.popup-close').setAttribute('aria-label', T('Close'));
         var end = function (yes) { pop.hidden = true; pop.onclick = null; document.removeEventListener('keydown', key, true);
           if (yes) drop(); else if (back && back.focus) back.focus(); };
         var key = function (e) {
