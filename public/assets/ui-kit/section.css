@@ -57,6 +57,7 @@
      .sec-text         words alone, centred: a kicker in caps, a title, a body, a link or buttons (2026-11-04)
      .sec-drift        one huge line that runs left to right as the page scrolls (2026-11-04)
      .sec-callout      two figures in an outlined frame, 8 modules — Apple's battery band (2026-11-04)
+     .sec-expand       a row of cards, one open wide, the rest strips that open on hover / tap (2026-11-04)
      .sec-figures      cards with large figures, a picture or a film on any of them, bento sizes (2026-11-04)
      .sec-numbers      a centred title and figures alone in 2 or 3 columns, Apple's «Strength in numbers.» (2026-11-04)
      .sec-bar          a title on the left (`.t-h1`, as every cards section — 2026-10-26) and a link or
@@ -699,6 +700,59 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 }
 @media (min-width: 1024px) { .sec-callout > .callout { grid-column: 3 / span 8; } }
 @media (min-width: 1920px) { .sec-callout > .callout { grid-column: 5 / span 12; } }
+
+/* ══════════════ EXPAND (2026-11-04) ══════════════
+   `.sec-expand`: a row of cards, one open wide, the others folded into strips (zoom.com's customer stories).
+   A strip shows its picture and its label on the middle; the open card its label as a kicker, a title, a
+   line and a round ↗ at the foot. On a pointer from 768 a card opens under the cursor (and on a tap); on a
+   phone the cards are a column — the open one tall, the rest short bands — and a tap opens. The width (or
+   height) flows; the words come in once it has. section.js EXPAND sets .is-open, aria-expanded, inert.
+     <section class="sec sec-expand"><header class="sec-head"><h2 class="t-h1">…</h2></header>
+       <ul class="xp-row">
+         <li class="xp-card is-open"><div class="xp-pic sec-ph"></div>   (an <img> or a <video>)
+           <button class="xp-toggle" type="button"><span class="xp-label">Installation</span></button>
+           <div class="xp-body"><h3 class="xp-title">…</h3><p class="xp-text">…</p>
+             <a class="btn btn-circle btn-circle-md btn-secondary xp-go" href="…" aria-label="…"><i data-icon="arrow-up-right" data-size="20"></i></a></div></li>
+         … </ul></section> */
+.xp-row { grid-column: 1 / -1; display: flex; flex-direction: column; gap: var(--card-gap); list-style: none; margin: 0; padding: 0; }
+.xp-card { position: relative; isolation: isolate; overflow: hidden; min-width: 0; min-height: var(--number-96);
+  border-radius: var(--sec-card-radius); background: var(--tile);
+  transition: min-height var(--duration-slower, 480ms) var(--ease-emphasized), flex-grow var(--duration-slower, 480ms) var(--ease-emphasized); }
+.xp-card.is-open { min-height: calc(var(--number-288) * 1.6); }
+.xp-card::after { content: ''; position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 var(--hairline) var(--tile-edge); }
+.xp-pic { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; padding: 0;
+  transition: opacity var(--duration-slower, 480ms) var(--ease-emphasized); }
+.xp-card:not(.is-open) .xp-pic { opacity: .6; }
+/* the whole card is its button; the label sits on it — on the middle when folded, a kicker at the top when open */
+.xp-toggle { position: absolute; inset: 0; z-index: 1; display: grid; place-items: center; padding: var(--space-24);
+  border: 0; background: none; color: var(--ink); cursor: pointer; font: inherit; text-align: center; border-radius: inherit; }
+.xp-card.is-open .xp-toggle { place-items: start; cursor: default; }
+.xp-toggle:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--accent); }
+.xp-label { font-size: var(--type-title); line-height: var(--leading-snug); font-weight: var(--weight-semibold); }
+.xp-body { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-24);
+  padding: calc(var(--space-24) * 2 + var(--space-8)) var(--space-24) var(--space-24); pointer-events: none;
+  opacity: 0; transform: translateY(var(--space-8)); transition: opacity var(--duration-base, 200ms), transform var(--duration-base, 200ms); }
+.xp-card.is-open .xp-body { opacity: 1; transform: none; transition-delay: 240ms; transition-duration: 360ms; }
+.xp-body > * { margin: 0; }
+.xp-body a, .xp-body button { pointer-events: auto; }
+.xp-title { max-width: calc(var(--number-288) * 2); font-size: var(--type-h2); line-height: var(--leading-tight); font-weight: var(--weight-semibold); text-wrap: balance; }
+.xp-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-16); }
+.xp-text { max-width: calc(var(--number-288) * 2); font-size: var(--type-body); line-height: var(--leading-relaxed); color: var(--ink-muted); text-wrap: pretty; }
+.xp-body .xp-go { flex: none; width: var(--number-48); height: var(--number-48);   /* the solid round: white on dark, black on paper */
+  --btn: var(--btn-solid); --btn-hover: var(--btn-solid-hover); --btn-ink: var(--btn-solid-ink); --btn-edge: none; }
+.xp-card:not(.is-open) .xp-toggle { padding: var(--space-12); }   /* a folded strip is narrow: the label keeps it whole */
+.xp-card:not(.is-open) .xp-label { overflow-wrap: anywhere; hyphens: auto; }
+@media (min-width: 768px) {
+  .xp-row { flex-direction: row; height: clamp(calc(var(--number-288) * 1.6), 70svh, calc(var(--number-288) * 2.4)); }
+  .xp-card { flex: 1 1 0; min-height: 0; }
+  .xp-card.is-open { flex-grow: 5; min-height: 0; }
+}
+@media (min-width: 1024px) {
+  .xp-body { padding: calc(var(--space-32) * 2 + var(--space-8)) var(--space-32) var(--space-32); }
+  .xp-toggle { padding: var(--space-32); }
+}
+@media (prefers-reduced-motion: reduce) { .xp-card, .xp-pic, .xp-body { transition: none; } }
 
 /* ══════════════ SLIDERS ══════════════
    One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the

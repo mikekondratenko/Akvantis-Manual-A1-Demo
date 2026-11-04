@@ -29,6 +29,21 @@
       el.setAttribute('role', 'img'); el.innerHTML = svg;
     });
   })();
+  /* EXPAND (2026-11-04) — .xp-row: one card open; from 768 on a pointer the card under it opens,
+     a tap or Enter on its button opens it anywhere. The closed cards' words are inert. */
+  (function expand() {
+    var hover = matchMedia('(hover: hover) and (min-width: 768px)');
+    [].forEach.call(document.querySelectorAll('.xp-row'), function (row) {
+      var cards = [].slice.call(row.children);
+      var open = function (c) { cards.forEach(function (x) { var on = x === c; x.classList.toggle('is-open', on);
+        var b = x.querySelector('.xp-toggle'); if (b) b.setAttribute('aria-expanded', on ? 'true' : 'false');
+        var body = x.querySelector('.xp-body'); if (body) body.inert = !on; }); };
+      cards.forEach(function (c) {
+        var b = c.querySelector('.xp-toggle'); if (b) b.addEventListener('click', function () { open(c); });
+        c.addEventListener('mouseenter', function () { if (hover.matches) open(c); }); });
+      open(row.querySelector('.xp-card.is-open') || cards[0]);
+    });
+  })();
   function start() {
     var fills = [].slice.call(document.querySelectorAll('.sec-quote-text')).filter(function (q) {
       return !q.querySelector('.is-muted');
