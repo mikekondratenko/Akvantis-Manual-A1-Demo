@@ -794,8 +794,14 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .rv.sec-cover:not(.is-in) { opacity: 1; transform: none; }
 .rv.sec-cover::before, .rv.sec-cover > .sec-media { transition: transform calc(var(--reveal-ms) * 1.35) var(--reveal-ease), opacity var(--reveal-ms) var(--reveal-ease); }
 .rv.sec-cover:not(.is-in)::before, .rv.sec-cover:not(.is-in) > .sec-media { opacity: 0; transform: scale(.7); }
-.rv.sec-cover > :not(.sec-media) { transition: opacity calc(var(--reveal-ms) * .8) var(--reveal-ease), transform var(--reveal-ms) var(--reveal-ease); transition-delay: 400ms; }
-.rv.sec-cover:not(.is-in) > :not(.sec-media) { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }   /* hidden at once when marked, not faded out */
+/* The words one by one (section.js marks them .rv-c, --rv-d 0.07 s apart, top down and left to right): in a
+   banner after its sheet (0.4 s), in the hero as the page opens (its sheet stands). 2026-11-04 */
+.rv.sec-hero:not(.is-in) { opacity: 1; transform: none; }
+.rv:is(.sec-cover, .sec-hero):not(.is-done) .rv-c { transition: opacity calc(var(--reveal-ms) * .8) var(--reveal-ease), transform var(--reveal-ms) var(--reveal-ease);
+  transition-delay: calc(var(--rv-d, 0ms) + 400ms); }
+.rv.sec-hero:not(.is-done) .rv-c { transition-delay: calc(var(--rv-d, 0ms) + 150ms); }
+.rv:is(.sec-cover, .sec-hero):not(.is-in) .rv-c { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }   /* hidden at once when marked, not faded out */
+/* once done (.is-done) the words keep their own transitions again — a button's hover */
 .rv :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid) > * {
   transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease), transform calc(var(--reveal-ms) * .9) var(--reveal-ease);
   transition-delay: calc(var(--rv-i, 0) * var(--reveal-step) + 120ms); }

@@ -57,10 +57,25 @@
       var s = e.target.__rvSec || e.target; s.classList.add('is-in'); io.unobserve(e.target);
       tracks.forEach(function (t) { if (t.sec === s) t.run(); });
       setTimeout(function () { s.classList.add('is-done'); }, 3600);   /* after the longest stagger (cards: 6 × 0.3 s) */ }); }, { rootMargin: '0px 0px -12% 0px' });
+    /* BANNER CONTENT (2026-11-04): in a banner (and the hero) the words come in one by one — the kicker,
+       the title, the caption, the price, each button — top down and left to right, 0.07 s apart. */
+    var bannerItems = function (s) {
+      var items = [];
+      [].forEach.call(s.children, function (c) {
+        if (c.matches('.sec-media, .sec-banner, .sec-ph')) return;
+        if (c.matches('.sec-head, .sec-actions') && c.children.length) [].push.apply(items, c.children); else items.push(c);
+      });
+      items.map(function (c) { var r = c.getBoundingClientRect(); return [c, Math.round(r.top / 8), r.left]; })
+        .sort(function (a, b) { return a[1] - b[1] || a[2] - b[2]; })
+        .forEach(function (p, k) { p[0].classList.add('rv-c'); p[0].style.setProperty('--rv-d', (k * 70) + 'ms'); });
+    };
+    var heroes = [];
     secs.forEach(function (s) {
+      if (s.classList.contains('sec-hero')) { bannerItems(s); s.classList.add('rv', 'rv-init'); heroes.push(s); return; }   // on load, the words only
       if (s.getBoundingClientRect().top < vh * 0.88 && !(s.classList.contains('sec-split') && [].every.call(s.children, function (c) { return c.getBoundingClientRect().top > vh * 0.88; }))) return;   // on the first screen: in, no motion
       [].forEach.call(s.querySelectorAll(CARDS), function (c, i) { c.style.setProperty('--rv-i', Math.min(i, 6)); });
       [].forEach.call(s.querySelectorAll('.specs > .specs-row, .compare thead tr, .compare tbody tr, .sec-faq-list > *'), function (r, i) { r.style.setProperty('--rv-r', Math.min(i, 8)); });   /* table rows: 0.07 s apart */
+      if (s.classList.contains('sec-cover')) bannerItems(s);
       if (s.classList.contains('sec-text')) [].forEach.call(s.children, function (c, k) { c.style.setProperty('--rv-d', (k * 70) + 'ms'); });   /* top down, 0.07 s apart (2026-11-04; was 0.7) */
       if (s.classList.contains('sec-split')) {   /* the halves: left first, 0.07 s apart (by where they stand) */
         var halves = [].slice.call(s.children).map(function (c) { var r = c.getBoundingClientRect(); return [c, r.left, r.top]; });
@@ -78,7 +93,8 @@
     });
     tracks.forEach(function (t) { if (sectionIn(t.sec)) t.run(); });   /* a slider on the first screen: its slides now */
     requestAnimationFrame(function () { requestAnimationFrame(function () {   /* the hidden state is drawn with no transition */
-      secs.forEach(function (s) { s.classList.remove('rv-init'); }); }); });
+      secs.forEach(function (s) { s.classList.remove('rv-init'); });
+      heroes.forEach(function (s) { s.classList.add('is-in'); setTimeout(function () { s.classList.add('is-done'); }, 2000); }); }); });
   })();
   /* EXPAND (2026-11-04) — .xp-row: one card open; from 768 on a pointer the card under it opens,
      a tap or Enter on its button opens it anywhere. The closed cards' words are inert. */
@@ -136,10 +152,10 @@
         var t = Math.max(0, Math.min(1, (vh - r.top) / way));   // top at the window's foot → −run (pinned)
         var x = x0 - way * t, dx = d.__x == null ? 0 : x - d.__x; d.__x = x;
         d.style.setProperty('--drift', x.toFixed(1) + 'px');
-        var cap = w * 0.25;
+        var cap = w * 0.8;
         for (var i = 1; i < d.__w.length; i++) {
           var o = d.__o[i] - dx;                                  // stays where it was…
-          o += (d.__o[i - 1] - o) * (0.16 + 0.14 / i);            // …then catches up with the word before it
+          o += (d.__o[i - 1] - o) * (0.046 + 0.04 / i);           // …then catches up with the word before it (3.5× the first try's lag)
           o = Math.max(-cap, Math.min(cap, o));
           if (Math.abs(o) < 0.3) o = 0; else moving = true;
           if (o !== d.__o[i]) { d.__o[i] = o; d.__w[i].style.transform = o ? 'translate3d(' + o.toFixed(1) + 'px,0,0)' : ''; }
