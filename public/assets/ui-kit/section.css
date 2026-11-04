@@ -773,6 +773,23 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .sec-slides > .sec-bar { flex-direction: column; align-items: center; text-align: center; gap: var(--space-12); }
 .sec-expand > .sec-head { grid-column: 1 / -1; justify-items: center; text-align: center; }
 
+/* ══════════════ REVEAL (2026-11-04) ══════════════
+   Every section of a page comes in as it enters the window — from transparent and 48 lower to its place —
+   and the cards in it follow one after another (70 apart, eight at most). section.js REVEAL marks the
+   sections `.rv` and adds `.is-in` when one is 12 % into the window; what is on the first screen is in at
+   once, with no motion (the hero never blinks). The cards are the grids' and the sliders' children; the
+   expanding cards (their own flex transition) and the order form are not staggered.
+   Nothing moves under prefers-reduced-motion (section.js does not run it). Tokens: --reveal-ms, --reveal-y. */
+:root { --reveal-ms: 900ms; --reveal-y: 48px; --reveal-ease: cubic-bezier(.16, 1, .3, 1); }
+.rv { transition: opacity calc(var(--reveal-ms) * .8) var(--reveal-ease), transform var(--reveal-ms) var(--reveal-ease); }
+.rv:not(.is-in) { opacity: 0; transform: translate3d(0, var(--reveal-y), 0); }
+.rv.is-in { transform: none; }
+.rv :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid, .slider-track) > * {
+  transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease), transform calc(var(--reveal-ms) * .9) var(--reveal-ease);
+  transition-delay: calc(var(--rv-i, 0) * 70ms + 120ms); }
+.rv:not(.is-in) :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid, .slider-track) > * { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }
+.rv.is-done :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid, .slider-track) > * { transition: none; }   /* once in, the cards keep no delay of their own */
+
 /* ══════════════ SLIDERS ══════════════
    One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the
    sheet's content by the grid margin either side, so the next slide shows in the margin and

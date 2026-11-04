@@ -13,6 +13,7 @@
                   section is a screen plus that tall, its .drift-pin sticks — and --drift on the line goes
                   from +margin (its first letter in from the left) to −run+margin (its last in from the right)
                   as the section's top goes from the window's top to −run. Nothing under reduced motion.
+     REVEAL       every section comes in as it enters the window (2026-11-04) — section.css REVEAL
      LOCKUPS      `.sec-lockup[data-device="A1"]` gets the product's own mark from the catalogue
                   (ui-kit/devices/devices.js → window.DEVICES), at once, as this file runs —
                   so scripts after it (order.js) find the drawing. The text and aria-label stay
@@ -28,6 +29,24 @@
       var svg = D[el.dataset.device]; if (!svg) return;
       if (!el.hasAttribute('aria-label')) el.setAttribute('aria-label', el.dataset.device);
       el.setAttribute('role', 'img'); el.innerHTML = svg;
+    });
+  })();
+  /* REVEAL (2026-11-04) — the sections come in as they enter the window (section.css REVEAL). The ones on the
+     first screen are in at once; the rest get .rv, and .is-in from an IntersectionObserver 12 % up from the
+     window's foot; .is-done once the motion is over. Cards get --rv-i for the stagger. Not under reduced motion. */
+  (function reveal() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+    var secs = [].slice.call(document.querySelectorAll('section.sec')).filter(function (s) { return !s.parentNode.closest('section.sec'); });
+    if (!secs.length) return;
+    var CARDS = ':is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid, .slider-track) > *';
+    var vh = innerHeight;
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (!e.isIntersecting) return;
+      var s = e.target; s.classList.add('is-in'); io.unobserve(s);
+      setTimeout(function () { s.classList.add('is-done'); }, 2000); }); }, { rootMargin: '0px 0px -12% 0px' });
+    secs.forEach(function (s) {
+      if (s.getBoundingClientRect().top < vh * 0.88) return;   // on the first screen: in, no motion
+      [].forEach.call(s.querySelectorAll(CARDS), function (c, i) { c.style.setProperty('--rv-i', Math.min(i, 8)); });
+      s.classList.add('rv'); io.observe(s);
     });
   })();
   /* EXPAND (2026-11-04) — .xp-row: one card open; from 768 on a pointer the card under it opens,
