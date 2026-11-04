@@ -494,7 +494,7 @@
       x.addEventListener('click', function () {
         if (!pop) {
           pop = document.createElement('div'); pop.className = 'popup-overlay'; pop.hidden = true;
-          pop.innerHTML = '<div class="popup is-center order-cancel-pop" role="alertdialog" aria-modal="true" aria-labelledby="' + id + '-t" aria-describedby="' + id + '-d">'
+          pop.innerHTML = '<div class="popup is-start order-cancel-pop" role="alertdialog" aria-modal="true" aria-labelledby="' + id + '-t" aria-describedby="' + id + '-d">'
             + '<div class="popup-header"><div class="popup-title" id="' + id + '-t"></div><div class="popup-text" id="' + id + '-d"></div></div>'
             + '<div class="popup-actions"><button class="btn btn-tertiary" type="button" data-keep></button><button class="btn btn-danger" type="button" data-drop></button></div></div>';
           document.body.appendChild(pop);

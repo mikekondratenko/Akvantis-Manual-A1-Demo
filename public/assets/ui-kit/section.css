@@ -888,7 +888,7 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-dock.is-on { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
 /* The pictures of what is taken (2026-10-29: no words beside them any more) — as many as fit,
    «2×» small at a picture's top right when there are more than one. */
-.order-dock-pics { display: flex; align-items: center; gap: var(--space-8); flex: 1; min-width: 0; overflow: hidden; padding: var(--space-4) var(--space-8) 0 0; }
+.order-dock-pics { display: flex; align-items: center; gap: var(--space-8); flex: 1; min-width: 0; overflow: hidden; padding: var(--space-4) var(--space-8) var(--space-4) 0; }   /* 4 over and under: room for the «2×» and the picture on the bar's middle (2026-11-04) */
 .order-dock-item { position: relative; flex: none; }
 .order-dock-item > :first-child { display: block; width: var(--number-32); height: var(--number-32);   /* 32 (2026-11-04; was 48) */ object-fit: contain; max-height: none;
   padding: 0; background: none; }   /* the picture alone, no plate (2026-10-29) */
@@ -901,10 +901,13 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-dock-txt .t-small, .order-dock-price .t-small { color: var(--ink-muted); }
 .order-dock-price { display: flex; flex-direction: row-reverse; align-items: baseline; gap: var(--space-8); flex: none; text-align: right; }   /* one row: the struck price left of the total (2026-10-29) */
 .order-dock-price .choice-was { margin: 0; font-size: var(--type-small); }
-.order-dock-price > .t-h3 { font-size: var(--type-title); }   /* the total two steps under h3: 14 · 16 (2026-11-04; was 20 · 24) */
+.order-dock-price > .t-h3 { font-size: var(--type-title); line-height: 1; }
+.order-dock-price { align-self: center; line-height: 1; }
+.order-dock-price > :empty { display: none; }   /* an empty line under the total would pull it off the middle */
+.order-dock-x { align-self: center; }   /* the total two steps under h3: 14 · 16 (2026-11-04; was 20 · 24) */
 /* CANCEL (2026-11-03): the × at the bar's end, after the total — the order thrown away, after a question
    (order.js CANCEL). 40 round, on the bar's frost; it eats into the 32 end padding so the bar keeps its height. */
-.order-dock-x { flex: none; margin-right: calc(var(--space-16) * -1); margin-left: calc(var(--space-8) * -1); color: var(--ink-muted); }
+.order-dock-x { flex: none; margin-right: calc((var(--bar-h, 56px) - var(--number-40)) / 2 - var(--space-32));   /* the 40 × as far from the end as from the top (2026-11-04) */ margin-left: calc(var(--space-8) * -1); color: var(--ink-muted); }
 .order-dock-x:hover { color: var(--ink); }
 .order-cancel-pop .popup-actions .btn { width: auto; min-width: 124px; }   /* «Скасувати замовлення» does not fit 124 */
 body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--number-96) + env(safe-area-inset-bottom)); }
