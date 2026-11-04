@@ -31,21 +31,40 @@
       el.setAttribute('role', 'img'); el.innerHTML = svg;
     });
   })();
-  /* REVEAL (2026-11-04) — the sections come in as they enter the window (section.css REVEAL). The ones on the
-     first screen are in at once; the rest get .rv, and .is-in from an IntersectionObserver 12 % up from the
-     window's foot; .is-done once the motion is over. Cards get --rv-i for the stagger. Not under reduced motion. */
+  /* REVEAL (2026-11-04) — sections come in as they enter the window (section.css REVEAL); the ones on the first
+     screen are in at once. Grid cards get --rv-i (the 0.3 s steps). Slides of a horizontal slider are revealed
+     one by one, from the right: each when it is ≥ 15 % in view in its track AND its section is in — those
+     that arrive together 0.3 s apart (--rv-d). Not under reduced motion. */
   (function reveal() {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
     var secs = [].slice.call(document.querySelectorAll('section.sec')).filter(function (s) { return !s.parentNode.closest('section.sec'); });
     if (!secs.length) return;
-    var CARDS = ':is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid, .slider-track) > *';
-    var vh = innerHeight;
+    var CARDS = ':is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid) > *';
+    var step = function () { return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--reveal-step')) || 300; };
+    var vh = innerHeight, tracks = [];
+    /* the slides: waiting in view until their section is in */
+    var show = function (list) { var k = 0; list.forEach(function (sl) { if (sl.classList.contains('is-in')) return;
+      sl.style.setProperty('--rv-d', (k++ * step()) + 'ms'); sl.classList.add('is-in'); }); };
+    var sectionIn = function (s) { return !s.classList.contains('rv') || s.classList.contains('is-in'); };
+    [].forEach.call(document.querySelectorAll('.slider-track'), function (t) {
+      var sec = t.closest('section.sec'); if (!sec) return;
+      var slides = [].slice.call(t.children), seen = new Set();
+      slides.forEach(function (sl) { sl.classList.add('rv-x'); });
+      var io = new IntersectionObserver(function (es) {
+        var now = []; es.forEach(function (e) { if (e.isIntersecting) seen.add(e.target); });
+        if (!sectionIn(sec)) return;
+        slides.forEach(function (sl) { if (seen.has(sl)) now.push(sl); }); show(now);
+      }, { root: t, threshold: 0.15 });
+      slides.forEach(function (sl) { io.observe(sl); });
+      tracks.push({ sec: sec, run: function () { show(slides.filter(function (sl) { return seen.has(sl); })); } });
+    });
     var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (!e.isIntersecting) return;
       var s = e.target; s.classList.add('is-in'); io.unobserve(s);
-      setTimeout(function () { s.classList.add('is-done'); }, 2000); }); }, { rootMargin: '0px 0px -12% 0px' });
+      tracks.forEach(function (t) { if (t.sec === s) t.run(); });
+      setTimeout(function () { s.classList.add('is-done'); }, 3200); }); }, { rootMargin: '0px 0px -12% 0px' });
     secs.forEach(function (s) {
       if (s.getBoundingClientRect().top < vh * 0.88) return;   // on the first screen: in, no motion
-      [].forEach.call(s.querySelectorAll(CARDS), function (c, i) { c.style.setProperty('--rv-i', Math.min(i, 8)); });
+      [].forEach.call(s.querySelectorAll(CARDS), function (c, i) { c.style.setProperty('--rv-i', Math.min(i, 6)); });
       s.classList.add('rv'); io.observe(s);
     });
   })();

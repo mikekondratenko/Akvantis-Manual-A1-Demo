@@ -774,21 +774,27 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .sec-expand > .sec-head { grid-column: 1 / -1; justify-items: center; text-align: center; }
 
 /* ══════════════ REVEAL (2026-11-04) ══════════════
-   Every section of a page comes in as it enters the window — from transparent and 48 lower to its place —
-   and the cards in it follow one after another (70 apart, eight at most). section.js REVEAL marks the
-   sections `.rv` and adds `.is-in` when one is 12 % into the window; what is on the first screen is in at
-   once, with no motion (the hero never blinks). The cards are the grids' and the sliders' children; the
-   expanding cards (their own flex transition) and the order form are not staggered.
-   Nothing moves under prefers-reduced-motion (section.js does not run it). Tokens: --reveal-ms, --reveal-y. */
-:root { --reveal-ms: 900ms; --reveal-y: 48px; --reveal-ease: cubic-bezier(.16, 1, .3, 1); }
+   Every section of a page comes in as it enters the window — from transparent and 48 lower to its place.
+   CARDS in a grid follow one after another, 0.3 s apart (six steps at most), 24 lower.
+   SLIDES of a horizontal slider come in from the right (48), 0.3 s apart — when their section enters the
+   window, and again for each slide the visitor scrolls into the track.
+   section.js REVEAL marks the sections `.rv` and adds `.is-in` when one is 12 % into the window; what is on
+   the first screen is in at once, no motion (the hero never blinks). The expanding cards (their own flex
+   transition) and the order form are not staggered. Nothing moves under prefers-reduced-motion.
+   Tokens: --reveal-ms, --reveal-y, --reveal-step, --reveal-ease. */
+:root { --reveal-ms: 900ms; --reveal-y: 48px; --reveal-step: 300ms; --reveal-ease: cubic-bezier(.16, 1, .3, 1); }
 .rv { transition: opacity calc(var(--reveal-ms) * .8) var(--reveal-ease), transform var(--reveal-ms) var(--reveal-ease); }
 .rv:not(.is-in) { opacity: 0; transform: translate3d(0, var(--reveal-y), 0); }
 .rv.is-in { transform: none; }
-.rv :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid, .slider-track) > * {
+.rv :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid) > * {
   transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease), transform calc(var(--reveal-ms) * .9) var(--reveal-ease);
-  transition-delay: calc(var(--rv-i, 0) * 70ms + 120ms); }
-.rv:not(.is-in) :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid, .slider-track) > * { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }
-.rv.is-done :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid, .slider-track) > * { transition: none; }   /* once in, the cards keep no delay of their own */
+  transition-delay: calc(var(--rv-i, 0) * var(--reveal-step) + 120ms); }
+.rv:not(.is-in) :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid) > * { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }
+.rv.is-done :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid) > * { transition: none; }   /* once in, no delay of their own */
+/* slides: from the right, each when it is in view in its track (section.js sets .rv-x, then .is-in, and --rv-d) */
+.slider-track > .rv-x { transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease), transform calc(var(--reveal-ms) * .9) var(--reveal-ease);
+  transition-delay: var(--rv-d, 0ms); }
+.slider-track > .rv-x:not(.is-in) { opacity: 0; transform: translate3d(var(--reveal-y), 0, 0); }
 
 /* ══════════════ SLIDERS ══════════════
    One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the
