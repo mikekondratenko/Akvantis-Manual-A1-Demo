@@ -818,6 +818,9 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .slider-track > .rv-x { transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease) var(--rv-d, 0ms),
   transform calc(var(--reveal-ms) * .9) var(--reveal-ease) var(--rv-d, 0ms); }
 .slider-track > .rv-x:not(.is-in) { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }
+/* The track scrolls on x, so it clips on y too: a rising slide was cut at its bottom edge. Room for the
+   rise above and below, given back by a negative margin — the layout does not move (2026-11-04)
+   (set on .slider-track below) */
 
 /* ══════════════ SLIDERS ══════════════
    One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the
@@ -828,8 +831,8 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .slider-track {
   position: relative; display: grid; grid-auto-flow: column; gap: var(--card-gap);
   overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
-  padding-inline: var(--grid-margin); scroll-padding-inline: var(--grid-margin);
-  list-style: none; margin: 0; scrollbar-width: none;
+  padding: calc(var(--reveal-y) / 2) var(--grid-margin); scroll-padding-inline: var(--grid-margin);
+  list-style: none; margin: calc(var(--reveal-y) / -2) 0; scrollbar-width: none;   /* room for a rising slide (above) */
 }
 .slider-track::-webkit-scrollbar { display: none; }
 .slide { scroll-snap-align: start; min-width: 0; }
