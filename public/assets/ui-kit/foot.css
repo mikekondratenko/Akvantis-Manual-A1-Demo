@@ -34,15 +34,15 @@
 .foot p + p { margin-top: var(--space-4); }
 /* The company's site (2026-10-21): a line of its own over the fine print, a step larger and
    in the page's muted ink, full ink under the cursor. */
-.foot-link { font-size: var(--type-caption); color: var(--ink-muted); text-decoration: none;
-  transition: color var(--duration-fast); }
+.foot-link { font-size: var(--type-caption); color: var(--ink-muted);
+  transition: color var(--duration-fast), background-size var(--duration-slow) var(--ease-emphasized); }   /* the line: type.css LINK */
 .foot-link:hover { color: var(--ink); }
 .foot-link:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset, 2px); border-radius: var(--radius-4); }
 /* LEGAL (2026-11-04): the public offer, the privacy policy, returns — a row of quiet links over the © line;
    the documents are the seller's (ФОП Ванжа), in the shop: docs/A1-specifications.md §2.5. In a `.sec-footer-bottom`
    the row stands on the left. */
 .legal-links { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-4) var(--space-16); margin: 0 0 var(--space-8); }
-.legal-links a { font-size: var(--type-caption); color: var(--ink-muted); text-decoration: none; transition: color var(--duration-fast); }
+.legal-links a { font-size: var(--type-caption); color: var(--ink-muted); transition: color var(--duration-fast), background-size var(--duration-slow) var(--ease-emphasized); }   /* the line: type.css LINK */
 .legal-links a:hover { color: var(--ink); }
 .legal-links a:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset, 2px); border-radius: var(--radius-4); }
 .sec-footer-bottom .legal-links { margin: 0; justify-content: flex-start; }

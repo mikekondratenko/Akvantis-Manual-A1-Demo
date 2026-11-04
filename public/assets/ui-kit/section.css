@@ -337,7 +337,7 @@ img.sec-banner { object-fit: contain; }
 .sec-footer-brand > svg, .sec-footer-brand > a > svg { width: var(--number-32); height: var(--number-32); color: var(--ink); display: block; }
 .sec-footer-col { display: grid; gap: var(--space-12); align-content: start; justify-items: start; }
 .sec-footer-col > b { font-size: var(--type-small); font-weight: var(--weight-semibold); color: var(--ink); }
-.sec-footer-col a { color: var(--ink-muted); text-decoration: none; font-size: var(--type-small); transition: color var(--duration-fast); }
+.sec-footer-col a { color: var(--ink-muted); font-size: var(--type-small); transition: color var(--duration-fast), background-size var(--duration-slow) var(--ease-emphasized); }   /* the line: type.css LINK */
 .sec-footer-col a:hover { color: var(--ink); }
 .sec-footer-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-16) var(--space-24);
   padding-top: var(--space-24); border-top: 1px solid var(--rule); font-size: var(--text-12); color: var(--ink-quiet, var(--ink-faint)); }
