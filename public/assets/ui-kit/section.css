@@ -321,6 +321,7 @@ img.sec-banner { object-fit: contain; }
 .sec-quote.is-filled > .sec-quote-by { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .sec-quote-fill { --fill: 100% !important; }
   .sec-quote:has(.sec-quote-fill) > .sec-quote-by { opacity: 1; transform: none; transition: none; } }
+.sec-quote.is-still > .sec-quote-by { opacity: 1; transform: none; transition: none; }   /* data-motion="off": white words, no fill (section.js) */
 .sec-quote-by { font-size: var(--type-body); color: var(--black-300); }   /* a step under the muted ink (2026-10-25) */
 .sec-quote.is-center { justify-items: center; text-align: center; }
 .sec-quote.is-center > * { grid-column: 1 / -1; max-width: 22ch; }
@@ -627,6 +628,10 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
   .sec-drift-text { width: auto; white-space: normal; transform: none; }
   .drift-w { transform: none !important; }
 }
+/* data-motion="off" (section.js marks the section .is-still): the same still line */
+.sec-drift.is-still { min-height: 0; padding: var(--sec-pad) var(--grid-margin); }
+.sec-drift.is-still .drift-pin { position: static; height: auto; }
+.sec-drift.is-still .sec-drift-text { width: auto; white-space: normal; transform: none; }
 
 /* ══════════════ FIGURES (2026-11-04) ══════════════
    `.sec-figures`: cards with large figures (Bluewater's SuperiorOsmosis board). A card is a kicker, an «Up to»,

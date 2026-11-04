@@ -23,6 +23,13 @@
    ───────────────────────────────────────────────────────────────────────────── */
 (function () {
   'use strict';
+  /* MOTION ON / OFF (2026-11-04) — every scroll motion here (the reveal, the drift line and its words, the quote's
+     fill, the mark's wave) can be turned off for one section or a whole page: data-motion="off" on the section,
+     or on <html>/<body>/any wrapper; the nearest data-motion wins, so data-motion="on" brings one block back
+     inside a still page. Still blocks get .is-still; reduced motion stills them all. */
+  var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var still = function (el) { if (RM) return true; var m = el && el.closest('[data-motion]'); return !!(m && m.getAttribute('data-motion') === 'off'); };
+  [].forEach.call(document.querySelectorAll('section.sec'), function (s) { if (still(s)) s.classList.add('is-still'); });
   (function lockups() {
     var D = {}; (window.DEVICES || []).forEach(function (d) { if (d.svg && !D[d.code]) D[d.code] = d.svg; });
     [].forEach.call(document.querySelectorAll('.sec-lockup[data-device]'), function (el) {
@@ -36,7 +43,7 @@
      is in — those in view 0.3 s apart (--rv-d), the rest at once. Not under reduced motion. */
   (function reveal() {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
-    var secs = [].slice.call(document.querySelectorAll('section.sec')).filter(function (s) { return !s.parentNode.closest('section.sec'); });
+    var secs = [].slice.call(document.querySelectorAll('section.sec')).filter(function (s) { return !s.parentNode.closest('section.sec') && !still(s); });
     if (!secs.length) return;
     var CARDS = ':is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid) > *';
     var step = function () { return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--reveal-step')) || 300; };
@@ -44,7 +51,7 @@
     /* the slides: waiting in view until their section is in */
     var sectionIn = function (s) { return !s.classList.contains('rv') || s.classList.contains('is-in'); };
     [].forEach.call(document.querySelectorAll('.slider-track'), function (t) {
-      var sec = t.closest('section.sec'); if (!sec) return;
+      var sec = t.closest('section.sec'); if (!sec || still(sec)) return;
       var slides = [].slice.call(t.children);
       slides.forEach(function (sl) { sl.classList.add('rv-x'); });
       /* on the reveal: the slides in view rise 0.3 s apart, the rest are in at once (they wait off-screen) */
@@ -102,7 +109,7 @@
   (function mark() {
     var n = 0, NS = 'http://www.w3.org/2000/svg';
     [].forEach.call(document.querySelectorAll('.header-mark > svg, .sec-footer-brand svg'), function (svg) {
-      var ps = svg.querySelectorAll(':scope > path'); if (ps.length !== 3 || svg.querySelector('.mark-waves')) return;
+      var ps = svg.querySelectorAll(':scope > path'); if (ps.length !== 3 || svg.querySelector('.mark-waves') || still(svg)) return;
       var id = 'mark-clip-' + (++n), defs = document.createElementNS(NS, 'defs'), cp = document.createElementNS(NS, 'clipPath'), c = document.createElementNS(NS, 'circle');
       cp.setAttribute('id', id); c.setAttribute('cx', '24.02'); c.setAttribute('cy', '24.18'); c.setAttribute('r', '21.1');   // the ring's inside
       cp.appendChild(c); defs.appendChild(cp); svg.insertBefore(defs, svg.firstChild);
@@ -140,15 +147,14 @@
   })();
   function start() {
     var fills = [].slice.call(document.querySelectorAll('.sec-quote-text')).filter(function (q) {
-      return !q.querySelector('.is-muted');
+      return !q.querySelector('.is-muted') && !still(q);
     }).map(function (q) {
       var f = q.querySelector('.sec-quote-fill');
       if (!f) { f = document.createElement('span'); f.className = 'sec-quote-fill';
         while (q.firstChild) f.appendChild(q.firstChild); q.appendChild(f); }
       return [q, f];
     });
-    var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var drifts = still ? [] : [].slice.call(document.querySelectorAll('.sec-drift-text'));
+    var drifts = [].slice.call(document.querySelectorAll('.sec-drift-text')).filter(function (d) { return !still(d); });
     /* WORDS (2026-11-04): the line is cut into words (.drift-w); on a scroll each word trails the line, a little
        more down the line, so the gaps open while the page moves and close smoothly as it stops. */
     drifts.forEach(function (d) {
