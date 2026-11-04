@@ -47,7 +47,7 @@
   margin: 0; padding: var(--space-16); text-align: center;
   border: 1px solid var(--choice-edge, transparent); border-radius: var(--radius-16); background: var(--choice); color: var(--ink);
   cursor: pointer; transition: background var(--duration-fast), border-color var(--duration-fast); }
-.choice:not(.is-row) { background: var(--choice-card, var(--choice)); border-color: var(--choice-card-edge, var(--choice-edge, transparent)); }   /* a card on paper: white, a light edge (tokens.css, 2026-10-30); on dark the two are not set — as before */
+.choice:not(.is-row) { background: var(--choice-card, var(--choice)); border-color: var(--choice-card-edge, var(--choice-edge, transparent)); }   /* a card on paper: white, a light edge (tokens.css, 2026-10-30); on dark the two are not set — the fill's edge, --choice-edge (2026-11-04) */
 .choice:has(> input:checked), .choice.is-on { background: var(--choice-on, var(--choice)); border-color: var(--choice-edge-on); box-shadow: inset 0 0 0 0.8px var(--choice-edge-on); }   /* active is 1.8px: border + .8 inset, nothing moves */
 .choice:not(.is-row) > input { position: absolute; opacity: 0; pointer-events: none; }
 .choice:not(.is-row):has(> input:focus-visible) { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
@@ -290,7 +290,7 @@
    A model's NAME IS ITS LOCKUP: <b class="choice-name"><span class="sec-lockup" data-device="K1"></span></b>
    — the catalogue's own mark (section.js fills it; the passport writes the SVG in). */
 .choice-grid.is-flush { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-radius: var(--radius-16); overflow: hidden;
-  background: var(--choice-card, var(--choice)); box-shadow: inset 0 0 0 1px var(--choice-card-edge, transparent); }
+  background: var(--choice-card, var(--choice)); box-shadow: inset 0 0 0 1px var(--choice-card-edge, var(--choice-edge, transparent)); }
 .choice-grid.is-flush > .choice { --choice-pic: 116px; border: 0; border-radius: 0; box-shadow: none; background: transparent;
   padding: var(--space-16) var(--space-12) calc(var(--space-16) + var(--space-4)); color: var(--ink); text-decoration: none; }
 .choice-grid.is-flush > .choice:not(:last-child):not(:nth-last-child(2):nth-child(odd)) { box-shadow: inset 0 -1px 0 var(--rule); }
@@ -309,8 +309,28 @@
    data-start the first shown) and takes the other cards out of the plate, so the hairlines stay right.
    The cards keep the flush card's hover. */
 .choice-filter { display: flex; align-items: center; gap: var(--space-12); min-width: 0; padding: var(--space-12) var(--space-16);
-  border-radius: var(--radius-16); background: var(--choice-card, var(--choice)); box-shadow: inset 0 0 0 1px var(--choice-card-edge, transparent); }
+  border-radius: var(--radius-16); background: var(--choice-card, var(--choice)); box-shadow: inset 0 0 0 1px var(--choice-card-edge, var(--choice-edge, transparent)); }
 .choice-filter + .choice-grid.is-flush { margin-top: var(--space-8); }
 .choice-filter .pair-row { display: flex; flex: none; gap: var(--space-4); }
 .choice-filter .pair-name { font-size: var(--text-14); color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+
+/* ══ A PICTURE TO CHOOSE — `.choice-grid.is-bare` (2026-11-04; the A1's colour) ══
+   The picture is the choice: at rest no plate and no edge — the product, a swatch over its name, the
+   name. 288 pictures (fitted to the card on a phone). Chosen: the card's own active state (the accent
+   edge on the choice's plate) and the swatch's ring. Two a row on every width, 8 apart, no scroll.
+     <div class="choice-grid is-2 is-bare"><label class="choice"><input type="radio" …>
+       <span class="choice-pics"><img class="choice-pic" …></span>
+       <span class="swatch-btn choice-swatch" style="background:#111113" aria-hidden="true"></span><b>Black</b></label>
+   Two colours in one disc: `swatch-split` with --swatch-a / --swatch-b (swatch.css), hexes from COLOURS. */
+.choice-grid.is-bare:not(.is-flush) > .choice { --choice-pic: 288px; gap: var(--space-8); }
+.choice-grid.is-bare:not(.is-flush) > .choice:not(.is-on):not(:has(> input:checked)) { background: transparent; border-color: transparent; }
+.choice-grid.is-bare .choice-pic { max-width: 100%; height: auto; aspect-ratio: 1; }
+.choice-swatch { pointer-events: none; margin-top: var(--space-8); }
+.choice:is(.is-on, :has(> input:checked)) .choice-swatch { padding: 5px; box-shadow: inset 0 0 0 2px var(--accent); }
+.choice:is(.is-on, :has(> input:checked)) .choice-swatch::after { inset: 5px; }
+@media (max-width: 767px) {
+  .choice-grid.is-bare:not(.is-flush) { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-columns: auto;
+    gap: var(--space-8); overflow: visible; scroll-snap-type: none; padding: 0; margin: 0; }
+  .choice-grid.is-bare:not(.is-flush) > .choice { margin-left: 0; border-radius: var(--radius-16); padding: var(--space-12); }
+}

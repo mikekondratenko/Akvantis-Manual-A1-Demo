@@ -102,8 +102,9 @@
 /* ── STATE AND VARIANTS — each re-points the role, none paints ── */
 
 /* ══════════════ LEVELS (2026-10-25) ══════════════
-   Primary hover steps one shade along the ramp; labels: cyan 7.7 (8.4 on hover), white 18; on
-   paper black with a white label 18:1, the cyan with dark ink 8.6:1. */
+   Primary hover steps one shade along the ramp. The label on the cyan is WHITE on either theme
+   (2026-11-04; was the dark ink, 8.6:1) — 2.4:1, under WCAG's 4.5, chosen for the brand. On paper the
+   primary is black with a white label, 18:1. */
 .btn-primary   { --btn: var(--btn-primary);   --btn-hover: var(--btn-primary-hover);   --btn-ink: var(--btn-primary-ink);   --btn-edge: var(--btn-primary-edge); }
 .btn-secondary { --btn: var(--btn-secondary); --btn-hover: var(--btn-secondary-hover); --btn-ink: var(--btn-secondary-ink); --btn-edge: var(--btn-secondary-edge); }
 .btn-tertiary,

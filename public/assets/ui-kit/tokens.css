@@ -123,6 +123,12 @@
   --frost-700  : rgba(40, 42, 42, .72);   /* --black-700, translucent */
   --frost-blur : blur(24px) saturate(120%);
   --frost-edge : inset 0 0 0 var(--hairline) var(--white-07);
+  /* A FILL HAS AN EDGE, ON EITHER THEME (2026-11-04): every grey surface — a plate, a section's card,
+     the hero's sheet, the tabs' track, a choice — is drawn with a 1px line inside, for contrast against
+     the page. On the dark ground it is the frost's own hairline (white at 7 %, ≈ #2E3030 on --black-900),
+     so a card and the header / the order bar draw one line; translucent, it holds on the hover fill too.
+     On paper: --black-800, a step darker than the tile (the light block). */
+  --tile-edge  : var(--white-07);
 
   /* Grey scale — the sheet, the sidebar, every surface */
   --black-50  : #F4F5F6;
@@ -175,7 +181,7 @@
      call to action; hover goes one step LIGHTER on the dark ground (the library's brand/hover). */
   --accent      : var(--cyan-500);
   --accent-deep : var(--cyan-400);
-  --accent-ink  : var(--black-1000);
+  --accent-ink  : #FFFFFF;   /* words on an accent fill: white, as the primary button's (2026-11-04) */
   --accent-text : var(--accent);       /* the accent as WORDS — one with --accent on the dark ground */
 
   /* ── ROLES (moved here from passport.css, 2026-10-10) ──
@@ -211,7 +217,7 @@
      the `--btn*` role, which `.btn`, `.round-btn` and `.hotspot` paint from. */
   --btn-primary             : var(--cyan-500);
   --btn-primary-hover       : var(--cyan-400);
-  --btn-primary-ink         : #111211;
+  --btn-primary-ink         : #FFFFFF;   /* white on the cyan, on either theme (2026-11-04; was #111211, 8.6:1 — white is 2.4:1, a brand call) */
   --btn-primary-edge        : none;
   --btn-secondary           : #FCFFFE;
   --btn-secondary-hover     : #EAEBEC;
@@ -441,6 +447,7 @@
   --choice-hover       : var(--black-700);
   --choice-edge-on     : var(--accent);
   --choice-plate       : var(--black-800);   /* an open group's plate: black-900 merged with the step's tile (2026-10-25) */
+  --choice-edge        : var(--tile-edge);   /* a card or a row at rest: the fill's edge (2026-11-04; was none on dark) */
 
   /* ── RADIUS ──
      Four corners off the same scale, so a 16px inset and a 16px corner are the same
@@ -680,7 +687,7 @@
      field's edge take --cyan-600 (3.3:1 — the 3:1 a control's outline needs). */
   --accent      : var(--cyan-500);
   --accent-deep : var(--cyan-400);
-  --accent-ink  : #111211;
+  --accent-ink  : #FFFFFF;   /* white on the cyan, as on the dark ground (2026-11-04) */
   --accent-text : var(--cyan-700);
   /* Status on paper — measured on white: danger 6.5, edge 4.8, success 5.5, warning 5.0, info 5.2. */
   --danger      : var(--red-700);

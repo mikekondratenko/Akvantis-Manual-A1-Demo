@@ -153,7 +153,7 @@ img.sec-banner { object-fit: contain; }
         photographs in the specimen. On paper the token is the light grey of the same step. */
   background: none;
 }
-.ph-fill .sec-ph { background: var(--black-900); }   /* TEST mode — see the RULE above */
+.ph-fill .sec-ph { background: var(--black-900); box-shadow: inset 0 0 0 var(--hairline) var(--tile-edge); }   /* TEST mode — see the RULE above; the fill's edge, as every grey surface (2026-11-04) */
 
 /* ── HERO ──
    The first screen: the object, then the words, centred. The top inset clears a fixed
@@ -851,7 +851,7 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-dock-item { position: relative; flex: none; }
 .order-dock-item > :first-child { display: block; width: var(--number-48); height: var(--number-48); object-fit: contain; max-height: none;
   padding: 0; background: none; }   /* the picture alone, no plate (2026-10-29) */
-.order-dock-item > .sec-ph { padding: 0; background: none; }
+.order-dock-item > .sec-ph { padding: 0; background: none; box-shadow: none; }
 .order-dock-n { position: absolute; top: calc(-1 * var(--space-4)); right: calc(-1 * var(--space-8));
   color: var(--ink); font-size: var(--text-11); line-height: 1; font-weight: var(--weight-semibold); }   /* just the words, no plate (2026-10-29) — white on the dark bar, the ink on paper */
 
@@ -868,7 +868,23 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--number-96) + env(safe-area-inset-bottom)); }
 /* the preview's controls over the bar: grid.css FAB ROW (2026-10-30) */
 
-/* A LIGHT GREY FILL HAS AN EDGE (2026-10-31, tokens.css --tile-edge): the section cards on paper. An
-   outline drawn inside, so a picture filling the card does not cover it. */
-[data-theme="light"] :is(.tile, .compare-pic, .sec-slides .slide, .story, .sec-reviews:not(.is-bare) .review) { outline: 1px solid var(--tile-edge); outline-offset: -1px; }
-[data-theme="light"] :is(.sec-hero, .sec-cover)::before { box-shadow: inset 0 0 0 1px var(--tile-edge); }   /* the hero's and the cover's grey sheet, too */
+/* A FILL HAS AN EDGE (tokens.css --tile-edge; paper 2026-10-31, dark 2026-11-04): the section cards on
+   either theme. An outline drawn inside, so a picture filling the card does not cover it. */
+:is(.tile, .compare-pic, .story, .sec-reviews:not(.is-bare) .review) { outline: var(--hairline) solid var(--tile-edge); outline-offset: calc(var(--hairline) * -1); }
+/* A slide's picture is absolute over the slide and would cover an outline: its edge is a layer on top of
+   everything in it (2026-11-04); the slot inside takes none, so the line is drawn once, round the corners. */
+.sec-slides .slide::after { content: ''; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 var(--hairline) var(--tile-edge); }
+.ph-fill .slide-media.sec-ph { box-shadow: none; }
+/* A slot INSIDE a card already has the card's edge round it: no second line (2026-11-04). */
+.ph-fill :is(.plate, .tile, .story, .slide, .review, .compare-pic, .choice) .sec-ph { box-shadow: none; }
+
+/* BANNERS ARE FULL BLEED (2026-11-04): in a `.sec-cover` — full screen or fixed height — the picture
+   runs to the edges of the screen: no inset frame, no corners, no edge. The words keep the grid's
+   margins. (The hero and the CTA keep their framed sheet.) */
+.sec-cover { --hero-inset: 0px; --hero-radius: 0; }
+@media (min-width: 768px)  { .sec-cover { --hero-inset: 0px; } }
+@media (min-width: 1024px) { .sec-cover { --hero-inset: 0px; --hero-radius: 0; } }
+.sec.sec-cover::before, .ph-fill .sec-cover > .sec-media.sec-ph { box-shadow: none; }
+.sec.sec-cover { border-radius: 0; margin-inline: calc(-1 * var(--space-2)); }   /* out of the stack's 2px to the window's edge */   /* .sec: over the fill's-edge rule below */
+:is(.sec-hero, .sec-cover)::before { box-shadow: inset 0 0 0 var(--hairline) var(--tile-edge); }   /* the hero's and the cover's grey sheet, too */
