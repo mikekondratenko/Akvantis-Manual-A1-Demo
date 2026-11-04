@@ -60,6 +60,8 @@
      .sec-expand       a row of cards, one open wide, the rest strips that open on hover / tap (2026-11-04)
      .sec-figures      cards with large figures, a picture or a film on any of them, bento sizes (2026-11-04)
      .sec-numbers      a centred title and figures alone in 2 or 3 columns, Apple's «Strength in numbers.» (2026-11-04)
+     .sec-trust        the promises in a row: an icon, a short title, a line — warranty, return, delivery,
+                       installation; lower than a section, 2 a row on a phone, 4 from 768 (2026-11-04)
      .sec-bar          a title on the left (`.t-h1`, as every cards section — 2026-10-26) and a link or
                        the arrows on the right, over a slider
      .sec-kicker       the small line over a title — muted, semibold, never in caps
@@ -130,6 +132,11 @@
 .sec > * { grid-column: 1 / -1; min-width: 0; }
 .sec.is-screen { min-height: 100vh; min-height: 100svh; }
 
+/* A STEP DARKER (2026-11-04, Michael): on a page's sections the cards, the figure cards and the hero's and the
+   banners' frames are a step closer to the page than a control's plate — --black-950, and their edge a step
+   fainter (--white-06). The order form keeps the kit's own plates (its controls sit on them). */
+.sec-stack > .sec:not(.sec-order) { --tile: var(--black-950); --tile-edge: var(--white-06); }
+
 /* ── PARTS ── */
 .sec-head { grid-column: var(--sec-head); display: grid; gap: var(--space-16); justify-items: start; }
 .sec-head > .t-lead { max-width: calc(var(--number-288) * 2); }
@@ -190,7 +197,7 @@ img.sec-banner { object-fit: contain; }
 @media (min-width: 1024px) { .sec-hero, .sec-cover { --hero-inset: var(--space-24); --hero-radius: var(--radius-40); } }
 .sec-hero::before, .sec-cover::before {
   content: ''; position: absolute; inset: var(--hero-inset); z-index: -1; pointer-events: none;
-  border-radius: var(--hero-radius); background: var(--black-900);
+  border-radius: var(--hero-radius); background: var(--tile);
 }
 /* Two frames in a row are one inset apart, not two (2026-10-25): the second sheet is drawn over
    the first's bottom inset. The frames keep their size — the hero stays exactly a screen. */
@@ -241,13 +248,38 @@ img.sec-banner { object-fit: contain; }
   border-radius: var(--hero-radius); object-fit: cover; grid-column: auto; grid-row: auto;
 }
 .sec-cover > :not(.sec-media) { position: relative; z-index: 1; }
+/* A PHOTOGRAPH IN A BANNER (2026-11-04) — `.is-photo` on the hero's `.sec-banner`, a banner's `.sec-media`, a highlight's
+   `.slide-media` or a split's picture: the photograph fills the frame edge to edge, and a veil — black, from 60 % to
+   nothing — lies under the words (at the foot of a banner, at the top of a slide) so white words read on a light
+   photograph. The veil is the one exception to «no scrim»: it is there only with a photograph. */
+:is(.sec-cover > .sec-media, .sec-hero.is-cover > .sec-banner).is-photo { object-fit: cover; padding: 0; }
+/* an <img> placed by its insets does not stretch (a replaced element keeps its own size) — so the size is said */
+:is(.sec-cover > img.sec-media, .sec-hero.is-cover > img.sec-banner) { width: calc(100% - 2 * var(--hero-inset)); height: calc(100% - 2 * var(--hero-inset));
+  max-height: none; min-height: 0; aspect-ratio: auto; top: var(--hero-inset); left: var(--hero-inset); align-self: auto; }
+@media (min-width: 1024px) { .sec-cover.is-narrow > img.sec-media { width: calc(100% - 2 * var(--narrow)); left: var(--narrow); } }
+:is(.sec-cover, .sec-hero.is-cover):has(> .is-photo)::after { content: ''; position: absolute; inset: var(--hero-inset); z-index: 0;
+  border-radius: var(--hero-radius); pointer-events: none; background: linear-gradient(to top, rgba(0, 0, 0, .6), rgba(0, 0, 0, 0) 55%); }
+.sec-cover.is-middle:has(> .is-photo)::after { background: rgba(0, 0, 0, .35); }
+/* on a photograph the words are white in both themes — the veil under them is black (2026-11-04) */
+:is(.sec-cover, .sec-hero.is-cover):has(> .is-photo) { --ink: #FCFFFE; --ink-muted: rgba(252, 255, 254, .72); color: var(--ink); }
+.slide-in:has(> .slide-media.is-photo) .slide-cap { color: #FCFFFE; }
+@media (min-width: 1024px) { .sec-cover.is-narrow:has(> .is-photo)::after { left: var(--narrow); right: var(--narrow); } }   /* the veil as narrow as its photo */
+.slide-in:has(> .slide-media.is-photo)::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, .55), rgba(0, 0, 0, 0) 45%); }
+.sec-split-pic > img.is-photo { object-fit: cover; border-radius: var(--sec-card-radius); }
+
+/* A PRODUCT IN A BANNER (2026-11-04) — `.is-object` on the hero's `.sec-banner` or a banner's `.sec-media`: a cut-out
+   render (on transparent) is not cropped to fill the frame but stands whole in its upper part, clear of the words
+   at the foot. */
+:is(.sec-cover > .sec-media, .sec-hero.is-cover > .sec-banner).is-object { object-fit: contain; padding: 6% 22% 30%; }
+@media (max-width: 767px) { :is(.sec-cover > .sec-media, .sec-hero.is-cover > .sec-banner).is-object { padding: 10% 8% 42%; } }
 .sec-cover > .sec-head { grid-column: 1 / -1; justify-items: center; }
 /* NARROW (2026-11-04) — `.sec-cover.is-narrow`: from 1024 the sheet and its picture take 10 of the page's 12
    modules, centred (14 of 20 from 1920; was 8 / 12), the words on the sheet's own middle; full width below.
    With `.is-fixed.is-middle` it is the centred narrow banner. */
 @media (min-width: 1024px) {
   .sec-cover.is-narrow { --narrow: calc(var(--grid-margin) + 1 * (var(--grid-col) + var(--grid-gutter))); }
-  .sec-cover.is-narrow::before, .sec-cover.is-narrow > .sec-media { left: var(--narrow); right: var(--narrow); }
+  .sec-cover.is-narrow::before, .sec-cover.is-narrow::after, .sec-cover.is-narrow > .sec-media { left: var(--narrow); right: var(--narrow); }
   .sec-cover.is-narrow > :not(.sec-media) { grid-column: 2 / span 10; }
 }
 @media (min-width: 1920px) {
@@ -268,10 +300,10 @@ img.sec-banner { object-fit: contain; }
    own sentence, set at 32 → 48 → 64 → 80; it fills from --black-800 to white as the page is
    scrolled (section.js). `.is-muted` inside dims a part of it (no fill); `.sec-quote-by`
    names who said it; buttons may follow. Left by default, `.is-center` on the axis. */
-:root { --type-quote: var(--text-28); --quote-span: 1 / -1; }   /* 28 on a phone (2026-10-25) */
-@media (min-width: 768px)  { :root { --type-quote: var(--text-48); } }
-@media (min-width: 1024px) { :root { --type-quote: var(--text-64); --quote-span: 1 / span 10; } }
-@media (min-width: 1440px) { :root { --type-quote: var(--text-80); } }
+:root { --type-quote: var(--text-26); --quote-span: 1 / -1; }   /* a step smaller (2026-11-04, Michael): 28 / 48 / 64 / 80 → 26 / 40 / 56 / 72 */
+@media (min-width: 768px)  { :root { --type-quote: var(--text-40); } }
+@media (min-width: 1024px) { :root { --type-quote: var(--text-56); --quote-span: 1 / span 10; } }
+@media (min-width: 1440px) { :root { --type-quote: var(--text-72); } }
 @media (min-width: 1920px) { :root { --quote-span: 1 / span 16; } }
 /* ── TEXT (2026-11-04) ── `.sec-text`: a section of words alone, centred (apple.com, «Brilliance within
    reach.»): a kicker in caps, a title, a body at a reading measure and — each optional — a link (↗ when it
@@ -440,7 +472,7 @@ img.sec-banner { object-fit: contain; }
 .card { display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-8) var(--space-8) var(--space-24);
   border-radius: var(--sec-card-radius); }
 .card-pic { width: 100%; aspect-ratio: 4 / 3; border-radius: calc(var(--sec-card-radius) - var(--space-8)); object-fit: contain; }
-img.card-pic { background: var(--black-800); }
+img.card-pic { background: none; }   /* no inner plate behind a cut-out (2026-11-04, Michael) — the card's own plate is enough */
 .card > :not(.card-pic) { margin-inline: var(--space-16); }
 .card > .card-pic + * { margin-top: var(--space-12); }
 .card > .t-small { color: var(--ink-muted); }
@@ -460,6 +492,12 @@ img.card-pic { background: var(--black-800); }
   .card > :not(.card-pic) { margin-inline: var(--space-24); }
   .card:not(:has(> .card-pic)) { padding-top: var(--space-32); }
 }
+/* CENTRED SECTIONS (2026-11-04, Michael: «on the landing the sections are centred») — `.is-center` on any
+   section puts its title block and its bar (a carousel's title over the arrows) on the axis; the cards' own
+   words follow (below). */
+.sec.is-center > .sec-head { grid-column: 1 / -1; justify-items: center; text-align: center; }
+.sec.is-center > .sec-head > .t-lead { margin-inline: auto; }
+.sec.is-center > .sec-bar { flex-direction: column; align-items: center; text-align: center; gap: var(--space-12); }
 /* Alignment (2026-10-26): the words and the button on the left by default; `.is-center` on the
    section or on one card centres them. The insets stay the same. */
 .sec.is-center .card, .card.is-center { text-align: center; }
@@ -799,6 +837,18 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .rv.sec-cover:not(.is-in) { opacity: 1; transform: none; }
 .rv.sec-cover::before, .rv.sec-cover > .sec-media { transition: transform calc(var(--reveal-ms) * 1.35) var(--reveal-ease), opacity var(--reveal-ms) var(--reveal-ease); }
 .rv.sec-cover:not(.is-in)::before, .rv.sec-cover:not(.is-in) > .sec-media { opacity: 0; transform: scale(.7); }
+/* BANNERS ON SCROLL (2026-11-04) — section.js SCRUB: a `.sec-cover` and the hero scale with the scroll position
+   (--scrub, set every frame from where the banner stands: --scrub-min → 1 coming in, 1 → --scrub-min going out),
+   the whole sheet at once. This replaces the timed grow above wherever the script runs (`.is-scrub`). */
+:root { --scrub-min: .8; }
+/* 2026-11-04 (Michael): only the MASK moves — the frame, the picture and its veil are clipped by an inset that
+   opens with the scroll; the picture itself keeps its size and place, and so do the words. */
+.sec-cover.is-scrub, .sec-hero.is-scrub { transform: none !important; }
+:is(.sec-cover, .sec-hero).is-scrub::before, :is(.sec-cover, .sec-hero).is-scrub::after,
+.sec-cover.is-scrub > .sec-media, .sec-hero.is-scrub > .sec-banner {
+  --scrub-cut: calc((1 - var(--scrub, 1)) * 50%);
+  clip-path: inset(var(--scrub-cut) round var(--hero-radius));
+  opacity: 1 !important; transform: none !important; transition: none !important; }
 /* The words one by one (section.js marks them .rv-c, --rv-d 0.07 s apart, top down and left to right): in a
    banner after its sheet (0.4 s), in the hero as the page opens (its sheet stands). 2026-11-04 */
 .rv.sec-hero:not(.is-in) { opacity: 1; transform: none; }
@@ -867,6 +917,29 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 /* In the title bar (slider.js moves them there): the bar's right end, no row padding (2026-10-26). */
 .sec-bar > .slider-ctrl.is-in-bar { padding: 0; margin-left: auto; }
 
+/* ── TRUST (2026-11-04) ── `.sec-trust`: the shop's promises in one row — an icon, a short title and a
+   line under it (Apple's «Why buy at Apple»): warranty, return, delivery, installation. It stands next
+   to the order form or between two large sections, so it is lower than a section (48 → 64 top and
+   bottom) and has no title of its own. Two a row on a phone, four from 768; centred; the icon is the
+   kit's own (icons.js) in the accent.
+     <section class="sec sec-trust" aria-label="Why buy from AKVANTIS">
+       <ul class="trust-grid">
+         <li class="trust-item"><i data-icon="shield-check" data-size="32"></i>
+           <p class="trust-title">5-year warranty</p><p class="trust-text">On the device, tied to its serial</p></li> …
+       </ul></section>
+   Four is the design; three or five work (the row wraps on a phone). Title — 2–4 words; line — one line. */
+.sec-trust { padding-block: var(--space-48); }
+@media (min-width: 1024px) { .sec-trust { padding-block: var(--space-64); } }
+.trust-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-40) var(--grid-gutter);
+  list-style: none; margin: 0; padding: 0; }
+@media (min-width: 768px) { .trust-grid { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); } }
+.trust-item { display: grid; gap: var(--space-4); justify-items: center; align-content: start; text-align: center;
+  padding-inline: var(--space-8); }
+.trust-item > * { margin: 0; }
+.trust-item > :is(svg, i) { width: var(--number-32); height: var(--number-32); margin-bottom: var(--space-12); color: var(--accent-text); }
+.trust-title { font-size: var(--type-body); line-height: var(--leading-snug); font-weight: var(--weight-semibold); color: var(--ink); }
+.trust-text { max-width: 24ch; font-size: var(--type-small); line-height: var(--leading-snug); color: var(--ink-muted); text-wrap: balance; }
+
 /* ── HIGHLIGHTS ── one slide a view, the full content width, 4:5 on a phone and 16:9 from
    1024; the caption sits on the picture at the top, the controls float at the bottom. */
 /* CENTRED (2026-11-04): every slide, the first included, stands in the middle of the viewport — the track
@@ -878,6 +951,14 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
   grid-auto-columns: var(--slide-w); padding-inline: calc((100cqi - var(--slide-w)) / 2); scroll-padding-inline: 0;
   gap: var(--card-gap); }   /* as every card and sheet: 12 (2026-11-04) */
 @media (min-width: 1024px) { .sec-slides .slider-track { --slide-w: min(100cqi - var(--grid-margin) * 4, 80svh * 16 / 9); } }
+/* SIDE SLIDES (2026-11-04): the neighbours 15 % smaller, by their place on the track (slider.js sets --slide-s). */
+.sec-slides .slider { --slide-side: .85; }
+.sec-slides .slide:has(> .slide-in) { overflow: visible; background: none; outline: none; }
+.sec-slides .slide:has(> .slide-in)::after { content: none; }   /* the edge is the wrapper's, scaled with it */
+.slide-in::after { content: ''; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 var(--hairline) var(--tile-edge); }
+.slide-in { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; background: var(--tile);
+  transform: scale(var(--slide-s, 1)); transform-origin: var(--slide-o, center); will-change: transform; }
 .sec-slides .slide { scroll-snap-align: center; position: relative; overflow: hidden; aspect-ratio: 4 / 5; border-radius: var(--sec-card-radius); background: var(--tile); }
 @media (min-width: 768px)  { .sec-slides .slide { aspect-ratio: 4 / 3; } }
 @media (min-width: 1024px) { .sec-slides .slide { aspect-ratio: 16 / 9; } }

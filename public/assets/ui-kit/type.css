@@ -38,7 +38,8 @@
 /* The role sizes, mobile first. The phone's two a step smaller (2026-10-25): 56 / 40 put four
    or five letters on a 390 line. */
 :root {
-  --type-display: var(--text-40);
+  /* TITLES A STEP SMALLER (2026-11-04, Michael): the display 40 / 72 / 80 / 96 → 32 / 64 / 72 / 80 */
+  --type-display: var(--text-32);
   --type-h1:      var(--text-32);
   --type-h2:      var(--text-24);
   /* ── AND EVERYTHING ELSE A STEP DOWN TOO (2026-10-29) ── on a 375 screen the 16s of an option's name,
@@ -53,11 +54,11 @@
   --type-small:   var(--text-13);
   --type-caption: var(--text-11);
 }
-@media (min-width: 768px)  { :root { --type-display: var(--text-72); --type-h1: var(--text-48); --type-h2: var(--text-32);
+@media (min-width: 768px)  { :root { --type-display: var(--text-64); --type-h1: var(--text-48); --type-h2: var(--text-32);
   --type-h3: var(--text-24); --type-title: var(--text-16); --type-body: var(--text-16); --type-small: var(--text-14); --type-caption: var(--text-12); } }
-@media (min-width: 1024px) { :root { --type-display: var(--text-80); --type-h1: var(--text-56); } }
+@media (min-width: 1024px) { :root { --type-display: var(--text-72); --type-h1: var(--text-56); } }
 /* The display's 96 only from 1460 (2026-10-26): at 1440 a 96 title read a step too large. */
-@media (min-width: 1460px) { :root { --type-display: var(--text-96); } }
+@media (min-width: 1460px) { :root { --type-display: var(--text-80); } }
 
 .t-display { font-size: var(--type-display); line-height: var(--leading-none);    font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); }
 .t-h1      { font-size: var(--type-h1); line-height: var(--leading-none);    font-weight: var(--weight-semibold); }

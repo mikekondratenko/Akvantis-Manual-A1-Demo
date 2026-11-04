@@ -103,6 +103,35 @@
       secs.forEach(function (s) { s.classList.remove('rv-init'); });
       heroes.forEach(function (s) { s.classList.add('is-in'); setTimeout(function () { s.classList.add('is-done'); }, 2000); }); }); });
   })();
+  /* BANNERS ON SCROLL (2026-11-04, Michael: «react to the scroll position, not a delay») — a banner (.sec-cover)
+     and the hero grow with the page: from --scrub-min (0.8) as the banner's top comes up from the window's foot
+     to full size once it has risen 80 % of a window — only on the way in: once open it stays open, going out
+     or scrolling back changes nothing (2026-11-04). Nothing runs on a timer. The whole sheet scales, words and all, so
+     nothing ever stands outside the frame. The words still come in one by one (REVEAL). Under reduced motion
+     or data-motion="off" the banners stand still. */
+  (function scrub() {
+    if (RM) return;
+    var els = [].filter.call(document.querySelectorAll('section.sec-cover, section.sec-hero'), function (s) { return !still(s); });
+    if (!els.length) return;
+    els.forEach(function (s) { s.classList.add('is-scrub'); });
+    var min = function () { return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--scrub-min')) || 0.8; };
+    var m = min(), ease = function (t) { return 1 - Math.pow(1 - t, 3); }, ticking = false;
+    var draw = function () {
+      ticking = false; var vh = innerHeight, span = vh * 0.8;
+      els.forEach(function (s) {
+        var r = s.getBoundingClientRect();
+        if (r.bottom < -vh || r.top > vh * 2) return;   // far away: leave it
+        /* 2026-11-04 (Michael): it opens only as it comes in on the way down; going out — or back up — it stays as it is */
+        var pin = Math.min(1, Math.max(0, (vh - r.top) / span));
+        if (pin <= (s.__scrub || 0)) return;
+        s.__scrub = pin;
+        s.style.setProperty('--scrub', (m + (1 - m) * ease(pin)).toFixed(4));
+      });
+    };
+    var ask = function () { if (!ticking) { ticking = true; requestAnimationFrame(draw); } };
+    addEventListener('scroll', ask, { passive: true }); addEventListener('resize', function () { m = min(); ask(); });
+    draw();
+  })();
   /* MARK (2026-11-04) — the Akvantis mark in the header and the footer: on a hover (or a key's focus) the ring
      stays and the wave rises out through the ring's inside while the same wave comes up from below, through a
      round mask (section.css MARK). The header's mark takes the page to its top. */

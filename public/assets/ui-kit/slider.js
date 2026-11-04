@@ -58,6 +58,24 @@
       if (onTap) onTap();
     });
     var pt; track.addEventListener('scroll', function () { clearTimeout(pt); pt = setTimeout(peek, 60); }, { passive: true });
+    /* SIDE SLIDES SMALLER (2026-11-04, Michael) — in the highlights (.sec-slides) a slide is full size on the
+       middle and 15 % smaller at its neighbour's place, by where it stands as the track scrolls (no timer):
+       --slide-s from 1 to --slide-side (.85). Measured on offsets, which a transform does not change. */
+    if (root.closest('.sec-slides') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      var side = parseFloat(getComputedStyle(root).getPropertyValue('--slide-side')) || 0.85, sq = false;
+      /* the scale goes on a wrapper (.slide-in), not the slide: scroll snapping measures the transformed box,
+         so a scaled slide would snap off the middle */
+      slides.forEach(function (sl) { if (sl.querySelector(':scope > .slide-in')) return;
+        var w = document.createElement('div'); w.className = 'slide-in';
+        while (sl.firstChild) w.appendChild(sl.firstChild); sl.appendChild(w); });
+      var scale = function () { sq = false; var mid = track.scrollLeft + track.clientWidth / 2;
+        slides.forEach(function (sl) { var w = sl.offsetWidth || 1, x = sl.offsetLeft - (sl.offsetParent === track ? 0 : track.offsetLeft) + w / 2,
+            d = Math.min(1, Math.abs(x - mid) / (w + 12));   /* the slide's middle on the track, whoever its offsetParent is */
+          sl.style.setProperty('--slide-s', (1 - (1 - side) * d).toFixed(4));
+          sl.style.setProperty('--slide-o', x > mid ? 'left center' : 'right center'); }); };   /* shrink toward the middle: the neighbour keeps its edge by the gap */
+      track.addEventListener('scroll', function () { if (!sq) { sq = true; requestAnimationFrame(scale); } }, { passive: true });
+      addEventListener('resize', scale); scale();
+    }
     addEventListener('resize', peek); setTimeout(peek, 0);
 
     if (auto) {

@@ -145,6 +145,7 @@
   --black-700 : #282A2A;
   --black-800 : #232525;
   --black-900 : #1E2020;
+  --black-950 : #181919;   /* half a step off the page (2026-11-04): the landing's cards and frames */
 
   /* ── CYAN — the brand (Figma: cyan, brand) ── */
   --cyan-50  : #E8F8FC;
@@ -650,6 +651,7 @@
   --black-1000 : #FFFFFF;
   --black-900  : #F3F4F4;
   --black-800  : #EDEEEF;
+  --black-950  : #F9F9F9;
   --black-700  : #E8E9EA;
   --black-600  : #DEE0E1;
   --black-500  : #D6D8D8;
