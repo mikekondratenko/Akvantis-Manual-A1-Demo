@@ -123,7 +123,9 @@
       var card = row.closest('.choice'), field = row.querySelector('input[type=hidden]');
       var list = row.dataset.colours ? row.dataset.colours.split(/\s+/) : (d.colours || []);
       var discs = document.createElement('div'); discs.className = 'pair-row';
-      discs.setAttribute('role', 'radiogroup'); discs.setAttribute('aria-label', d.code + ' finish');
+      discs.setAttribute('role', 'radiogroup'); var nameOf = card && card.querySelector('.choice-name, b');
+      var w = (window.KitLang && KitLang.t && KitLang.t('Finish')) || 'Finish';   /* the page's language; the product's own name, not its id (2026-11-04) */
+      discs.setAttribute('aria-label', w + ' · ' + (nameOf ? nameOf.textContent.trim() : d.code));
       var name = document.createElement('span'); name.className = 'pair-name';
       var single = list.length < 2;
       /* data-by="a1_colour" (2026-11-03): the row is set from a radio group elsewhere in the form (a step of

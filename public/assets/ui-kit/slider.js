@@ -22,6 +22,8 @@
     pause: '<i data-icon="pause" data-size="20" data-fill></i>',
     play: '<i data-icon="play" data-size="20" data-fill></i>'   /* as the stories' play (2026-11-04) */
   };
+  /* Words through the page's language when it has one (window.KitLang, 2026-11-04). */
+  var L = function (t) { return (window.KitLang && KitLang.t && KitLang.t(t)) || t; };
   var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function init(root) {
@@ -46,7 +48,7 @@
       var dots = document.createElement('div'); dots.className = 'slider-dots';
       slides.forEach(function (s, i) {
         var b = document.createElement('button'); b.type = 'button'; b.className = 'slider-dot';
-        b.setAttribute('aria-label', 'Slide ' + (i + 1)); b.addEventListener('click', function () { go(i); restart(); });
+        b.setAttribute('aria-label', L('Slide') + ' ' + (i + 1)); b.addEventListener('click', function () { go(i); restart(); });
         dots.appendChild(b);
       });
       var pp = document.createElement('button'); pp.type = 'button'; pp.className = 'btn btn-circle btn-circle-md btn-frost';   /* the stories' round frost button (2026-11-04) */
@@ -64,7 +66,7 @@
       var restart = function () {
         clearTimeout(timer);
         root.classList.toggle('is-playing', playing()); root.classList.toggle('is-paused', paused);
-        pp.innerHTML = paused ? ICON.play : ICON.pause; pp.setAttribute('aria-label', paused ? 'Play' : 'Pause');
+        pp.innerHTML = paused ? ICON.play : ICON.pause; pp.setAttribute('aria-label', L(paused ? 'Play' : 'Pause'));
         var on = dots.querySelector('.is-on'); if (on) { on.classList.remove('is-on'); void on.offsetWidth; on.classList.add('is-on'); }
         if (playing()) timer = setTimeout(function () { go(current() + 1); restart(); }, auto);
       };
@@ -76,7 +78,7 @@
       var prev = document.createElement('button'), next = document.createElement('button');
       prev.type = next.type = 'button'; prev.className = next.className = 'btn btn-circle btn-circle-md';
       prev.innerHTML = ICON.prev; next.innerHTML = ICON.next;
-      prev.setAttribute('aria-label', 'Previous'); next.setAttribute('aria-label', 'Next');
+      prev.setAttribute('aria-label', L('Previous')); next.setAttribute('aria-label', L('Next'));
       var step = function (dir) { var i = current() + dir; if (i >= 0 && i < slides.length) go(i); };
       prev.addEventListener('click', function () { step(-1); }); next.addEventListener('click', function () { step(1); });
       var ends = function () {

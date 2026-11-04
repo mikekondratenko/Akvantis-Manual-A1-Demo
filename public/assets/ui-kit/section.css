@@ -259,7 +259,7 @@ img.sec-banner { object-fit: contain; }
    leaves the page) or buttons.
      <section class="sec sec-text">
        <p class="sec-text-kicker">A1 · Direct Flow</p>
-       <h2 class="t-display">Clean water within reach.</h2>
+       <h2 class="t-h1">Clean water within reach.</h2>
        <p class="sec-text-body">…</p>
        <a class="link sec-text-link" href="…">Open the A1 guide <i data-icon="arrow-up-right" data-size="20"></i></a>
          or <div class="sec-actions"><a class="btn btn-primary" href="…">…</a> …</div>
@@ -275,10 +275,8 @@ img.sec-banner { object-fit: contain; }
 .sec-text .sec-actions { justify-content: center; }
 .sec-text-link { color: var(--accent-text); font-size: var(--type-body); }
 .sec-text-link > svg, .sec-text-link > i { display: inline-block; vertical-align: -.15em; margin-left: var(--space-4); }
-@media (min-width: 1024px) {
-  .sec-text-kicker { font-size: var(--text-16); }
-  .sec-text-body, .sec-text-link { font-size: var(--text-24); }
-}
+/* One size on every width (2026-11-04): the kicker 14, the body and the link 16 — the title is the
+   sections' own `.t-h1`, as every section title. */
 
 .sec-quote { row-gap: var(--space-24); padding-block: calc(var(--sec-pad) * 1.5); }
 .sec-quote > * { grid-column: var(--quote-span); }

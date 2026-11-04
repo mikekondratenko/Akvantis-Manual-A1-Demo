@@ -27,7 +27,8 @@
     };
     var set = function (on) {
       o.classList.toggle('is-on', on); b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on);
-      b.setAttribute('aria-label', on ? 'Hide grid' : 'Show grid'); b.title = on ? 'Hide grid' : 'Show grid';
+      var w = on ? 'Hide grid' : 'Show grid'; w = (window.KitLang && KitLang.t && KitLang.t(w)) || w;   /* the page's language (2026-11-04) */
+      b.setAttribute('aria-label', w); b.title = w;
       try { localStorage.setItem(K, on ? '1' : ''); } catch (e) {}
     };
     b.addEventListener('click', function () { set(!o.classList.contains('is-on')); });
