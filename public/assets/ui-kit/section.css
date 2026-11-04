@@ -191,7 +191,7 @@ img.sec-banner { object-fit: contain; }
 }
 /* Two frames in a row are one inset apart, not two (2026-10-25): the second sheet is drawn over
    the first's bottom inset. The frames keep their size — the hero stays exactly a screen. */
-:is(.sec-hero, .sec-cover) + :is(.sec-hero, .sec-cover) { margin-top: calc(var(--card-gap) - 2 * var(--hero-inset) - var(--stack-gap, 0px)); }   /* the two sheets --card-gap apart (2026-11-04; was one inset) */
+:is(.sec-hero, .sec-cover) + :is(.sec-hero, .sec-cover) { background: transparent; margin-top: calc(var(--card-gap) - 2 * var(--hero-inset) - var(--stack-gap, 0px)); }   /* the two sheets --card-gap apart (2026-11-04; was one inset) */
 .sec-hero > .sec-head, .sec-cta > .sec-head { grid-column: 1 / -1; justify-items: center; }
 .sec-hero .sec-actions, .sec-cta .sec-actions { justify-content: center; }
 /* Centred lines are balanced, caption included: two near-equal lines, never a word alone. */
