@@ -54,7 +54,9 @@
   font-display: swap;
 }
 
-:root {
+/* `data-theme="dark"` on a block keeps it dark on a light page (2026-11-04: the A1 landing's buy bar is
+   always the dark frost) — the same tokens set again on that block, so everything inside reads them. */
+:root, [data-theme="dark"] {
   /* Ink and paper */
   --black      : #111211;
   --black-1000 : #111211;

@@ -175,6 +175,16 @@
    the one button on the page that paled when reached for. */
 [data-theme="light"] .btn-frost { --btn-hover: var(--black-700); --btn-edge: inset 0 0 0 1px var(--control-edge); --btn-edge-hover: inset 0 0 0 1px var(--control-edge); }
 
+/* ── FROST, A STATE OF THE SECONDARY AND TERTIARY (2026-11-04) ── `.is-frost` on `.btn-secondary` / `.btn-tertiary`:
+   the same level, the plate frosted (--frost-900 under the blur, the frost's hairline) so the button floats over a
+   picture, a 3D scene or the page — the header's material. The label is the theme's ink (white on the dark ground,
+   black on paper); under the cursor the level's own hover fill. The A1 landing's second buttons (Explore …).
+     <a class="btn btn-tertiary is-frost" href="#about">Explore</a> */
+.btn-secondary.is-frost, .btn-tertiary.is-frost {
+  --btn: var(--frost-900); --btn-ink: var(--ink); --btn-edge: var(--frost-edge);
+  -webkit-backdrop-filter: var(--frost-blur); backdrop-filter: var(--frost-blur); }
+.btn-secondary.is-frost { --btn-hover: var(--btn-tertiary-hover); }
+
 /* Round — an icon and nothing else, 48 across. Give it an aria-label. */
 .btn-round { width: var(--number-48); padding: 0; flex: none; }
 

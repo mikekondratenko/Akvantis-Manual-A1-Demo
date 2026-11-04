@@ -145,7 +145,8 @@ a level class copies them into the role, so the same class works on `.btn`, `.ro
 
 `.btn-warning` and `.btn-danger` are tertiary in weight (20 % of their hue). `.btn-ghost` is the
 quietest: an outline and no fill (on paper the one control edge, grey under the cursor). There is no cyan
-secondary: the accent is the primary's. `.is-on` (a toggle that stays pressed) takes the
+secondary: the accent is the primary's. `.is-frost` on `.btn-secondary` or `.btn-tertiary` (2026-11-04) is a state, not a level: the
+same button on the frosted plate the header wears, for a button floating over a picture, a 3D scene or the page. `.is-on` (a toggle that stays pressed) takes the
 primary's fill. `.round-btn` and `.hotspot` have two levels and no cyan: primary is the solid ink
 (`--btn-solid*`: white on the dark ground, black on paper) and tertiary, drawn as the outline
 (`--btn-outline*`: white with the control edge on paper); `.round-btn` is

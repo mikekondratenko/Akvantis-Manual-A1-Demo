@@ -405,6 +405,9 @@
     }
     function applyTint () {
       var t = resolveTint(S.tint);
+      /* `sky` (2026-11-04, the A1 landing's hero): the haze behind the water given outright — the page's own
+         ground, so a sheet set into a page has no band where it meets it. Same forms as `tint`. */
+      if (S.sky) { var sk = resolveTint(S.sky); if (sk.custom) t = { name: t.name, water: t.water, sky: sk.water }; }
       gl.uniform3f(U.uWater, t.water[0] / 255, t.water[1] / 255, t.water[2] / 255);
       gl.uniform3f(U.uSky, t.sky[0] / 255, t.sky[1] / 255, t.sky[2] / 255);
       gl.clearColor(t.sky[0] / 255, t.sky[1] / 255, t.sky[2] / 255, 1);
