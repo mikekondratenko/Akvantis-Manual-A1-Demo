@@ -78,4 +78,4 @@
   -webkit-backdrop-filter: var(--frost-blur); backdrop-filter: var(--frost-blur); }
 .fab-row > .fab-theme { order: 1; } .fab-row > .lang-fab { order: 2; } .fab-row > .grid-fab { order: 3; }
 .fab-row > .btn.grid-fab { position: relative; width: var(--number-48); --btn: var(--frost-900); --btn-edge: var(--frost-edge); --btn-edge-hover: var(--frost-edge); }
-@media (max-width: 1183px) { body.has-dock .fab-row { bottom: calc(max(var(--space-12), env(safe-area-inset-bottom)) + 68px + var(--space-8)); } }
+@media (max-width: 1183px) { body.has-dock .fab-row { bottom: calc(max(var(--space-12), env(safe-area-inset-bottom)) + var(--bar-h, 56px) + var(--space-8)); } }   /* over the bar, as tall as the head (2026-11-04) */

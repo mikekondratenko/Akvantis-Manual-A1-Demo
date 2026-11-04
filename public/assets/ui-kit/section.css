@@ -876,17 +876,21 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
    the full width less the gutter. Comes up with the first choice. */
 .order-dock { position: fixed; z-index: 19; left: 50%; bottom: max(var(--space-12), env(safe-area-inset-bottom));
   width: var(--bar-w, calc(var(--number-288) * 2)); max-width: calc(100% - var(--space-24));
-  display: flex; align-items: center; gap: var(--space-16); padding: var(--space-8) var(--space-32) var(--space-8) var(--space-24);
-  border-radius: var(--radius-pill); background: var(--frost-900); box-shadow: var(--frost-edge);   /* fully round ends (2026-10-29) */
+  /* 2026-11-04: as tall as the head (--bar-h, 56 · 72), the picture as far from the left end as from the
+     top; a wide, soft shadow under the whole bar so it floats over the page. */
+  display: flex; align-items: center; gap: var(--space-16); height: var(--bar-h, 56px);
+  padding: 0 var(--space-32) 0 calc((var(--bar-h, 56px) - var(--number-32)) / 2);
+  border-radius: var(--radius-pill); background: var(--frost-900);   /* fully round ends (2026-10-29) */
+  box-shadow: var(--frost-edge), 0 24px 64px var(--scrim-60);
   -webkit-backdrop-filter: var(--frost-blur); backdrop-filter: var(--frost-blur);
   transform: translate(-50%, calc(100% + var(--space-24))); opacity: 0; pointer-events: none;
   transition: transform var(--duration-slow) var(--ease-emphasized), opacity var(--duration-base); }
 .order-dock.is-on { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
 /* The pictures of what is taken (2026-10-29: no words beside them any more) — as many as fit,
    «2×» small at a picture's top right when there are more than one. */
-.order-dock-pics { display: flex; gap: var(--space-8); flex: 1; min-width: 0; overflow: hidden; padding: var(--space-4) var(--space-8) 0 0; }
+.order-dock-pics { display: flex; align-items: center; gap: var(--space-8); flex: 1; min-width: 0; overflow: hidden; padding: var(--space-4) var(--space-8) 0 0; }
 .order-dock-item { position: relative; flex: none; }
-.order-dock-item > :first-child { display: block; width: var(--number-48); height: var(--number-48); object-fit: contain; max-height: none;
+.order-dock-item > :first-child { display: block; width: var(--number-32); height: var(--number-32);   /* 32 (2026-11-04; was 48) */ object-fit: contain; max-height: none;
   padding: 0; background: none; }   /* the picture alone, no plate (2026-10-29) */
 .order-dock-item > .sec-ph { padding: 0; background: none; box-shadow: none; }
 .order-dock-n { position: absolute; top: calc(-1 * var(--space-4)); right: calc(-1 * var(--space-8));
@@ -897,6 +901,7 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
 .order-dock-txt .t-small, .order-dock-price .t-small { color: var(--ink-muted); }
 .order-dock-price { display: flex; flex-direction: row-reverse; align-items: baseline; gap: var(--space-8); flex: none; text-align: right; }   /* one row: the struck price left of the total (2026-10-29) */
 .order-dock-price .choice-was { margin: 0; font-size: var(--type-small); }
+.order-dock-price > .t-h3 { font-size: var(--type-title); }   /* the total two steps under h3: 14 · 16 (2026-11-04; was 20 · 24) */
 /* CANCEL (2026-11-03): the × at the bar's end, after the total — the order thrown away, after a question
    (order.js CANCEL). 40 round, on the bar's frost; it eats into the 32 end padding so the bar keeps its height. */
 .order-dock-x { flex: none; margin-right: calc(var(--space-16) * -1); margin-left: calc(var(--space-8) * -1); color: var(--ink-muted); }
