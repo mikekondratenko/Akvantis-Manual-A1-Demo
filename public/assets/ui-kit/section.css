@@ -786,17 +786,19 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .rv { transition: opacity calc(var(--reveal-ms) * .8) var(--reveal-ease), transform var(--reveal-ms) var(--reveal-ease); }
 .rv:not(.is-in) { opacity: 0; transform: translate3d(0, var(--reveal-y), 0); }
 .rv.is-in { transform: none; }
+.rv-init, .rv-init * { transition: none !important; }   /* hidden at once when marked, not faded out */
 .rv :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid) > * {
   transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease), transform calc(var(--reveal-ms) * .9) var(--reveal-ease);
   transition-delay: calc(var(--rv-i, 0) * var(--reveal-step) + 120ms); }
 .rv:not(.is-in) :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid) > * { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }
 .rv.is-done :is(.sec-cards-grid, .sec-bento-grid, .fig-grid, .num-grid, .sec-grid) > * { transition: none; }   /* once in, no delay of their own */
 /* IMAGE + TEXT (2026-11-04): the two halves of a `.sec-split` come in 0.7 s apart, always the left one first
-   (whichever it is — picture or words; on a phone the upper one) — section.js sets --rv-d by where they stand. */
-.rv.sec-split > * { transition: opacity calc(var(--reveal-ms) * .8) var(--reveal-ease), transform var(--reveal-ms) var(--reveal-ease);
+   (whichever it is — picture or words; on a phone the upper one) — section.js sets --rv-d by where they stand.
+   TEXT (2026-11-04): a `.sec-text`'s kicker, title, body and link / buttons the same — 0.7 s apart, top down. */
+.rv:is(.sec-split, .sec-text) > * { transition: opacity calc(var(--reveal-ms) * .8) var(--reveal-ease), transform var(--reveal-ms) var(--reveal-ease);
   transition-delay: calc(var(--rv-d, 0ms) + 120ms); }
-.rv.sec-split:not(.is-in) > * { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }
-.rv.sec-split.is-done > * { transition: none; }
+.rv:is(.sec-split, .sec-text):not(.is-in) > * { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }
+.rv:is(.sec-split, .sec-text).is-done > * { transition: none; }
 /* TABLES (2026-11-04): the rows of the specifications and of the comparison come in one after another,
    0.5 s apart (eight steps at most) — section.js sets --rv-r. */
 .rv :is(.specs > .specs-row, .compare thead tr, .compare tbody tr) { transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease), transform calc(var(--reveal-ms) * .9) var(--reveal-ease);

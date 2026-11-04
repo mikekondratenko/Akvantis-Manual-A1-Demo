@@ -66,14 +66,17 @@
       if (s.getBoundingClientRect().top < vh * 0.88) return;   // on the first screen: in, no motion
       [].forEach.call(s.querySelectorAll(CARDS), function (c, i) { c.style.setProperty('--rv-i', Math.min(i, 6)); });
       [].forEach.call(s.querySelectorAll('.specs > .specs-row, .compare thead tr, .compare tbody tr'), function (r, i) { r.style.setProperty('--rv-r', Math.min(i, 8)); });   /* table rows: 0.5 s apart */
+      if (s.classList.contains('sec-text')) [].forEach.call(s.children, function (c, k) { c.style.setProperty('--rv-d', (k * 700) + 'ms'); });   /* top down, 0.7 s apart */
       if (s.classList.contains('sec-split')) {   /* the halves: left first, 0.7 s apart (by where they stand) */
         var halves = [].slice.call(s.children).map(function (c) { var r = c.getBoundingClientRect(); return [c, r.left, r.top]; });
         var side = halves.length > 1 && Math.abs(halves[0][1] - halves[1][1]) > 40;   // side by side → by left, stacked → by top
         halves.sort(function (a, b) { return side ? a[1] - b[1] : a[2] - b[2]; })
           .forEach(function (p, k) { p[0].style.setProperty('--rv-d', (k * 700) + 'ms'); });
       }
-      s.classList.add('rv'); io.observe(s);
+      s.classList.add('rv', 'rv-init'); io.observe(s);
     });
+    requestAnimationFrame(function () { requestAnimationFrame(function () {   /* the hidden state is drawn with no transition */
+      secs.forEach(function (s) { s.classList.remove('rv-init'); }); }); });
   })();
   /* EXPAND (2026-11-04) — .xp-row: one card open; from 768 on a pointer the card under it opens,
      a tap or Enter on its button opens it anywhere. The closed cards' words are inert. */
