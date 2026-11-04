@@ -194,7 +194,9 @@
       steps().forEach(function (s) { var v = s.querySelector('.order-step-val'); if (v) v.innerHTML = stepVal(s, true); });
 
       var first = steps()[0], pick = first && first.querySelector('input:checked:not(:disabled):not([data-alt])');
-      var chosen = on ? counted(first).length > 0 : !!pick;
+      /* HIDDEN UNTIL THE FORM IS TOUCHED (2026-11-04): a choice made by default (the A1's colour) does not bring the bar
+         up — only the visitor's own first act in the form does (a tap, a key, Next); a reset hides it again. */
+      var chosen = ('touched' in form.dataset) && (on ? counted(first).length > 0 : !!pick);
       if (dock) { dock.classList.toggle('is-on', chosen); document.body.classList.toggle('has-dock', chosen); }
       var sum = 0, open = false, off = 0, kg = 0, ship = 0;   /* off: the discounts taken (a negative data-price — trade-in); kg: data-kg of what is chosen; ship: the delivery's price */
       $$(form, 'input:checked:not(:disabled):not([data-alt])').filter(live).forEach(function (i) {
@@ -339,8 +341,11 @@
       if (all[i + 1]) openStep(all[i + 1]);
     }); });
 
-    form.addEventListener('change', function () { steps().forEach(function (s) { if (passes(s)) hint(s, ''); }); update(); lock(); });
-    form.addEventListener('input', function () { steps().forEach(function (s) { if (passes(s)) hint(s, ''); }); update(); });
+    var touch = function () { if (!('touched' in form.dataset)) { form.dataset.touched = ''; update(); } };
+    form.addEventListener('pointerdown', function (e) { if (e.target.closest('.choice, button, input, select, textarea, label, a')) touch(); });
+    form.addEventListener('keydown', function (e) { if (e.isTrusted) touch(); });
+    form.addEventListener('change', function (e) { if (e.isTrusted) form.dataset.touched = ''; steps().forEach(function (s) { if (passes(s)) hint(s, ''); }); update(); lock(); });
+    form.addEventListener('input', function (e) { if (e.isTrusted) form.dataset.touched = '';   /* the visitor's own, not a script's (a reset's clicks) */ steps().forEach(function (s) { if (passes(s)) hint(s, ''); }); update(); });
     update(); lock(); ready = true;
 
     /* send */
@@ -469,7 +474,7 @@
 
     /* RESET (2026-11-03): whatever empties the form — the bar's × (CANCEL), a request sent — leaves no
        old error, hint or «chosen by itself» behind; then everything recounts. */
-    form.addEventListener('reset', function () { setTimeout(function () {
+    form.addEventListener('reset', function () { delete form.dataset.touched; setTimeout(function () {
       $$(form, '[data-pick-one]').forEach(function (o) { delete o.dataset.unpicked; });
       $$(form, '[aria-invalid]').forEach(function (el) { if (el.name) mark(el); });
       steps().forEach(function (s) { hint(s, ''); });
