@@ -597,8 +597,10 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
    `.sec-figures`: cards with large figures (Bluewater's SuperiorOsmosis board). A card is a kicker, an «Up to»,
    the figure and a line — each optional; a card may carry a picture or a film filling it (`.has-pic` +
    `.fig-pic`, an <img>, a <video> or a `.sec-ph`), the words then at its foot over the picture.
-   Sizes as the bento: 4 of 12 · `.is-half` 6 · `.is-wide` 8 · `.is-full` 12 · `.is-tall` rows (--rows, 2);
+   Sizes on the cards' own 12: 5 · `.is-half` 6 · `.is-wide` 7 · `.is-full` 12 · `.is-tall` rows (--rows, 2);
    two columns on a tablet, one on a phone.
+   RULE — THE FIGURE IS A NUMBER (2026-11-04): what is set large is digits — 3, 2:1, 0.0001 µm, 2.0 L/min — as short
+   as can be; a unit goes in <small>, every word goes to the kicker or the line under it. Never a name set large.
      <section class="sec sec-figures"><header class="sec-head"><h2 class="t-h1">…</h2></header>
        <ul class="fig-grid">
          <li class="fig-card"><p class="fig-kicker">A1 technology</p><p class="fig-value is-accent">Direct Flow RO</p><p class="fig-text">…</p></li>
@@ -606,13 +608,17 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
          <li class="fig-card is-wide is-tall has-pic" style="--rows: 3"><img class="fig-pic" src="…" alt=""><p class="fig-kicker">…</p><p class="fig-value">2:1</p></li>
        </ul></section> */
 .fig-grid { display: grid; gap: var(--card-gap); grid-auto-flow: dense; list-style: none; margin: 0; padding: 0; grid-column: 1 / -1; }
+/* NARROW (2026-11-04): from 1024 the cards take 8 of the page's 12 modules, centred (12 of 20 from 1920);
+   the section's title stands on the same line. Inside, the cards keep their own 12. */
+@media (min-width: 1024px) { .sec-figures > :is(.fig-grid, .sec-head) { grid-column: 3 / span 8; } }
+@media (min-width: 1920px) { .sec-figures > :is(.fig-grid, .sec-head) { grid-column: 5 / span 12; } }
 @media (min-width: 768px)  { .fig-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
                              .fig-card:is(.is-wide, .is-full) { grid-column: span 2; } }
 @media (min-width: 1024px) { .fig-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
-                             .fig-card { grid-column: span 4; } .fig-card.is-half { grid-column: span 6; }
-                             .fig-card.is-wide { grid-column: span 8; } .fig-card.is-full { grid-column: span 12; }
+                             .fig-card { grid-column: span 5; } .fig-card.is-half { grid-column: span 6; }
+                             .fig-card.is-wide { grid-column: span 7; }   /* 5 + 7 in the narrow 8 (2026-11-04; was 4 + 8) */ .fig-card.is-full { grid-column: span 12; }
                              .fig-card.is-tall { grid-row: span var(--rows, 2); } }
-.fig-card { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: flex-start; gap: var(--space-8);
+.fig-card { container-type: inline-size; position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: flex-start; gap: var(--space-8);
   min-width: 0; padding: var(--space-24); border-radius: var(--sec-card-radius); background: var(--tile); overflow: hidden; }
 @media (min-width: 1024px) { .fig-card { padding: var(--space-32); } }
 .fig-card::after { content: ''; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
@@ -623,13 +629,15 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .fig-kicker { font-size: var(--type-title); line-height: var(--leading-snug); font-weight: var(--weight-semibold); color: var(--ink); }
 .fig-kicker + .fig-value, .fig-kicker + .fig-pre { margin-top: var(--space-16); }
 .fig-pre { font-size: var(--type-small); line-height: var(--leading-snug); color: var(--ink-muted); }
-.fig-value { font-size: var(--type-h1); line-height: var(--leading-none); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); color: var(--ink); }
+.fig-value { white-space: nowrap; font-size: min(var(--type-h1), 15cqi);   /* never wider than its card: 1024's narrow cards (2026-11-04) */
+   line-height: var(--leading-none); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); color: var(--ink); }
 .fig-value small { font-size: .6em; font-weight: var(--weight-medium); letter-spacing: 0; }
 .fig-value.is-accent { color: var(--accent-text); }
 .fig-text { margin-top: var(--space-8) !important; max-width: calc(var(--number-288) * 1.5); font-size: var(--type-body); line-height: var(--leading-relaxed); color: var(--ink-muted); text-wrap: pretty; }
 
 /* ══════════════ NUMBERS (2026-11-04) ══════════════
-   `.sec-numbers`: Apple's «Strength in numbers.» — a centred title and figures alone, no cards, in two
+   `.sec-numbers`: Apple's «Strength in numbers.» — a centred title and figures alone (digits only: a unit's symbol in
+   <small>, every word in the line under it — as .sec-figures' RULE), no cards, in two
    (`.is-2`) or three (`.is-3`, the default) columns from 768; one column on a phone. A figure is an «Up to»
    over it (optional), the figure, a line under it — all centred.
      <section class="sec sec-numbers is-3"><header class="sec-head"><h2 class="t-h1">A1 in numbers.</h2></header>
@@ -650,6 +658,7 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .num-value { font-size: var(--text-40); line-height: var(--leading-tight); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); color: var(--ink); }
 @media (min-width: 1024px) { .num-value { font-size: var(--text-56); } }
 @media (min-width: 1440px) { .num-value { font-size: var(--text-64); } }
+.num-value small { font-size: .5em; font-weight: var(--weight-medium); letter-spacing: 0; }   /* a unit's symbol, small; words go to the line (2026-11-04) */
 .num-text { font-size: var(--type-small); line-height: var(--leading-snug); color: var(--ink-muted); text-wrap: balance; }
 
 /* ══════════════ SLIDERS ══════════════
