@@ -812,10 +812,15 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
   transition-delay: calc(var(--rv-r, 0) * 500ms + 120ms); }
 .rv:not(.is-in) :is(.specs > .specs-row, .compare thead tr, .compare tbody tr) { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 4), 0); }
 .rv.is-done :is(.specs > .specs-row, .compare thead tr, .compare tbody tr) { transition: none; }
-/* slides: from the right, each when it is in view in its track (section.js sets .rv-x, then .is-in, and --rv-d) */
-.slider-track > .rv-x { transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease), transform calc(var(--reveal-ms) * .9) var(--reveal-ease);
-  transition-delay: var(--rv-d, 0ms); }
-.slider-track > .rv-x:not(.is-in) { opacity: 0; transform: translate3d(var(--reveal-y), 0, 0); }
+/* SLIDES (2026-11-04): on the reveal they rise like the cards — the ones in view 0.3 s apart (--rv-d), the rest
+   at once; when the track is swiped, LAG: each slide trails the motion a little (--lag on `translate`, more the
+   further right it stands) and eases back — section.js SLIDER LAG. */
+.slider-track > * { translate: var(--lag, 0px) 0; transition: translate 520ms var(--reveal-ease); }
+.slider-track > .is-peek { cursor: pointer; }   /* a click scrolls it in (slider.js) */
+.slider-track > .rv-x { transition: opacity calc(var(--reveal-ms) * .7) var(--reveal-ease) var(--rv-d, 0ms),
+  transform calc(var(--reveal-ms) * .9) var(--reveal-ease) var(--rv-d, 0ms), translate 520ms var(--reveal-ease); }
+.slider-track > .rv-x:not(.is-in) { opacity: 0; transform: translate3d(0, calc(var(--reveal-y) / 2), 0); }
+@media (prefers-reduced-motion: reduce) { .slider-track > * { translate: none; } }
 
 /* ══════════════ SLIDERS ══════════════
    One mechanism for three sections: a horizontal track that scrolls and snaps, wider than the

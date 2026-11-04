@@ -32,9 +32,8 @@
     });
   })();
   /* REVEAL (2026-11-04) — sections come in as they enter the window (section.css REVEAL); the ones on the first
-     screen are in at once. Grid cards get --rv-i (the 0.3 s steps). Slides of a horizontal slider are revealed
-     one by one, from the right: each when it is ≥ 15 % in view in its track AND its section is in — those
-     that arrive together 0.3 s apart (--rv-d). Not under reduced motion. */
+     screen are in at once. Grid cards get --rv-i (the 0.3 s steps). Slides rise like cards when their section
+     is in — those in view 0.3 s apart (--rv-d), the rest at once. Not under reduced motion. */
   (function reveal() {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
     var secs = [].slice.call(document.querySelectorAll('section.sec')).filter(function (s) { return !s.parentNode.closest('section.sec'); });
@@ -43,20 +42,16 @@
     var step = function () { return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--reveal-step')) || 300; };
     var vh = innerHeight, tracks = [];
     /* the slides: waiting in view until their section is in */
-    var show = function (list) { var k = 0; list.forEach(function (sl) { if (sl.classList.contains('is-in')) return;
-      sl.style.setProperty('--rv-d', (k++ * step()) + 'ms'); sl.classList.add('is-in'); }); };
     var sectionIn = function (s) { return !s.classList.contains('rv') || s.classList.contains('is-in'); };
     [].forEach.call(document.querySelectorAll('.slider-track'), function (t) {
       var sec = t.closest('section.sec'); if (!sec) return;
-      var slides = [].slice.call(t.children), seen = new Set();
+      var slides = [].slice.call(t.children);
       slides.forEach(function (sl) { sl.classList.add('rv-x'); });
-      var io = new IntersectionObserver(function (es) {
-        var now = []; es.forEach(function (e) { if (e.isIntersecting) seen.add(e.target); });
-        if (!sectionIn(sec)) return;
-        slides.forEach(function (sl) { if (seen.has(sl)) now.push(sl); }); show(now);
-      }, { root: t, threshold: 0.15 });
-      slides.forEach(function (sl) { io.observe(sl); });
-      tracks.push({ sec: sec, run: function () { show(slides.filter(function (sl) { return seen.has(sl); })); } });
+      /* on the reveal: the slides in view rise 0.3 s apart, the rest are in at once (they wait off-screen) */
+      var run = function () { var k = 0, tr = t.getBoundingClientRect();
+        slides.forEach(function (sl) { var r = sl.getBoundingClientRect(), seen = r.right > tr.left + 8 && r.left < tr.right - 8;
+          sl.style.setProperty('--rv-d', seen ? (k++ * step()) + 'ms' : '0ms'); sl.classList.add('is-in'); }); };
+      tracks.push({ sec: sec, run: run });   /* run once the sections are marked (below) */
     });
     var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (!e.isIntersecting) return;
       var s = e.target; s.classList.add('is-in'); io.unobserve(s);
@@ -75,8 +70,25 @@
       }
       s.classList.add('rv', 'rv-init'); io.observe(s);
     });
+    tracks.forEach(function (t) { if (sectionIn(t.sec)) t.run(); });   /* a slider on the first screen: its slides now */
     requestAnimationFrame(function () { requestAnimationFrame(function () {   /* the hidden state is drawn with no transition */
       secs.forEach(function (s) { s.classList.remove('rv-init'); }); }); });
+  })();
+  /* SLIDER LAG (2026-11-04) — while a track is swiped, each slide trails the motion a little and eases back
+     (section.css SLIDES, --lag on `translate`): the offset is the scroll's step × where the slide stands in
+     the track (0 at its left edge, more to the right, 60 px at most). Not under reduced motion. */
+  (function lag() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    [].forEach.call(document.querySelectorAll('.slider-track'), function (t) {
+      var last = t.scrollLeft, rest = 0, slides = [].slice.call(t.children);
+      t.addEventListener('scroll', function () {
+        var dx = t.scrollLeft - last; last = t.scrollLeft; if (!dx) return;
+        var tr = t.getBoundingClientRect(), W = tr.width || 1;
+        slides.forEach(function (sl) { var r = sl.getBoundingClientRect(), p = Math.max(0, Math.min(1.3, (r.left - tr.left) / W));
+          sl.style.setProperty('--lag', Math.max(-60, Math.min(60, dx * p * 2.4)).toFixed(1) + 'px'); });
+        clearTimeout(rest); rest = setTimeout(function () { slides.forEach(function (sl) { sl.style.setProperty('--lag', '0px'); }); }, 80);
+      }, { passive: true });
+    });
   })();
   /* EXPAND (2026-11-04) — .xp-row: one card open; from 768 on a pointer the card under it opens,
      a tap or Enter on its button opens it anywhere. The closed cards' words are inert. */

@@ -42,6 +42,23 @@
       track.scrollTo({ left: slides[i].offsetLeft - pad() });
     };
     var auto = +root.dataset.autoplay;
+    var onTap = null;   /* the autoplay's restart, set below */
+
+    /* A SLIDE IS A WAY TO IT (2026-11-04): a slide not fully in view (a carousel's half card, the highlights'
+       neighbours) is .is-peek — a pointer — and a click on it scrolls it in; a click on a link or a button
+       inside a slide is the link's or the button's. */
+    var peek = function () { var tr = track.getBoundingClientRect();
+      slides.forEach(function (s) { var r = s.getBoundingClientRect(); s.classList.toggle('is-peek', r.left < tr.left - 2 || r.right > tr.right + 2); }); };
+    track.addEventListener('click', function (e) {
+      var s = e.target.closest('.slider-track > *'); if (!s || !s.classList.contains('is-peek') || e.target.closest('a, button, input, label, select, textarea')) return;
+      var i = slides.indexOf(s); if (i < 0) return;
+      var tr = track.getBoundingClientRect(), r = s.getBoundingClientRect();
+      if (auto || r.left < tr.left) go(i);   /* to its place (centred / at the start) */
+      else track.scrollTo({ left: track.scrollLeft + (r.right - tr.right) + pad() });   /* a carousel: just enough to show it whole */
+      if (onTap) onTap();
+    });
+    var pt; track.addEventListener('scroll', function () { clearTimeout(pt); pt = setTimeout(peek, 60); }, { passive: true });
+    addEventListener('resize', peek); setTimeout(peek, 0);
 
     if (auto) {
       root.style.setProperty('--slide-ms', auto + 'ms');
@@ -71,6 +88,7 @@
         if (playing()) timer = setTimeout(function () { go(current() + 1); restart(); }, auto);
       };
       pp.addEventListener('click', function () { paused = !paused; restart(); });
+      onTap = restart;
       new IntersectionObserver(function (e) { visible = e[0].isIntersecting; restart(); }, { threshold: .5 }).observe(root);
       var t; track.addEventListener('scroll', function () { clearTimeout(t); t = setTimeout(mark, 80); }, { passive: true });
       mark(); restart();
