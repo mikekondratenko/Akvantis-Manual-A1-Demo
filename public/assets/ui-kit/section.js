@@ -56,17 +56,17 @@
     var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (!e.isIntersecting) return;
       var s = e.target; s.classList.add('is-in'); io.unobserve(s);
       tracks.forEach(function (t) { if (t.sec === s) t.run(); });
-      setTimeout(function () { s.classList.add('is-done'); }, 5600);   /* after the longest stagger (rows: 8 × 0.5 s) */ }); }, { rootMargin: '0px 0px -12% 0px' });
+      setTimeout(function () { s.classList.add('is-done'); }, 3600);   /* after the longest stagger (cards: 6 × 0.3 s) */ }); }, { rootMargin: '0px 0px -12% 0px' });
     secs.forEach(function (s) {
       if (s.getBoundingClientRect().top < vh * 0.88) return;   // on the first screen: in, no motion
       [].forEach.call(s.querySelectorAll(CARDS), function (c, i) { c.style.setProperty('--rv-i', Math.min(i, 6)); });
-      [].forEach.call(s.querySelectorAll('.specs > .specs-row, .compare thead tr, .compare tbody tr'), function (r, i) { r.style.setProperty('--rv-r', Math.min(i, 8)); });   /* table rows: 0.5 s apart */
-      if (s.classList.contains('sec-text')) [].forEach.call(s.children, function (c, k) { c.style.setProperty('--rv-d', (k * 700) + 'ms'); });   /* top down, 0.7 s apart */
-      if (s.classList.contains('sec-split')) {   /* the halves: left first, 0.7 s apart (by where they stand) */
+      [].forEach.call(s.querySelectorAll('.specs > .specs-row, .compare thead tr, .compare tbody tr'), function (r, i) { r.style.setProperty('--rv-r', Math.min(i, 8)); });   /* table rows: 0.07 s apart */
+      if (s.classList.contains('sec-text')) [].forEach.call(s.children, function (c, k) { c.style.setProperty('--rv-d', (k * 70) + 'ms'); });   /* top down, 0.07 s apart (2026-11-04; was 0.7) */
+      if (s.classList.contains('sec-split')) {   /* the halves: left first, 0.07 s apart (by where they stand) */
         var halves = [].slice.call(s.children).map(function (c) { var r = c.getBoundingClientRect(); return [c, r.left, r.top]; });
         var side = halves.length > 1 && Math.abs(halves[0][1] - halves[1][1]) > 40;   // side by side → by left, stacked → by top
         halves.sort(function (a, b) { return side ? a[1] - b[1] : a[2] - b[2]; })
-          .forEach(function (p, k) { p[0].style.setProperty('--rv-d', (k * 700) + 'ms'); });
+          .forEach(function (p, k) { p[0].style.setProperty('--rv-d', (k * 70) + 'ms'); });   /* 0.07 s (was 0.7) */
       }
       s.classList.add('rv', 'rv-init'); io.observe(s);
     });
