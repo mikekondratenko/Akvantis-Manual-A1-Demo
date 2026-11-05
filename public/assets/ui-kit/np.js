@@ -164,7 +164,7 @@
      WarehouseDoors"] gets Nova Poshta's own price and date for the place chosen, the parcel's
      weight (form[data-kg]) and worth (form[data-goods], €, declared in hryvnia): the price in
      its .choice-price and in its data-price (€, the form's rate back), the day in [data-np-term].
-     From form[data-np-sender] (a city Ref) — Kyiv until the client says (docs 4.4). Asked again
+     From form[data-np-sender] (a city Ref; Kyiv when the form names none — the A1 landing sends from Dnipro, docs 4.2 D2). Asked again
      only when the place, the weight or the worth changes. data-np-free: only the day is asked for —
      the price stays the row's own (2026-11-03: the branch and the parcel locker, free — on the company;
      the courier is paid, Nova Poshta's tariff, «Nova Poshta tariff» until the city is chosen). */
@@ -180,9 +180,16 @@
     var money = function (uah) { return form.dataset.currency === 'UAH'
       ? new Intl.NumberFormat(lang, { style: 'currency', currency: 'UAH', maximumFractionDigits: 0 }).format(Math.round(uah))
       : '€' + (uah / rate).toFixed(2); };   /* the euro as the form writes it, «€5.29», in every language (2026-10-29: was «5,29 €» in Ukrainian) */
-    var doc = function (method, svc) { return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apiKey: '',
-      modelName: 'InternetDocument', calledMethod: method, methodProperties: { CitySender: from, CityRecipient: to, ServiceType: svc, Weight: String(kg),
-        Cost: String(worth), CargoType: 'Parcel', SeatsAmount: '1' } }) }).then(function (r) { return r.json(); })
+    /* DISPATCH DAY (2026-11-05, the client's logistics: «до 15:00 — відправка день в день»): form[data-np-cutoff="15"] —
+       an order before that hour, Kyiv time, leaves today, after it tomorrow; the date asked of Nova Poshta is that day's */
+    var cut = +form.dataset.npCutoff, sent = '';
+    if (cut) { var kv = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Kyiv' }));
+      if (kv.getHours() >= cut) kv.setDate(kv.getDate() + 1);
+      sent = ('0' + kv.getDate()).slice(-2) + '.' + ('0' + (kv.getMonth() + 1)).slice(-2) + '.' + kv.getFullYear(); }
+    var doc = function (method, svc) { var mp = { CitySender: from, CityRecipient: to, ServiceType: svc, Weight: String(kg),
+        Cost: String(worth), CargoType: 'Parcel', SeatsAmount: '1' }; if (sent && method === 'getDocumentDeliveryDate') mp.DateTime = sent;
+      return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apiKey: '',
+      modelName: 'InternetDocument', calledMethod: method, methodProperties: mp }) }).then(function (r) { return r.json(); })
       .then(function (j) { if (!j.success || !j.data || !j.data[0]) throw new Error('quote'); return j.data[0]; }); };
     rows.forEach(function (row) {
       var svc = row.dataset.npQuote, price = row.querySelector('.choice-price'), term = row.querySelector('[data-np-term]');
