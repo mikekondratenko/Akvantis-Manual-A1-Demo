@@ -185,6 +185,10 @@
     var cut = +form.dataset.npCutoff, sent = '';
     if (cut) { var kv = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Kyiv' }));
       if (kv.getHours() >= cut) kv.setDate(kv.getDate() + 1);
+      /* form[data-np-weekdays="12345"]: the days the warehouse sends (Mon = 1 … Sun = 7) — after Friday's cut-off,
+         Monday (2026-11-05, the client's warehouse: no dispatch on Saturday) */
+      var wd = form.dataset.npWeekdays;
+      if (wd) for (var i = 0; i < 7 && wd.indexOf(String(kv.getDay() || 7)) < 0; i++) kv.setDate(kv.getDate() + 1);
       sent = ('0' + kv.getDate()).slice(-2) + '.' + ('0' + (kv.getMonth() + 1)).slice(-2) + '.' + kv.getFullYear(); }
     var doc = function (method, svc) { var mp = { CitySender: from, CityRecipient: to, ServiceType: svc, Weight: String(kg),
         Cost: String(worth), CargoType: 'Parcel', SeatsAmount: '1' }; if (sent && method === 'getDocumentDeliveryDate') mp.DateTime = sent;
@@ -195,7 +199,10 @@
       return ask(url).catch(function (e) { if (url === API) throw e; return ask(API); })
       .then(function (j) { if (!j.success || !j.data || !j.data[0]) throw new Error('quote'); return j.data[0]; }); };
     rows.forEach(function (row) {
+      /* form[data-np-pickup="doors"]: Nova Poshta collects from the sender's address (2026-11-05, the warehouse's
+         street in Dnipro), so the parcel's way starts at «Doors», not at a branch */
       var svc = row.dataset.npQuote, price = row.querySelector('.choice-price'), term = row.querySelector('[data-np-term]');
+      if (form.dataset.npPickup === 'doors') svc = svc.replace(/^Warehouse/, 'Doors');
       row.classList.add('is-quoting');
       Promise.all([doc('getDocumentPrice', svc), doc('getDocumentDeliveryDate', svc).catch(function () { return null; })]).then(function (r) {
         if (form.dataset.npQuoted !== key) return;   /* asked again since */
