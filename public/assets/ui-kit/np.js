@@ -188,8 +188,11 @@
       sent = ('0' + kv.getDate()).slice(-2) + '.' + ('0' + (kv.getMonth() + 1)).slice(-2) + '.' + kv.getFullYear(); }
     var doc = function (method, svc) { var mp = { CitySender: from, CityRecipient: to, ServiceType: svc, Weight: String(kg),
         Cost: String(worth), CargoType: 'Parcel', SeatsAmount: '1' }; if (sent && method === 'getDocumentDeliveryDate') mp.DateTime = sent;
-      return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apiKey: '',
-      modelName: 'InternetDocument', calledMethod: method, methodProperties: mp }) }).then(function (r) { return r.json(); })
+      var body = JSON.stringify({ apiKey: '', modelName: 'InternetDocument', calledMethod: method, methodProperties: mp });
+      var ask = function (to) { return fetch(to, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body }).then(function (r) { if (!r.ok) throw new Error('np ' + r.status); return r.json(); }); };
+      /* the page's own endpoint (form[data-np-endpoint] — the worker, with the cabinet's key: the contract tariff);
+         not there (a page opened from disk, a local server) → Nova Poshta's public API, the public tariff (2026-11-05) */
+      return ask(url).catch(function (e) { if (url === API) throw e; return ask(API); })
       .then(function (j) { if (!j.success || !j.data || !j.data[0]) throw new Error('quote'); return j.data[0]; }); };
     rows.forEach(function (row) {
       var svc = row.dataset.npQuote, price = row.querySelector('.choice-price'), term = row.querySelector('[data-np-term]');
