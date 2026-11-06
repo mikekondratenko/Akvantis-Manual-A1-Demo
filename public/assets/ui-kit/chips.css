@@ -1,0 +1,56 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Chips — a row of filters: one pressed, the rest a tap away (2026-11-06). Requires tokens.css.
+   First worn by the passport's Accessories (All · Bottle 500 ml · Bottle 350 ml · Towel); it lived
+   there as `.pp-chip` and moved here so the next filter row is this one, not a copy of it.
+
+     <div class="chips edge-fade" role="group" aria-label="…">
+       <button class="chip" type="button" aria-pressed="true">All</button>
+       <button class="chip" type="button" aria-pressed="false">Bottle 500 ml</button>
+     </div>
+
+   A chip is a toggle, so its state is `aria-pressed`, not a class: the one attribute both the
+   reader's screen reader and this stylesheet read. One row, never wrapping — a row that wraps
+   is a second row of filters nobody asked for — so it scrolls sideways, with no bar, and its
+   edges fade (EDGE FADE below). The row has no fill of its own: it sits on whatever plate
+   carries it, and the plate's padding is the row's — see `.chips.is-inset`.
+
+   ── EDGE FADE — THE RULE FOR EVERYTHING THAT SCROLLS SIDEWAYS ──
+   Content cut by the edge of a sideways scroller fades out into it; it is never cut sharp.
+   A chip sliced in half by a hard edge reads as a layout bug; the same chip fading out reads as
+   «there is more this way». The same mask the segmented tabs have worn since 2026-10-21
+   (segmented.css) — a 64 ramp down to 8 %, opened only at an end that has something hidden
+   behind it — now as a class any scroller can wear: `.edge-fade`. `edge-fade.js` sets
+   `.is-fade-start` / `.is-fade-end` from the scroll position (Kit.edgeFade). A mask, not a
+   painted gradient: it has no colour, so it is right on any ground, in either theme.
+
+   The mask fades everything in the box, its background included — so the box that wears
+   `.edge-fade` must be the bare scroller, with the plate's fill on a parent. That is why the
+   segmented tabs scroll an inner rail, and why `.chips` has no fill.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* EDGE FADE */
+.edge-fade {
+  --fade-start: 0px; --fade-end: 0px; --fade-len: var(--number-64);
+  overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain;
+  -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,.08), #000 var(--fade-start), #000 calc(100% - var(--fade-end)), rgba(0,0,0,.08));
+          mask-image: linear-gradient(to right, rgba(0,0,0,.08), #000 var(--fade-start), #000 calc(100% - var(--fade-end)), rgba(0,0,0,.08));
+}
+.edge-fade::-webkit-scrollbar { display: none; }
+.edge-fade.is-fade-start { --fade-start: var(--fade-len); }
+.edge-fade.is-fade-end   { --fade-end: var(--fade-len); }
+
+/* CHIPS */
+.chips { display: flex; gap: var(--space-8); min-width: 0; }
+/* on a plate: the plate's padding moves inside the scroller, so the first chip starts at the
+   plate's inset and the last can scroll all the way out to the plate's edge */
+.chips.is-inset { padding: var(--space-12); }
+.chip {
+  flex: none; display: inline-flex; align-items: center; height: var(--number-32); padding: 0 var(--space-12);
+  border: 0; border-radius: var(--radius-pill); background: var(--white-08); color: var(--ink-muted);
+  font: inherit; font-size: var(--text-12); font-weight: var(--weight-medium); white-space: nowrap; cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+.chip:hover { color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--page); }
+.chip:disabled { opacity: .4; cursor: default; }
+@media (prefers-reduced-motion: reduce) { .chip { transition: none; } }

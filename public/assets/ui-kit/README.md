@@ -56,6 +56,9 @@ ui-kit/kit/           →  <project>/public/assets/ui-kit/
 ├── segmented.css the segmented tabs (Kit.segmented) — kit.css @imports it; a page links it alone
 ├── progress.css the progress plate (Kit.progress) — Figma Progress Bar; kit.css @imports it
 ├── status.css   status pills (.status-pill) and alert banners (.alert), by data-tone; kit.css @imports it
+├── chips.css    a row of filters (.chips .chip, aria-pressed) and the EDGE FADE rule (.edge-fade) — whatever
+│                scrolls sideways fades out at the end that hides more; kit.css @imports it (2026-11-06)
+├── edge-fade.js sets .is-fade-start / .is-fade-end on every .edge-fade (Kit.edgeFade) — standalone
 ├── section.css  the screens of a landing: .sec-hero .sec-benefits .sec-split .sec-cta .sec-faq;
 │                specimen preview/sections.html; requires tokens, grid, type, button (+ page);
 │                every section is listed in docs/DESIGN.md → Sections
@@ -350,6 +353,7 @@ Added 2026-09-28, pattern taken from Shokobox. Two parts:
   under it. No row is chosen by default. Chosen row `aria-current="true"`: `--btn` fill, `--btn-ink` text,
   check on the right; pressing it again un-chooses it. The choice is kept in the reader's
   browser (`localStorage` `akv-region`).
+- **Compact** `.regions.regions-compact` (2026-11-06) — the A1 landing and the ID page: country names only (no flag/globe, no language, no pills), phone and tablet (< 1024) a card 12 from the top and sides, radius 24 all round; from 1024 a centred popup 360 wide, padding 24, title 20, rows 56 / radius 12, check on the chosen row. The geo note beside it is one line — «Region: Deutschland» · Change (opens the sheet) · ×.
 - Opens on `.is-open` (script) or `:target` (no script); closes on ×, scrim, Esc.
 
 Regions today: Global / English (`index.html`), Germany / Deutsch (`de.html`),

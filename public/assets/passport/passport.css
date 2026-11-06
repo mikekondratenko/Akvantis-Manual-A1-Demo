@@ -783,6 +783,16 @@ body.is-frosted .plate .card {
   max-width: 100%; max-height: 100%;
   object-fit: contain; display: block;
 }
+/* ── THE PRODUCT IN 3D (2026-11-06) ──
+   In place of the photograph when the page chose it (builder: Pictures → Photo | 3D). It fills the same frame the
+   photograph would, so the page does not move when a reader switches nothing at all; the photograph is its poster
+   until the model has loaded. A horizontal swipe turns it — sides only, never the back (min/max-camera-orbit) — and
+   a vertical one still scrolls the page (touch-action: pan-y). */
+.shot model-viewer {
+  display: block; width: 100%; height: 100%;
+  background: transparent; --poster-color: transparent;
+  --progress-bar-height: 0;
+}
 
 /* ── NO PHOTOGRAPH YET: AN EMPTY PLATE ──
    It used to draw the catalogue lockup — the `A1` mark — which was the wrong stand-in
@@ -1259,9 +1269,9 @@ html.anim .wrap > .geo-note { opacity: 1; transform: none; transition-delay: 0s;
 /* No dot: a note about the page, not a state of a machine. */
 .geo-note .alert::before { display: none; }
 .geo-note .alert { padding-left: var(--space-24); gap: var(--space-8); }
-/* Two lines at most on a phone: the action as narrow as its word. */
+/* One line (2026-11-06): «Region: Deutschland» · Change · × — the action as narrow as its word. */
 .geo-note .alert-action.btn { padding: 0 var(--space-16); }
-.geo-note .alert-msg { flex: 1 1 auto; white-space: normal; font-size: var(--text-14); }
+.geo-note .alert-msg { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--text-14); font-weight: var(--weight-semibold); }
 /* Change is the one thing to do here: the primary button, not the alert's tinted action. */
 .geo-note .alert-action.btn.btn-primary { --btn: var(--btn-primary); --btn-hover: var(--btn-primary-hover); --btn-ink: var(--btn-primary-ink); --btn-edge: none; }
 .geo-x {
@@ -1291,6 +1301,10 @@ html.anim .wrap > .geo-note { opacity: 1; transform: none; transition-delay: 0s;
    fill their island edge to edge, two a row, no gap and no corners, a hairline between them (each
    card's own); a lone last card stays on the left — never centred, never widened. */
 .plate.pp-fold { padding: 0; background: none; overflow: visible; }
+/* 2026-11-06: the plate's hairline (page.css, dark since 2026-11-04) is the strip's, not the fold's — on the
+   fold it drew one outline round the strip and every island under it when open. */
+.plate.pp-fold { box-shadow: none; }
+.pp-fold > button.panel-title.card { box-shadow: inset 0 0 0 var(--hairline) var(--tile-edge); }
 .pp-fold > button.panel-title.card {
   width: 100%; margin: 0; min-height: var(--number-64); padding: var(--space-12) var(--space-16);
   justify-content: flex-start; border-radius: var(--radius-16); background: var(--tile); color: inherit;
@@ -1310,16 +1324,12 @@ html.anim .wrap > .geo-note { opacity: 1; transform: none; transition-delay: 0s;
 .pp-offers > .pp-offer > b:not(.choice-name) { font-size: var(--text-14); }
 .pp-offers > .pp-offer > .choice-name { font-size: var(--text-28); }   /* the lockup at ~20 (.72em), as in the A1 form — the page has no type.css, so --type-h3 is not there */
 /* the filter over the accessories */
-.pp-chips { display: flex; gap: var(--space-8); padding: var(--space-12); overflow-x: auto; scrollbar-width: none; }
-.pp-chips::-webkit-scrollbar { display: none; }
-.pp-chip { flex: none; height: var(--number-32); padding: 0 var(--space-12); border: 0; border-radius: var(--radius-pill);
-  background: var(--white-08); color: var(--ink-muted); font: inherit; font-size: var(--text-12); font-weight: var(--weight-medium); cursor: pointer; }
-.pp-chip[aria-pressed="true"] { background: var(--ink); color: var(--page); }
+/* the island only; the row is the kit's chips (chips.css, 2026-11-06), scrolling inside it with its edges faded */
 /* the finish filter over the cartridges and the faucets (2026-11-03): the kit's .choice-filter on the page's tile */
 .pp-filter { background: var(--tile); box-shadow: none; }
 .pp-filter + .choice-grid.is-flush { margin-top: 0; }
 /* SERVICE — two options as the A1 form's delivery (choice.css PICK), each its own island; chosen, it opens
-   onto its city, the reader's phone, «Call me back» and «Call». */
+   onto its city, the reader's phone and «Call me back» («Call» removed 2026-11-06). */
 .pp-fold .choice-group.is-pick.pp-svc { background: var(--tile); }
 /* The request form (2026-10-31): the fields one under another, 12 apart, as the kit's .choice-more;
    sent, it gives way to a short thank-you on the same plate. */
@@ -1330,9 +1340,8 @@ html.anim .wrap > .geo-note { opacity: 1; transform: none; transition-delay: 0s;
 .pp-svc-form[hidden], .pp-svc-done[hidden] { display: none; }
 .pp-svc-done > b { font-size: var(--text-16); font-weight: 500; color: var(--ink); }
 .pp-svc-done > p { margin: 0; font-size: var(--text-14); color: var(--ink-muted); }
-.pp-svc-act { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-8); }
+.pp-svc-act { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8); }   /* one button: «Call» removed 2026-11-06 */
 .pp-svc-act > .btn { width: 100%; }
-.pp-call[aria-disabled="true"] { opacity: .25; pointer-events: none; }
 .pp-svc-note { margin: 0; font-size: var(--text-12); color: var(--ink-muted); }
 .pp-svc-note.is-ok { color: var(--success, var(--ink)); }
 .pp-svc-note.is-err { color: var(--danger, var(--ink)); }

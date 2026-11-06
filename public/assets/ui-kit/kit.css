@@ -21,6 +21,8 @@
 @import url('progress.css');
 /* Status pills and alert banners (2026-10-21) — status.css, for the same reason. */
 @import url('status.css');
+/* Chips — a row of filters — and the EDGE FADE rule for anything that scrolls sideways (2026-11-06). */
+@import url('chips.css');
 /* The popup and its overlay (2026-10-29) — popup.css, for the same reason. */
 @import url('popup.css');
 /* The toggle switch (2026-10-29) — toggle.css, for the same reason. */

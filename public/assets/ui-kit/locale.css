@@ -174,3 +174,34 @@ a.lang-mark.locale.locale-lang { gap: var(--space-4); padding: 0 var(--space-8) 
 .region-lang[aria-current="true"], .region-lang[aria-current="true"]:hover { background: #FCFFFE; color: #111211; box-shadow: none; }
 .region-lang:focus-visible { outline: none; box-shadow: var(--focus-halo); }
 html.regions-lock { overflow: hidden; }
+
+/* ── COMPACT: COUNTRIES ONLY (2026-11-06, Michael) ── `.regions.regions-compact`
+   The landing and the ID page: a row is the country's name and nothing else — no flag, no
+   globe, no language under it, no language pills — and the popup is smaller: rows 56 tall at
+   radius 12, a 20 title. Phone and tablet (below 1024): a card 12 from the top and the sides,
+   radius 24 all round, dropping in from above. From 1024: centred, 360 wide, 24 padding.
+   The chosen row keeps its plate and the check. Markup:
+     <a class="region" href="…" data-region="de"><span class="region-txt"><b>Deutschland</b></span>
+       <span class="region-on">(the check icon)</span></a>
+   The icon, the language and the pills are hidden here too, so an older page in this sheet
+   reads the same. */
+.regions-compact .region-ico, .regions-compact .region-txt span, .regions-compact .region-langs { display: none; }
+.regions-compact .regions-head { min-height: var(--number-40); margin-bottom: var(--space-12); }
+.regions-compact .regions-head h2 { font-size: var(--text-20, 20px); }   /* the fallback: pages exported before --text-20 */
+.regions-compact .regions-list { gap: var(--space-4); }
+.regions-compact .region { min-height: var(--number-56); padding: 0 var(--space-12) 0 var(--space-16); border-radius: var(--radius-12); }
+.regions-compact .region-txt b { font-size: var(--text-16); }
+@media (max-width: 1023px) {
+  .regions-compact .regions-sheet {
+    top: calc(var(--space-12) + env(safe-area-inset-top)); left: var(--space-12); right: var(--space-12); width: auto;
+    padding: var(--space-16); border-radius: var(--radius-24); opacity: 1;
+    transform: translateY(calc(-100% - var(--space-24) - env(safe-area-inset-top)));
+    transition: transform var(--duration-slow) var(--ease-emphasized);
+  }
+  .regions-compact.is-open .regions-sheet, .regions-compact:target .regions-sheet { transform: none; }
+  .regions-compact .regions-head, .regions-compact .regions-list { max-width: none; }
+}
+@media (min-width: 1024px) {
+  .regions-compact .regions-sheet { width: min(calc(var(--number-288) + var(--space-72)), calc(100% - var(--space-48))); padding: var(--space-24); }
+  .regions-compact .regions-head { margin-bottom: var(--space-16); }
+}

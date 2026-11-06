@@ -1361,7 +1361,13 @@
     var pop = document.createElement('div');
     pop.className = 'cpick'; pop.hidden = true;
     pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'Choose a color');
+    /* THE BAR (2026-11-06) — the name of what is being coloured, a × to close, and the strip to drag it by.
+       A picker that opens beside its swatch covers whatever sits next to the swatch, and on a 3D stage that is
+       usually the thing being coloured. Dragged once, it stays where it was put — for every swatch, until the
+       page reloads — so you look at the model while you pick, not at the rail. */
     pop.innerHTML =
+      '<div class="cpick-bar"><span class="cpick-title">Colour</span>' +
+      '<button type="button" class="cpick-x" aria-label="Close" title="Close">' + icon('x', { size: 16 }) + '</button></div>' +
       '<div class="cpick-wheel"><canvas></canvas><div class="cpick-dim"></div>' +
       '<button type="button" class="cpick-handle" role="slider" aria-label="Hue and saturation"></button></div>' +
       '<input class="cpick-range" type="range" min="0" max="100" step="1" aria-label="Brightness">' +
@@ -1375,7 +1381,8 @@
     var dim = pop.querySelector('.cpick-dim'), handle = pop.querySelector('.cpick-handle');
     var range = pop.querySelector('.cpick-range'), chip = pop.querySelector('.cpick-chip');
     var hex = pop.querySelector('.cpick-hex'), tool = pop.querySelector('.cpick-tool');
-    var st = { h: 0, s: 0, v: 1, input: null, anchor: null, drawn: 0 };
+    var st = { h: 0, s: 0, v: 1, input: null, anchor: null, drawn: 0, spot: null };
+    var bar = pop.querySelector('.cpick-bar'), title = pop.querySelector('.cpick-title');
 
     /* True HSV at V = 1, hue clockwise from three o'clock DOWNWARD in hue (red → magenta →
        blue), which is the mesh on the `.swatch-custom` disc: `conic-gradient(from 90deg, red,
@@ -1463,6 +1470,11 @@
     function place() {
       var a = (st.anchor || st.input).getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
       var gap = 8, vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight;
+      if (st.spot) {   // dragged: where it was put, kept inside the window
+        pop.style.left = Math.max(gap, Math.min(st.spot.x, vw - w - gap)) + 'px';
+        pop.style.top = Math.max(gap, Math.min(st.spot.y, vh - h - gap)) + 'px';
+        return;
+      }
       var top = a.bottom + gap; if (top + h > vh - gap && a.top - gap - h >= gap) top = a.top - gap - h;
       var left = Math.max(gap, Math.min(a.left, vw - w - gap));
       pop.style.top = Math.max(gap, top) + 'px'; pop.style.left = left + 'px';
@@ -1471,6 +1483,8 @@
     function open(input) {
       if (st.input && st.input !== input) close();
       st.input = input; st.anchor = input.closest('.swatch-btn') || input;
+      /* the title: the input's own name, without a trailing «colour» it would repeat */
+      title.textContent = (input.getAttribute('aria-label') || input.title || 'Colour').replace(/\s*[—–-]\s*colou?r$/i, '') || 'Colour';
       var hsv = cpRgbToHsv(cpHexToRgb(input.value) || [255, 255, 255]);
       st.h = hsv[0]; st.s = hsv[1]; st.v = hsv[2];
       pop.hidden = false; paintWheel(); render(); place();
@@ -1491,6 +1505,19 @@
       close();
     }
     document.addEventListener('pointerdown', away, true);
+    pop.querySelector('.cpick-x').addEventListener('click', function () { close(true); });
+    bar.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0 || e.target.closest('.cpick-x')) return;
+      e.preventDefault();
+      var r = pop.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+      bar.classList.add('is-dragging'); bar.setPointerCapture(e.pointerId);
+      var move = function (ev) { st.spot = { x: ev.clientX - dx, y: ev.clientY - dy }; place(); };
+      var up = function () {
+        bar.classList.remove('is-dragging');
+        bar.removeEventListener('pointermove', move); bar.removeEventListener('pointerup', up); bar.removeEventListener('pointercancel', up);
+      };
+      bar.addEventListener('pointermove', move); bar.addEventListener('pointerup', up); bar.addEventListener('pointercancel', up);
+    });
     pop.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); close(true); } });
     window.addEventListener('resize', function () { if (!pop.hidden) { st.drawn = 0; paintWheel(); render(); place(); } });
     window.addEventListener('scroll', function () { if (!pop.hidden) place(); }, true);
