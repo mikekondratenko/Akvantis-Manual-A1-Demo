@@ -59,6 +59,9 @@
            visitor's own card and grew over Pay, Apple's hid itself off Safari). A PROTOTYPE: not wired to the wallets — a
            press sends the form as Pay does, to monobank's page, which offers Apple Pay / Google Pay
            itself. Paying in the button needs merchant certificates (docs/order-form-questions.md 5.7).
+   REVIEW  form[data-review-url="/api/review"] (2026-11-07): with Trade-in ticked the order is not paid — it goes there
+           (with its photos) for AKVANTIS to check first; the button reads «Send for review», the answer { order, key }
+           takes the buyer to thanks.html?review=…#k=…, where it is paid once approved (A1 landing, src/review.js).
    PHOTOS  a picture to attach is the kit's photo.js (.photo-drop): its error is the file input's own
            (setCustomValidity), shown here as any field's (2026-11-03).
    SEND    checked here, not by the browser's bubbles: a wrong field gets aria-invalid and a
@@ -214,7 +217,8 @@
       form.dataset.kg = Math.round(kg * 10) / 10; form.dataset.goods = open ? '' : sum + codeOff - ship;
       form.dataset.sum = open || !chosen ? '' : sum;   /* the total in €, for the Google Pay sheet (WALLET) */
       var plan = valOf('payment'), inParts = plan && plan !== 'full';
-      var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) word(pay).textContent = inParts ? T('Apply for {n} payments', { n: plan }) : chosen ? T('Pay {sum}', { sum: sumTxt }) : T('Pay');
+      var review = !!form.dataset.reviewUrl && valOf('tradein') === 'yes';   /* REVIEW: Trade-in is checked before it is paid */
+      var pay = form.querySelector('[data-pay]'); if (pay && !pay.classList.contains('is-loading')) word(pay).textContent = review ? T('Send for review') : inParts ? T('Apply for {n} payments', { n: plan }) : chosen ? T('Pay {sum}', { sum: sumTxt }) : T('Pay');
       /* [data-per-month="10"]: the total over that many parts, «408 грн / міс.» — the row's price on the right, as a
          delivery's (2026-11-03: was a line under the name with «· 10 × with monobank»; the name already says how many).
          [data-pay-total]: the whole sum, in the «Pay in full» row. Nothing chosen or a price on request: empty. */
@@ -379,6 +383,16 @@
         if (s && s.querySelector('.panel-title').getAttribute('aria-expanded') !== 'true') all.forEach(function (x) { acc(x.querySelector('.panel-title'), x === s); });
         setTimeout(function () { first.focus(); }, 300); return; }
       var lead = Object.fromEntries(new FormData(form)); lead.page = location.href; lead.lang = lang;
+      /* REVIEW (2026-11-07): Trade-in ticked → the order (photos and all) goes to AKVANTIS to check; paid on thanks.html once approved.
+         Before the wallet: Google Pay with Trade-in is sent for review too. */
+      if (form.dataset.reviewUrl && valOf('tradein') === 'yes') {
+        if (notice) notice.hidden = true; busy(true); word(send).textContent = T('Sending');
+        fetch(form.dataset.reviewUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
+          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.order) throw new Error(j.error || r.status); return j; }); })
+          .then(function (j) { location.assign('thanks.html?review=' + encodeURIComponent(j.order) + '#k=' + encodeURIComponent(j.key));   /* the key after # — never sent to a server or to analytics (2026-11-14, audit п.8) */ })
+          .catch(function (e) { busy(false); tell('error', T('The order could not be sent ({why}). Please try again in a minute.', { why: e.message })); });
+        return;
+      }
       if (via === 'gpay' && gpay) { if (notice) notice.hidden = true; return gpay(lead); }   /* in the click's own turn — Google asks for that */
       if (notice) notice.hidden = true; busy(true);
       /* PAY (2026-10-26): form[data-pay-url="/api/pay"] — the order goes to the page's own worker, which
