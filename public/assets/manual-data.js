@@ -344,17 +344,17 @@ window.MANUAL_DATA = {
           "label": "Lock clips",
           "items": [
             {
-              "art": "assets/art/box/lock-clip-blue.webp",
+              "art": "assets/art/box/lock-clip-green.webp",
               "name": "Clip 3/8\"",
               "count": "7x",
-              "desc": "Blue",
+              "desc": "Green",
               "label": "Clip 3/8\""
             },
             {
-              "art": "assets/art/box/lock-clip-red.webp",
+              "art": "assets/art/box/lock-clip-blue.webp",
               "name": "Clip 3/8\"",
               "count": "2x",
-              "desc": "Red",
+              "desc": "Blue",
               "label": "Clip 3/8\""
             },
             {
@@ -372,17 +372,17 @@ window.MANUAL_DATA = {
           "label": "Tubes and key",
           "items": [
             {
+              "art": "assets/art/box/pe-tubing-3-8-green.webp",
+              "name": "3/8\" PE Tubing",
+              "count": "1x",
+              "desc": "Green",
+              "label": "3/8\" PE Tubing"
+            },
+            {
               "art": "assets/art/box/pe-tubing-3-8-blue.webp",
               "name": "3/8\" PE Tubing",
               "count": "1x",
               "desc": "Blue",
-              "label": "3/8\" PE Tubing"
-            },
-            {
-              "art": "assets/art/box/pe-tubing-3-8-red.webp",
-              "name": "3/8\" PE Tubing",
-              "count": "1x",
-              "desc": "Red",
               "label": "3/8\" PE Tubing"
             },
             {
@@ -572,7 +572,7 @@ window.MANUAL_DATA = {
               "w": 362,
               "h": 218,
               "n": 5,
-              "caption": "Hand-tighten, no tools",
+              "caption": "Push in & lock with clips",
               "marks": [
                 {
                   "type": "ok",
@@ -636,14 +636,14 @@ window.MANUAL_DATA = {
                 {
                   "x": 40.6,
                   "y": 75.3,
-                  "ref": "assets/art/box/pe-tubing-3-8-red.webp",
-                  "desc": "Red · water inlet, from the valve to the unit"
+                  "ref": "assets/art/box/pe-tubing-3-8-blue.webp",
+                  "desc": "Blue · water inlet, from the valve to the unit"
                 },
                 {
                   "x": 56.3,
                   "y": 51,
-                  "ref": "assets/art/box/pe-tubing-3-8-blue.webp",
-                  "desc": "Blue · pure water, from the unit to the faucet"
+                  "ref": "assets/art/box/pe-tubing-3-8-green.webp",
+                  "desc": "Green · pure water, from the unit to the faucet"
                 },
                 {
                   "x": 55.7,
@@ -703,7 +703,7 @@ window.MANUAL_DATA = {
               "w": 362,
               "h": 506,
               "n": 2,
-              "caption": "Connect blue tube",
+              "caption": "Connect green tube",
               "marks": [
                 {
                   "type": "ok",
@@ -785,14 +785,14 @@ window.MANUAL_DATA = {
                 {
                   "x": 41.1,
                   "y": 75.3,
-                  "ref": "assets/art/box/pe-tubing-3-8-red.webp",
-                  "desc": "Red · water inlet, from the valve to the unit"
+                  "ref": "assets/art/box/pe-tubing-3-8-blue.webp",
+                  "desc": "Blue · water inlet, from the valve to the unit"
                 },
                 {
                   "x": 56.5,
                   "y": 60.5,
-                  "ref": "assets/art/box/pe-tubing-3-8-blue.webp",
-                  "desc": "Blue · pure water, from the unit to the faucet"
+                  "ref": "assets/art/box/pe-tubing-3-8-green.webp",
+                  "desc": "Green · pure water, from the unit to the faucet"
                 },
                 {
                   "x": 56.2,
@@ -870,7 +870,7 @@ window.MANUAL_DATA = {
               "w": 237,
               "h": 334,
               "n": 4,
-              "caption": "Insert red tube"
+              "caption": "Insert blue tube"
             },
             {
               "art": "assets/art/cards/p08-5.webp",
@@ -942,7 +942,7 @@ window.MANUAL_DATA = {
               "w": 736,
               "h": 334,
               "n": 3,
-              "caption": "Insert gray tube"
+              "caption": "Insert grey tube"
             },
             {
               "art": "assets/art/cards/p09-4.webp",

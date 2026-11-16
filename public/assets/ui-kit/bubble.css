@@ -7,10 +7,11 @@
    The (i): the kit's small round icon button (button.css .icon-btn idea — the glyph's own ink at
    8 / 14 % under it), 24 on a 16 glyph, the faint ink until it is pointed at or open; it sits in
    the line of words after a name and does not make the line taller.
-   The bubble: one for the page, made by bubble.js — the toast's colours (the white on the dark
-   ground, the black on paper: --white / --black-1000 swap with the theme), 12 round, 12 / 16 in,
-   at most 280 wide, the small text; a 6px nose toward the (i). Under the (i), or over it when
-   there is no room under; never off the screen (16 from its edge). Behaviour: bubble.js.
+   The bubble: one for the page, made by bubble.js — in the page's own theme (2026-11-11, Michael; was the toast's
+   inverted colours): on paper a light plate with the page's ink and a soft shadow, on the dark ground the dark plate
+   of the location sheet (--black-900, the frost's edge); 12 round, 12 / 16 in, at most 280 wide, the small text; a
+   6px nose toward the (i). Below 1024 always under the (i); never off the screen sideways (16 from its edge). From 1024 (2026-11-11): to the RIGHT of the (i), as wide as the room to the end of its form (or of a
+   [data-bubble-within] box), the nose pointing left — under it again where that room is under 240. Behaviour: bubble.js.
    ───────────────────────────────────────────────────────────────────────────── */
 
 .bubble-btn {
@@ -26,10 +27,10 @@
 .bubble-btn:focus-visible { outline: none; color: var(--ink); box-shadow: var(--focus-halo); }
 
 .bubble {
-  position: fixed; z-index: 90; top: 0; left: 0;
+  position: fixed; z-index: 90; top: 0; left: 0; box-sizing: border-box;   /* the width bubble.js sets is the whole plate */
   max-width: min(calc(var(--number-288) - var(--space-8)), calc(100vw - 2 * var(--space-16)));
   padding: var(--space-12) var(--space-16); border-radius: var(--radius-12);
-  background: var(--white); color: var(--black-1000); box-shadow: var(--shadow-md);
+  background: var(--black-900); color: var(--ink); box-shadow: var(--frost-edge), 0 12px 32px rgba(0, 0, 0, .36);
   font-family: var(--font-primary); font-size: var(--type-small); line-height: var(--leading-normal); font-weight: var(--weight-regular);
   text-align: left; text-wrap: pretty;
   opacity: 0; transform: translateY(var(--bubble-shift, 4px)); pointer-events: none;
@@ -45,5 +46,10 @@
 .bubble.is-above { --bubble-shift: -4px; }
 .bubble.is-above::before { bottom: -5px; }
 .bubble b { font-weight: var(--weight-semibold); }
+[data-theme="light"] .bubble { background: var(--page); color: var(--ink); box-shadow: 0 0 0 1px rgba(17, 18, 17, .06), 0 12px 32px rgba(17, 18, 17, .14); }
+/* Beside the (i), from 1024 (bubble.js sets .is-side and the width): the nose on the left edge, level with the (i). */
+.bubble.is-side { max-width: none; transform: translateX(-4px); }
+.bubble.is-side.is-open { transform: none; }
+.bubble.is-side::before { left: -5px; top: var(--bubble-nose-y, 20px); margin: -6px 0 0; }
 /* In a specimen: the bubble drawn in place, open, the nose up (preview only). */
 .bubble.is-static { position: relative; display: inline-block; opacity: 1; transform: none; pointer-events: auto; margin-top: var(--space-8); }

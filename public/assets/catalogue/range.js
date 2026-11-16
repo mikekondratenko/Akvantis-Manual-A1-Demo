@@ -85,9 +85,24 @@ window.RANGE = {
       "Gold",
       "GD",
       "#C9A55C"
+    ],
+    "gy": [
+      "Rock Grey",
+      "GY",
+      "#ABAAA6"
+    ],
+    "gn": [
+      "Forest Green",
+      "GN",
+      "#4F665B"
+    ],
+    "sh": [
+      "Sahara Red",
+      "SH",
+      "#B5675B"
     ]
   },
-  finOrder: ["bk","nb","sb","gd","st","ni","cr","wg","wh","aw"],
+  finOrder: ["bk","nb","gn","sb","sh","gd","gy","st","ni","cr","wg","wh","aw"],
   tiers: {"1":"entry","2":"variant","3":"plus","4":"variant","5":"pro","7":"max"},
   storage: "Keep in a dry place",
 
@@ -192,6 +207,18 @@ window.RANGE = {
       { code: "SLT-15", name: "Salt", display: "AQUAFLOW Tablet Salt 15 kg", sheet: "Tablet Salt · 15 kg", fill: "15 kg", compat: "U1 · U3 · U5 · S1 · S2 · S3 · S5", fn: "Regenerates ion exchange resin. Restores softening capacity. Safe for all softener systems.", comp: "Sodium chloride (NaCl) ≥99.5%. Vacuum evaporated tablet salt. Food-grade quality." },
       { code: "ION", name: "Ion", display: "AQUAFLOW Ion Exchange Resin 20 L", sheet: "Ion Exchange Resin · 20 L", fill: "20 L", compat: "U1 · U3 · U5 · S1 · S2 · S3 · S5", fn: "Removes calcium and magnesium. Softens water. Reduces scale buildup.", comp: "Sulfonated polystyrene cation exchange resin. Food grade." },
       { code: "MIN", name: "Mineral", display: "AQUAFLOW Natural Volcanic Mineral 20 L", sheet: "Natural Volcanic Mineral · 20 L", fill: "20 L", compat: "F1 · F3", fn: "Removes suspended particles, rust and sediment. Protects downstream filters.", comp: "Natural volcanic mineral. No chemical regeneration required." }
+    ] },
+    /* 2026-11-06: Akvantis Club — the accessories the passport and the A1 form sell beside the machines.
+       Two bottles, five colours each: Black and Blue are the range's own finishes, Rock Grey, Forest Green
+       and Sahara Red were added for them (hex read off the renders). Codes drafted.
+       2026-11-12 RENAMED: the bottles are Akvantis — «Ocean Bottle» is gone from every name. The name is the type:
+       Akvantis Original Go 500 (500 ml) and Akvantis Peak Brew 350 (350 ml, thermo); the colour stands beside it,
+       «Akvantis Original Go 500 · Ocean Blue». A card that already says Akvantis shows the type alone, the volume under it. The colours carry their own names on a bottle
+       (`finNames`, not translated): Obsidian Black, Ocean Blue, Sahara Red, Forest Green, Rock Grey.
+       `spare` here only means «counted by batch, not serialised» — a bottle carries no serial. */
+    { letter: "CL", name: "Club", title: "Akvantis Club — accessories", proposed: true, items: [
+      { code: "OB500", name: "Akvantis Original Go 500", display: "AKVANTIS Original Go 500", type: "Original Go", fill: "500 ml", fins: ["nb","bk","sh","gn","gy"], finNames: { bk: "Obsidian Black", nb: "Ocean Blue", sh: "Sahara Red", gn: "Forest Green", gy: "Rock Grey" }, spare: true },
+      { code: "OB350", name: "Akvantis Peak Brew 350", display: "AKVANTIS Peak Brew 350", type: "Peak Brew", fill: "350 ml", fins: ["nb","bk","sh","gn","gy"], finNames: { bk: "Obsidian Black", nb: "Ocean Blue", sh: "Sahara Red", gn: "Forest Green", gy: "Rock Grey" }, spare: true }
     ] },
     { letter: "X", title: "Valves", planned: true, off: true, items: [
       { code: "X1", display: "AKVANTIS X1 Smart Water Valve" }

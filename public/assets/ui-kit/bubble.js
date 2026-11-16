@@ -15,11 +15,27 @@
     tip = document.createElement('div'); tip.className = 'bubble'; tip.id = 'kit-bubble'; tip.setAttribute('role', 'tooltip'); tip.hidden = true;
     document.body.appendChild(tip);
   }
+  var SIDE = 1024, ROOM = 240;
   function place() {
     if (!owner) return;
-    var r = owner.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight, vw = document.documentElement.clientWidth, vh = window.innerHeight;
+    var vw = document.documentElement.clientWidth, vh = window.innerHeight;
+    tip.classList.remove('is-side'); tip.style.width = '';
+    /* From 1024 (2026-11-11): beside the (i), to the end of its form or [data-bubble-within] box */
+    if (vw >= SIDE) {
+      var o = owner.getBoundingClientRect(), box = owner.closest('[data-bubble-within], form');
+      var end = Math.min(vw - EDGE, box ? box.getBoundingClientRect().right - EDGE : vw - EDGE), sx = o.right + GAP, room = Math.floor(end - sx);
+      if (room >= ROOM) {
+        tip.classList.add('is-side'); tip.classList.remove('is-above'); tip.style.width = room + 'px';
+        var sh = tip.offsetHeight, cy = o.top + o.height / 2, sy = Math.max(EDGE, Math.min(vh - EDGE - sh, cy - 20));
+        tip.style.left = Math.round(sx) + 'px'; tip.style.top = Math.round(sy) + 'px';
+        tip.style.setProperty('--bubble-nose-y', Math.round(Math.max(14, Math.min(sh - 14, cy - sy))) + 'px');
+        return;
+      }
+    }
+    var r = owner.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
     var cx = r.left + r.width / 2, x = Math.max(EDGE, Math.min(vw - EDGE - w, cx - w / 2));
-    var above = r.bottom + GAP + h > vh - EDGE && r.top - GAP - h > EDGE;
+    /* below 1024 always under the (i) (2026-11-11, Michael: on a phone it drops down); over it only beside-less desktops without room */
+    var above = vw >= SIDE && r.bottom + GAP + h > vh - EDGE && r.top - GAP - h > EDGE;
     tip.classList.toggle('is-above', above);
     tip.style.left = Math.round(x) + 'px';
     tip.style.top = Math.round(above ? r.top - GAP - h : r.bottom + GAP) + 'px';

@@ -1322,7 +1322,10 @@ html.anim .wrap > .geo-note { opacity: 1; transform: none; transition-delay: 0s;
 .pp-fold .choice-grid.is-flush { background: var(--tile); box-shadow: none; }
 .pp-fold .choice-grid.is-flush > .choice:hover { background: var(--tile-hover); }
 .pp-offers > .pp-offer > b:not(.choice-name) { font-size: var(--text-14); }
-.pp-offers > .pp-offer > .choice-name { font-size: var(--text-28); }   /* the lockup at ~20 (.72em), as in the A1 form — the page has no type.css, so --type-h3 is not there */
+.pp-offers > .pp-offer > .choice-name { font-size: var(--text-28); }
+/* the cartridges' replacement interval (2026-11-06): the kit's refresh-cw at the line's size, then «6 months» */
+.pp-offer > small.pp-cycle { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-4); }
+.pp-offer > small.pp-cycle > svg { width: 1.15em; height: 1.15em; flex: none; }   /* the lockup at ~20 (.72em), as in the A1 form — the page has no type.css, so --type-h3 is not there */
 /* the filter over the accessories */
 /* the island only; the row is the kit's chips (chips.css, 2026-11-06), scrolling inside it with its edges faded */
 /* the finish filter over the cartridges and the faucets (2026-11-03): the kit's .choice-filter on the page's tile */

@@ -93,7 +93,7 @@ window.MANUAL_TEXTS = {
       { "en": "Clip 3/8\"", "de": "Clip 3/8\"", "uk": "Кліпса 3/8\"" },
       { "en": "Clip 1/4\"", "de": "Clip 1/4\"", "uk": "Кліпса 1/4\"" },
       { "en": "Blue", "de": "Blau", "uk": "Синя" },
-      { "en": "Red", "de": "Rot", "uk": "Червона" },
+      { "en": "Green", "de": "Grün", "uk": "Зелена" },
       { "en": "Grey", "de": "Grau", "uk": "Сіра" },
       { "en": "Tubes and key", "de": "Schläuche und Schlüssel", "uk": "Трубки та ключ" },
       { "en": "3/8\" PE Tubing", "de": "3/8\"-PE-Schlauch", "uk": "PE-трубка 3/8\"" },
@@ -102,8 +102,8 @@ window.MANUAL_TEXTS = {
       { "en": "Drain Saddle", "de": "Abflussschelle", "uk": "Дренажний хомут" }
     ],
     "overview": [
-      { "en": "Red · water inlet, from the valve to the unit", "de": "Rot · Wasserzulauf, vom Ventil zum Gerät", "uk": "Червона · подача води, від клапана до блока" },
-      { "en": "Blue · pure water, from the unit to the faucet", "de": "Blau · Reinwasser, vom Gerät zum Wasserhahn", "uk": "Синя · чиста вода, від блока до крана" },
+      { "en": "Blue · water inlet, from the valve to the unit", "de": "Blau · Wasserzulauf, vom Ventil zum Gerät", "uk": "Синя · подача води, від клапана до блока" },
+      { "en": "Green · pure water, from the unit to the faucet", "de": "Grün · Reinwasser, vom Gerät zum Wasserhahn", "uk": "Зелена · чиста вода, від блока до крана" },
       { "en": "Grey · drain, from the unit to the drain saddle", "de": "Grau · Abwasser, vom Gerät zur Abflussschelle", "uk": "Сіра · дренаж, від блока до дренажного хомута" },
       { "en": "Two, on both ends of the mineralizator", "de": "Zwei Stück, an beiden Enden des Mineralisators", "uk": "Два, на обох кінцях мінералізатора" },
       { "en": "On the Inlet and Pure ports; a 1/4\" one on Drain", "de": "An den Anschlüssen Inlet und Pure; ein 1/4\"-Verbinder an Drain", "uk": "На портах Inlet і Pure; фітинг 1/4\" — на Drain" }
@@ -120,14 +120,14 @@ window.MANUAL_TEXTS = {
       { "en": "Drill hole", "de": "Loch bohren", "uk": "Просвердліть отвір" },
       { "en": "Insert K1 faucet", "de": "Wasserhahn K1 einsetzen", "uk": "Вставте кран K1" },
       { "en": "Tighten nut", "de": "Mutter anziehen", "uk": "Затягніть гайку" },
-      { "en": "Hand-tighten, no tools", "de": "Handfest anziehen, ohne Werkzeug", "uk": "Затягніть рукою, без інструментів" },
+      { "en": "Push in & lock with clips", "de": "Aufstecken und mit Clips sichern", "uk": "Вставте й зафіксуйте кліпсами" },
       { "en": "Drinking Water Faucet", "de": "Trinkwasserhahn", "uk": "Кран для питної води" },
       { "en": "Buy K1", "de": "K1 kaufen", "uk": "Купити K1" },
       { "en": "Overview with K1 Faucet", "de": "Übersicht mit Wasserhahn K1", "uk": "Огляд із краном K1" }
     ],
     "faucet-k3": [
       { "en": "Insert K3 faucet", "de": "Wasserhahn K3 einsetzen", "uk": "Вставте кран K3" },
-      { "en": "Connect blue tube", "de": "Blauen Schlauch anschließen", "uk": "Під’єднайте синю трубку" },
+      { "en": "Connect green tube", "de": "Grünen Schlauch anschließen", "uk": "Під’єднайте зелену трубку" },
       { "en": "Attach connector", "de": "Verbinder anbringen", "uk": "Встановіть фітинг" },
       { "en": "Connect to mineralizator", "de": "Mit Mineralisator verbinden", "uk": "Під’єднайте до мінералізатора" },
       { "en": "Buy K3", "de": "K3 kaufen", "uk": "Купити K3" },
@@ -137,13 +137,13 @@ window.MANUAL_TEXTS = {
       { "en": "Unscrew cold hose", "de": "Kaltwasserschlauch abschrauben", "uk": "Відкрутіть шланг холодної води" },
       { "en": "Insert 3-way valve", "de": "3-Wege-Ventil einsetzen", "uk": "Встановіть триходовий клапан" },
       { "en": "Tighten connections", "de": "Verbindungen festziehen", "uk": "Затягніть з’єднання" },
-      { "en": "Insert red tube", "de": "Roten Schlauch einstecken", "uk": "Вставте червону трубку" },
+      { "en": "Insert blue tube", "de": "Blauen Schlauch einstecken", "uk": "Вставте синю трубку" },
       { "en": "Lock with clip", "de": "Mit Clip sichern", "uk": "Зафіксуйте кліпсою" }
     ],
     "drain": [
       { "en": "Drill hole in pipe", "de": "Loch ins Rohr bohren", "uk": "Просвердліть отвір у трубі" },
       { "en": "Fit drain clamp", "de": "Abflussschelle montieren", "uk": "Встановіть дренажний хомут" },
-      { "en": "Insert gray tube", "de": "Grauen Schlauch einstecken", "uk": "Вставте сіру трубку" }
+      { "en": "Insert grey tube", "de": "Grauen Schlauch einstecken", "uk": "Вставте сіру трубку" }
     ],
     "tubes": [
       { "en": "Find the ports", "de": "Anschlüsse finden", "uk": "Знайдіть порти" },

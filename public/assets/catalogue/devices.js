@@ -186,7 +186,7 @@ window.COLOURS = [
        two-colour finish silently shows only its first colour. */
     { id: 'whitegrey',   label: 'White & Grey', hex: '#F7F7F7', hex2: '#8A8F94' },
     { id: 'chrome',      label: 'Chrome',      hex: '#C9CED2' },
-    { id: 'steel',       label: 'Brushed Steel', hex: '#9BA1A5' },
+    { id: 'steel',       label: 'Stainless Steel', hex: '#9BA1A5' },
     /* 2026-11-03: K1 on the A1 landing comes in gold too (Michael). */
     { id: 'gold',        label: 'Gold',        hex: '#C9A55C' }
   ];
