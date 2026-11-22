@@ -186,6 +186,10 @@
   --accent-deep : var(--cyan-400);
   --accent-ink  : #FFFFFF;   /* words on an accent fill: white, as the primary button's (2026-11-04) */
   --accent-text : var(--accent);       /* the accent as WORDS — one with --accent on the dark ground */
+  /* One step brighter than --accent-text, for a small label that should read as the brand rather
+     than as a dark blue (2026-11-21, the landing's card kickers). On the dark ground the two are
+     the same; on paper this is --cyan-600 against --accent-text's --cyan-700. */
+  --accent-text-bright : var(--accent-text);
 
   /* ── ROLES (moved here from passport.css, 2026-10-10) ──
      The ramp says what a grey *is*; a role says what it *does*. Every page that reads —
@@ -693,6 +697,7 @@
   --accent-deep : var(--cyan-400);
   --accent-ink  : #FFFFFF;   /* white on the cyan, as on the dark ground (2026-11-04) */
   --accent-text : var(--cyan-700);
+  --accent-text-bright : var(--cyan-600);   /* 4.0:1 on the card — a label, not body copy */
   /* Status on paper — measured on white: danger 6.5, edge 4.8, success 5.5, warning 5.0, info 5.2. */
   --danger      : var(--red-700);
   --danger-edge : var(--red-600);

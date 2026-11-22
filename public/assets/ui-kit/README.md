@@ -63,6 +63,11 @@ ui-kit/kit/           →  <project>/public/assets/ui-kit/
 │                specimen preview/sections.html; requires tokens, grid, type, button (+ page);
 │                every section is listed in docs/DESIGN.md → Sections
 ├── section.js   the sections' behaviour: the quote's fill on scroll (2026-10-25)
+├── a1-marks.js  the A1's own value icons from the carton (Figma `icons/A1`, 2492:557): window.A1Marks,
+│                `<i data-a1="leak-protection">` swapped at load. NOT the interface set — see icons.js (2026-11-21)
+├── waves.js     the sheet of water with rings, as a card's ground (`.fig-card.has-waves` +
+│                `<canvas class="fig-wave" data-waves>`); window.Waves, mounts itself, stops off screen.
+│                Tuned on A1-Landing-Page/public/water-waves.html — numbers travel from there (2026-11-21)
 ├── choice.css   a plate that is chosen: cards (a 1px accent edge when chosen) and rows (a marker, no plate) (2026-10-25)
 ├── choice.js    a counted choice: − / + and a tap on the card, the ends dimmed, `input` fired (2026-10-25)
 ├── order.js     the order form (section.css «ORDER», from the A1 landing): steps, counts, the bar, sending (2026-10-25)

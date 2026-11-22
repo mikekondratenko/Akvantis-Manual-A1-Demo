@@ -27,7 +27,8 @@
      a picture — and `.sec-actions` (buttons 8 apart) may stand in any of them.
      .sec-cover        a banner: a picture filling the frame, the words on it; full screen, or
                        `.is-fixed` / `--cover-h` for a height; the words centred or `.is-start`,
-                       at the foot or `.is-middle`; `.is-narrow` — 10 modules wide from 1024
+                       at the foot or `.is-middle`; `.is-narrow` — 10 modules wide from 1024;
+                       `.is-pinned` — the picture stands still and the frame travels over it (see PINNED)
      .sec-order        the order form (from the A1 landing, 2026-10-25): a stepper of accordions —
                        choice → … → contacts — then Send, and a frosted bar at the window's foot
                        with what is chosen and its price. Behaviour: kit/order.js. See «ORDER».
@@ -58,13 +59,16 @@
      .sec-drift        one huge line that runs right to left, the section pinned until it has passed (2026-11-04)
      .sec-callout      two figures in an outlined frame, 8 modules — Apple's battery band (2026-11-04)
      .sec-expand       a row of cards, one open wide, the rest strips that open on hover / tap (2026-11-04)
-     .sec-figures      cards with large figures, a picture or a film on any of them, bento sizes (2026-11-04)
+     .sec-figures      cards with large figures, a picture or a film on any of them, bento sizes (2026-11-04);
+                       words at either end (.is-bottom), a picture in the flow (.fig-slot), dark on paper
+                       (data-theme="dark") and water behind them (.has-waves + kit/waves.js) — 2026-11-21;
+                       `.is-stacked` — two columns that stack, each card its own height (Figma's boards)
      .sec-numbers      a centred title and figures alone in 2 or 3 columns, Apple's «Strength in numbers.» (2026-11-04)
      .sec-trust        the promises in a row: an icon, a short title, a line — warranty, return, delivery,
                        installation; lower than a section, 2 a row on a phone, 4 from 768 (2026-11-04)
      .sec-bar          a title on the left (`.t-h1`, as every cards section — 2026-10-26) and a link or
                        the arrows on the right, over a slider
-     .sec-kicker       the small line over a title — muted, semibold, never in caps
+     .sec-kicker       the small line over a title — body at 14, sentence case, muted (2026-11-20)
      .sec-slides       the highlights: wide slides one at a time, a caption on each, dots that
                        fill as they play and a pause button (kit/slider.js, data-autoplay)
      .sec-gallery      the same cards (.plate.card) in a carousel, about half a screen wide, arrows (kit/slider.js)
@@ -268,6 +272,38 @@ img.sec-banner { object-fit: contain; }
   background: linear-gradient(to bottom, rgba(0, 0, 0, .55), rgba(0, 0, 0, 0) 45%); }
 .sec-split-pic > img.is-photo { object-fit: cover; border-radius: var(--sec-card-radius); }
 
+/* ── PINNED PICTURE (2026-11-20, Michael) ── an option, off unless asked for: `.is-pinned` on a full-screen
+   banner and its picture travels at half the page's speed — `--pin-rate`: 0 holds it still in the window, 1 is
+   the page's own speed, .5 (the default) is half. The picture is a window tall and is moved by a scroll-driven
+   animation, so the browser runs it beside the scroll, on the compositor: there is no script in the scroll and
+   nothing to stutter. The section clips its children to exactly the frame, so the rounded corners hold and the
+   picture never shows in the inset. Because the picture is only a window tall, nothing is enlarged and the
+   composition is the one that was framed. A frame up to a window tall is covered at every moment of the pass,
+   the way in and the way out included, so `.is-fixed` banners take it as well. FROM 1024 ONLY, and only where the browser has scroll-driven
+   animations; everywhere else the picture simply fills its frame, as it always did. BANNERS ONLY: a card's or a
+   split's picture never moves, so a product keeps the place it was framed in. section.js marks the banner
+   `data-pin`; under `data-motion="off"` or reduced motion it does not, and nothing here applies. */
+:root { --pin-rate: .5; }
+@media (min-width: 1024px) {
+  @supports (animation-timeline: view()) {
+    /* `overflow: clip` in place of the sheet's `hidden`: hidden makes a scroll container, and a scroll-driven
+       animation inside one measures itself against a box that never scrolls — nothing would move. clip hides
+       the same and makes no container; the rounded frame is cut by the clip-path. */
+    :is(.sec-cover, .sec-hero).is-pinned[data-pin] {
+      overflow: clip;
+      clip-path: inset(var(--hero-inset) var(--pin-x, var(--hero-inset)) round var(--hero-radius)); }
+    :is(.sec-cover, .sec-hero).is-pinned[data-pin] > :is(.sec-media, .sec-banner).is-photo {
+      top: 0; height: 100svh; border-radius: 0;
+      animation-name: pin-slip; animation-duration: auto; animation-timing-function: linear;
+      animation-fill-mode: both; animation-timeline: view(); }
+    .sec-cover.is-narrow.is-pinned[data-pin] { --pin-x: var(--narrow); }
+  }
+}
+@keyframes pin-slip {
+  from { transform: translate3d(0, calc(-1 * (1 - var(--pin-rate)) * 100svh), 0); }
+  to   { transform: translate3d(0, calc((1 - var(--pin-rate)) * 100svh), 0); }
+}
+
 /* A PRODUCT IN A BANNER (2026-11-04) — `.is-object` on the hero's `.sec-banner` or a banner's `.sec-media`: a cut-out
    render (on transparent) is not cropped to fill the frame but stands whole in its upper part, clear of the words
    at the foot. */
@@ -315,11 +351,10 @@ img.sec-banner { object-fit: contain; }
        <a class="link sec-text-link" href="…">Open the A1 guide <i data-icon="arrow-up-right" data-size="20"></i></a>
          or <div class="sec-actions"><a class="btn btn-primary" href="…">…</a> …</div>
      </section>
-   The caps are this kicker's own (asked for 2026-11-04); `.sec-kicker` elsewhere stays in sentence case. */
+   One face with `.sec-kicker` since 2026-11-20 (Michael): body at 14, sentence case — see «KICKER» below. */
 .sec-text { justify-items: center; text-align: center; row-gap: var(--space-16); padding-block: calc(var(--sec-pad) * 1.5); }
 .sec-text > * { grid-column: 1 / -1; margin: 0; }
-.sec-text-kicker { font-size: var(--text-12); line-height: var(--leading-snug); font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--ink); }
+.sec-text-kicker { color: var(--ink); }   /* the face is the kicker's, below; only the colour is its own */
 .sec-text-body { max-width: calc(var(--number-288) * 3); margin-top: var(--space-8); font-size: var(--type-body);
   line-height: var(--leading-relaxed); color: var(--ink-muted); text-wrap: pretty; }
 .sec-text > :is(.sec-text-link, .sec-actions) { margin-top: var(--space-16); }
@@ -364,8 +399,23 @@ img.sec-banner { object-fit: contain; }
    Every column and row is optional. */
 .sec-footer { align-content: start; row-gap: var(--space-48); padding-block: var(--space-64) var(--space-32); }
 .sec-footer-top { display: grid; gap: var(--space-40) var(--grid-gutter); }
+/* ON THE PAGE'S OWN COLUMNS (2026-11-21, Michael) — the footer used to divide its width 2 : 1 : 1 : 1, which
+   left every column standing between the page's columns. From 1024 it sits on the grid itself: the brand takes
+   the first four of the twelve, and the lists begin on columns 5, 8 and 11 — three columns each, and two for
+   the last, whose links are short (2026-11-21, Michael, by his mark-up). From 1920 it is 7 · 5 · 5 · 3 of
+   twenty. Below 1024 it stays two columns, where the grid has too few to divide. */
 @media (min-width: 768px)  { .sec-footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1024px) { .sec-footer-top { grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1024px) {
+  .sec-footer-top { grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr)); }
+  .sec-footer-top > .sec-footer-brand { grid-column: span 4; }
+  .sec-footer-top > .sec-footer-col   { grid-column: span 3; }
+  .sec-footer-top > .sec-footer-col:last-child { grid-column: span 2; }
+}
+@media (min-width: 1920px) {
+  .sec-footer-top > .sec-footer-brand { grid-column: span 7; }
+  .sec-footer-top > .sec-footer-col   { grid-column: span 5; }
+  .sec-footer-top > .sec-footer-col:last-child { grid-column: span 3; }
+}
 .sec-footer-brand { display: grid; gap: var(--space-16); justify-items: start; align-content: start; color: var(--ink-muted); }
 .sec-footer-brand > svg, .sec-footer-brand > a > svg { width: var(--number-32); height: var(--number-32); color: var(--ink); display: block; }
 .sec-footer-col { display: grid; gap: var(--space-12); align-content: start; justify-items: start; }
@@ -407,7 +457,11 @@ img.sec-banner { object-fit: contain; }
    edge — 3 · 1 · 2 on a phone, 4 · 1 · 3 on a tablet — the lead a step down, no full-screen
    height; `.is-flip` puts the picture on the left. */
 .sec-split { align-items: center; }
-.sec-split-text { display: grid; justify-items: start; gap: var(--space-16); max-width: calc(var(--number-288) * 2); }
+.sec-split-text { display: grid; justify-items: start; gap: var(--space-16); max-width: calc(var(--number-288) * 2); min-width: 0; }
+/* min-width: 0 (2026-11-20) — without it one long word (Ukrainian, German) makes the grid track grow to the
+   word and the text runs past the page's edge; the text wraps inside its columns instead. */
+.sec-split-text > * { min-width: 0; overflow-wrap: break-word; }
+.sec-split-pic { min-width: 0; }
 .sec-split-text .sec-actions { margin-top: var(--space-16); }
 .sec-split-pic { display: grid; place-items: center; order: -1; }
 .sec-split-pic > img { width: 100%; max-height: min(72svh, calc(var(--number-288) * 2)); aspect-ratio: 1; object-fit: contain; }
@@ -422,6 +476,14 @@ img.sec-banner { object-fit: contain; }
   .sec-split.is-screen { min-height: 0; }
   .sec-split-text { gap: var(--space-12); }
   .sec-split-text .sec-actions { margin-top: var(--space-8); }
+}
+/* PHONE (2026-11-20, Michael — the A1 landing at 375): two halves side by side clipped the title («Новий картри…»);
+   below 768 the picture is the full width on top and the text under it, whichever side `.is-flip` puts it on. */
+@media (max-width: 767px) {
+  .sec-split > .sec-split-pic,
+  .sec-split.is-flip > .sec-split-pic  { grid-column: 1 / -1; grid-row: 1; }
+  .sec-split > .sec-split-text,
+  .sec-split.is-flip > .sec-split-text { grid-column: 1 / -1; grid-row: 2; margin-top: var(--space-24); }
 }
 /* (2026-10-29) the lead's phone step is the type roles' now (type.css) */
 @media (min-width: 1024px) {
@@ -633,9 +695,14 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
 .sec-faq .panel-fold > * > :last-child { margin-bottom: calc(var(--space-24) - var(--space-2)); }   /* + the list's 12 + the next strip's 22 ≈ 56 from an answer to the next question — as from one closed question to the next */
 .sec-faq .panel-body p + p { margin-top: var(--space-8); }
 
-/* ── KICKER ── the small line over a title. Never caps: muted, semibold, a size up from body. */
-.sec-kicker { font-size: var(--type-title); font-weight: var(--weight-semibold); color: var(--ink-muted); }
-@media (min-width: 1024px) { .sec-kicker { font-size: var(--text-24); } }
+/* ── KICKER (2026-11-20, Michael) ── one face for the small line over a title, wherever it stands: body at 14,
+   in sentence case, at every width. It was 14 → 16 → 24 in sentence case, which read as a second title beside
+   the real one; then caps at 12 with the widest tracking for an afternoon, which read as a label on a form.
+   Body 14 says the line without raising its voice. The colour is all that still differs: muted over a section's
+   title, full ink in a `.sec-text`. */
+.sec-kicker, .sec-text-kicker { font-size: var(--text-14); line-height: var(--leading-relaxed);
+  font-weight: var(--weight-regular); letter-spacing: normal; text-transform: none; }
+.sec-kicker { color: var(--ink-muted); }
 
 /* ── STATEMENT ── one thought, as large as the type goes: 48 → 72 → 96 → 128. */
 .sec-statement { justify-items: center; text-align: center; row-gap: var(--space-16); padding-block: calc(var(--sec-pad) * 1.5); }
@@ -695,23 +762,156 @@ button.panel-title[aria-expanded="true"] .sec-faq-sign { transform: rotate(45deg
                              .fig-card:is(.is-wide, .is-full) { grid-column: span 2; } }
 /* From 1024 two equal columns, 4 page modules each (2026-11-04; was 5 + 7 of the cards' own 12) */
 @media (min-width: 1024px) { .fig-card.is-tall { grid-row: span var(--rows, 2); } }
+/* `--fig-h` (2026-11-21): the height the card was composed at, in whole pixels — a board drawn
+   in Figma is a composition of heights, and a card that finds its own makes a different picture.
+   On its own it is a minimum, so a card never clips its words; with `.is-exact` it is the height,
+   and the card neither grows nor shrinks — that is how a board matches its drawing to the pixel. */
 .fig-card { container-type: inline-size; position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: flex-start; gap: var(--space-8);
-  min-width: 0; padding: var(--space-24); border-radius: var(--sec-card-radius); background: var(--tile); overflow: hidden; }
-@media (min-width: 1024px) { .fig-card { padding: var(--space-32); } }
+  min-width: 0; min-height: var(--fig-h, auto); padding: var(--space-24); border-radius: var(--sec-card-radius); background: var(--tile); overflow: hidden; }
+/* 32 all the way up (2026-11-21, Michael): the card used to take 40 at 1920 through the sheet's
+   own inset, and on a fact board that reads as a frame around the words rather than a card. */
+@media (min-width: 768px) { .fig-card { padding: var(--space-32); } }
 .fig-card::after { content: ''; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
   box-shadow: inset 0 0 0 var(--hairline) var(--tile-edge); }   /* the fill's edge, over a picture too */
 .fig-card > * { margin: 0; position: relative; z-index: 1; }
 .fig-card.has-pic { justify-content: flex-end; min-height: calc(var(--number-288) * 1.5); }
 .fig-card > .fig-pic { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; padding: 0; }
 .fig-kicker { font-size: var(--type-title); line-height: var(--leading-snug); font-weight: var(--weight-semibold); color: var(--ink); }
+/* THE ACCENT IS THE KICKER'S, NOT THE FIGURE'S (2026-11-21, Michael) — a card's heading is the
+   page's ink in every card, and the small line above it is what carries the brand colour. */
+.fig-kicker.is-accent { font-size: var(--type-small); letter-spacing: 0; color: var(--accent-text-bright); }
+/* THE MARK IN A CARD (2026-11-21) — one of the A1's own icons (kit/a1-marks.js) above the fact:
+   `<i data-a1="leak-protection"></i>` first in the card. The card decides the size, not the tag:
+   88 on a fact board, `--fig-mark` for anything else. The stroke stays 1 px at every size —
+   `non-scaling-stroke`, the same rule the interface icons are built on — so a big mark is a
+   bigger drawing rather than a heavier one. */
+.fig-card > .a1-mark { display: block; align-self: flex-start;   /* the card is a flex column: without this an auto-width svg takes the whole row and the drawing centres itself */
+  width: auto; height: var(--fig-mark, var(--number-88));
+  color: var(--ink); margin-bottom: var(--space-16); }
+.fig-card > .a1-mark :is(path, circle, rect, line, polyline, polygon) { vector-effect: non-scaling-stroke; }
+.fig-card.is-bottom > .a1-mark { margin-top: auto; }
 .fig-kicker + .fig-value, .fig-kicker + .fig-pre { margin-top: var(--space-16); }
 .fig-pre { font-size: var(--type-small); line-height: var(--leading-snug); color: var(--ink-muted); }
-.fig-value { white-space: nowrap; font-size: min(var(--type-h1), 15cqi);   /* never wider than its card: 1024's narrow cards (2026-11-04) */
-   line-height: var(--leading-none); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); color: var(--ink); }
-.fig-value small { font-size: .6em; font-weight: var(--weight-medium); letter-spacing: 0; }
+/* ONE SIZE, AND IT WRAPS (2026-11-21, Michael) — the figure used to be `min(h1, 15cqi)`, which
+   made every card's heading a different size (a narrow card shrank its own) and set a phrase
+   nowrap so «Без інструментів» ran out of the card. Now: one step down from the display role
+   (h2, the same in every card), the heading bound by the card, and a line that does not fit
+   wraps to the next — the way the Figma board sets it. The unit keeps the figure's size; only
+   its weight is lighter, so «5 років» reads as one heading rather than two sizes. */
+.fig-value { font-size: var(--type-h2); max-width: 100%; overflow-wrap: break-word; text-wrap: balance;
+   line-height: var(--leading-tight); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); color: var(--ink); }
+.fig-value small { font-size: 1em; font-weight: var(--weight-medium); letter-spacing: 0; }
 .fig-value.is-accent { color: var(--accent-text); }
+/* A FACT SAID IN WORDS (2026-11-21) — `.is-words`. The figure slot holds digits and never wraps,
+   which is right for «2:1» and wrong for «No tools»: a phrase set nowrap runs out of its card.
+   The words keep the figure's size and weight and are allowed to break. The RULE above still
+   stands — digits first; this is for the few cards whose fact has no number in it. */
+.fig-value.is-words { hyphens: none; }   /* kept as a marker: the fact is a phrase, not digits */
+/* A SHORT FIGURE IS SET LARGER (2026-11-21, Michael) — up to five characters, two steps up the
+   type scale: h2 → h1 → display. «2:1», «98 %», «126» are the cards that carry a board, and at
+   the body heading's size they read as a label; «0.0001 мкм» is a measurement and stays where it
+   is. The count is the digits alone — the unit in <small> is not counted — and `section.js` does
+   it, because CSS cannot count characters. */
+.fig-value.is-short { font-size: var(--type-display); }
 .fig-text { margin-top: var(--space-8) !important; max-width: calc(var(--number-288) * 1.5); font-size: var(--type-small);   /* a step under the body (2026-11-04) */
   line-height: var(--leading-relaxed); color: var(--ink-muted); text-wrap: pretty; }
+
+/* ── THE FOUR OPTIONS (2026-11-21, from the A1 landing's three fact boards) ──
+   The card was a figure over a ground; the landing wanted it to carry a render, to put its
+   words at either end of the card, to stand dark on a light page, and — on a few of them —
+   to have water moving behind the words. Each is one class, and they compose.
+
+     WHERE THE WORDS SIT
+       (default)   at the top, the picture under them
+       .is-bottom  at the foot, the picture above them — what `.has-pic` already did, now
+                   said out loud so a card with a slot can do it too
+
+     THE PICTURE — three ways, and only one of them is new
+       (none)      no picture at all: the card is the figure and its line
+       .fig-slot   a picture IN the card's flow, flush to its sides and its near edge, clipped
+                   by the card's own corners. The slot is the thing a Figma component calls
+                   «Картинка (опційно)»: it holds an <img>, a <video> or a `.sec-ph` and keeps
+                   its box whether or not the picture has arrived
+       .has-pic + .fig-pic   the picture FILLS the card and the words sit on it (unchanged)
+
+     LIGHT OR DARK
+       `data-theme="dark"` on the card — the kit's own switch, already in tokens.css. The card
+       paints `--tile` and reads `--ink`, so the attribute is the whole of it: no second set of
+       colors to keep in step, and a dark card on a paper page is the same object, not a copy.
+
+     WATER BEHIND IT
+       `.has-waves` + `<canvas class="fig-wave" data-waves>` — kit/waves.js mounts the sheet of
+       rings on it (the same arithmetic as the passport's ripple and the landing's bench). It is
+       a ground, so it sits under everything and never takes a pointer; with no WebGL, or for a
+       reader who asked for less motion, the canvas stays empty and the card's own `--tile`
+       shows — which is why nothing has to be hidden when it does not run.
+
+     <li class="fig-card is-bottom">
+       <div class="fig-slot"><img src="…" alt=""></div>
+       <p class="fig-value">2:1</p><p class="fig-text">…</p></li>
+
+     <li class="fig-card has-waves is-bottom">
+       <canvas class="fig-wave" data-waves></canvas>
+       <p class="fig-value">2:1</p><p class="fig-text">…</p></li>                                */
+.fig-card.is-bottom { justify-content: flex-end; }
+.fig-card.is-top    { justify-content: flex-start; }
+/* The slot reaches the card's own edges: the card's padding is cancelled on the slot's sides
+   and on whichever end it sits at, so a render is flush with the corner rather than framed by
+   a margin the card never asked for. */
+/* HEIGHT IN WHOLE PIXELS (2026-11-21, Michael: «no fractional block sizes»). An aspect-ratio
+   on a card whose width is a twelfth of 1436 gives 358.67 and a half-pixel seam under the
+   picture; a step off the number scale cannot. `--fig-slot-h` takes any of them. */
+.fig-slot { position: relative; align-self: stretch; overflow: hidden; border-radius: 0;
+  margin-inline: calc(-1 * var(--space-24)); height: var(--fig-slot-h, var(--number-288)); flex: none; }
+.fig-card > .fig-slot:first-child { margin-top: calc(-1 * var(--space-24)); margin-bottom: var(--space-8); }
+.fig-card > .fig-slot:last-child  { margin-bottom: calc(-1 * var(--space-24)); margin-top: var(--space-8); }
+/* WHOLE, NOT CROPPED (2026-11-21, Michael: «a picture across the whole container»). A product
+   render is a cut-out on its own ground: `cover` fills the box by cutting the machine's head
+   off. `contain` gives the picture the whole slot and shows all of it; the card's own plate
+   stands behind it. A photograph that should bleed goes in `.fig-pic`, which fills the card. */
+.fig-slot > :is(img, video) { width: 100%; height: 100%; object-fit: contain; border-radius: 0; }
+.fig-slot > .sec-ph { width: 100%; height: 100%; border-radius: 0; }
+@media (min-width: 1024px) {
+  .fig-slot { margin-inline: calc(-1 * var(--space-32)); }
+  .fig-card > .fig-slot:first-child { margin-top: calc(-1 * var(--space-32)); }
+  .fig-card > .fig-slot:last-child  { margin-bottom: calc(-1 * var(--space-32)); }
+}
+/* A card with a slot is as tall as its parts; only a card whose picture FILLS it needs a floor
+   to stand the words on. */
+.fig-card:has(> .fig-slot) { min-height: 0; }
+/* The water. Transparent to the pointer and under everything: `.fig-card > *` already lifts the
+   words to z-index 1, and the card's edge is drawn over the lot by ::after. */
+.fig-card.has-waves { min-height: calc(var(--number-288) * 1.2); }
+.fig-wave { position: absolute; inset: 0; z-index: 0 !important; display: block; width: 100%; height: 100%;
+  border-radius: inherit; pointer-events: none; }
+
+/* ── TWO COLUMNS THAT STACK (2026-11-21) — `.is-stacked` on the section ──
+   The default grid lays the cards on rows, so two cards side by side are as tall as the
+   taller one and a short card carries dead space. The landing's boards are built the other
+   way: two columns, each card as tall as its own content, the next card starting where the
+   last one ended — what a Figma auto-layout column does, and what the three A1 boards were
+   designed as. The columns are written in the markup — `<ul class="fig-grid"><li class="fig-col">…` —
+   because a balanced CSS-columns flow decides for itself how many cards each column takes,
+   and a board's columns are a composition: which fact stands beside which. */
+@media (min-width: 768px) {
+  /* THE BOARD FILLS ITS BLOCK (2026-11-21, Michael: «no empty space — the columns always fill»).
+     Columns stretch to the tallest one, and inside a short column the cards share what is left,
+     so the board ends on one line instead of a ragged foot. A card grows; it never shrinks
+     below what it holds, and the picture slot keeps its own whole-pixel height. */
+  .sec-figures.is-stacked .fig-grid { display: flex; gap: var(--card-gap); align-items: stretch; }
+  /* `<li class="fig-col"><ul>…cards…</ul></li>` — the column is a list item of the grid and the
+     cards are a list inside it, so the markup stays a list all the way down. */
+  .sec-figures.is-stacked .fig-col { flex: 1 1 0; min-width: 0; }
+  .sec-figures.is-stacked .fig-col > ul { height: 100%; display: flex; flex-direction: column; gap: var(--card-gap);
+    list-style: none; margin: 0; padding: 0; }
+  .sec-figures.is-stacked .fig-col > ul > .fig-card { flex: 1 1 auto; }
+  /* A card drawn at an exact height keeps it: the column's cards were composed to add up, so
+     there is nothing left for them to share. */
+  .sec-figures.is-stacked .fig-col > ul > .fig-card.is-exact { flex: 0 0 auto; height: var(--fig-h); }
+  .sec-figures.is-stacked .fig-card:is(.is-wide, .is-full, .is-tall) { grid-column: auto; grid-row: auto; }
+}
+/* On a phone the two columns are one: the lists unwrap and the cards follow each other. */
+@media (max-width: 767px) { .sec-figures.is-stacked :is(.fig-col, .fig-col > ul) { display: contents; } }
 
 /* ══════════════ NUMBERS (2026-11-04) ══════════════
    `.sec-numbers`: Apple's «Strength in numbers.» — a centred title and figures alone (digits only: a unit's symbol in

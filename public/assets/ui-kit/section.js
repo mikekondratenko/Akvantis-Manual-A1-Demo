@@ -30,6 +30,27 @@
   var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var still = function (el) { if (RM) return true; var m = el && el.closest('[data-motion]'); return !!(m && m.getAttribute('data-motion') === 'off'); };
   [].forEach.call(document.querySelectorAll('section.sec'), function (s) { if (still(s)) s.classList.add('is-still'); });
+  /* ── A SHORT FIGURE (2026-11-21) ──
+     `.fig-value` with five characters or fewer gets `.is-short`, and section.css sets it two
+     steps larger. The count is the figure itself: the unit in <small> and the spaces around it
+     are left out, so «98 %» counts two and «2.0 L/min» counts three. Re-run it after writing a
+     figure from a script: `Section.shortFigures(root)`. */
+  function shortFigures (root) {
+    var list = (root || document).querySelectorAll('.fig-value');
+    for (var i = 0; i < list.length; i++) {
+      var el = list[i], text = '';
+      for (var j = 0; j < el.childNodes.length; j++) {
+        var n = el.childNodes[j];
+        if (n.nodeType === 1 && n.tagName === 'SMALL') continue;
+        text += n.textContent || '';
+      }
+      el.classList.toggle('is-short', text.replace(/\s+/g, '').length <= 5);
+    }
+  }
+  shortFigures();
+  window.Section = window.Section || {};
+  window.Section.shortFigures = shortFigures;
+
   (function lockups() {
     var D = {}; (window.DEVICES || []).forEach(function (d) { if (d.svg && !D[d.code]) D[d.code] = d.svg; });
     [].forEach.call(document.querySelectorAll('.sec-lockup[data-device]'), function (el) {
@@ -108,10 +129,11 @@
      to full size once it has risen 80 % of a window — only on the way in: once open it stays open, going out
      or scrolling back changes nothing (2026-11-04). Nothing runs on a timer. The whole sheet scales, words and all, so
      nothing ever stands outside the frame. The words still come in one by one (REVEAL). Under reduced motion
-     or data-motion="off" the banners stand still. */
+     or data-motion="off" the banners stand still. A pinned banner is left out (2026-11-20): its picture is
+     a window tall, and the scrub mask, which cuts from the element's own middle, would cut it to pieces. */
   (function scrub() {
     if (RM) return;
-    var els = [].filter.call(document.querySelectorAll('section.sec-cover, section.sec-hero'), function (s) { return !still(s); });
+    var els = [].filter.call(document.querySelectorAll('section.sec-cover:not(.is-pinned), section.sec-hero:not(.is-pinned)'), function (s) { return !still(s); });
     if (!els.length) return;
     els.forEach(function (s) { s.classList.add('is-scrub'); });
     var min = function () { return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--scrub-min')) || 0.8; };
@@ -131,6 +153,16 @@
     var ask = function () { if (!ticking) { ticking = true; requestAnimationFrame(draw); } };
     addEventListener('scroll', ask, { passive: true }); addEventListener('resize', function () { m = min(); ask(); });
     draw();
+  })();
+  /* PINNED PICTURE (2026-11-20, Michael) — an option a banner asks for by class: `.is-pinned` on a `.sec-cover`
+     or the hero. Nothing runs on the scroll: section.css moves the picture with a scroll-driven
+     animation, at half the page's speed (`--pin-rate`). All that is done here is the mark the CSS waits for, so
+     that under reduced motion or data-motion="off" the picture stays the picture it always was. */
+  (function pinned() {
+    if (RM) return;
+    [].forEach.call(document.querySelectorAll('.sec-cover.is-pinned, .sec-hero.is-pinned'), function (s) {
+      if (!still(s)) s.setAttribute('data-pin', '');
+    });
   })();
   /* MARK (2026-11-04) — the Akvantis mark in the header and the footer: on a hover (or a key's focus) the ring
      stays and the wave rises out through the ring's inside while the same wave comes up from below, through a
