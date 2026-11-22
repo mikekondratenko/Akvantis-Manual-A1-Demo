@@ -1470,3 +1470,28 @@ body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--numb
 .ph-fill :is(.plate, .tile, .story, .slide, .review, .compare-pic, .choice, .fig-card) .sec-ph { box-shadow: none; }
 
 :is(.sec-hero, .sec-cover)::before { box-shadow: inset 0 0 0 var(--hairline) var(--tile-edge); }   /* the hero's and the cover's grey sheet, too */
+
+/* ══════════════ MOBILE FOLD (2026-11-22, Michael) ══════════════
+   A section that folds under its name on a phone — `data-mfold` on the section, mobile-fold.js wraps it (the opening
+   is accordion.js). The kit's line plate: no fill, no corners, no outline — a divider under each fold (and over the
+   first of a run), its name at 20, a large plus that turns to a cross. Every row inside starts on the page's own line:
+   the strip does not bleed out, the body has no inset of its own, and a FAQ inside is aligned the same way. A folded
+   section loses its padding and its rounded sheet, so the folds stand one under the other as a list. */
+@media (max-width: 767px) {
+  .sec.has-mfold { padding-block: 0 !important; border-radius: 0 !important; overflow: visible; }
+  .mfold { grid-column: 1 / -1; min-width: 0; padding-inline: 0; border-bottom: 1px solid var(--rule); }
+  .plate.is-line.mfold { border-radius: 0; }
+  .has-mfold.is-mfold-first > .mfold { border-top: 1px solid var(--rule); }   /* the first of a run (mobile-fold.js: the section shown before it is not a fold) */
+  .mfold > button.panel-title { width: 100%; margin-inline: 0; padding-inline: 0; }
+  .mfold > button.panel-title, .mfold > button.panel-title:hover { background: none !important; }
+  .mfold > button.panel-title > .mfold-name { font-size: var(--text-20); font-weight: var(--weight-medium); color: var(--ink); }   /* over a FAQ's own 16 */
+  .mfold-sign { width: var(--number-24); height: var(--number-24); color: var(--ink); }
+  .mfold > .panel-fold > .panel-body { min-width: 0; padding-inline: 0; }
+  .mfold > .panel-fold > .panel-body > .sec-head h2 { display: none; }
+  .mfold > .panel-fold > .panel-body > .sec-head { margin-bottom: var(--space-16); }
+  /* a FAQ inside: its questions on the same line, no lit plate under a touched one */
+  .mfold .sec-faq-list { gap: 0; }
+  .mfold .sec-faq-list > .plate { margin-inline: 0; padding-inline: 0; }
+  .mfold .sec-faq-list > .plate > button.panel-title { width: 100%; margin-inline: 0; padding-inline: 0; background: none !important; }
+  .mfold .sec-faq-list > .plate.is-line { background: none !important; }
+}
