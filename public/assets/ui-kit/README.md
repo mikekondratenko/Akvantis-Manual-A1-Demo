@@ -54,6 +54,8 @@ ui-kit/kit/           →  <project>/public/assets/ui-kit/
 ├── hotspot.css  the "+" in a black disc on a picture — a button that opens more; requires tokens.css
 ├── button.css   the one button, tools and pages alike — color from the --btn role; requires tokens.css
 ├── segmented.css the segmented tabs (Kit.segmented) — kit.css @imports it; a page links it alone
+├── calendar.css the date picker's popover (.cal) — the look of kit.css «CALENDAR», for a page without kit.css (2026-11-22)
+├── calendar.js  the date picker on its own: input[data-calendar], DD.MM.YYYY, typeable; window.KitCalendar (parse, iso, bind) (2026-11-22)
 ├── progress.css the progress plate (Kit.progress) — Figma Progress Bar; kit.css @imports it
 ├── status.css   status pills (.status-pill) and alert banners (.alert), by data-tone; kit.css @imports it
 ├── chips.css    a row of filters (.chips .chip, aria-pressed) and the EDGE FADE rule (.edge-fade) — whatever

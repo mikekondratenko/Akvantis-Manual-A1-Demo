@@ -1,0 +1,47 @@
+/* calendar.css — the kit's date picker (calendar.js), on its own (2026-11-22). The same look as kit.css «CALENDAR»
+   (Kit.calendar, the builder's), for pages that do not link kit.css. The ramp's colours, so it is right on either
+   theme: on paper the popover is the light grey the kit's dropdown list is (field.css «suggest-list»).
+
+   A month on a popover, anchored under the field it fills. A date typed as `07.05.2026` is 7 May and 5 July in the
+   same characters; a grid with the weekday letters over it can only be read one way. */
+.cal {
+  position: absolute; z-index: 60; width: 288px;
+  background: var(--black-800); border: 1px solid var(--black-600);
+  border-radius: var(--radius-12); padding: var(--space-12);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-primary);
+}
+[data-theme="light"] .cal { border-color: var(--black-400); }
+.cal[hidden] { display: none; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); margin-bottom: var(--space-12); }
+/* the month is the label, centred, so the two arrows sit at the edges */
+.cal-title { flex: 1 1 auto; text-align: center; color: var(--white); font-size: var(--type-small); font-weight: var(--weight-semibold); }
+.cal-nav {
+  flex: 0 0 auto; width: 32px; height: 32px; display: grid; place-items: center;
+  background: transparent; border: 0; border-radius: 50%;
+  color: var(--black-250); cursor: pointer; transition: background var(--duration-fast), color var(--duration-fast);
+}
+.cal-nav:hover { background: var(--black-700); color: var(--white); }
+.cal-nav:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.cal-nav:disabled { opacity: .3; cursor: default; background: none; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+/* the weekday row is a ruler for the grid under it — muted */
+.cal-dow { height: 28px; display: grid; place-items: center; color: var(--ink-faint); font-size: var(--type-caption); font-weight: var(--weight-medium); }
+/* a circle, not a rounded box: the mark is 36 square, centred in its column, the same shape on every weekday */
+.cal-day {
+  width: 36px; height: 36px; margin: 0 auto; display: grid; place-items: center;
+  background: transparent; border: 0; border-radius: 50%;
+  color: var(--white); font-family: inherit; font-size: var(--type-small); font-weight: var(--weight-medium);
+  font-variant-numeric: tabular-nums; cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+.cal-day:hover { background: var(--black-700); }
+.cal-day:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* the days either side of the month are drawn, greyed: a grid that starts mid-row reads as broken */
+.cal-day.is-out { color: var(--black-450); }
+/* today is outlined, the chosen day filled — two statements a person must tell apart on the same cell */
+.cal-day.is-today { box-shadow: inset 0 0 0 1px var(--black-400); }
+.cal-day.is-on, .cal-day.is-on:hover { background: var(--accent); color: var(--accent-ink); }
+/* after today when the field asks for a past date (data-calendar-max="today") */
+.cal-day.is-off, .cal-day.is-off:hover { color: var(--black-450); background: none; cursor: default; opacity: .5; }
+@media (prefers-reduced-motion: reduce) { .cal-nav, .cal-day { transition: none; } }
