@@ -110,14 +110,16 @@
     var word = function (b) { return b.querySelector(':scope > span') || b; };
     /* The prices are written in € (data-price). form[data-currency="UAH"][data-rate="48"] shows them in
        hryvnia — times the rate, whole, «23 760 грн» (2026-10-26: the Ukrainian version). */
-    var cur = form.dataset.currency || 'EUR', rate = +form.dataset.rate || 1;
+    /* the rate is read each time (2026-11-22): a page may fill it in after this runs (the landing's local preview put
+       {{rate}} in at load, after us, and the bar counted € as hryvnia one to one) */
+    var cur = form.dataset.currency || 'EUR', rateOf = function () { return +form.dataset.rate || 1; };
     var eur = function (n) { if (n == null) return cur === 'EUR' ? '€ ···' : '··· ' + cur;
-      var v = n * rate, whole = cur !== 'EUR';   /* € always with its cents — «€495.00» (2026-10-26); hryvnia whole */
+      var v = n * rateOf(), whole = cur !== 'EUR';   /* € always with its cents — «€495.00» (2026-10-26); hryvnia whole */
       if (cur === 'EUR') return (v < 0 ? '−' : '') + '€' + Math.abs(v).toFixed(2);   /* «€627.00» in every language, as the cards are written (2026-10-29: Ukrainian gave «627,00 €») */
       return new Intl.NumberFormat(lang, { style: 'currency', currency: cur, currencyDisplay: cur === 'EUR' ? 'narrowSymbol' : 'symbol',   /* «395 €», not «395 EUR» */
         minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }).format(whole ? Math.round(v) : v); };
     /* RULE (2026-10-29): a struck price is just the number — never € or грн; the price beside it says the currency. */
-    var num = function (n) { var v = n * rate; return cur === 'EUR' ? v.toFixed(2) : new Intl.NumberFormat(lang, { maximumFractionDigits: 0 }).format(Math.round(v)); };
+    var num = function (n) { var v = n * rateOf(); return cur === 'EUR' ? v.toFixed(2) : new Intl.NumberFormat(lang, { maximumFractionDigits: 0 }).format(Math.round(v)); };
     var dock = document.getElementById(form.id + '-dock');
     var alt = form.querySelector('input[data-alt]');
     var steps = function () { return $$(form, '.order-step:not([hidden])'); };
@@ -212,7 +214,12 @@
       if (!on) steps().forEach(function (s) {
         $$(s, 'input:checked:not(:disabled):not([data-alt])').filter(live).forEach(function (i) {
           var card = i.closest('.choice'); if (!card) return;
-          var ps = $$(card, '.choice-pic'); if (!ps.length) return;
+          var ps = $$(card, '.choice-pic');
+          /* a card with no picture can name one for the bar: data-dock-pic="…src" (AKVANTIS service: the van), or
+             data-dock-mark — its own sign (.choice-mark: a partner's mark, dark and light) (2026-11-22) */
+          if (!ps.length && card.dataset.dockPic) { var im = document.createElement('img'); im.src = card.dataset.dockPic; im.alt = ''; ps = [im]; }
+          if (!ps.length && 'dockMark' in card.dataset) ps = $$(card, '.choice-mark').slice(0, 1);
+          if (!ps.length) return;
           items.push({ pics: ps, n: 1, name: label(i) });
           var w0 = wasOf(card); if (w0) was += w0 - (+card.dataset.price || 0); }); });
       $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return;
