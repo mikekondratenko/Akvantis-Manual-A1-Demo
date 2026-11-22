@@ -1487,6 +1487,13 @@ body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--numb
   .mfold > button.panel-title > .mfold-name { font-size: var(--text-20); font-weight: var(--weight-medium); color: var(--ink); }   /* over a FAQ's own 16 */
   .mfold-sign { width: var(--number-24); height: var(--number-24); color: var(--ink); }
   .mfold > .panel-fold > .panel-body { min-width: 0; padding-inline: 0; }
+  /* a closed fold paints nothing (2026-11-23, iPhone): the fold's 0-high overflow does not clip what Safari draws on
+     layers of its own — the card galleries that scroll sideways, pictures with a transform — and on the way back up
+     they came out over the page, cards over banners. Closed: hidden once the fold has shut (the visibility waits for
+     the close to finish); open or opening: painted, with the paint held inside the fold. */
+  .mfold > .panel-fold { position: relative; }
+  .mfold > .panel-fold > * { contain: paint; }
+  .mfold > .panel-fold[data-open="false"] > * { visibility: hidden; transition: visibility 0s linear var(--duration-slow); }
   .mfold > .panel-fold > .panel-body > .sec-head h2 { display: none; }
   .mfold > .panel-fold > .panel-body > .sec-head { margin-bottom: var(--space-16); }
   /* a FAQ inside: its questions on the same line, no lit plate under a touched one */
