@@ -203,7 +203,27 @@
           pick = first && first.querySelector('input:checked:not(:disabled):not([data-alt])');
       /* HIDDEN UNTIL THE FORM IS TOUCHED (2026-11-04): a choice made by default (the A1's colour) does not bring the bar
          up — only the visitor's own first act in the form does (a tap, a key, Next); a reset hides it again. */
-      var chosen = ('touched' in form.dataset) && (on ? counted(first).length > 0 : !!pick);
+      /* EVERYTHING CHOSEN (2026-11-22, evening): the bar shows every card taken in the form — the A1's colour, the bundle
+         with its tap, each counted cartridge — not the product step's alone (a tap chosen in the form did not show).
+         A picture that a later card shows again goes (data-dock-key, else data-device-pic: the colour's A1 gives way to
+         the bundle's, which already wears that colour). With the alternative on (filters only) the counts alone. */
+      var wasOf = function (el) { var w = el && el.querySelector('.choice-was'); return w ? +(w.dataset.was || w.textContent.replace(/[^\d.]/g, '')) || 0 : 0; };   /* data-was: the struck price in € */
+      var items = [], was = 0;
+      if (!on) steps().forEach(function (s) {
+        $$(s, 'input:checked:not(:disabled):not([data-alt])').filter(live).forEach(function (i) {
+          var card = i.closest('.choice'); if (!card) return;
+          var ps = $$(card, '.choice-pic'); if (!ps.length) return;
+          items.push({ pics: ps, n: 1, name: label(i) });
+          var w0 = wasOf(card); if (w0) was += w0 - (+card.dataset.price || 0); }); });
+      $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return;
+        var i = c.querySelector('input[type=number]'), n = +i.value || 0; if (!n) return;
+        items.push({ pics: $$(c, '.choice-pic').slice(0, 1), n: n, name: label(i) });
+        var w = wasOf(c); if (w) was += (w - (+c.dataset.price || 0)) * n; });
+      var keyOf = function (p) { return p.dataset.dockKey || p.dataset.devicePic || ''; }, later = {};
+      for (var ii = items.length - 1; ii >= 0; ii--) {
+        items[ii].pics = items[ii].pics.filter(function (p) { var k = keyOf(p); if (!k) return true; if (later[k]) return false; later[k] = 1; return true; });
+        if (!items[ii].pics.length) items.splice(ii, 1); }
+      var chosen = ('touched' in form.dataset) && (on ? counted(first).length > 0 : !!pick || items.length > 0);
       if (dock) { dock.classList.toggle('is-on', chosen); document.body.classList.toggle('has-dock', chosen); }
       var sum = 0, open = false, off = 0, kg = 0, ship = 0;   /* off: the discounts taken (a negative data-price — trade-in); kg: data-kg of what is chosen; ship: the delivery's price */
       $$(form, 'input:checked:not(:disabled):not([data-alt])').filter(live).forEach(function (i) {
@@ -244,16 +264,11 @@
          «2×» on a picture when there are more than one — and the total, with the price it would have
          been (the struck prices of the cards, the trade-in and a code put back) struck small over it.
          No words: the steps and the summary say them. Each picture names itself (alt) for a reader. */
-      var items = [], was = 0;
-      var wasOf = function (el) { var w = el && el.querySelector('.choice-was'); return w ? +(w.dataset.was || w.textContent.replace(/[^\d.]/g, '')) || 0 : 0; };   /* data-was: the struck price in € */
-      if (!on && pick) { var card = pick.closest('.choice');
-        if (card) { items.push({ pics: $$(card, '.choice-pic'), n: 1, name: label(pick) }); var w0 = wasOf(card); if (w0) was += w0 - (+card.dataset.price || 0); } }
-      $$(form, '.choice.is-count.is-on').forEach(function (c) { if (c.closest('[hidden]')) return;
-        var i = c.querySelector('input[type=number]'), n = +i.value || 0; if (!n) return;
-        items.push({ pics: $$(c, '.choice-pic').slice(0, 1), n: n, name: label(i) });
-        var w = wasOf(c); if (w) was += (w - (+c.dataset.price || 0)) * n; });
       var holder = dock.querySelector('.order-dock-pics'); holder.innerHTML = '';
-      items.forEach(function (it) { it.pics.forEach(function (p, k) {
+      /* a plus between the pictures — A1 + K1 + 2× I (2026-11-22, evening) */
+      var plus = function () { var x = document.createElement('span'); x.className = 'order-dock-plus'; x.setAttribute('aria-hidden', 'true');
+        x.innerHTML = window.KitIcons ? KitIcons.svg('plus', { size: 12 }) : '<i data-icon="plus" data-size="12"></i>'; holder.appendChild(x); };
+      items.forEach(function (it) { it.pics.forEach(function (p, k) { if (holder.firstChild) plus();
         var box = document.createElement('span'); box.className = 'order-dock-item';
         var c = p.cloneNode(true); c.removeAttribute('id'); if (c.tagName === 'IMG') c.alt = it.name; box.appendChild(c);
         if (it.n > 1 && k === 0) { var b = document.createElement('b'); b.className = 'order-dock-n'; b.textContent = it.n + '×'; box.appendChild(b); }
@@ -262,6 +277,9 @@
       if (nameEl2) nameEl2.textContent = ''; if (subEl) subEl.textContent = '';
       var total = dock.querySelector('[data-dock="total"]');
       total.textContent = open ? eur(null) : eur(sum); total.classList.toggle('order-tbd', open);
+      /* only the colour so far (no product, nothing priced): no «0 грн» — the sum waits for the product (2026-11-22) */
+      var unpriced = !on && !pick && !open && !sum;
+      if (unpriced) { total.textContent = ''; dock.querySelector('[data-dock="total-sub"]').textContent = ''; return; }
       var before = sum - off + was;   /* off is negative: the trade-in, a code */
       var tsub = dock.querySelector('[data-dock="total-sub"]');
       if (open) tsub.textContent = T('price on request');

@@ -1428,6 +1428,8 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
    «2×» small at a picture's top right when there are more than one. */
 .order-dock-pics { display: flex; align-items: center; gap: var(--space-8); flex: 1; min-width: 0; overflow: hidden; padding: var(--space-4) var(--space-8) var(--space-4) 0; }   /* 4 over and under: room for the «2×» and the picture on the bar's middle (2026-11-04) */
 .order-dock-item { position: relative; flex: none; }
+.order-dock-plus { flex: none; display: flex; color: var(--ink-muted, currentColor); opacity: .6; }   /* between the pictures (2026-11-22) */
+.order-dock-plus > svg { width: 12px; height: 12px; }
 .order-dock-item > :first-child { display: block; width: var(--number-32); height: var(--number-32);   /* 32 (2026-11-04; was 48) */ object-fit: contain; max-height: none;
   padding: 0; background: none; }   /* the picture alone, no plate (2026-10-29) */
 .order-dock-item > .sec-ph { padding: 0; background: none; box-shadow: none; }
