@@ -1300,6 +1300,7 @@ img.slide-media.is-object { object-fit: contain; padding: 12% 20% 16%; }
    down a dropdown or a Nova Poshta list under a field near the step's foot drops past it, not cut. */
 .order-step .panel-fold[data-open="true"] > * { animation: order-unclip 0s linear var(--duration-slow) forwards; }
 @keyframes order-unclip { to { overflow: visible; } }
+@keyframes mfold-unclip { to { overflow: visible; contain: none; } }
 /* On paper (2026-10-30) the step plates and the payment islands are white with a light edge (--plate-edge),
    so the grey rows and the white cards inside read against them; on dark --plate-edge is not set. */
 [data-theme="light"] .order-steps { --tile: #FFFFFF; }
@@ -1494,6 +1495,9 @@ body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--numb
   .mfold > .panel-fold { position: relative; }
   .mfold > .panel-fold > * { contain: paint; }
   .mfold > .panel-fold[data-open="false"] > * { visibility: hidden; transition: visibility 0s linear var(--duration-slow); }
+  /* …and once a fold is down it clips nothing (as an open order step, «order-unclip»): the taps' galleries are strips that
+     scroll sideways, and inside a clipping box Safari kept drawing them, and the banner over them, where they had been */
+  .mfold > .panel-fold[data-open="true"] > * { animation: mfold-unclip 0s linear var(--duration-slow) forwards; }
   .mfold > .panel-fold > .panel-body > .sec-head h2 { display: none; }
   .mfold > .panel-fold > .panel-body > .sec-head { margin-bottom: var(--space-16); }
   /* a FAQ inside: its questions on the same line, no lit plate under a touched one */
