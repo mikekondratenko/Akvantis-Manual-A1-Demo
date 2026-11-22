@@ -196,7 +196,11 @@
       if (window.Choice) Choice.sync(form);
       steps().forEach(function (s) { var v = s.querySelector('.order-step-val'); if (v) v.innerHTML = stepVal(s, true); });
 
-      var first = steps()[0], pick = first && first.querySelector('input:checked:not(:disabled):not([data-alt])');
+      /* THE PRODUCT'S STEP (2026-11-22): the bar shows what was chosen in the step that holds the product — the one with the
+         alternative (data-alt), or one marked data-dock, else the first. The A1 landing's form opens with the colour now, and
+         the bar showed the colour's picture: never the bundle with its tap, and with only cartridges it did not come up. */
+      var first = (alt && alt.closest('.order-step')) || form.querySelector('.order-step[data-dock]') || steps()[0],
+          pick = first && first.querySelector('input:checked:not(:disabled):not([data-alt])');
       /* HIDDEN UNTIL THE FORM IS TOUCHED (2026-11-04): a choice made by default (the A1's colour) does not bring the bar
          up — only the visitor's own first act in the form does (a tap, a key, Next); a reset hides it again. */
       var chosen = ('touched' in form.dataset) && (on ? counted(first).length > 0 : !!pick);
