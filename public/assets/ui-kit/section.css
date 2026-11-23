@@ -1486,6 +1486,7 @@ body.has-dock .sec-footer, body.has-dock .foot { padding-bottom: calc(var(--numb
   .mfold > button.panel-title { width: 100%; margin-inline: 0; padding-inline: 0; }
   .mfold > button.panel-title, .mfold > button.panel-title:hover { background: none !important; }
   .plate.is-line.mfold, .plate.is-line.mfold:has(> button.panel-title:hover) { background: none; }   /* no grey sheet under a touched fold: a tap leaves :hover on (iPhone) */
+  .mfold:has(> .panel-fold[data-open="true"]) { border-bottom-color: transparent; }   /* open, the fold ends with its content: no rule under it (Michael, 12:39) */
   .mfold.rv-c { opacity: 1 !important; transform: none !important; transition: none !important; }   /* a fold in a banner is not a word to reveal: sliding in, its rule stood 24 px off the one above */
   .mfold > button.panel-title > .mfold-name { font-size: var(--text-20); font-weight: var(--weight-medium); color: var(--ink); }   /* over a FAQ's own 16 */
   .mfold-sign { width: var(--number-24); height: var(--number-24); color: var(--ink); }
